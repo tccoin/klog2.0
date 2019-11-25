@@ -70,5 +70,7 @@ typings/
 pan/
 
 # app data
+settings.json
+index.html
 certs/
 doc/
