@@ -12,7 +12,7 @@ let staticDir = isDev ? __dirname : buildDir;
 fs.readFile('settings.json', 'utf8', (err, data) => {
   let settings;
   if (err) {
-    console.log('appId and appKey are not set in `settings.json`.');
+    console.log('settings.json not found.');
     settings = {
       appId: "",
       appKey: ""

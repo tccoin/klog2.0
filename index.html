@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-Hans">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Klog</title>
+  <meta name="description" content="Share everything.">
+  <meta charset="utf-8">
+
+  <!-- Web App -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#212121" id="themeColor">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- For Apple -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Klog">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Klog">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="bookmark" href="/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="/static/img/klog/klogapple.png">
+  <link rel="apple-touch-icon-precomposed" href="/static/img/klog/klogapple.png">
+
+  <!-- For Android -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!--Style-->
+  <style>
+    html {
+      height: 100%;
+      width: 100%;
+      background-color: #000;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Source Han Sans CN", "Source Han Sans SC", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 100%;
+      width: 100%;
+      overscroll-behavior-y: none;
+    }
+
+    body[unresolved] klog-app {
+      display: none;
+    }
+
+    body:not([unresolved])>.splash-container {
+      display: none;
+    }
+
+    body>.splash-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body>.splash-container h1 {
+      font-size: 20vw;
+      font-weight: lighter;
+      color: rgba(0, 0, 0, .87);
+    }
+
+    body>.splash-container sup {
+      font-size: .5em;
+      color: rgba(0, 0, 0, .54);
+    }
+
+    #statusbarFix,
+    #statusbarFixBackground {
+      display: block;
+      width: 100vw;
+      height: 100px;
+      position: fixed;
+      left: 0;
+      top: -100px;
+      transition: all .25s ease;
+    }
+
+    #statusbarFix {
+      z-index: 1000001;
+    }
+
+    #statusbarFixBackground {
+      z-index: 1000000;
+      background-color: var(--klog-statusbar-color, #000);
+      opacity: var(--klog-statusbar-opacity, 1);
+    }
+
+    @media(max-width: 767px) {
+      body>.splash-container h1 {
+        font-size: 20vh;
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+
+<body unresolved>
+  <div id="statusbarFix"></div>
+  <div id="statusbarFixBackground"></div>
+  <!-- Main View -->
+  <klog-app></klog-app>
+
+  <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="node_modules/@webcomponents/html-imports/html-imports.min.js"></script>
+  <!-- <script src="bower_components/webcomponentsjs/webcomponents-hi-ce.js"></script> -->
+  <script src="https://c.lcfile.com/static/js/3.11.1/av-min.js"></script>
+  <script type="module">
+    window.WebComponents = window.WebComponents || {
+      waitFor(cb) { addEventListener('WebComponentsReady', cb) }
+    }
+    WebComponents.waitFor(async () => {
+      // LeanCloud
+      // appId and appKey will be replaced by app.js
+      const appId = '$GLOBAL_APPID';
+      const appKey = '$GLOBAL_APPKEY';
+      AV.init({
+        appId, appKey,
+        serverURLs: 'https://us.leancloud.cn'
+      });
+
+      //serviceWorker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js');
+      }
+      HTMLImports.loadImports(document.body);
+
+      //resolve
+      document.body.removeAttribute('unresolved');
+    });
+  </script>
+  <link rel="import" href="/src/klog-app.html" />
+</body>
+
+</html>
