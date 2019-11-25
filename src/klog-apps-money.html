@@ -1,0 +1,193 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="klog-style-layout.html">
+<link rel="import" href="klog-style-card.html">
+<link rel="import" href="klog-icons.html">
+<dom-module id="klog-apps-money">
+  <template>
+    <style include="klog-style-layout"></style>
+    <style include="klog-style-card"></style>
+    <style>
+      :host {
+        display: block;
+        min-height: 100vh;
+        padding: 64px 0 32px;
+        background-color: var(--klog-page-background);
+      }
+
+      app-header {
+        --primary-text-color: #FFF;
+        --secondary-text-color: #FFF;
+        --primary-background-color: var(--paper-indigo-700);
+        --secondary-background-color: var(--paper-indigo-500);
+        --header-text-color: #FFF;
+        overflow: hidden;
+        box-shadow: 0 4px 4px rgba(0, 0, 0, .3);
+      }
+
+      .form {
+        max-width: 720px;
+        margin: 32px auto;
+        padding: 32px;
+      }
+
+      paper-input:first-child {
+        margin-top: 0 !important;
+      }
+
+      paper-dialog {
+        overflow-y: auto;
+        min-width: 350px;
+      }
+
+      paper-toast em {
+        color: var(--paper-yellow-500);
+        font-style: normal;
+      }
+    </style>
+    <app-header fixed>
+      <app-toolbar>
+        <div class="title">
+          <div main-title>销售报告生成</div>
+        </div>
+        <paper-button on-click="process" raised>
+          <iron-icon icon="save"></iron-icon>
+          生成
+        </paper-button>
+      </app-toolbar>
+    </app-header>
+    <app-localstorage-document key="number" data="{{number}}"></app-localstorage-document>
+    <app-localstorage-document key="messages" data="{{messages}}"></app-localstorage-document>
+    <div class="form klog-card">
+      <paper-input label="总数" value="{{number}}"></paper-input>
+      <paper-textarea label="微信消息" value="{{messages}}" placeholder="在这里粘贴">
+        <paper-textarea>
+    </div>
+
+    <paper-toast id="lengthErrorToast" text="你输入的微信消息多或少于{{number}}条…数据很可能出错"></paper-toast>
+    <paper-toast id="formatErrorToast">第{{errorMessage}}条<em>{{errorStore}}</em>店铺没有<em>{{errorLine}}</em>信息
+    </paper-toast>
+
+    <paper-dialog id="resultDialog" with-backdrop>
+      <h2>新鲜业绩出炉！</h2>
+      <paper-textarea value="{{resultText}}"></paper-textarea>
+    </paper-dialog>
+
+  </template>
+
+  <script>
+    class KlogAppsMoney extends Polymer.Element {
+
+      static get is() { return 'klog-apps-money'; }
+
+      ready() {
+        super.ready();
+        this.total = this.total || 0;
+        this.messages = this.messages || '';
+        this._int = setInterval(() => {
+          let htmlTheme = document.querySelector('html').getAttribute('theme');
+          if (htmlTheme) {
+            document.querySelector('html').setAttribute('theme', htmlTheme + ' custom');
+            document.querySelector('html').style.background = 'var(--paper-indigo-700)';
+            document.querySelector('#statusbarFix').style.background = '#303FA0';
+            document.querySelector('#statusbarFix').style.opacity = 1;
+            clearInterval(this._int);
+          }
+        }, 10);
+      }
+
+      process() {
+        // get the brands
+        let re = /店铺名称：/g;
+        let brands = [];
+        let brand;
+
+        this.messages = this.messages.replace(/:|;|；/g, "：");
+
+        while (brand = re.exec(this.messages)) {
+          brands.push(brand[0]);
+        }
+        // console.log(brands);
+
+        // split the messages
+        let messages = this.messages.split(re);
+        //console.log(messages);
+        messages.shift();
+        if (messages.length != this.number) return this.$.lengthErrorToast.show();
+
+        // parse the data
+        let result = [];
+        let dataArray = [];
+        for (let i = 0; i < messages.length; i++) {
+          let message = messages[i];
+          let data = this.parse(messages[i]);
+          console.log(data);
+          if (!Array.isArray(data[1])) {
+            this.errorMessage = i + 1;
+            this.errorLine = data[1].replace('：', '');
+            this.errorStore = data[0];
+            return this.$.formatErrorToast.show();
+          }
+          if (result.length > 0) result = data[1].map((a, j) => a + result[j]);
+          else result = data[1];
+          dataArray.push(data);
+        };
+
+        // concat the result
+        // ${Math.floor(result[2] / this.total * 100)}%
+        this.resultText = `蔡翰炜区域汇总${this.number}家（H8J3M2）
+当日销售：${result[0]}
+当日销售件数：${result[1]}
+月目标：${result[2]}
+月销售：${result[3]}
+月达成：${Math.floor(result[3] / result[2] * 100)}%
+月同期销售：${result[4]}
+月同比：${Math.floor(result[3] / result[4] * 100) - 100}%
+年销售：${result[5]}
+年同期销售：${result[6]}
+年同比：${Math.floor(result[5] / result[6] * 100) - 100}%`;
+        //         dataArray.map((data, i) => this.resultText += `
+
+        // ${brands[i]}${data[0]}
+        // 当天销售：${data[1][0]} 排名：${data[1][1]}
+        // 月累计：${data[1][2]}
+        // 年累计：${data[1][3]}
+        // 新增VIP人数：${data[1][5]}`);
+        this.$.resultDialog.open();
+      }
+
+      parse(str) {
+        let dlc = [
+          ["今日完成：", "\n"],
+          ["今日销售件数：", "\n"],
+          ["店铺月指标：", "\n"],
+          ["店铺月完成销售：", "\n"],
+          ["店铺月同期金额：", "\n"],
+          ["店铺年销售金额：", "\n"],
+          ["店铺年同期金额：", "\n"],
+        ];
+        let data = [];
+        let shop = str.substr(0, str.indexOf("\n"));
+        for (let i = 0; i < dlc.length; i++) {
+          if (str.indexOf(dlc[i][0]) == -1) {
+            return [shop, dlc[i][0]];
+          }
+          let start = str.indexOf(dlc[i][0]) + dlc[i][0].length;
+          let stop = start + 1 + str.substr(start + 1).indexOf(dlc[i][1]);
+          data[i] = parseInt(str.substr(start, stop - start)) || 0;
+        }
+        return [shop, data];
+      }
+
+    }
+
+    window.customElements.define(KlogAppsMoney.is, KlogAppsMoney);
+  </script>
+
+</dom-module>

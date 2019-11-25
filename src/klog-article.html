@@ -1,0 +1,382 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="klog-style-layout.html">
+<link rel="import" href="klog-style-card.html">
+<link rel="import" href="klog-markdown.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-data-article.html">
+<link rel="import" href="klog-data-image.html">
+<link rel="import" href="klog-render-timestamp.html">
+<dom-module id="klog-article">
+  <template>
+    <style include="klog-style-layout"></style>
+    <style include="klog-style-card"></style>
+    <style>
+      :host {
+        display: block;
+        min-height: 100vh;
+        background-color: var(--klog-article-theme-color);
+        outline: none;
+        opacity: 0;
+        transition: opacity .1s ease, transform .1s ease-out;
+      }
+
+      :host([loaded]) {
+        opacity: 1;
+        transform: none;
+      }
+
+      app-header {
+        --klog-header-background-color: var(--klog-article-theme-color);
+        --klog-header-text-color: var(--secondary-text-color);
+        --klog-header-short-width: 128px;
+        @apply --shadow-none;
+      }
+
+      .content {
+        transition: opacity .5s ease;
+      }
+
+      :host([loading]) .content,
+      :host([loading]) .footer {
+        opacity: 0;
+      }
+
+      .section,
+      .footer {
+        max-width: 720px;
+        margin: auto;
+        box-sizing: border-box;
+      }
+
+      klog-markdown {
+        --klog-markdown-font-size: 16px;
+      }
+
+      .author {
+        display: flex;
+        margin: 16px auto 32px;
+        padding: 16px;
+        max-width: 720px;
+        width: calc(100vw - 2 * 24px);
+        border-radius: 8px;
+        background: var(--light-primary-color);
+      }
+
+      .author[theme=dark] {
+        background: linear-gradient(to bottom right, var(--paper-indigo-500), var(--paper-indigo-700));
+      }
+
+      .author .avatar {
+        width: 50px;
+        height: 50px;
+        margin-right: 16px;
+      }
+
+      .author .meta {
+        color: var(--secondary-text-color);
+        width: calc(100% - 64px);
+      }
+
+      .meta-user {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .meta-name {
+        color: var(--primary-text-color);
+        font-weight: bold;
+      }
+
+      .meta-intro {
+        display: block;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .footer {
+        padding: 16px;
+        font-size: 20px;
+        color: var(--primary-text-color);
+        opacity: 0.15;
+        text-align: right;
+        cursor: default;
+      }
+
+      .footer .logo {
+        position: relative;
+        user-select: none;
+      }
+
+      .footer .logo a {
+        @apply --fit-layout;
+        z-index: 1;
+      }
+
+      [hidden] {
+        display: none;
+      }
+
+      /*immersive mode*/
+
+      :host(:not([immersive])) .immersive {
+        display: none !important;
+      }
+
+      :host([immersive]) .non-immersive {
+        display: none !important;
+      }
+
+      /*Article header*/
+
+      .immersive-title {
+        padding: 0 16px;
+      }
+
+      .immersive-title h1 {
+        font-size: 3em;
+        font-weight: 400;
+        line-height: 1.3;
+        margin: 1em 0 1em;
+      }
+
+      .immersive.author .meta {
+        display: flex;
+        align-items: center;
+      }
+
+      .dot-divider {
+        display: inline-block;
+        margin: 0 6px;
+        width: 5px;
+        height: 5px;
+        background: var(--divider-color);
+        border-radius: 50%;
+      }
+
+      @media (min-width: 1080px) {
+        :host {
+          --klog-media-width: 850px;
+
+          --klog-markdown-image-container: {
+            min-width: 100%;
+            margin: 0 0 12px 50%;
+            width: max-content;
+            transform: translateX(-50%);
+          }
+
+          --klog-markdown-image: {
+            width: fit-content;
+            @apply(--shadow-elevation-16dp);
+          }
+        }
+      }
+
+      @media (min-width: 1921px) {
+        :host {
+          --klog-media-width: 1024px;
+        }
+      }
+
+      @media (min-width: 768px) {
+        :host::-webkit-scrollbar-thumb {
+          background-color: var(--scrollbar-thumb-color) !important;
+        }
+
+        :host(:hover)::-webkit-scrollbar-thumb {
+          background-color: var(--scrollbar-thumb-active-color) !important;
+        }
+      }
+    </style>
+    <app-route route="{{route}}" pattern="/:path" data="{{routeData}}"></app-route>
+    <klog-data-article path="{{path}}" loading="{{loading}}" last-response="{{article}}" last-error="{{error}}"
+      is-owner="{{isOwner}}" userinfo="{{userinfo}}"></klog-data-article>
+    <app-header id="header" class="non-immersive" id="header" fixed short>
+      <app-toolbar>
+        <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
+        <div class="title">
+          <div>{{article.title}}</div>
+        </div>
+        <paper-icon-button icon="edit" on-click="edit" hidden$="{{!isOwner}}"></paper-icon-button>
+      </app-toolbar>
+      <paper-progress indeterminate disabled="{{!loading}}"></paper-progress>
+    </app-header>
+    <div class="content">
+      <!--immersive title-->
+      <div class="section immersive-title immersive">
+        <h1>{{article.title}}</h1>
+      </div>
+      <!--author-->
+      <div class="section author" theme$="{{theme}}">
+        <klog-data-image class="avatar" src="{{article.author.avatarUrl}}" avatar></klog-data-image>
+        <div class="meta">
+          <div class="meta-user">
+            <span class="meta-name">{{article.author.displayName}}<template is="dom-if"
+                if="{{article.author.introduction}}">,&nbsp;
+              </template></span>
+            <span class="meta-intro">{{article.author.introduction}}</span>
+          </div>
+          <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发布于 </klog-render-timestamp>
+        </div>
+      </div>
+      <!--article-->
+      <klog-markdown class="section article" id="markdown" markdown="{{article.markdown}}"
+        ignore-title="{{article.title}}" theme="{{theme}}" lazy></klog-markdown>
+    </div>
+    <div class="footer">
+      <span class="logo">
+        Klog.
+        <a href="#/timeline/" class="immersive"></a>
+      </span>
+    </div>
+  </template>
+  <script>
+    class KlogArticle extends Polymer.Element {
+
+      static get is() { return 'klog-article'; }
+
+      static get properties() {
+        return {
+          isOwner: {
+            type: Boolean,
+            value: false
+          },
+          loading: {
+            type: Boolean,
+            notify: true,
+            reflectToAttribute: true,
+          },
+          immersive: {
+            type: Boolean,
+            reflectToAttribute: true,
+          }
+        }
+      }
+
+      static get observers() {
+        return [
+          'loadArticle(routeData.path)',
+          'handleError(error)',
+          'updateDocumentTitle(article.title)',
+          'updateImmersiveMode(article.immersive)',
+          'enableSmoothScroll(article.title)'
+        ]
+      }
+
+      back() {
+        if (!this.backTo) {
+          this.backTo = 'timeline';
+        }
+        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: this.backTo, now: false } }));
+      }
+
+      loadArticle(path) {
+        if (window.location.hash.indexOf('#/article') == -1) return
+        this.path = path;
+      }
+
+      ready() {
+        super.ready();
+        this.$.markdown.scrollTarget = document.scrollingElement;
+        this.setAttribute('tabindex', 1);
+        this.addEventListener('keydown', (e) => {
+          if (e.ctrlKey == true && e.keyCode == 69) {
+            //ctrl e
+            e.preventDefault();
+            this.edit();
+          }
+        });
+
+        this._scrollHandler = e => {
+          let y = document.scrollingElement.scrollTop;
+          if (y > 0) {
+            this.$.header.updateStyles({
+              '--klog-header-short-width': (this.isOwner ? 128 : 80) + 'px',
+            });
+            this.$.header.classList.add('collapsed');
+          } else {
+            this.$.header.classList.remove('collapsed');
+          }
+
+          if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
+            let isLight = this.theme == 'light';
+            this.$.header.updateStyles({ '--klog-header-opacity': 1 - (isLight ? 0.3 : 0.2) });
+            this.$.header.style.backdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
+            this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
+          } else {
+            this.$.header.updateStyles({ '--klog-header-opacity': 1 });
+            this.$.header.style.backdropFilter = 'initial';
+            this.$.header.style.webkitBackdropFilter = 'initial';
+          }
+
+        };
+      }
+
+      edit() {
+        this.dispatchEvent(new CustomEvent('editor-open', {
+          bubbles: true, composed: true, detail: {
+            articleId: this.article.objectId,
+            backTo: window.location.hash
+          }
+        }));
+      }
+
+      handleError() {
+        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
+      }
+
+      load() {
+        const html = document.querySelector('html');
+        html.style.scrollBehavior = 'initial';
+        html.scrollTop = 0;
+        html.style.scrollBehavior = 'smooth';
+        this._scrollHandler();
+        window.addEventListener('scroll', this._scrollHandler);
+        setTimeout(() => {
+          this.setAttribute('loaded', true);
+        }, 1);
+      }
+
+      unload() {
+        window.removeEventListener('scroll', this._scrollHandler);
+        this.removeAttribute('loaded');
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.path = '';
+            this.isOwner = false;
+            this.article = {
+              markdown: ''
+            };
+            resolve();
+          }, 301);
+        });
+      }
+
+      parseDate(date) {
+        return Date.parse(date)
+      }
+
+      enableSmoothScroll() {
+        // document.querySelector('html').
+      }
+
+      updateDocumentTitle(title) {
+        if (!title) return
+        document.title = title + ' - Klog';
+      }
+
+      updateImmersiveMode(immersive) {
+        this.immersive = immersive;
+        if (immersive) this.dispatchEvent(new CustomEvent('drawer-disable', { bubbles: true, composed: true }));
+      }
+
+    }
+
+    window.customElements.define(KlogArticle.is, KlogArticle);
+  </script>
+</dom-module>

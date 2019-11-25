@@ -1,0 +1,58 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="klog-style-layout.html">
+<link rel="import" href="klog-style-scrollbar.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-data-list.html">
+<link rel="import" href="klog-timeline-item.html">
+<dom-module id="klog-zone">
+  <template>
+    <style include="klog-style-layout"></style>
+    <style include="klog-style-scrollbar"></style>
+    <style>
+     :host {
+      display: block;
+      padding: 0;
+      background: var(--klog-page-background);
+    }
+    .card-container{
+      height: 100vh;
+      padding: 96px 0;
+      box-sizing: border-box;
+      overflow-y: auto;
+      justify-content: center;
+      transition: all var(--refresh-animation-duration) ease-out;
+    }
+
+    klog-timeline-item {
+      max-width: 600px;
+      margin: 0 auto 16px;
+    }
+    </style>
+    <klog-data-list id="data" type="timeline" last-response="{{items}}" type="timeline" key="date"></klog-data-list>
+    <app-header></app-header>
+    <div class="card-container">
+      <template is="dom-repeat" items="{{items}}">
+        <klog-timeline-item data="{{item}}"></klog-timeline-item>
+      </template>
+    </div>
+  </template>
+  <script>
+  class KlogZone extends Polymer.Element {
+
+    static get is() { return 'klog-zone'; }
+
+    ready() {
+      super.ready();
+      this.$.data.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'date'];
+      this.$.data.include = ['author', 'topic'];
+      this.$.data.userinfo = this.userinfo;
+      this.$.data.load();
+    }
+
+  }
+
+  window.customElements.define(KlogZone.is, KlogZone);
+  </script>
+</dom-module>

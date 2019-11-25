@@ -1,0 +1,343 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="klog-style-scrollbar.html">
+<link rel="import" href="klog-image.html">
+<link rel="import" href="klog-player-lite.html">
+<link rel="import" href="klog-style-markdown.html">
+<dom-module id="klog-markdown">
+  <template>
+    <link rel="stylesheet" media="all" href="../bower_components/Han/dist/han.min.css">
+    <link rel="stylesheet" href="../static/lib/prism/prism-dark.css">
+    <link rel="stylesheet" href="../static/lib/prism/prism-light.css">
+    <style include="klog-style-scrollbar"></style>
+    <style include="klog-style-markdown"></style>
+    <article id="article" class="klog-article-content" theme$="[[theme]]">
+      <slot></slot>
+      <div id="content"></div>
+      <slot name="after"></slot>
+    </article>
+  </template>
+  <script src="../bower_components/Han/dist/han.min.js"></script>
+  <script src="../static/lib/marked/marked.min.js"></script>
+  <script src="../static/lib/prism/prism.js"></script>
+  <script>
+    class KlogMarkdown extends Polymer.Element {
+
+      static get is() { return 'klog-markdown'; }
+
+      static get properties() {
+        return {
+          markdown: {
+            type: String,
+            observer: '_render'
+          },
+          theme: {
+            type: String,
+            value: false,
+            reflectToAttribute: true
+          },
+          ignoreTitle: {
+            type: String
+          },
+          collection: {
+            type: String,
+            notify: true
+          },
+          tags: {
+            type: Array,
+            notify: true
+          },
+          wordCount: {
+            type: Number,
+            notify: true
+          },
+          scrollBias: {
+            type: Number
+          },
+          lazy: {
+            type: Boolean,
+            value: false
+          }
+        }
+      }
+
+      lazyInit() {
+        if (!"IntersectionObserver" in window) {
+          console.log('Lazy-load is not supported.');
+          this.lazy = false;
+        }
+      }
+
+      lazyObserve() {
+        let lazyObserver = new IntersectionObserver((entries, observer) => {
+          for (let entry of entries) {
+            if (entry.isIntersecting) {
+              let notlazy = entry.target;
+              notlazy.lazyload();
+              lazyObserver.unobserve(notlazy);
+            }
+          };
+        });
+
+        let lazyElements = this.$.article.querySelectorAll('[lazy]');
+        for (let element of lazyElements) {
+          lazyObserver.observe(element);
+        }
+      }
+
+      ready() {
+        super.ready();
+
+        //lazy-init
+        if (this.lazy) this.lazyInit();
+
+        //render
+        let renderer = new marked.Renderer();
+
+        renderer.heading = (text, depth) => {
+          let id = 'heading' + (++this._headingId);
+          this._headings.push({ depth: depth, text: text, id: id });
+          return `<h${depth} id="${id}" depth="${depth}">${text}</h${depth}>\n`;
+        };
+
+        renderer.image = (href, title, text) => {
+          var out = '<klog-image src="' + href + '" alt="' + text + '"';
+          if (title) {
+            out += ' title="' + title + '"';
+          }
+          if (this.lazy) out += ` lazy theme="${this.theme}"`;
+          out += '></klog-image>';
+          if (text) {
+            out = `<div image description>${out}<div class="description">${text}</div></div>`;
+          } else {
+            out = `<div image>${out}</div>`;
+          }
+
+          return out;
+        };
+
+        renderer.code = function (code, lang, escaped) {
+          lang = lang || '';
+          var _lang = lang.replace(/cpp/i, 'c++').toUpperCase();
+          lang = Prism.languages[lang] ? lang : 'clike';
+          var grammar = Prism.languages[lang];
+          var out = Prism.highlight(code, grammar, lang);
+          if (out != null) {
+            escaped = true;
+            code = out;
+          }
+          var lang_escape = escape(lang, true);
+          var code_escape = escaped ? code : escape(code, true);
+          var out_lang = _lang ? `<div class="meta"><span class="code-lang">${_lang}</span></div>` : '';
+          out = `<pre class="language-${lang_escape}">${out_lang}<code>${code_escape}\n</code></pre>\n`;
+          return out
+        }
+
+        renderer.link = function (href, title, text = '') {
+          if (/^&lt;V&gt;/.test(text)) {
+            text = text.replace(/^&lt;V&gt;/, '');
+            return `<a href="${href}">视频链接</a>`;
+            //return `<klog-player-lite src="${href}" alt="${text}"></klog-player-lite>`;
+          }
+          var out = '<a href="' + href + '"';
+          if (title) {
+            out += ' title="' + title + '"';
+          }
+          out += '>' + text + '</a>';
+          return out;
+        };
+
+        let block = {};
+
+        block.toc = {
+          reg: /^\n*\[toc\] *\n/i,
+          lex: function (src, cap) {
+            src = src.substring(cap[0].length);
+            return { src: src, text: '' }
+          },
+          parse: () => {
+            this._hasToc = true;
+            return '<span toc></span>'
+          }
+        };
+
+        block.at = {
+          reg: /^@\(([\s\S]*?)\)(\[([\s\S]*?)\])?/,
+          lex: function (src, cap) {
+            src = src.substring(cap[0].length);
+            cap = [cap[1] ? marked.escape(cap[1]) : false, cap[3] ? marked.escape(cap[3]) : false];
+            return { src: src, text: cap }
+          },
+          parse: (cap) => {
+            this.collection = cap[0] || '';
+            this.tags = cap[1] ? cap[1].toLowerCase().split(',') : [];
+            return `<!--collection:${cap[0]};tags:${this.tags}-->`
+          }
+        };
+
+        let inline = {};
+
+        inline.katex = {
+          reg: /^\$([^\$]+?)\$/,
+          parse: (src, cap) => {
+            this._katex();
+            src = src.substring(cap[0].length);
+            cap = marked.escape(cap[0].replace(/\$/gm, ''));
+            return {
+              src: src,
+              text: `<klog-render-katex code="${cap}"><code lang="latex">${cap}</code></klog-render-katex>`
+            };
+          }
+        };
+
+        inline.katexblock = {
+          reg: /^\$\$([^\$]+?)\$\$/,
+          parse: (src, cap) => {
+            this._katex();
+            src = src.substring(cap[0].length);
+            cap = marked.escape(cap[0].replace(/\$\$/gm, ''));
+            return {
+              src: src,
+              text: `<klog-render-katex code="${cap}" block><code lang="latex">${cap}</code></klog-render-katex>`
+            };
+          }
+        };
+
+        let inlineText = /^[\s\S]+?(?=[\\<!\[`*\$~]|https?:\/\/|ftp:\/\/|www\.|[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}\$~-]+@|\b_| *\n|$)/;
+
+        this.options = {
+          gfm: true,
+          tables: true,
+          breaks: true,
+          sanitize: true,
+          renderer: renderer,
+          block: block,
+          inline: inline,
+          inlineText: inlineText
+        };
+      }
+
+      _tocRenderer() {
+        let headings = this._headings;
+        headings.push({ depth: 0 });
+        let _depth = 0;
+        let out = '<div toc>';
+        for (let heading of headings) {
+          let newli = '';
+          if (heading.text) newli = `<li name="${heading.id}"><span>${heading.text}</span>`;
+          if (heading.depth == _depth) {
+            out += `</li>${newli}`;
+          }
+          while (heading.depth > _depth) {
+            ++_depth;
+            out += `<ol>${newli}`;
+          }
+          while (heading.depth < _depth) {
+            --_depth;
+            out += '</li></ol>';
+            if (heading.text) out += `</li>${newli}`;
+          }
+
+        }
+        out += '</div>';
+        return out
+      }
+
+      _tocEvent() {
+        let links = this.$.content.querySelectorAll('div[toc] li');
+        for (let link of links) {
+          link.addEventListener('mouseover', (e) => {
+            e.stopPropagation();
+            let _selected = this.$.content.querySelector('li.selected');
+            if (_selected) _selected.classList.remove('selected');
+            e.currentTarget.classList.add('selected');
+          });
+          link.addEventListener('click', (e) => {
+            e.stopPropagation();
+            let i = 0;
+            while (e.currentTarget.tagName != 'LI') i++;
+            let name = e.currentTarget.getAttribute('name');
+            let element = this.$.content.querySelector('#' + name);
+            if (element) {
+              let bias = this.scrollBias || 0;
+              let scrollTarget = this.scrollTarget || document.scrollingElement;
+              //html will move while scrolling
+              let htmlFix = scrollTarget.tagName == 'HTML' ? 0 : scrollTarget.getBoundingClientRect().top;
+              let y = scrollTarget.scrollTop + element.getBoundingClientRect().top - htmlFix;
+              this.scrollTarget.scrollTop = y;
+            }
+          });
+        }
+      }
+
+      _katex() {
+        if (!this._initKatex) {
+          let element = document.createElement('script');
+          element.src = '/static/lib/katex/katex.min.js';
+          element.onload = () => Polymer.importHref(this.resolveUrl('klog-render-katex.html'));
+          this.appendChild(element);
+          this._initKatex = true;
+        }
+      }
+
+      _updateWordCount() {
+        if (!this.$.content.innerText) {
+          this.wordCount = 0;
+          return;
+        }
+        this.wordCount = this.$.content.innerText
+          .replace(/(\r\n+|\s+|　+)+/g, "龘")
+          .replace(/[\x00-\xff]/g, "m")
+          .replace(/m+/g, "*")
+          .replace(/龘/g, "")
+          .length;
+      }
+
+      _render() {
+        // reset attributes
+        this.$.content.innerHTML = '';
+        this.collection = 'Daily';
+        this.tags = [];
+        this._headingId = 0;
+        this._headings = [];
+        this._hasToc = false;
+        // no markdown
+        if (!this.markdown) {
+          this._updateWordCount();
+          return;
+        }
+        // translate markdown
+        marked(this.markdown, this.options, (err, out) => {
+          if (err) throw err;
+          //toc
+          if (this._hasToc) {
+            out = out.replace(/<span toc><\/span>/g, this._tocRenderer());
+            setTimeout(() => this._tocEvent(), 1);
+          }
+          //render
+          this.$.content.innerHTML = out;
+          // word count
+          this._updateWordCount();
+          // remove main title
+          let headings = this.$.content.querySelectorAll('[depth]');
+          let title;
+          for (let heading of headings) {
+            if (!title || heading.getAttribute('depth') < title.getAttribute('depth')) {
+              title = heading;
+            }
+          }
+          if (title && title.innerText == this.ignoreTitle) {
+            title.parentNode.removeChild(title);
+          }
+          //Han
+          Han(this.$.article, this.$.article).render();
+          setTimeout(() => this.dispatchEvent(new CustomEvent('markdown-rendered', { bubbles: true, composed: true })), 1);
+          if (this.lazy) setTimeout(() => this.lazyObserve(), 1);
+        });
+      }
+
+    }
+
+    window.customElements.define(KlogMarkdown.is, KlogMarkdown);
+  </script>
+
+</dom-module>

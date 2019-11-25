@@ -1,0 +1,129 @@
+[theme~=dark] code[class*="language-"],
+[theme~=dark] pre[class*="language-"] {
+  color: #ABB2BF;
+}
+
+[theme~=dark] pre[class*="language-"]::-moz-selection,
+[theme~=dark] pre[class*="language-"] ::-moz-selection,
+[theme~=dark] code[class*="language-"]::-moz-selection,
+[theme~=dark] code[class*="language-"] ::-moz-selection {
+  background: #383e49;
+}
+
+[theme~=dark] pre[class*="language-"]::selection,
+[theme~=dark] pre[class*="language-"] ::selection,
+[theme~=dark] code[class*="language-"]::selection,
+[theme~=dark] code[class*="language-"] ::selection {
+  background: #9aa2b1;
+}
+
+[theme~=dark] .token.comment,
+[theme~=dark] .token.prolog,
+[theme~=dark] .token.doctype,
+[theme~=dark] .token.cdata {
+  color: #5C6370;
+}
+
+[theme~=dark] .token.punctuation {
+  color: #abb2bf;
+}
+
+[theme~=dark] .token.selector,
+[theme~=dark] .token.tag {
+  color: #e06c75;
+}
+
+[theme~=dark] .token.property,
+[theme~=dark] .token.boolean,
+[theme~=dark] .token.number,
+[theme~=dark] .token.constant,
+[theme~=dark] .token.symbol,
+[theme~=dark] .token.attr-name,
+[theme~=dark] .token.deleted {
+  color: #d19a66;
+}
+
+[theme~=dark] .token.string,
+[theme~=dark] .token.char,
+[theme~=dark] .token.attr-value,
+[theme~=dark] .token.builtin,
+[theme~=dark] .token.inserted {
+  color: #98c379;
+}
+
+[theme~=dark] .token.operator,
+[theme~=dark] .token.entity,
+[theme~=dark] .token.url,
+[theme~=dark] .language-css .token.string,
+[theme~=dark] .style .token.string {
+  color: #56b6c2;
+}
+
+[theme~=dark] .token.atrule,
+[theme~=dark] .token.keyword {
+  color: #c678dd;
+}
+
+[theme~=dark] .token.function {
+  color: #61afef;
+}
+
+[theme~=dark] .token.regex,
+[theme~=dark] .token.important,
+[theme~=dark] .token.variable {
+  color: #c678dd;
+}
+
+[theme~=dark] .token.important,
+[theme~=dark] .token.bold {
+  font-weight: bold;
+}
+
+[theme~=dark] .token.italic {
+  font-style: italic;
+}
+
+[theme~=dark] .token.entity {
+  cursor: help;
+}
+
+[theme~=dark] pre.line-numbers {
+  position: relative;
+  padding-left: 3.8em;
+  counter-reset: linenumber;
+}
+
+[theme~=dark] pre.line-numbers>code {
+  position: relative;
+}
+
+[theme~=dark] .line-numbers .line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  font-size: 100%;
+  left: -3.8em;
+  width: 3em;
+  /* works for line-numbers below 1000 lines */
+  letter-spacing: -1px;
+  border-right: 0;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+[theme~=dark] .line-numbers-rows>span {
+  pointer-events: none;
+  display: block;
+  counter-increment: linenumber;
+}
+
+[theme~=dark] .line-numbers-rows>span:before {
+  content: counter(linenumber);
+  color: #5C6370;
+  display: block;
+  padding-right: 0.8em;
+  text-align: right;
+}

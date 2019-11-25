@@ -1,0 +1,144 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<dom-module id="klog-backdrop">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        --klog-backdrop-default-front-top: 64px;
+      }
+
+      #back {
+        height: 0;
+        z-index: 1;
+        @apply --klog-backdrop-back;
+      }
+
+      #front {
+        position: absolute;
+        top: 0px;
+        bottom: var(--klog-backdrop-default-front-top);
+        transform: translateY(var(--klog-backdrop-default-front-top));
+        transition: transform.2s ease;
+        z-index: 99;
+      }
+    </style>
+    <div id="back">
+      <slot name="back"></slot>
+    </div>
+    <div id="front">
+      <slot name="front"></slot>
+    </div>
+  </template>
+  <script>
+    class KlogBackdrop extends Polymer.Element {
+
+      static get is() { return 'klog-backdrop'; }
+
+      static get properties() {
+        return {
+          active: {
+            type: Boolean,
+            value: false,
+            observer: 'update'
+          },
+          moving: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true,
+            notify: true
+          },
+          frontSwitchDisabled: {
+            type: Boolean,
+            value: false
+          },
+          gestureDisabled: {
+            type: Boolean,
+            value: false
+          },
+        }
+      }
+
+      ready() {
+        super.ready();
+        this.addEventListener('klog-backdrop-toggle', () => this.toggle());
+        this.addEventListener('klog-backdrop-update', () => this.update());
+        this.$.front.addEventListener('click', () =>
+          this.dispatchEvent(new CustomEvent('klog-backdrop-front-click', { bubbles: true, composed: true }))
+        );
+        this.$.front.addEventListener('klog-backdrop-touchstart', e => {
+          this.movestart(e.detail.touches[0].clientY);
+        });
+        this.$.front.addEventListener('touchmove', e => {
+          if (this.moving) e.preventDefault();
+          this.move(e.touches[0].clientY);
+        });
+        this.$.front.addEventListener('touchend', e => {
+          this.moveend();
+        });
+      }
+
+      deactive() {
+        this.active = false;
+        this.update();
+      }
+
+      toggle() {
+        this.active = !this.active;
+      }
+
+      show() {
+        this.active = true;
+      }
+
+      hide() {
+        this.active = false;
+      }
+
+      movestart(clientY) {
+        if (this.gestureDisabled) return;
+        this.moving = true;
+        this._clientYStart = clientY;
+        this._transformYStart = this.$.front.getBoundingClientRect().top;
+        this.$.front.style.transition = "none";
+      }
+
+      move(clientY) {
+        if (this.gestureDisabled) return;
+        if (!this.moving) return;
+        let backHeight = this.$.back.scrollHeight;
+        let clientYDiff = clientY - this._clientYStart;
+        let transformY = Math.max(Math.min(clientYDiff + this._transformYStart, backHeight), 64)
+        this.$.front.style.transform = `translateY(${transformY}px)`;
+      }
+
+      moveend() {
+        if (this.gestureDisabled) return;
+        this.moving = false;
+        this.$.front.style.transition = "transform .2s ease";
+        let backHeight = this.$.back.scrollHeight;
+        let currentY = this.$.front.getBoundingClientRect().top;
+        this.active = currentY > backHeight * 0.8;
+        this.update();
+      }
+
+      update() {
+        // event
+        if (this.active) {
+          this.dispatchEvent(new CustomEvent('klog-backdrop-active', { bubbles: true, composed: true }));
+        } else {
+          this.dispatchEvent(new CustomEvent('klog-backdrop-deactive', { bubbles: true, composed: true }));
+        }
+        // transform
+        let backHeight = this.$.back.scrollHeight;
+        this.$.front.style.transform = this.active ? `translateY(${backHeight}px)` : 'translateY(var(--klog-backdrop-default-front-top))';
+      }
+
+    }
+
+    window.customElements.define(KlogBackdrop.is, KlogBackdrop);
+  </script>
+</dom-module>

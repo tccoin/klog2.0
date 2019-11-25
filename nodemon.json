@@ -1,0 +1,5 @@
+{
+  "restartable": "rs",
+  "verbose": true,
+  "ignore": ["pan","build","static"]
+}

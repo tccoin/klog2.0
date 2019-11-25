@@ -1,0 +1,152 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<dom-module id="klog-data-article">
+  <script>
+    class KlogDataArticle extends Polymer.Element {
+
+      static get is() { return 'klog-data-article'; }
+
+      static get properties() {
+        return {
+          type: {
+            type: String
+          },
+          path: {
+            type: String,
+            observer: '_onIdChanged'
+          },
+          articleId: {
+            type: String,
+            observer: '_onIdChanged'
+          },
+          loading: {
+            type: Boolean,
+            value: true,
+            notify: true
+          },
+          lastResponse: {
+            type: Object,
+            notify: true
+          },
+          lastError: {
+            type: Number,
+            notify: true
+          },
+          isOwner: {
+            type: Boolean,
+            notify: true
+          },
+          collection: {
+            type: String,
+            observer: 'load'
+          },
+          disabled: {
+            type: Boolean
+          },
+          key: {
+            type: String
+          }
+        }
+      }
+
+      _onIdChanged(id, _id) {
+        if (id != _id) this.load();
+      }
+
+      load() {
+        if (!this.default && !this.path && !this.articleId) return;
+        if (this.disabled) return;
+        this.loading = true;
+        // ID
+        if (this.articleId) {
+          this.loadByArticleId();
+        } else {
+          this.loadByPath();
+        }
+      }
+
+      loadByArticleId() {
+        var article = AV.Object.createWithoutData('Article', this.articleId);
+        return article.fetch()
+          .then(data => {
+            if (data.get('updatedAt')) {
+              return this._onLoad(data);
+            } else {
+              return this._onFailed();
+            }
+          });
+      }
+
+      loadByPath() {
+        let query = new AV.Query('Article');
+        let author;
+        // 私有文章
+        if (this.type == 'user') {
+          if (!this.userinfo || !this.userinfo.publicinfo) {
+            setTimeout(() => this.load(this.path), 100);
+            return;
+          }
+          author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
+          query.equalTo('author', author);
+        }
+        // 笔记本
+        if (this.collection && this.collection != 'all') {
+          query.equalTo('collection', this.collection);
+        }
+        // 路径
+        if (this.path) {
+          query.equalTo('path', this.path);
+        }
+        query.select(['title', 'markdown', 'comments', 'topic', 'author', 'immersive', 'collection', 'tags', 'path']);
+        query.include(['author', 'topic']);
+        query.limit(1);
+        if (this.key) query.descending(this.key);
+        else query.descending('createdAt');
+        return query.find().then((articles) => {
+          if (articles.length != 0) {
+            return this._onLoad(articles[0]);
+          } else {
+            return this._onFailed();
+          }
+        }).catch(err => {
+          console.log(err);
+        });
+      }
+
+      _onLoad(article) {
+        this.loading = false;
+        let articleToJson = article.toJSON();
+        let isOwner = this._calcIsOwner(article);
+        //process data
+        articleToJson.isOwner = isOwner;
+        //set prototype
+        this.isOwner = isOwner;
+        this.set('lastResponse', articleToJson);
+        //event
+        this.dispatchEvent(new CustomEvent('success', { bubbles: true, composed: true, detail: { data: articleToJson } }));
+        //save pointer
+        this._article = article;
+
+        return Promise.resolve(articleToJson);
+      }
+
+      _onFailed() {
+        this.loading = false;
+        this.lastError = 404;
+        this.dispatchEvent(new CustomEvent('error', { bubbles: true, composed: true }));
+        return Promise.reject();
+      }
+
+      _calcIsOwner(article) {
+        if (!this.userinfo) {
+          return false;
+        }
+        let publicinfo = this.userinfo.publicinfo;
+        let userid = publicinfo ? publicinfo.id : null;
+        return this.userinfo ? (article.get('author').id == userid) : false;
+      }
+
+    }
+
+    window.customElements.define(KlogDataArticle.is, KlogDataArticle);
+  </script>
+</dom-module>

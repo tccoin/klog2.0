@@ -1,0 +1,54 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="klog-data-image.html">
+<dom-module id="klog-image">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .info {
+        @apply --fit-layout;
+        background: rgba(0, 0, 0, .5);
+      }
+    </style>
+    <!-- <div class="info">123</div> -->
+    <klog-data-image id="img" src="{{src}}" alt="{{alt}}" lazy="{{lazy}}" theme$="{{theme}}" content></klog-data-image>
+
+  </template>
+
+  <script>
+    class Klog extends Polymer.Element {
+
+      static get is() { return 'klog-image'; }
+
+      static get properties() {
+        return {
+          src: {
+            type: String,
+          },
+          alt: {
+            type: String,
+          },
+          lazy: {
+            type: Boolean,
+            value: false
+          },
+          theme: {
+            type: String
+          }
+        }
+      }
+
+      lazyload() {
+        this.$.img.lazyload();
+      }
+
+    }
+
+    window.customElements.define(Klog.is, Klog);
+  </script>
+
+</dom-module>

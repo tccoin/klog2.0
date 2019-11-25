@@ -1,0 +1,102 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="klog-data-list.html">
+<dom-module id="klog-data-timeline">
+  <template>
+    <klog-data-list id="list" type="timeline" last-response="{{lastResponse}}" loading="{{loading}}" keyword="{{keyword}}"
+      key="date"></klog-data-list>
+  </template>
+
+  <script>
+    class KlogDataTimeline extends Polymer.Element {
+
+      static get is() { return 'klog-data-timeline'; }
+
+      static get properties() {
+        return {
+          pageSize: {
+            type: Number,
+            value: 10
+          },
+          loading: {
+            type: Boolean,
+            value: true,
+            notify: true,
+          },
+          pageNumber: {
+            type: Number,
+            observer: 'load'
+          },
+          lastResponse: {
+            type: Array,
+            notify: true
+          },
+          keyword: {
+            type: String
+          },
+          hasMore: {
+            type: Boolean
+          },
+          lastResponseTimestamp: {
+            type: Number
+          }
+        }
+      }
+
+      load() {
+        this.$.list.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'date'];
+        this.$.list.include = ['author', 'topic'];
+        this.$.list.load();
+      }
+
+      loadFakeData() {
+        this.lastResponse = [];
+        for (let i = 0; i < 10; i++) {
+          let author1 = {
+            displayName: 'Tccoin',
+            avatarUrl: 'https://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg'
+          };
+          let author2 = {
+            displayName: 'Tccoin',
+            avatarUrl: 'https://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg'
+          };
+          let markdown = '# hello, world \n\r' + '烫'.repeat(200);
+          let timelineItem = {
+            title: 'hello, world',
+            author: author1,
+            text: '烫'.repeat(500),
+            markdown: markdown,
+            createTime: `8月${20 - i}日`,
+            type: 'article',
+            topic: '日常',
+            attachments: [{
+              image: true,
+              url: 'http://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg',
+              text: '用户头像',
+            },
+            {
+              image: true,
+              url: 'http://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg',
+              text: '用户头像',
+            },
+            {
+              file: true,
+              url: 'http://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg',
+              text: '用户头像',
+            }
+            ],
+            comment: [{
+              author: author2,
+              content: 'ﾟ ∀ﾟ)ノ',
+            }]
+          };
+          //new Date(new Date().getTime() - 3600000 * 24 * i)
+          this.push('lastResponse', timelineItem);
+        }
+      }
+
+    }
+
+    window.customElements.define(KlogDataTimeline.is, KlogDataTimeline);
+  </script>
+
+</dom-module>

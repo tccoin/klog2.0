@@ -1,0 +1,169 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="klog-style-dialog.html">
+<link rel="import" href="klog-style-toolbar.html">
+<link rel="import" href="klog-style-note.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-pages.html">
+<link rel="import" href="klog-backdrop.html">
+<link rel="import" href="klog-note-list.html">
+<link rel="import" href="klog-note-content.html">
+<dom-module id="klog-note">
+  <template>
+    <style include="klog-style-toolbar"></style>
+    <style include="klog-style-dialog"></style>
+    <style include="klog-style-note"></style>
+    <app-route route="{{route}}" pattern="/:collection" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <app-route route="{{subroute}}" pattern="/:path" data="{{subrouteData}}"></app-route>
+    <klog-backdrop id="backdrop" class="layout" gesture-disabled="{{!gesture}}" moving="{{moving}}"
+      front-switch-disabled>
+      <klog-pages class="backdrop-back" slot="back" selected="0">
+        <div>
+          <app-toolbar class="backdrop-back-toolbar" id="toolbar">
+            <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
+            <div class="divider"></div>
+            <paper-button on-click="add">
+              <iron-icon icon="add"></iron-icon>新建笔记
+            </paper-button>
+          </app-toolbar>
+        </div>
+        <div>
+          <app-toolbar class="backdrop-back-toolbar">
+            <paper-icon-button icon="close"></paper-icon-button>
+          </app-toolbar>
+        </div>
+      </klog-pages>
+
+      <klog-pages class="backdrop-front" slot="front" selected="{{selected}}" disabled="{{!mobile}}">
+        <klog-note-list id="list" userinfo="{{userinfo}}" keyword="{{keyword}}" theme="[[theme]]"
+          collection="{{collection}}" stt="{{stt}}" gesture="{{gesture}}" moving="{{moving}}" mobile="{{mobile}}"
+          path="{{path}}"></klog-note-list>
+        <klog-note-content id="content" userinfo="{{userinfo}}" keyword="{{keyword}}" collection="{{collection}}"
+          stt="{{stt}}" mobile="{{mobile}}" selected="{{selected}}" path="{{path}}"></klog-note-content>
+      </klog-pages>
+    </klog-backdrop>
+    <paper-dialog id="shareDialog" class="share-dialog" with-backdrop>
+      <h2>这个链接，通向光明</h2>
+      <p>https://klog.app/#/article/{{shareDialogPath}}</p>
+    </paper-dialog>
+  </template>
+  <script>
+    class KlogNote extends Polymer.Element {
+
+      static get is() { return 'klog-note'; }
+
+      static get properties() {
+        return {
+          selected: {
+            type: Number,
+            value: 0,
+          },
+          mobile: {
+            type: Boolean,
+            reflectToAttribute: true
+          }
+        }
+      }
+
+      static get observers() {
+        return [
+          'routeChanged(routeData.collection, subrouteData.path)',
+          'loadPreference(userinfo.preference)',
+          'articleError(error)'
+        ]
+      }
+
+      openDrawer() {
+        this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+      }
+
+      ready() {
+        super.ready();
+        this.setAttribute('tabindex', 1);
+        this.addEventListener('pages-select', () => {
+          if (this.selected == 0) {
+            this.article = {};
+          }
+          this.$.backdrop.active = false;
+          this.$.backdrop.update();
+        });
+        this.addEventListener('note-share', (e) => {
+          this.share(e.detail.path);
+        });
+      }
+
+      load() {
+        document.title = '笔记 - Klog';
+        if (!this.userinfo.createdAt) {
+          this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
+          return;
+        }
+      }
+
+      unload() {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.path = '';
+            resolve();
+          }, 200);
+        });
+      }
+
+      share(path) {
+        this.shareDialogPath = path || this.path;
+        this.$.shareDialog.open();
+      }
+
+      loadPreference(preference) {
+        this.stt = preference ? preference.stt : [];
+      }
+
+      routeChanged(collection, path) {
+        if (window.location.href.indexOf('#/note') == -1) return;
+        collection = collection || 'all';
+        if (this.collection != collection) {
+          this.collection = collection;
+          this.$.list.keyword = '';
+          if (!this.mobile) this.$.list.$.search.focus();
+        }
+        if (path) {
+          this.selected = 1;
+          this.path = path;
+          this.loadArticle(path);
+        } else {
+          this.selected = 0;
+          this.loadArticle();
+        }
+      }
+
+      loadArticle(path) {
+        this.$.content.load(path);
+      }
+
+      articleError() {
+        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'note/' } }));
+        this.path = '';
+        this.listLoaded();
+        console.log(this.error);
+      }
+
+      add() {
+        let collection = this.collection == 'all' ? '笔记' : this.collection;
+        this.dispatchEvent(new CustomEvent('editor-open', {
+          bubbles: true, composed: true, detail: {
+            backTo: window.location.hash,
+            preset: {
+              markdown: '@(' + collection + ')[]',
+              private: true
+            }
+          }
+        }));
+      }
+
+    }
+
+    window.customElements.define(KlogNote.is, KlogNote);
+  </script>
+</dom-module>

@@ -1,0 +1,143 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="klog-input.html">
+<link rel="import" href="klog-style.html">
+<dom-module id="klog-editor-info-form">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .toggle-button {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 16px;
+      }
+
+      .toggle-button .label {
+        color: var(--primary-text-color);
+        flex: 1;
+      }
+
+      klog-input {
+        --primary-background-color: var(--klog-page-background);
+      }
+
+      paper-button {
+        margin: 16px 0 0 0;
+      }
+
+      .align-right {
+        text-align: right;
+      }
+
+      #deleteButton {
+        border-radius: 23px;
+        border: var(--outlined-border-width) solid var(--paper-red-500);
+        color: var(--paper-red-500);
+      }
+
+      #deleteButton[disabled] {
+        background: transparent;
+      }
+    </style>
+    <klog-input label="标题" placeholder="{{displayTitle}}" value="{{title}}" outlined></klog-input>
+    <klog-input label="路径" id="pathInput" placeholder="{{randomPath}}" value="{{path}}" outlined></klog-input>
+    <div class="toggle-button">
+      <span class="label">不推送至时间轴</span>
+      <paper-toggle-button checked="{{private}}" disabled="{{immersive}}"></paper-toggle-button>
+    </div>
+    <div class="toggle-button">
+      <span class="label">独立页面</span>
+      <paper-toggle-button checked="{{immersive}}"></paper-toggle-button>
+    </div>
+    <div class="align-right">
+      <paper-button id="deleteButton" on-click="delete" hidden$="{{!articleId}}" disabled="{{loading}}">
+        <iron-icon icon="delete"></iron-icon>
+        {{deleteCountdown}}
+      </paper-button>
+    </div>
+  </template>
+  <script>
+    class KlogEditorInfoForm extends Polymer.Element {
+
+      static get is() { return 'klog-editor-info-form'; }
+
+      static get properties() {
+        return {
+          title: {
+            type: String,
+            notify: true
+          },
+          path: {
+            type: String,
+            notify: true
+          },
+          private: {
+            type: Boolean,
+            notify: true,
+          },
+          immersive: {
+            type: Boolean,
+            notify: true,
+          },
+          loading: {
+            type: Boolean,
+            observer: '_resetCountdown',
+          },
+          deleteCountdown: {
+            type: Number,
+            value: 3,
+          },
+          deleteLock: {
+            type: Boolean,
+            value: false,
+          },
+          folded: {
+            type: Boolean,
+            value: false,
+          },
+          icon: {
+            type: String,
+            value: 'keyboard-arrow-up'
+          },
+          articleId: {
+            type: String,
+            observer: 'articleIdChanged'
+          }
+        }
+      }
+
+      articleIdChanged() {
+        this.dispatchEvent(new CustomEvent('klog-backdrop-update', { bubbles: true, composed: true }));
+      }
+
+      delete() {
+        this.dispatchEvent(new CustomEvent('vibrate-start', { bubbles: true, composed: true, detail: { duration: (4 - this.deleteCountdown) * 50 } }));
+        if (this.deleteCountdown > 0) {
+          if (this.deleteLock) return
+          this.deleteLock = true;
+          setTimeout(() => {
+            this.deleteLock = false;
+            this.deleteCountdown--;
+          }, 200);
+          return
+        }
+        this.dispatchEvent(new CustomEvent('delete', { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent('klog-backdrop-toggle', { bubbles: true, composed: true }));
+      }
+
+      _resetCountdown() {
+        if (!this.loading) this.deleteCountdown = 3;
+      }
+
+    }
+
+    window.customElements.define(KlogEditorInfoForm.is, KlogEditorInfoForm);
+  </script>
+</dom-module>

@@ -1,0 +1,34 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="klog-data-gql.html">
+<dom-module id="klog-data-car">
+  <script>
+    class klogDataCar extends KlogDataGql {
+      static get is() { return 'klog-data-car'; }
+
+      static get properties() {
+        return {
+          cars: {
+            type: Array,
+            notify: true
+          }
+        }
+      }
+
+      ready() {
+        super.ready();
+        this.auto = true;
+        this.query = gql`
+            Car(limit:5){
+              filename
+            }
+        `;
+      }
+
+      handle(data) {
+        super.handle(data);
+        this.cars = this.lastResponse.Car;
+      }
+    }
+    window.customElements.define(klogDataCar.is, klogDataCar);
+  </script>
+</dom-module>

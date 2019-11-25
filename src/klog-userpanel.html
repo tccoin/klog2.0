@@ -1,0 +1,327 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-ripple/paper-ripple.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-style-card.html">
+<link rel="import" href="klog-style-toolbar.html">
+<link rel="import" href="klog-style-dialog.html">
+<link rel="import" href="klog-render-timestamp.html">
+<link rel="import" href="klog-upload-zone.html">
+<link rel="import" href="klog-data-list.html">
+<link rel="import" href="klog-input.html">
+<link rel="import" href="klog-dropdown-menu.html">
+<dom-module id="klog-userpanel">
+  <template>
+    <style include="klog-style-card"></style>
+    <style include="klog-style-toolbar"></style>
+    <style include="klog-style-dialog"></style>
+    <style>
+      :host {
+        display: block;
+        background: var(--klog-page-background);
+        padding: 64px 0 32px;
+      }
+
+      app-toolbar {
+        position: fixed;
+        top: 0;
+        background: transparent;
+      }
+
+      .divider {
+        flex: 1;
+      }
+
+      .userpanel-card {
+        max-width: 400px;
+        width: calc(100% - 16px);
+        margin: 0 auto 32px;
+        border-radius: 5px;
+        box-sizing: border-box;
+        background-color: var(--primary-background-color);
+        @apply --shadow-elevation-2dp;
+      }
+
+      .userpanel-card:last-child {
+        margin-bottom: 0;
+      }
+
+      .userpanel-card .card-meta.header {
+        padding: 8px 16px 8px 24px;
+        display: flex;
+        align-items: center;
+        min-height: 56px;
+        box-sizing: border-box;
+      }
+
+      .userpanel-card .card-meta.header .title {
+        color: var(--secondary-text-color);
+        font-weight: bold;
+      }
+
+      .userpanel-card .card-meta.header paper-icon-button {
+        color: var(--primary-color);
+      }
+
+      .form>* {
+        margin: 0 24px;
+        padding-bottom: 16px;
+      }
+
+      .form>.fit {
+        margin: 0 8px;
+      }
+
+      .list a {
+        text-decoration: none;
+      }
+
+      .list .article-item {
+        display: flex;
+        padding: 16px 24px;
+        border-top: 1px solid var(--divider-color);
+        position: relative;
+        user-select: none;
+        cursor: default;
+        color: var(--primary-text-color);
+      }
+
+      .list .article-item .header {
+        width: 8em;
+      }
+
+      .list .article-item .header b {
+        display: block;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .list .article-item .header b[hidden] {
+        display: none;
+      }
+
+      .list .article-item .meta {
+        color: var(--secondary-text-color);
+        font-size: 0.8em;
+      }
+
+      .list .article-item .text {
+        flex: 1;
+        padding-left: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        max-height: 5.1em;
+        color: var(--secondary-text-color);
+      }
+
+      klog-upload-zone {
+        width: 200px;
+      }
+
+      .form paper-button {
+        color: var(--primary-text-color);
+      }
+
+      .form paper-button iron-icon {
+        color: var(--secondary-text-color);
+        padding-right: 8px;
+      }
+
+      .form paper-tabs {
+        max-width: 352px;
+        width: calc(100vw - 16px);
+        --paper-tabs-selection-bar-color: transparent;
+        --paper-tab-ink: var(--primary-color);
+      }
+    </style>
+    <klog-data-list id="data" last-response="{{list}}" userinfo="{{userinfo}}"></klog-data-list>
+
+    <app-toolbar>
+      <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
+      <div class="divider"></div>
+      <paper-button on-click="logout">
+        <iron-icon icon="power_settings_new"></iron-icon>注销
+      </paper-button>
+    </app-toolbar>
+
+    <div class="userpanel-card klog-card">
+      <div class="card-meta header">
+        <div class="title">公开信息</div>
+        <div class="divider"></div>
+        <paper-icon-button icon="save" on-click="updatePublicinfo"></paper-icon-button>
+      </div>
+      <div class="form">
+        <klog-input label="头像路径" value="{{userinfo.avatarUrl}}" outlined hidden></klog-input>
+        <klog-input label="昵称" value="{{userinfo.displayName}}" outlined></klog-input>
+        <klog-input label="个人介绍" value="{{userinfo.introduction}}" outlined></klog-input>
+        <paper-button on-click="openUploadAvatarDialog">
+          <iron-icon icon="cloud_upload"></iron-icon>上传头像
+        </paper-button>
+        <div class="fit">
+        </div>
+      </div>
+    </div>
+
+    <div class="userpanel-card klog-card">
+      <div class="card-meta header">
+        <div class="title">我就喜欢</div>
+      </div>
+      <div class="form">
+        <!-- <paper-dropdown-menu label="主题">
+          <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{preference.theme}}">
+            <paper-item name="light">浅色</paper-item>
+            <paper-item name="dark">深色</paper-item>
+            <paper-item name="system">跟随系统</paper-item>
+            <paper-item name="time">跟随时间</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu> -->
+        <!-- <klog-dropdown-menu label="主题">
+            <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{preference.theme}}">
+              <paper-item name="light">浅色</paper-item>
+              <paper-item name="dark">深色</paper-item>
+              <paper-item name="system">跟随系统</paper-item>
+              <paper-item name="time">跟随时间</paper-item>
+            </paper-listbox>
+          </klog-dropdown-menu> -->
+        <klog-dropdown-menu label="主题" outlined vertical-align="top" horizontal-align="left" vertical-offset="62"
+          horizontal-offset="-16">
+          <paper-tabs selected="{{preference.theme}}" slot="dropdown-content" class="dropdown-content"
+            attr-for-selected="name">
+            <paper-tab name="light">浅色</paper-tab>
+            <paper-tab name="dark">深色</paper-tab>
+            <paper-tab name="system">跟随系统</paper-tab>
+            <paper-tab name="time">根据时间</paper-tab>
+          </paper-tabs>
+        </klog-dropdown-menu>
+        <paper-toggle-button checked="{{preference.backdropBlurEnabled}}">毛玻璃效果</paper-toggle-button>
+        <!-- <paper-toggle-button checked="{{preference.darkThemeDisabled}}">没有黑夜</paper-toggle-button> -->
+        <!-- <paper-toggle-button checked="{{preference.gestureDisabled}}">手势什么的最讨厌了</paper-toggle-button> -->
+      </div>
+    </div>
+
+    <div class="userpanel-card klog-card">
+      <div class="card-meta header">
+        <div class="title">启动时打开</div>
+      </div>
+      <div class="form">
+        <paper-radio-group selected="{{preference.defaultPage}}">
+          <paper-radio-button name="timeline">时间轴</paper-radio-button>
+          <paper-radio-button name="note">笔记</paper-radio-button>
+        </paper-radio-group>
+      </div>
+    </div>
+
+    <paper-dialog id="uploadAvatarDialog" with-backdrop>
+      <klog-upload-zone bucketname="klog-avatar" fileinfo="{{avatarinfo}}"></klog-upload-zone>
+    </paper-dialog>
+    <paper-toast id="updateToast" text="已更新账户"></paper-toast>
+  </template>
+  <script>
+    class KlogUserpanel extends Polymer.Element {
+
+      static get is() { return 'klog-userpanel'; }
+
+      static get observers() {
+        return [
+          'loadList(userinfo.publicinfo.id)',
+          'updateAvatarUrl(avatarinfo)',
+          'updatePreference(preference.theme,preference.defaultPage,preference.backdropBlurEnabled)'
+        ]
+      }
+
+      openDrawer() {
+        this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+      }
+
+      logout() {
+        this.userinfo.klogUser.logout();
+        this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
+      }
+
+      newArticle() {
+        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
+      }
+
+      load() {
+        document.title = '个人资料 - Klog';
+        if (!this.userinfo.createdAt) {
+          this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
+          return;
+        }
+        this.preference = this.userinfo.preference;
+        this.loadList();
+      }
+
+      loadList() {
+        this.$.data.load();
+      }
+
+      parseDate(date) {
+        return Date.parse(date)
+      }
+
+      openUploadAvatarDialog() {
+        this.$.uploadAvatarDialog.open();
+      }
+
+      updateAvatarUrl(avatarinfo) {
+        this.userinfo.avatarUrl = avatarinfo.host + '/' + avatarinfo.key;
+        console.log(this.userinfo.avatarUrl);
+        this.$.uploadAvatarDialog.close();
+        this.updatePublicinfo();
+      }
+
+      _updateUserinfo(info) {
+        let klogUser = this.userinfo.klogUser;
+        klogUser.update(info).then(() => {
+          this.$.updateToast.show();
+          klogUser.updateUserinfo();
+        });
+      }
+
+      updatePublicinfo() {
+        let newInfo = {
+          displayName: {
+            publicRead: true,
+            value: this.userinfo.displayName
+          },
+          introduction: {
+            publicRead: true,
+            value: this.userinfo.introduction
+          },
+          avatarUrl: {
+            publicRead: true,
+            value: this.userinfo.avatarUrl
+          },
+        };
+        this._updateUserinfo(newInfo);
+      }
+
+      updatePreference() {
+        if (!this._preferenceInit) {
+          this._preferenceInit = true;
+          return;
+        }
+        this._updateUserinfo({ preference: { value: this.preference } });
+      }
+
+    }
+
+    window.customElements.define(KlogUserpanel.is, KlogUserpanel);
+  </script>
+</dom-module>

@@ -1,0 +1,464 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-style-layout.html">
+<link rel="import" href="klog-style-scrollbar.html">
+<link rel="import" href="klog-style-card.html">
+<link rel="import" href="klog-timeline-item.html">
+<link rel="import" href="paper-chip.html">
+<dom-module id="klog-timeline">
+  <template>
+    <style include="klog-style-layout"></style>
+    <style include="klog-style-scrollbar"></style>
+    <style>
+      :host {
+        display: block;
+        min-height: 100vh;
+        overflow: hidden;
+        padding: 0;
+        background: var(--klog-theme-background);
+      }
+
+      app-header {
+        transition: transform var(--refresh-animation-duration) ease !important;
+      }
+
+      app-toolbar .title {
+        flex: initial;
+        cursor: pointer;
+        pointer-events: auto;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .main-container {
+        padding: 96px 0;
+        min-height: 100vh;
+        box-sizing: border-box;
+        overflow: hidden;
+        justify-content: center;
+      }
+
+      .filter-container {
+        padding: 0 8px;
+        box-sizing: border-box;
+        overflow: auto;
+        white-space: nowrap;
+        width: fit-content;
+        /* transform-origin: left center; */
+        transition: all .15s ease;
+      }
+
+      paper-chip {
+        --paper-chip-text-color: var(--secondary-text-color);
+        --divider-color: var(--secondary-text-color);
+
+        --paper-button-style: {
+          padding: 6px 16px;
+          border-radius: 20px;
+          font-weight: bold;
+        }
+      }
+
+      paper-chip#dailyFilter {
+        --primary-color: var(--paper-amber-900);
+      }
+
+      paper-chip#noteFilter {
+        --primary-color: var(--paper-green-700);
+      }
+
+      paper-chip#projectFilter {
+        --primary-color: var(--paper-blue-grey-500);
+      }
+
+      .item {
+        max-width: 600px;
+        margin: 0 auto 16px;
+        transition: width .2s ease;
+      }
+
+      .eof {
+        width: 100px;
+        padding: 4px 8px;
+        margin: 32px auto 0;
+        box-sizing: border-box;
+        text-align: center;
+        border-radius: 16px;
+        color: var(--klog-theme-on-background);
+        background: var(--hover-overlay-background-color);
+        user-select: none;
+      }
+
+      .timeline-container {
+        transition: all var(--refresh-animation-duration) ease-out;
+      }
+
+      /*header button transition*/
+      .reminder {
+        transition: color .5s ease, box-shadow .3s ease;
+      }
+
+      .reminder .reminder-label {
+        white-space: nowrap;
+        overflow: hidden;
+        transition: width .2s ease;
+      }
+
+      /*when header is collapsed or reminder is not active*/
+      .reminder:not([active]),
+      app-header.collapsed .reminder {
+        width: 48px;
+        height: 48px;
+        padding: 0px;
+        flex-basis: 48px;
+        flex-shrink: 0;
+        min-width: auto;
+        border-radius: 50%;
+      }
+
+      .reminder:not([active]) iron-icon,
+      app-header.collapsed .reminder iron-icon {
+        margin-right: 0;
+      }
+
+      .reminder:not([active]) .reminder-label,
+      app-header.collapsed .reminder .reminder-label {
+        width: 0px;
+      }
+
+      /*when header is not collapsed and reminder is active*/
+      app-header:not(.collapsed) .reminder[active] {
+        color: var(--primary-color);
+      }
+
+      app-header:not(.collapsed) .reminder[active]:hover {
+        @apply(--shadow-elevation-4dp);
+      }
+
+      app-header:not(.collapsed) .reminder[active] .reminder-label {
+        width: 56px;
+      }
+
+      /*animation*/
+
+      :host([exit]) .timeline-container,
+      :host([loading]) .timeline-container {
+        transform: translateY(30vh);
+        opacity: 0;
+      }
+    </style>
+    <app-localstorage-document key="timelineFilter" data="{{filter}}"></app-localstorage-document>
+    <klog-data-timeline id="data" last-response="{{list}}" keyword="{{filter}}"></klog-data-timeline>
+    <app-header id="header" fixed short>
+      <app-toolbar>
+        <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
+        <div class="title" id="refreshButton">
+          <div main-title>Klog</div>
+          <div class="divider"></div>
+          <div page-title>时间轴</div>
+          <paper-ripple></paper-ripple>
+        </div>
+        <div class="divider"></div>
+        <paper-button class="reminder" id="reminder" on-click="add">
+          <iron-icon icon="edit"></iron-icon>
+          <span class="reminder-label">写点什么</span>
+        </paper-button>
+      </app-toolbar>
+      <paper-progress indeterminate disabled="{{!loading}}"></paper-progress>
+    </app-header>
+    <div class="main-container" id="container">
+      <div class="filter-container item" id="filter" on-click="setFilter">
+        <paper-chip for='' outlined active id="defaultFilter">全部文章</paper-chip>
+        <paper-chip for="日常" id="dailyFilter" outlined>日常</paper-chip>
+        <paper-chip for="笔记" id="noteFilter" outlined>笔记</paper-chip>
+        <paper-chip for="项目" id="projectFilter" outlined>创意</paper-chip>
+      </div>
+      <div class="timeline-container" id="scrollTarget">
+        <template is="dom-repeat" items="{{items}}">
+          <klog-timeline-item class="item" data="{{item}}"></klog-timeline-item>
+        </template>
+        <div class="eof" hidden="{{!_eof}}">Klog 奇点</div>
+      </div>
+    </div>
+  </template>
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class KlogTimeline extends Polymer.Element {
+
+      static get is() { return 'klog-timeline'; }
+
+      static get properties() {
+        return {
+          loading: {
+            type: Boolean,
+            value: true,
+            reflectToAttribute: true
+          },
+          refreshAnimationDuration: {
+            type: Number,
+            value: 200
+          },
+          list: {
+            type: Array,
+            observer: 'refreshed'
+          },
+          filter: {
+            type: String,
+            observer: '_filterUpdate'
+          }
+        }
+      }
+
+      openDrawer() {
+        this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+      }
+
+      ready() {
+        super.ready();
+        this.updateStyles({
+          '--refresh-animation-duration': this.refreshAnimationDuration + 'ms',
+        });
+        this.$.refreshButton.addEventListener('click', () => {
+          this.dispatchEvent(new CustomEvent('vibrate-start', { bubbles: true, composed: true, detail: { duration: 50 } }));
+          this.refresh();
+        });
+        this._initScroller();
+        this._initPageloader();
+        this.activeReminder();
+        this._lazyObserver = new IntersectionObserver((entries, observer) => {
+          // [intersecting]
+          for (let entry of entries) {
+            let target = entry.target;
+            if (entry.isIntersecting) {
+              target.setAttribute("intersecting", '');
+            } else {
+              target.removeAttribute("intersecting");
+            }
+          }
+          // [overflow]
+          let lastOverflowTarget = this.$.container.querySelector('klog-timeline-item[overflow]');
+          let overflowTarget = this.$.container.querySelector('klog-timeline-item[intersecting]');
+          if (!lastOverflowTarget) {
+            overflowTarget.setAttribute("overflow", '');
+          } else if (overflowTarget !== lastOverflowTarget) {
+            lastOverflowTarget.removeAttribute("overflow");
+            overflowTarget.setAttribute("overflow", '');
+          }
+        });
+      }
+
+      activeReminder() {
+        setTimeout(() => {
+          this.$.reminder.setAttribute('active', true);
+        }, 2000);
+      }
+
+      _initScroller() {
+        this._scrollHandler = e => {
+          let y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+          if (y > 16) {
+            let progress = Math.max(0, Math.min(1, (y - 16) / 30));
+            this.$.filter.style.transform = `scale(${1 - progress * 0.05})`;
+            if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
+              this.$.filter.style.opacity = 1;
+            } else {
+              this.$.filter.style.opacity = 1 - progress;
+            }
+          }
+          else {
+            this.$.filter.style.transform = `scale(1)`;
+            this.$.filter.style.opacity = 1;
+          }
+          if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
+            const statusBar = document.querySelector('#statusbarFix');
+            const statusBarBackground = document.querySelector('#statusbarFixBackground');
+            const color = this.$.header.getComputedStyleValue("--klog-header-background-color") || this.$.header.getComputedStyleValue("--primary-background-color");
+            let progress = Math.max(0, Math.min(1, y / 66));
+            let isLight = this.theme == 'light';
+            this.$.header.updateStyles({ '--klog-header-opacity': 1 - progress * (isLight ? 0.3 : 0.2) });
+            this.$.header.style.backdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
+            this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
+            window.ShadyCSS && window.ShadyCSS.styleSubtree(statusBarBackground, {
+              '--klog-statusbar-opacity': 1 - progress * (isLight ? 0.1 : 0.05),
+              '--klog-statusbar-color': color
+            });
+            statusBar.style.backdropFilter = `saturate(180%) blur(${(isLight ? 15 : 20)}px)`;
+            statusBar.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 15 : 20)}px)`;
+          } else {
+            this.$.header.updateStyles({ '--klog-header-opacity': 1 });
+            this.$.header.style.backdropFilter = 'initial';
+            this.$.header.style.webkitBackdropFilter = 'initial';
+          }
+          let intersectinglist = this.$.container.querySelectorAll('klog-timeline-item[intersecting]');
+          for (let target of intersectinglist) {
+            let margin = target.offsetTop + target.offsetHeight - y;
+            let progress1 = Math.max(0, Math.min(1, (margin - 64) / 64));
+            let progress2 = Math.max(0, Math.min(1, (margin - 64) / (64 + target.offsetHeight)));
+            target.style.transform = `scale(${0.9 + progress2 * 0.1})`;
+            if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
+              target.style.opacity = 1;
+            } else {
+              target.style.opacity = progress1;
+            }
+          }
+        };
+      }
+
+
+      _initPageloader() {
+        this._pageSize = 20;
+        this._resetPage();
+        this._pageScrollHandler = e => {
+          let y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+          let wh = window.innerHeight; // container height
+          let eh = this.scrollHeight;  // element height
+          if (y + wh * 1.4 >= eh) {
+            this._loadNextPage();
+          }
+        };
+      }
+
+      _loadNewPage(list) {
+        this._items = list;
+        this._resetPage();
+        this._loadNextPage();
+        window.scrollTo(0, 0);
+      }
+
+      _resetPage() {
+        this._pageNumber = 0;
+        this._eof = false;
+      }
+
+
+      _loadNextPage() {
+        // page control
+        this._pageNumber++;
+        this.items = this._items.slice(0, this._pageNumber * this._pageSize);
+        if (this._pageNumber * this._pageSize >= this._items.length) {
+          this._eof = true;
+        }
+        // lazy oberser
+        setTimeout(() => this.enableObserver(), 1);
+      }
+
+      enableObserver() {
+        let lazyElements = this.$.container.querySelectorAll('klog-timeline-item:not([watch])');
+        for (let element of lazyElements) {
+          element.setAttribute('watch', '');
+          this._lazyObserver.observe(element);
+        }
+      }
+
+      disableObserver() {
+        let lazyElements = this.$.container.querySelectorAll('klog-timeline-item[watch]');
+        for (let element of lazyElements) {
+          element.removeAttribute('watch');
+          element.removeAttribute('intersecting');
+          element.removeAttribute('overflow');
+          element.setAttribute('style', '');
+          this._lazyObserver.unobserve(element);
+        }
+      }
+
+      setFilter(e) {
+        if (e.target.tagName == 'PAPER-CHIP') {
+          if (e.target.active) {
+            this.filter = '';
+          } else {
+            this.filter = e.target.getAttribute('for');
+          }
+        }
+      }
+
+      _filterUpdate(filter, oldFilter) {
+        let activeChip, oldActiveChip;
+        activeChip = filter ? this.$.filter.querySelector(`[for=${filter}]`) : this.$.defaultFilter;
+        if (oldFilter) {
+          oldActiveChip = this.$.filter.querySelector(`[for=${oldFilter}]`);
+        } else {
+          oldActiveChip = this.$.defaultFilter;
+        }
+        if (!filter) {
+          if (this.$.defaultFilter.active) return
+          oldActiveChip.active = false;
+          this.$.defaultFilter.active = true;
+        } else {
+          oldActiveChip.active = false;
+          activeChip.active = true;
+        }
+        this.refresh();
+      }
+
+      load() {
+        document.title = '时间轴 - Klog';
+        window.scrollTo(0, 0);
+        this._scrollHandler();
+        this.$.filter.classList.add('hidden');
+        window.addEventListener('scroll', this._scrollHandler);
+        window.addEventListener('scroll', this._pageScrollHandler);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.refresh();
+            resolve();
+          }, 1);
+        });
+      }
+
+      unload() {
+        window.removeEventListener('scroll', this._scrollHandler);
+        window.removeEventListener('scroll', this._pageScrollHandler);
+        this.$.reminder.removeAttribute('active');
+        this.disableObserver();
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.dispatchEvent(new CustomEvent('theme-update', { bubbles: true, composed: true }));
+            resolve();
+          }, this.refreshAnimationDuration + 1);
+        });
+
+      }
+
+      add() {
+        this.dispatchEvent(new CustomEvent('editor-open', {
+          bubbles: true, composed: true, detail: {
+            backTo: window.location.hash,
+            preset: {
+              markdown: '@(日常)[]',
+              private: false
+            }
+          }
+        }));
+      }
+
+      refresh() {
+        this._refreshTimestamp = new Date().getTime();
+        this.loading = true;
+        this.$.data.load();
+      }
+
+      refreshed() {
+        let loadingTime = new Date().getTime() - this._refreshTimestamp;
+        let wait = 150;
+        let duration = this.refreshAnimationDuration + wait;
+        let delay = loadingTime >= duration ? 1 : duration - loadingTime;
+        if (this._timer) clearTimeout(this._timer);
+        this._timer = setTimeout(() => {
+          this.loading = false;
+          this.$.filter.classList.remove('hidden');
+          this.scrollTop = 0;
+          this._loadNewPage(this.list);
+        }, delay);
+      }
+
+    }
+
+    window.customElements.define(KlogTimeline.is, KlogTimeline);
+  </script>
+</dom-module>

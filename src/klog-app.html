@@ -1,0 +1,397 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="klog-data-user.html">
+<link rel="import" href="klog-drawer.html">
+<link rel="import" href="klog-style.html">
+<link rel="import" href="klog-style-scrollbar.html">
+<link rel="import" href="klog-style-dialog.html">
+<dom-module id="klog-app">
+  <template>
+    <style include="klog-style-scrollbar"></style>
+    <style include="klog-style-dialog"></style>
+    <style>
+      :host {
+        display: block;
+        min-height: 100%;
+        background: var(--primary-background-color);
+        color: var(--primary-text-color);
+        position: relative;
+        --paper-toggle-button-unchecked-button-color: var(--accent-color);
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: none;
+      }
+
+      iron-pages {
+        overflow: hidden;
+      }
+
+      iron-pages,
+      iron-pages>* {
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      .spinner-container {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10000;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: var(--klog-page-background, #000);
+        opacity: 1;
+        transition: all .5s ease;
+      }
+
+      .spinner-container[hidden] {
+        z-index: -1;
+        opacity: 0;
+      }
+
+      paper-dialog {
+        max-width: 450px;
+      }
+
+      paper-dialog .actions {
+        text-align: right;
+        color: var(--klog-theme-primary);
+      }
+
+      paper-toast a {
+        color: var(--paper-yellow-500);
+        float: right;
+        cursor: pointer;
+      }
+    </style>
+    <!-- Preference -->
+    <app-localstorage-document id="preference" key="preference" data="{{preference}}"></app-localstorage-document>
+    <!-- Route -->
+    <app-location route="{{route}}" use-hash-as-path></app-location>
+    <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{_subroute}}"></app-route>
+    <!-- Loading -->
+    <div class="spinner-container" hidden$="{{!loading}}">
+      <paper-spinner active="{{loading}}"></paper-spinner>
+    </div>
+    <!-- Media query -->
+    <iron-media-query query="max-width: 767px" query-matches="{{mobile}}"></iron-media-query>
+    <!-- User -->
+    <klog-data-user id="user" userinfo="{{userinfo}}"></klog-data-user>
+    <!-- Drawer -->
+    <klog-drawer id="drawer" userinfo="[[userinfo]]" page="{{page}}"></klog-drawer>
+    <!-- Pages -->
+    <iron-pages id="pages" role="main" selected="{{page}}" attr-for-selected="name" selected-attribute="visible">
+      <klog-404 name="404" page="{{page}}"></klog-404>
+      <klog-timeline name="timeline" userinfo="[[userinfo]]" theme="[[theme]]"></klog-timeline>
+      <klog-article name="article" route="{{subroute}}" userinfo="[[userinfo]]" theme="{{theme}}"></klog-article>
+      <klog-editor id="editor" name="editor" mobile="{{mobile}}" userinfo="[[userinfo]]" route="{{subroute}}"
+        theme="{{theme}}"></klog-editor>
+      <klog-login id="login" name="login" userinfo="[[userinfo]]"></klog-login>
+      <klog-signup id="signup" name="signup" userinfo="[[userinfo]]"></klog-signup>
+      <klog-userpanel name="userpanel" userinfo="[[userinfo]]"></klog-userpanel>
+      <klog-apps name="apps" route="{{subroute}}"></klog-apps>
+      <klog-note name="note" userinfo="[[userinfo]]" route="{{subroute}}" theme="[[theme]]" mobile="{{mobile}}"
+        gesture="{{gesture}}"></klog-note>
+      <!--testing-->
+      <klog-drive name="drive" userinfo="[[userinfo]]"></klog-drive>
+      <klog-zone name="zone" userinfo="[[userinfo]]" route="{{subroute}}"></klog-zone>
+      <klog-lab name="lab" userinfo="[[userinfo]]" route="{{subroute}}"></klog-lab>
+    </iron-pages>
+    <paper-toast text="没有网啦！！(´ﾟДﾟ`)" id="offlineToast"></paper-toast>
+    <paper-toast text="Klog 更新已就绪" id="reloadToast" duration="10000"><a on-click="reload">Link Start!</a></paper-toast>
+    <paper-dialog id="happynewyearDialog" with-backdrop>
+      <h2>Hi, 新年快乐！</h2>
+      <p>说来 Klog 已经走过了差不多一年半，不温不火，却是我最满意的样子。感谢各位一直以来的支持。</p>
+      <p>Tccoin, <br>在新年之夜送上祝福</p>
+      <div class="actions">
+        <paper-button dialog-confirm autofocus>新年快乐</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class KlogApp extends Polymer.Element {
+
+      static get is() { return 'klog-app'; }
+
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            reflectToAttribute: true,
+            observer: '_pageChanged'
+          },
+          mobile: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          loading: {
+            type: Boolean,
+            value: true
+          },
+          theme: {
+            type: String,
+            reflectToAttribute: true
+          },
+          gesture: {
+            type: Boolean
+          }
+        }
+      }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)',
+          'updateSubroute(_subroute)',
+          '_updatePreference(userinfo.preference)'
+        ]
+      }
+
+      updateSubroute(_subroute) {
+        let r = _subroute.path ? _subroute.path.match(/([^\?]*)\??(.*)/) : [null, null];
+        this.set('subroute', {
+          prefix: _subroute.prefix,
+          path: r[1],
+          param: r[2],
+        });
+      }
+
+      ready() {
+        super.ready();
+        // event
+        this.addEventListener('klog-app-load', (e) => {
+          this._now = e.detail.now == undefined ? true : e.detail.now;
+          if (e.detail.page) window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
+          if (this.swReg) this.swReg.update();
+        });
+        this.addEventListener('klog-update', () => { if (this.swReg) this.swReg.update() });
+        this.addEventListener('drawer-disable', () => this.$.drawer.disabled = true);
+        this.addEventListener('user-login-page-open', (e) => {
+          setTimeout(() => {
+            this.$.login.continue = e.detail ? e.detail.continue : window.location.hash;
+            this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'login', now: true } }));
+          }, 1);
+        });
+        this.addEventListener('user-signup-page-open', (e) => {
+          setTimeout(() => {
+            this.$.signup.continue = e.detail ? e.detail.continue : window.location.hash;
+            this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'signup', now: true } }));
+          }, 1);
+        });
+        this.addEventListener('drawer-toggle', () => {
+          this.$.drawer.toggle();
+        });
+        this.addEventListener('theme-update', () => {
+          this._updateTheme(this.preference.theme);
+        });
+        this.addEventListener('editor-open', (e) => {
+          const editorLoaded = () => {
+            this.$.editor.backTo = e.detail.backTo || '';
+            this.$.editor.preset = e.detail.preset || {};
+            this.removeEventListener('editor-loaded', editorLoaded);
+          };
+          this.addEventListener('editor-loaded', editorLoaded);
+          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' + (e.detail.articleId || ''), now: false } }));
+        });
+        //upload service worker
+        if (navigator.serviceWorker) {
+          navigator.serviceWorker.getRegistration().then(reg => {
+            if (!reg) return;
+            this.swReg = reg;
+            // check for update every 10 mins
+            this.swReg.update();
+            // setTimeout(() => this.swReg.update(), 3600 * 10);
+            // reload if update required
+            reg.onupdatefound = () => {
+              let installing = reg.installing;
+              installing.onstatechange = () => {
+                if (installing.state == 'installed') {
+                  console.log('need reload');
+                  this.$.reloadToast.open();
+                }
+              };
+            };
+          });
+        }
+        // listen for online/offline
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          window.addEventListener('online', (e) => this._notifyNetworkStatus(e));
+          window.addEventListener('offline', (e) => this._notifyNetworkStatus(e));
+        });
+        this._notifyNetworkStatus();
+        // vibrate
+        this.addEventListener('vibrate-start', (e) => {
+          if ("vibrate" in navigator) {
+            navigator.vibrate(e.detail.duration);
+          }
+        });
+      }
+
+      reload() {
+        location.reload();
+      }
+
+      _routePageChanged(page) {
+        /*
+           app-route
+        => this._routePageChanged(routeData.page)
+        => this.page
+        => this._pageChanged()
+        */
+        let oldPageElement = this.$.pages.querySelector('.iron-selected');
+        let now = this._now;
+        let promise;
+        // 卸载
+        if (oldPageElement && oldPageElement.unload) {
+          if (!now) oldPageElement.setAttribute('exit', '');
+          if (page != this.page) promise = oldPageElement.unload(onunload);
+        }
+        if (now || !promise) promise = Promise.resolve();
+        // 跳转
+        promise.then(() => {
+          setTimeout(() => {
+            if (oldPageElement && page != oldPageElement.getAttribute('name') && !now) {
+              oldPageElement.removeAttribute('entry');
+            }
+            if (page) {
+              this.page = page;
+            } else {
+              this._loadDefaultPage();
+            }
+          }, 1);
+        });
+      }
+
+      _loadDefaultPage() {
+        // the default page loading logic need to be update
+        this._waitingToLoadDefaultPage = false;
+        if (this.preference && this.preference.defaultPage) {
+          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: this.preference.defaultPage + '/' } }));
+        } else {
+          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'timeline/' } }));
+        }
+      }
+
+      _pageChanged(page) {
+        if (page != null) {
+          let pageElement = this.shadowRoot.querySelector(`[name='${page}']`);
+          if (!pageElement) {
+            this.page = '404';
+            return;
+          }
+          let now = this._now;
+          //启用drawer
+          this.$.drawer.disabled = false;
+          //加载
+          this.loading = true;
+          //加载Html并触发load
+          Polymer.importHref(this.resolveUrl('klog-' + page + '.html'), () => {
+            this._updateUserinfo(e => {
+              let promise;
+              if (!pageElement.load || !(promise = pageElement.load(this))) {
+                promise = Promise.resolve();
+              }
+              promise.then(() => {
+                setTimeout(() => {
+                  //加载动画
+                  pageElement.removeAttribute('exit');
+                  if (!now) pageElement.setAttribute('entry', '');
+                }, 1);
+              });
+              this.loading = false;
+              this.removeEventListener('userinfo-updated', this._updateUserinfoCallback);
+            });
+          });
+        }
+      }
+
+      _updateUserinfo(callback) {
+        if (!this.userinfo) {
+          this._updateUserinfoCallback = callback;
+          this.addEventListener('userinfo-updated', callback)
+        } else {
+          callback();
+        }
+      }
+
+      _notifyNetworkStatus() {
+        this.offline = !navigator.onLine;
+        if (this.offline) {
+          this.$.offlineToast.open();
+        }
+      }
+
+      _updateTheme(themeStrategy) {
+        // 主题更新策略
+        let theme = themeStrategy;
+        if (themeStrategy == 'system') {
+          if (window.matchMedia('(prefers-color-scheme)').media) {
+            const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = isSystemDark ? 'dark' : 'light';
+          } else {
+            themeStrategy = 'time';
+          }
+        }
+        if (themeStrategy == 'time') {
+          let d = new Date();
+          let h = d.getHours();
+          theme = (h > 22 || h < 7) ? 'dark' : 'light';
+        }
+        this.theme = theme;
+
+        // 更新主题
+        let htmlTheme = document.querySelector('html').getAttribute('theme');
+        if (htmlTheme && htmlTheme.indexOf('custom') > -1) {
+          document.querySelector('html').setAttribute('theme', theme + ' custom');
+          return;
+        }
+        document.querySelector('html').setAttribute('theme', theme);
+        document.querySelector('html').style.background = theme == 'light' ? '#e0e0e0' : '#000000';
+        let metaThemeColor = document.querySelector("meta[name=theme-color]");
+        metaThemeColor.setAttribute("content", theme == 'light' ? '#e0e0e0' : '#000000');
+        const statusBar = document.querySelector('#statusbarFix');
+        const statusBarBackground = document.querySelector('#statusbarFixBackground');
+        window.ShadyCSS && window.ShadyCSS.styleSubtree(statusBarBackground, {
+          '--klog-statusbar-opacity': theme == 'light' ? 0.8 : 0.3,
+          '--klog-statusbar-color': theme == 'light' ? '#e0e0e0' : '#000000'
+        });
+        statusBar.style.backdropFilter = 'initial';
+        statusBar.style.webkitBackdropFilter = 'initial';
+      }
+
+      _updateGesture(gestureDisabled) {
+        this.gesture = this.mobile ? !gestureDisabled : false;
+      }
+
+      _updatePreference(preference) {
+        if (!preference) return;
+        this.preference = preference || this.preference;
+        // theme
+        this._updateTheme(preference.theme);
+        if (this._updateThemeInterval) clearInterval(this._updateThemeInterval);
+        this._updateThemeInterval = setInterval(() => this._updateTheme(preference.theme), 5 * 60 * 1000);
+        // gestureDisabled
+        this._updateGesture(preference.gestureDisabled);
+        if (this._waitingToLoadDefaultPage) {
+          this._loadDefaultPage();
+        }
+      }
+
+    }
+
+    window.customElements.define(KlogApp.is, KlogApp);
+  </script>
+</dom-module>

@@ -1,0 +1,243 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="klog-style-scrollbar.html">
+<link rel="import" href="klog-style-dialog.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-data-collection.html">
+<dom-module id="klog-drawer">
+  <template>
+    <style include="klog-style-scrollbar"></style>
+    <style include="klog-style-dialog"></style>
+    <style>
+      :host {
+        display: block;
+        color: var(--primary-text-color);
+      }
+
+      app-drawer {
+        z-index: 10000;
+        user-select: none;
+        --app-drawer-width: 272px;
+
+        --app-drawer-content-container: {
+          background: var(--primary-background-color);
+          @apply --shadow-elevation-16dp;
+        }
+      }
+
+      .container {
+        height: 100vh;
+        overflow: auto;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        user-select: none;
+        cursor: default;
+      }
+
+      .divider {
+        margin-top: 8px;
+        margin: 8px 0;
+        border-top: 1px solid var(--divider-color);
+      }
+
+      .subtitle {
+        font-size: .9em;
+        padding: 16px 16px 8px;
+      }
+
+      .title {
+        line-height: 32px;
+        padding: 16px;
+        box-sizing: border-box;
+        font-size: 20px;
+      }
+
+      .item {
+        line-height: 32px;
+        padding: 6px 8px;
+        margin: 4px 8px;
+        border-radius: 5px;
+        box-sizing: border-box;
+        overflow: hidden;
+        position: relative;
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .item iron-icon {
+        margin-right: 16px;
+      }
+
+      .item::after {
+        @apply --overlay-style;
+        opacity: 0;
+      }
+
+      .item:not(.iron-selected):hover::after {
+        opacity: var(--hover-opacity);
+      }
+
+      .item.iron-selected {
+        font-weight: bolder;
+        color: var(--primary-color);
+        cursor: default;
+      }
+
+      .item.iron-selected::after {
+        @apply --overlay-style-activated;
+        background-color: var(--primary-color);
+      }
+
+      .item.secondary iron-icon {
+        opacity: 0.6;
+      }
+
+      .brand {
+        opacity: 0.2;
+        position: absolute;
+        bottom: 120px;
+        left: 0;
+        margin: 8px 16px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      paper-dialog {
+        min-width: 300px;
+      }
+
+      paper-dialog .actions {
+        text-align: right;
+        color: var(--klog-theme-primary);
+      }
+    </style>
+    <klog-data-collection id="collection" userinfo="[[userinfo]]" last-response="{{collections}}">
+    </klog-data-collection>
+    <app-drawer id="drawer" swipe-open="{{!disabled}}" opened="{{opened}}">
+      <div class="container" id="scrollTarget">
+        <div class="title">记录未来</div>
+        <iron-selector attr-for-selected="name" selected="{{page}}" on-iron-select="close" on-click="updatePage">
+
+          <div class="item" name="timeline">
+            <iron-icon icon="timeline"></iron-icon>时间轴
+            <paper-ripple></paper-ripple>
+          </div>
+
+          <template is="dom-if" if="{{!isLogin}}">
+            <div class="item" name="login">
+              <iron-icon icon="account_circle"></iron-icon>登录
+              <paper-ripple></paper-ripple>
+            </div>
+            <div class="item" name="signup">
+              <iron-icon icon="account_box"></iron-icon>注册
+              <paper-ripple></paper-ripple>
+            </div>
+          </template>
+
+          <template is="dom-if" if="{{isLogin}}">
+            <div class="item" name="userpanel">
+              <iron-icon icon="account_circle"></iron-icon>个人设置
+              <paper-ripple></paper-ripple>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="subtitle">分类</div>
+
+            <div class="item secondary" name="note/all/">
+              <iron-icon icon="book"></iron-icon>所有笔记
+              <paper-ripple></paper-ripple>
+            </div>
+
+            <template is="dom-repeat" items="{{collections}}">
+              <div class="item secondary" name="note/{{item}}/">
+                <iron-icon icon="label"></iron-icon>{{item}}
+                <paper-ripple></paper-ripple>
+              </div>
+            </template>
+          </template>
+
+          <div class="divider"></div>
+
+          <div class="item" on-click="about">
+            <iron-icon icon="info"></iron-icon>关于
+            <paper-ripple></paper-ripple>
+          </div>
+        </iron-selector>
+      </div>
+    </app-drawer>
+
+    <paper-dialog id="aboutDialog" with-backdrop>
+      <h2>$klog -V</h2>
+      <p>v2.8.0<br>2017-2019<br>Powered by Kr with Love.</p>
+      <div class="actions">
+        <paper-button on-click="changelog">更新日志</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script>
+    class KlogDrawer extends Polymer.Element {
+
+      static get is() { return 'klog-drawer'; }
+
+      static get properties() {
+        return {
+          page: {
+            type: String
+          },
+          disabled: {
+            type: Boolean,
+            value: false
+          },
+          opened: {
+            type: Boolean
+          }
+        }
+      }
+
+      ready() {
+        super.ready();
+        this.isLogin = false;
+        document.querySelector('klog-app').addEventListener('userinfo-updated', e => this.openHandle(e.detail.isLogin));
+      }
+
+      openHandle(isLogin = fasle) {
+        this.$.collection.list();
+        this.isLogin = isLogin;
+      }
+
+      toggle() {
+        this.$.drawer.toggle();
+      }
+
+      updatePage() {
+        setTimeout(() => {
+          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: this.page } }));
+        }, 1);
+      }
+
+      close() {
+        this.$.drawer.close();
+      }
+
+      about() {
+        this.close();
+        this.$.aboutDialog.open();
+        this.dispatchEvent(new CustomEvent('klog-update', { bubbles: true, composed: true }));
+      }
+
+      changelog() {
+        this.$.aboutDialog.close();
+        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/article-169172' } }));
+      }
+
+    }
+
+    window.customElements.define(KlogDrawer.is, KlogDrawer);
+  </script>
+</dom-module>

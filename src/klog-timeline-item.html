@@ -1,0 +1,169 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-ripple/paper-ripple.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-data-timeline.html">
+<link rel="import" href="klog-data-image.html">
+<link rel="import" href="klog-style-card.html">
+<link rel="import" href="klog-timeline-attachments.html">
+<link rel="import" href="klog-render-timestamp.html">
+<dom-module id="klog-timeline-item">
+  <template>
+    <style include="klog-style-card"></style>
+    <style>
+      :host {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: default;
+        width: 100%;
+        --app-grid-columns: 3;
+        --app-grid-item-height: 100%;
+        --app-grid-gutter: 1px;
+        --secondary-font-size: 14px;
+      }
+
+      .card {
+        width: 100%;
+        width: calc(100% - 16px);
+        cursor: pointer;
+        background: var(--klog-theme-surface);
+        -webkit-tap-highlight-color: transparent;
+        transition: box-shadow .3s ease;
+      }
+
+      .card:hover {
+        @apply --shadow-elevation-8dp;
+      }
+
+      /*card-meta*/
+
+      .card-meta {
+        display: flex;
+        align-items: center;
+        line-height: 1.3;
+        margin: 0 !important;
+        padding: calc(var(--klog-card-padding) * 2);
+        color: var(--secondary-text-color);
+        font-size: var(--secondary-font-size);
+      }
+
+      .card-meta .date {
+        white-space: nowrap;
+      }
+
+      .meta-name {
+        margin-right: 4px;
+        font-weight: bold;
+        color: var(--primary-text-color);
+      }
+
+      .meta-collection {
+        white-space: nowrap;
+      }
+
+      .card-meta+.card-title {
+        margin-top: var(--klog-card-padding);
+      }
+
+      /*card-body*/
+
+      .card-title {
+        color: var(--primary-text-color);
+      }
+
+      .card-title+.card-content {
+        margin-top: 0;
+      }
+
+      .card-content {
+        display: flex !important;
+        flex-direction: row;
+      }
+
+      .content-text {
+        max-height: 6.8em;
+        overflow: hidden;
+        flex: 1;
+        margin: 0;
+        padding-right: calc(var(--klog-card-padding) * 2);
+        font-size: var(--secondary-font-size);
+        color: var(--klog-card-content-color, var(--primary-text-color));
+      }
+
+      .content-thumbnail {
+        width: 160px;
+        height: 90px;
+        border-radius: 3px;
+      }
+
+      /*card-attachments*/
+
+      .attachments {
+        position: relative;
+        margin-top: 0;
+        margin-bottom: 0;
+        overflow: hidden;
+      }
+
+      /*card-actions*/
+
+      .actions {
+        display: flex;
+        color: var(--secondary-text-color);
+      }
+
+      .divider {
+        flex: 1;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+    <div class="card klog-card" attachment$="{{has(data.attachment)}}" comment$="{{has(data.attachment)}}"
+      raised$="{{expended}}" on-click="read">
+      <div class="card-meta">
+        <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" avatar></klog-data-image>
+        <div class="meta">
+          <span class="meta-name">{{data.author.displayName}}</span>
+          <span class="meta-collection">发布在&nbsp;{{data.collection}}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="date">
+          <klog-render-timestamp time-stamp="{{data.date}}"></klog-render-timestamp>
+        </div>
+      </div>
+      <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
+      <div class="card-content" hidden$="{{!data.text}}">
+        <p class="content-text" id="text">{{data.text}}</p>
+        <template is="dom-if" if="{{data.image.url}}">
+          <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
+        </template>
+      </div>
+    </div>
+  </template>
+  <script src="/static/lib/Clamp.js/clamp.min.js"></script>
+  <script>
+    class KlogTimelineItem extends Polymer.Element {
+
+      static get is() { return 'klog-timeline-item'; }
+
+      ready() {
+        super.ready();
+        setTimeout(() => $clamp(this.$.text, { clamp: 4 }), 1);
+      }
+
+      has(sth) {
+        return !(sth == false)
+      }
+
+      read() {
+        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/' + this.data.path, now: false } }));
+      }
+    }
+
+    window.customElements.define(KlogTimelineItem.is, KlogTimelineItem);
+  </script>
+</dom-module>

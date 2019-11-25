@@ -1,0 +1,39 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<dom-module id="klog-apps">
+  <template>
+    <style>
+       :host {
+        display: block;
+      }
+    </style>
+
+    <app-route route="{{route}}" pattern="/:appName" data="{{routeData}}"></app-route>
+
+  </template>
+
+  <script>
+    class KlogApps extends Polymer.Element {
+
+      static get is() { return 'klog-apps'; }
+
+      static get observers() {
+        return [
+          'loadApp(routeData.appName)',
+        ]
+      }
+
+      loadApp(appName) {
+        this.dispatchEvent(new CustomEvent('drawer-disable', { bubbles: true, composed: true }));
+        Polymer.importHref(this.resolveUrl('klog-apps-' + appName + '.html'), () => {
+          let app = document.createElement('klog-apps-' + appName);
+          this.shadowRoot.append(app);
+        });
+      }
+
+    }
+
+    window.customElements.define(KlogApps.is, KlogApps);
+  </script>
+
+</dom-module>

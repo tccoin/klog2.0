@@ -1,0 +1,115 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-style.html">
+<dom-module id="paper-chip">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        user-select: none;
+        cursor: default;
+      }
+
+      .checkmark {
+        width: 0;
+        height: 20px;
+        vertical-align: middle;
+        color: var(--primary-text-color);
+        -webkit-transition: width .15s cubic-bezier(.4, 0, .2, 1);
+        -o-transition: width .15s cubic-bezier(.4, 0, .2, 1);
+        transition: width .15s cubic-bezier(.4, 0, .2, 1);
+      }
+
+      :host([active]) .checkmark {
+        width: 20px;
+      }
+
+      .checkmark path {
+        -webkit-transition: stroke-dashoffset .15s cubic-bezier(.4, 0, .6, 1) 50ms;
+        -o-transition: stroke-dashoffset .15s 50ms cubic-bezier(.4, 0, .6, 1);
+        transition: stroke-dashoffset .15s cubic-bezier(.4, 0, .6, 1) 50ms;
+        stroke-width: 2px;
+        stroke-dashoffset: 29.78334;
+        stroke-dasharray: 29.78334;
+        stroke: var(--paper-chip-text-color, --primary-text-color);
+      }
+
+      :host([active]) .checkmark path {
+        stroke-dashoffset: 0;
+        stroke: var(--primary-color);
+      }
+
+      paper-button {
+        padding: 4px 12px;
+        min-width: auto;
+        border-radius: 18px;
+        color: var(--paper-chip-text-color, --primary-text-color);
+        overflow: hidden;
+        text-transform: none;
+        background: transparent;
+        @apply --paper-button-style;
+      }
+
+      paper-button::after {
+        @apply --overlay-style;
+      }
+
+      :host([disabled]) paper-button {
+        color: var(--disabled-text-color);
+      }
+
+      :host([active]) paper-button {
+        color: var(--primary-color);
+      }
+
+      :host([active]) paper-button::after {
+        @apply --overlay-style-selected;
+      }
+
+      :host([outlined]) paper-button {
+        border: var(--outlined-border-width) solid var(--border-color, --divider-color);
+      }
+
+      :host([outlined]) paper-button::after {
+        opacity: 0;
+      }
+
+      :host([outlined][active]) paper-button {
+        border: var(--outlined-border-width) solid var(--primary-color);
+      }
+    </style>
+
+    <paper-button disabled="{{disabled}}">
+      <svg class="checkmark" viewBox="-2 -3 30 30">
+        <path fill="none" stroke="black" d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
+      </svg>
+      <slot></slot>
+    </paper-button>
+
+  </template>
+
+  <script>
+    class PaperChip extends Polymer.Element {
+
+      static get is() { return 'paper-chip'; }
+
+      static get properties() {
+        return {
+          active: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          disabled: {
+            type: Boolean,
+            reflectToAttribute: true
+          }
+        }
+      }
+
+    }
+
+    window.customElements.define(PaperChip.is, PaperChip);
+  </script>
+
+</dom-module>

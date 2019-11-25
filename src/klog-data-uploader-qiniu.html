@@ -1,0 +1,102 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<script src="../static/js/qiniu-token.min.js"></script>
+<dom-module id="klog-data-uploader">
+  <template>
+    <iron-ajax id="ajax" method="post" url="https://up.qbox.me" handle-as="json" on-response="_onResponse"></iron-ajax>
+  </template>
+
+  <script>
+    class KlogUploader extends Polymer.Element {
+
+      static get is() { return 'klog-data-uploader'; }
+
+      static get properties() {
+        return {
+          fileinfo: {
+            type: Object,
+            notify: true,
+          },
+          bucketname: {
+            type: String,
+            value: 'klog2',
+            notify: true,
+          },
+          remainingNumber: {
+            type: Number,
+            notify: true,
+          },
+          files: {
+            type: Array,
+            value: [],
+          },
+          uploading: {
+            type: Boolean,
+            value: false,
+            notify: true,
+          },
+        }
+      }
+
+      _onResponse(e) {
+        //update fileinfo
+        let fileinfo = e.detail.response;
+        fileinfo.host = 'http://oxqsk2qu4.bkt.clouddn.com';
+        //console.log(fileinfo);
+        if (fileinfo) {
+          fileinfo.remaining = this.files.length != 1;
+          fileinfo.timestamp = Date.parse(new Date());
+          this.set('fileinfo', fileinfo);
+        }
+        //fire
+        this.dispatchEvent(new CustomEvent('upload-success', { bubbles: true, composed: true, detail: { fileinfo: this.fileinfo } }));
+        //upload next file
+        this.shift('files');
+        this._filesChanged();
+        if (this.files.length > 0) {
+          this._uploadToServer(this.files[0]);
+        } else {
+          this.uploading = false;
+        }
+      }
+
+      upload(file) {
+        if (!file) return
+        this.push('files', file);
+        this._filesChanged();
+        if (!this.uploading) {
+          this._uploadToServer(this.files[0]);
+        }
+      }
+
+      _uploadToServer(file) {
+        if (!file) return
+        this.uploading = true;
+        let data = new FormData();
+        data.append('file', file);
+        //data.append('key', file.name);
+        data.append('token', this.getToken(this.bucketname));
+        this.$.ajax.body = data;
+        this.$.ajax.generateRequest();
+      }
+
+      _filesChanged() {
+        this.remainingNumber = this.files.length;
+      }
+
+      getToken(bucketname) {
+        qiniuToken.config.access_key = 'iaK9y8sIrzgjYcYfkQOlIYloEugbL-OL2ujMe9G9';
+        qiniuToken.config.secret_key = 'PIz-ntSB_NVGW3yO_49VbFy0i1GfKVmhi_MtvkqE';
+        qiniuToken.config.bucketname = bucketname;
+        qiniuToken.config.saveKey = '$(etag)$(ext)';
+        qiniuToken.config.returnBody = '{"key": $(key), "hash": $(etag), "fname": $(fname), "mimeType": $(mimeType), "width": $(imageInfo.width), "height": $(imageInfo.height), "exif": $(exif), "imageAve": $(imageAve), "bucket": $(bucket)}';
+        var token = qiniuToken.getToken();
+        return token
+      }
+
+    }
+
+    window.customElements.define(KlogUploader.is, KlogUploader);
+  </script>
+
+</dom-module>

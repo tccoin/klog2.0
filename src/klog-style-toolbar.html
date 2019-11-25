@@ -1,0 +1,192 @@
+<dom-module id="klog-style-toolbar">
+  <template>
+    <style>
+      app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 100;
+        /* background-color: var(--klog-header-background-color, var(--primary-background-color)); */
+        color: var(--klog-header-text-color, var(--secondary-text-color));
+        box-shadow: 0 1px 8px rgba(0, 0, 0, .3);
+        overflow: hidden;
+      }
+
+      app-header::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background-color: var(--klog-header-background-color, var(--primary-background-color));
+        opacity: var(--klog-header-opacity, 1);
+      }
+
+      app-toolbar {
+        display: flex;
+        width: 100%;
+        z-index: 100;
+        box-sizing: border-box;
+        background-color: transparent;
+      }
+
+      app-toolbar>.divider {
+        flex: 1;
+        height: 100%;
+      }
+
+      app-toolbar .title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex: 1;
+        line-height: 26px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        color: inherit;
+        user-select: none;
+        cursor: default;
+        margin-left: 16px;
+      }
+
+      app-toolbar .title .divider {
+        width: 1px;
+        height: 20px;
+        margin: 0 16px;
+        background: var(--klog-header-divider-color, var(--divider-color));
+      }
+
+      app-toolbar .actions {
+        display: inline;
+        white-space: nowrap;
+      }
+
+      app-toolbar paper-icon-button {
+        width: 48px;
+        height: 48px;
+        padding: 12px;
+        flex-basis: 48px;
+        flex-shrink: 0;
+      }
+
+      app-toolbar[vertical] {
+        width: 64px;
+        height: 100vh;
+        padding: 16px 0;
+        flex-shrink: 0;
+        flex-direction: column;
+        box-sizing: border-box;
+      }
+
+      app-toolbar paper-button {
+        font-size: 14px;
+        font-weight: bold;
+        color: inherit;
+      }
+
+      app-toolbar:not([vertical]) paper-button iron-icon {
+        margin-right: 8px;
+      }
+
+      app-toolbar:[vertical] paper-button iron-icon {
+        margin-bottom: 8px;
+      }
+
+      app-header paper-progress {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        z-index: 100;
+        transition: all 300ms ease;
+        --paper-progress-active-color: var(--primary-color);
+        --paper-progress-container-color: transparent;
+      }
+
+      app-header paper-progress[disabled] {
+        display: none;
+      }
+
+      /*short*/
+
+      app-header[short],
+      app-toolbar[short] {
+        transition: .15s box-shadow .1s ease, width .25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      }
+
+      app-header[short].collapsed,
+      app-toolbar[short].collapsed {
+        width: var(--klog-header-short-width, 128px);
+        right: auto;
+        border-radius: 0 0 24px 0;
+        box-shadow: 0 1px 8px rgba(0, 0, 0, .3) !important;
+      }
+
+      app-header[short] .title,
+      app-toolbar[short] .title {
+        transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+      }
+
+      app-header[short].collapsed .actions,
+      app-toolbar[short].collapsed .actions {
+        width: 64px;
+        overflow: hidden;
+      }
+
+      app-header[short].collapsed .title,
+      app-toolbar[short].collapsed .title {
+        margin-left: 0;
+        opacity: 0;
+      }
+
+      @media (max-width: 767px) {
+
+        app-header[short].collapsed,
+        app-toolbar[short].collapsed {
+          width: calc(var(--klog-header-short-width, 128px) - 24px);
+        }
+
+        app-toolbar {
+          padding: 0 4px;
+        }
+
+        app-toolbar[vertical] {
+          padding: 4px 0;
+        }
+
+        app-toolbar[vertical] paper-icon-button[icon=menu],
+        app-toolbar[vertical] paper-icon-button.navigation {
+          margin-bottom: 4px;
+        }
+
+        :host([entry]) .title [main-title],
+        :host([entry]) .title .divider {
+          display: none;
+        }
+      }
+
+      /*animation*/
+
+      :host .title .divider {
+        transition: all .3s ease-out;
+      }
+
+      :host([exit]) .title .divider {
+        opacity: 0;
+        transform: scale(1, 0);
+      }
+
+      :host .title [page-title] {
+        transition: opacity .15s ease, transform .2s ease;
+      }
+
+      :host([exit]) .title [page-title] {
+        opacity: 0;
+        transform: translate(-20%, 0);
+      }
+    </style>
+  </template>
+</dom-module>

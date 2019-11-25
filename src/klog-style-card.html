@@ -1,0 +1,41 @@
+<dom-module id="klog-style-card">
+  <template>
+    <style>
+       :host {
+        --klog-card-padding: 8px;
+      }
+
+      .klog-card {
+        position: relative;
+        box-sizing: border-box;
+        border-radius: 5px;
+        background-color: var(--primary-background-color);
+        transition: box-shadow .2s ease-out;
+        @apply --shadow-elevation-2dp;
+      }
+
+      .klog-card[raised] {
+        @apply --shadow-elevation-8dp;
+      }
+
+      .klog-card>* {
+        margin-top: calc(var(--klog-card-padding) * 2);
+        margin-bottom: calc(var(--klog-card-padding) * 2);
+      }
+
+      .klog-card .card-title {
+        font-size: 1.4em;
+        line-height: 1;
+        margin: calc(var(--klog-card-padding) * 3) calc(var(--klog-card-padding) * 2) calc(var(--klog-card-padding) * 2);
+      }
+
+      .klog-card .card-content {
+        margin: calc(var(--klog-card-padding) * 2);
+      }
+
+      .klog-card .card-actions {
+        margin: var(--klog-card-padding) calc(var(--klog-card-padding) * 2);
+      }
+    </style>
+  </template>
+</dom-module>

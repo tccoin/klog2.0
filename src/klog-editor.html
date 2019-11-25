@@ -1,0 +1,396 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-editor-info-form.html">
+<link rel="import" href="klog-editor-browser.html">
+<link rel="import" href="klog-editor-header.html">
+<link rel="import" href="klog-editor-textarea.html">
+<link rel="import" href="klog-data-editor.html">
+<link rel="import" href="klog-style-scrollbar.html">
+<link rel="import" href="klog-backdrop.html">
+<link rel="import" href="klog-pages.html">
+<link rel="import" href="klog-markdown.html">
+<link rel="import" href="klog-upload-zone.html">
+<link rel="import" href="klog-editor-helper.html">
+<dom-module id="klog-editor">
+  <template>
+    <style include="klog-style-scrollbar"></style>
+    <style>
+      :host {
+        display: block;
+        overflow: hidden;
+        padding: 0;
+        background-color: var(--klog-page-background);
+        --klog-editor-padding: 24px;
+        --klog-markdown-padding: var(--klog-editor-padding);
+        --textarea-padding: var(--klog-editor-padding);
+      }
+
+      .layout {
+        display: flex;
+        flex-direction: column;
+      }
+
+      klog-backdrop {
+        display: flex;
+        justify-content: center;
+        align-content: center;
+
+        --klog-backdrop-back: {
+          --accent-color: var(--secondary-background-color);
+        }
+      }
+
+      klog-backdrop klog-pages {
+        background-color: var(--primary-background-color);
+      }
+
+      .klog-editor-back-pages {
+        margin: 16px auto;
+        padding: 16px;
+        max-height: calc(100vh - 224px);
+        box-sizing: border-box;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+      }
+
+      klog-editor-header {
+        width: 100vw;
+      }
+
+      klog-editor-info-form {
+        width: 100%;
+        max-width: 360px;
+      }
+
+      klog-upload-zone {
+        width: 100%;
+      }
+
+      .klog-editor-main-pages {
+        width: 100vw;
+        max-width: 1280px;
+        height: calc(100vh - 64px);
+        margin: auto;
+        border-radius: 12px 12px 0 0;
+        overflow: hidden;
+        @apply --shadow-elevation-4dp;
+      }
+
+      klog-editor-textarea {
+        width: 50vw;
+        border-right: 1px solid var(--divider-color);
+      }
+
+      klog-markdown {
+        background: var(--primary-background-color);
+        width: calc(50vw - 1px);
+      }
+
+      klog-markdown .info {
+        font-size: 12px;
+        cursor: default;
+        user-select: none;
+        color: var(--secondary-text-color);
+      }
+
+      paper-toast a {
+        color: var(--paper-yellow-500);
+        float: right;
+        cursor: pointer;
+      }
+
+      @media (max-width: 767px) {
+        :host {
+          --klog-editor-padding: 16px;
+        }
+      }
+
+      /*animation*/
+
+      :host([exit]) .klog-editor-back-pages,
+      klog-backdrop .klog-editor-main-pages {
+        transition: opacity .2s ease, transform .1s ease;
+      }
+
+      :host([exit]) .klog-editor-back-pages,
+      :host([exit]) .klog-editor-main-pages {
+        opacity: 0;
+        transform: translateY(5vh);
+      }
+
+      klog-editor-helper {
+        display: none;
+        transition: opacity .15s ease-out;
+      }
+
+      :host([exit]) klog-editor-header {
+        opacity: 0;
+      }
+    </style>
+    <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
+    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" title="{{title}}"
+      auto-title="{{autoTitle}}" display-title="{{displayTitle}}" path="{{path}}" random-Path="{{randomPath}}"
+      display-path="{{displayPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}"
+      private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}" current-line="{{currentLine}}">
+    </klog-data-editor>
+    <div class="layout">
+      <klog-backdrop id="backdrop">
+        <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}"
+          display-title="{{displayTitle}}" title="{{title}}" auto-title="{{autoTitle}}" path="{{path}}"
+          random-Path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}" mobile="{{mobile}}"
+          userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}"></klog-editor-header>
+        <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
+          <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}"
+            display-title="{{displayTitle}}" title="{{title}}" auto-title="{{autoTitle}}" path="{{path}}"
+            random-Path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}"></klog-editor-info-form>
+          <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
+          <klog-editor-browser name="browser" disabled="{{loading}}" article-id="{{articleId}}"
+            collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser>
+        </iron-pages>
+        <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
+          <klog-editor-textarea id="textarea" loading="{{loading}}" value="{{markdown}}" preview="{{preview}}"
+            placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
+          <klog-markdown id="markdown" markdown="{{preview}}" theme="[[theme]]" word-count="{{wordCount}}"
+            collection="{{collection}}">
+            <span slot="after" class="info">字数统计: {{wordCount}}</span>
+          </klog-markdown>
+        </klog-pages>
+      </klog-backdrop>
+    </div>
+    <klog-editor-helper id="helper"></klog-editor-helper>
+    <paper-toast text="{{err}}" id="toast0"></paper-toast>
+    <paper-toast text="已保存" id="toast1">
+      <a on-click="back">查看</a>
+    </paper-toast>
+    <paper-toast text="已删除" id="toast2" with-backdrop></paper-toast>
+  </template>
+  <script src="/static/lib/marked/marked.min.js"></script>
+  <script>
+    class KlogEditor extends Polymer.Element {
+
+      static get is() { return 'klog-editor'; }
+
+      static get properties() {
+        return {
+          articleId: {
+            type: String,
+            observer: '_idChanged'
+          },
+          selected: {
+            type: Number,
+          },
+          loading: {
+            type: Boolean,
+            value: false
+          },
+          err: {
+            observer: '_errChanged'
+          },
+          mobile: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          backTo: {
+            type: String,
+            value: ''
+          },
+          preset: {
+            type: Object,
+            value: {}
+          },
+          path: {
+            type: String
+          }
+        }
+      }
+
+      ready() {
+        super.ready();
+        // preset
+        this._defaultPreset = {
+          markdown: '@(笔记)[]',
+          private: true
+        };
+        // bond
+        this.$.textarea.$.preview = this.$.markdown;
+        this.$.markdown.scrollTarget = this.$.markdown;
+        this.$.header.$.uploadzone = this.$.uploadzone;
+        this.$.header.$.backdrop = this.$.backdrop;
+        this.$.infoform.$.header = this.$.header;
+        // activate the leancloud server
+        AV.Cloud.run('warmup').then(function (data) {
+          console.log(data);
+        });
+        //event
+        this.addEventListener('active-backdrop-front', (e) => {
+          let newSelected = e.detail.selected;
+          if (this.$.backdrop.active && this.backSelected != newSelected) this.$.backdrop.toggle();
+          this.backSelected = newSelected;
+          this.$.backdrop.show();
+        });
+        this.addEventListener('upload-success', (e) => {
+          e.stopPropagation();
+          this.set("fileinfo", e.detail.fileinfo);
+          if (this.$.uploadzone.remainingNumber == 1) {
+            this.$.backdrop.toggle();
+          }
+        });
+        this.addEventListener('reset', (e) => {
+          e.stopPropagation();
+          if (this.loading) return
+          this.$.data.reset();
+          //browser
+          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
+        });
+        this.$.textarea.addEventListener('klog-editor-input', (e) => {
+          this.$.helper.load(e.detail.currentLine);
+        });
+        this.addEventListener('save', (e) => {
+          e.stopPropagation();
+          if (this.loading) return
+          this.loading = true;
+          this.$.data.save().then((updatedArticle) => {
+            //data
+            this.$.data.articleId = updatedArticle.id;
+            //ui
+            this.loading = false;
+            this.$.toast1.open();
+            //browser
+            this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: '#/editor/' + this.articleId } }));
+          }, err => {
+            this.set('err', err);
+            this.loading = false;
+          });
+        });
+        this.addEventListener('delete', (e) => {
+          e.stopPropagation();
+          if (this.loading) return
+          this.loading = true;
+          this.$.data.delete().then((success) => {
+            //data
+            this.$.data.reset();
+            //ui
+            this.loading = false;
+            this.$.toast2.noCancelOnOutsideClick = false;
+            this.$.toast2.open();
+            //browser
+            setTimeout(() => {
+              this.$.header.back();
+            }, 3000);
+          }, (err) => {
+            this.set('err', err);
+            this.loading = false;
+          });
+        });
+        this.addEventListener('keydown', (e) => {
+          if (e.ctrlKey == true && e.keyCode == 83) {
+            //ctrl s
+            e.preventDefault();
+            if (!this.loading) this.dispatchEvent(new CustomEvent('save', { bubbles: true, composed: true }));
+          }
+        });
+        this.addEventListener('dragover', e => this.dragover(e), false);
+        this.addEventListener('dragleave', e => this.dragleave(e), false);
+        this.addEventListener('drop', e => this.drop(e), false);
+        setTimeout(() => {
+          //connect the components
+          this.$.data.editor = this;
+          this.scrollTarget = document.querySelector('html');
+        }, 1);
+      }
+
+      back() {
+        this.$.header.back();
+      }
+
+      dragover() {
+        this.dispatchEvent(new CustomEvent('active-backdrop-front', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            selected: 'uploadzone'
+          }
+        }));
+      }
+
+      dragleave() {
+        this.$.backdrop.hide();
+      }
+
+      drop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+
+      _idChanged(id) {
+        if (id) {
+          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' + this.articleId } }));
+          this.loading = true;
+          this.$.data.load(id)
+            .then(() => {
+              this.loading = false;
+              this.$.textarea.reset();
+            });
+        }
+      }
+
+      reset() {
+        this.loading = false;
+        this.$.backdrop.hide();
+        this.$.data.reset();
+      }
+
+      load() {
+        document.title = '写作 - Klog';
+        if (!this.userinfo.createdAt) this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
+        this.reset();
+        this.articleId = this.routeData.id;
+        this.$.textarea.load();
+        this.dispatchEvent(new CustomEvent('editor-loaded', { bubbles: true, composed: true }));
+        setTimeout(() => {
+          this._loadPreset();
+        }, 1);
+      }
+
+      unload() {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.routeData.id = ''
+            this.preset = {};
+            this.$.textarea.unload();
+            resolve();
+          }, 150);
+        });
+      }
+
+      _loadPreset() {
+        if (this.articleId) return;
+        let preset = Object.assign(this._defaultPreset, this.preset);
+        for (let key of Object.keys(preset)) {
+          this[key] = preset[key];
+        }
+      }
+
+      _errChanged() {
+        if (this.err) {
+          this.$.toast0.show();
+          setTimeout(() => this.err = null, 3000);
+        }
+      }
+
+    }
+
+    window.customElements.define(KlogEditor.is, KlogEditor);
+  </script>
+</dom-module>

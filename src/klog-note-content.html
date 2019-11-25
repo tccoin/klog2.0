@@ -1,0 +1,357 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="klog-style-scrollbar.html">
+<link rel="import" href="klog-style-toolbar.html">
+<link rel="import" href="klog-icons.html">
+<link rel="import" href="klog-data-article.html">
+<link rel="import" href="klog-markdown.html">
+<dom-module id="klog-note-content">
+  <template>
+    <style include="klog-style-scrollbar"></style>
+    <style include="klog-style-toolbar"></style>
+    <style>
+      :host {
+        flex: 1;
+        height: calc(100vh - 64px);
+        outline: none;
+      }
+
+      /*container*/
+
+      .main-container {
+        position: relative;
+        max-height: 100%;
+        z-index: 2;
+        overflow: auto;
+        background: var(--primary-background-color);
+        opacity: 1;
+        transition: opacity .2s ease;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      }
+
+      :host([loading]) .main-container {
+        opacity: 0;
+      }
+
+      .spinner-container {
+        @apply(--fit-layout);
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-background-color);
+        opacity: 0;
+        transition: opacity .2s ease;
+        --paper-spinner-color: var(--secondary-text-color);
+      }
+
+      :host([loading]) .spinner-container {
+        opacity: 1;
+      }
+
+      /*content*/
+
+      app-toolbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: var(--primary-background-color);
+        color: var(--secondary-text-color);
+        @apply(--shadow-none);
+        transition: box-shadow .15s ease-out;
+      }
+
+      app-toolbar::after {
+        content: '';
+        @apply(--swipe-indicator);
+      }
+
+      :host(:not([mobile])) app-toolbar {
+        position: absolute;
+        width: auto;
+        z-index: 10;
+        top: 0;
+        left: auto;
+        right: 0;
+        margin: 16px;
+        height: 36px;
+        padding: 0 4px;
+        border-radius: 18px;
+        color: var(--secondary-text-color);
+        background: var(--secondary-background-color);
+      }
+
+      :host(:not([mobile])) app-toolbar paper-icon-button {
+        height: 36px;
+        width: 36px;
+        flex-basis: 36px;
+        padding: 9px;
+        line-height: 0;
+      }
+
+      :host([mobile]) app-toolbar.raised {
+        @apply(--shadow-elevation-4dp);
+      }
+
+      :host(:not([mobile])) app-toolbar.raised {
+        @apply(--shadow-elevation-2dp);
+      }
+
+      .breadcrumbs {
+        white-space: nowrap;
+        overflow: hidden;
+        font-size: 12px;
+        text-overflow: ellipsis;
+        cursor: default;
+        user-select: none;
+      }
+
+      .breadcrumbs .collection,
+      .breadcrumbs .tags {
+        display: inline;
+      }
+
+      .breadcrumbs .collection[hidden],
+      .breadcrumbs .tags[hidden] {
+        display: none !important;
+      }
+
+      .breadcrumbs .tags {
+        color: var(--secondary-text-color);
+      }
+
+      .breadcrumbs .tags::before {
+        content: '/';
+        margin: 0 8px;
+        color: var(--secondary-text-color);
+      }
+
+      .breadcrumbs .collection:hover,
+      .breadcrumbs .tag:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .breadcrumbs .tag:not(:first-child) {
+        position: relative;
+        padding-left: 6px;
+      }
+
+      .breadcrumbs .tag:not(:first-child)::before {
+        content: ', ';
+        position: absolute;
+        left: 0;
+      }
+
+      @media (min-width: 768px) {
+        [mobile] {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 767px) {
+        :host {
+          height: 100vh;
+        }
+
+        .main-container {
+          padding-top: 64px;
+          height: calc(100vh - 64px);
+        }
+      }
+    </style>
+
+    <klog-data-article path="{{path}}" key="updatedAt" last-response="{{article}}" loading="{{loading}}"
+      last-error="{{error}}" userinfo="{{userinfo}}" type="user" default="{{!mobile}}" keyword="{{keyword}}"
+      collection="{{collection}}">
+    </klog-data-article>
+
+    <div class="spinner-container">
+      <paper-spinner-lite active></paper-spinner-lite>
+    </div>
+
+    <app-toolbar id="notetool" short>
+      <paper-icon-button icon="arrow_back" on-click="back" mobile></paper-icon-button>
+      <div class="divider"></div>
+      <div class="actions">
+        <paper-icon-button icon="edit" on-click="edit"></paper-icon-button>
+        <paper-icon-button icon="share" on-click="share"></paper-icon-button>
+        <paper-icon-button icon="{{sttIcon}}" on-click="stickToTop"></paper-icon-button>
+      </div>
+    </app-toolbar>
+
+    <div class="main-container" id="scrollTarget">
+      <div class="body">
+        <klog-markdown class="markdown" id="markdown" ignore-title-disabled="{{article.title}}"
+          markdown="{{article.markdown}}" theme="{{theme}}" scroll-bias="{{_getBias(mobile)}}">
+          <div class="breadcrumbs" on-click="_setFilter">
+            <div class="collection" hidden$="{{!article.collection}}">{{article.collection}}</div>
+            <div class="tags" hidden$="{{_isNull(article.tags)}}">
+              <template is="dom-repeat" items="{{article.tags}}">
+                <span class="tag">{{_uppercase(item)}}</span>
+              </template>
+            </div>
+          </div>
+        </klog-markdown>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    class KlogNoteContent extends Polymer.Element {
+
+      static get is() { return 'klog-note-content'; }
+
+      static get properties() {
+        return {
+          mobile: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          loading: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
+          keyword: {
+            type: String,
+            notify: true
+          },
+          collection: {
+            type: String,
+            notify: true
+          },
+          selected: {
+            type: Number,
+            notify: true
+          },
+          sttIcon: {
+            type: String,
+            value: 'bookmark_border'
+          },
+          path: {
+            type: String,
+            notify: true
+          }
+        }
+      }
+
+      static get observers() {
+        return [
+          'load(path)',
+          'loaded(article.objectId)'
+        ]
+      }
+
+      ready() {
+        super.ready();
+        this.$.markdown.scrollTarget = this.$.scrollTarget;
+        this.setAttribute('tabindex', 1);
+        this.$.scrollTarget.addEventListener('scroll', () => {
+          let y = this.$.scrollTarget.scrollTop;
+          if (y > 0) {
+            if (!this.mobile) {
+              this.$.notetool.classList.add('raised');
+            } else {
+              this.$.notetool.classList.add('collapsed');
+            }
+          } else {
+            this.$.notetool.classList.remove('raised');
+            this.$.notetool.classList.remove('collapsed');
+          }
+        });
+      }
+
+      share() {
+        this.dispatchEvent(new CustomEvent('note-share', { bubbles: true, composed: true, detail: { path: this.article.path } }));
+      }
+
+      edit() {
+        this.dispatchEvent(new CustomEvent('editor-open', {
+          bubbles: true, composed: true, detail: {
+            articleId: this.article.objectId,
+            backTo: window.location.hash
+          }
+        }));
+      }
+
+      back() {
+        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' } }));
+      }
+
+      load(path) {
+        if (window.location.hash.indexOf('#/note') == -1) return;
+        this.path = path || '';
+        if (!path) {
+          this.selected = 0;
+        } else {
+          this.selected = 1;
+          let hash = 'note/' + this.collection + '/' + path;
+          if (window.location.hash != '#/' + hash) {
+            this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: hash } }));
+          }
+        }
+      }
+
+      loaded(articleId) {
+        this.articleId = articleId;
+        //stt
+        this._updateSttIcon();
+        //clean state
+        this.$.scrollTarget.scrollTop = 0;
+      }
+
+      stickToTop() {
+        let stt = this.stt;
+        let articleId = this.articleId;
+        let i = stt.indexOf(articleId);
+        if (i > -1) {
+          stt.splice(i, 1);
+        } else {
+          stt.push(this.articleId);
+        }
+        let klogUser = this.userinfo.klogUser;
+        let newPreference = Object.assign(this.userinfo.preference, { stt: stt });
+        klogUser.update({ preference: { value: newPreference } }).then(() => {
+          klogUser.updateUserinfo();
+        });
+        this.stt = stt;
+        this._updateSttIcon();
+      }
+
+      _updateSttIcon() {
+        this.sttIcon = this.stt.indexOf(this.articleId) > -1 ? 'bookmark' : 'bookmark_border';
+      }
+
+      _isNull(arr = []) {
+        return arr.length == 0;
+      }
+
+      _uppercase(str) {
+        return str.toUpperCase();
+      }
+
+      _getBias(mobile) {
+        return mobile ? -64 : 0;
+      }
+
+      _setFilter(e) {
+        if (e.target.className == 'tag') {
+          this.keyword = e.target.innerText;
+          this.selected = 0;
+        } else if (e.target.className == 'collection') {
+          this.collection = e.target.innerText;
+          this.selected = 0;
+        }
+      }
+
+    }
+
+    window.customElements.define(KlogNoteContent.is, KlogNoteContent);
+  </script>
+</dom-module>
