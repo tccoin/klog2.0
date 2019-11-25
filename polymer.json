@@ -16,8 +16,7 @@
     "src/klog-apps-kdoc.html",
     "src/klog-404.html",
     "src/klog-lab.html",
-    "src/klog-render-katex.html",
-    "src/klog-editor-moon.html"
+    "src/klog-render-katex.html"
   ],
   "npm": true,
   "moduleResolution": "node",
