@@ -174,7 +174,7 @@
 
     <paper-dialog id="aboutDialog" with-backdrop>
       <h2>$klog -V</h2>
-      <p>v2.8.0<br>2017-2019<br>Powered by Kr with Love.</p>
+      <p>v2.8.1<br>2017-2019<br>Powered by Kr with Love.</p>
       <div class="actions">
         <paper-button on-click="changelog">更新日志</paper-button>
       </div>
@@ -233,7 +233,7 @@
 
       changelog() {
         this.$.aboutDialog.close();
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/article-169172' } }));
+        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/about-klog-2-0' } }));
       }
 
     }
