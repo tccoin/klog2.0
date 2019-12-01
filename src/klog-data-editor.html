@@ -210,7 +210,7 @@
       }
 
       _pathChanged() {
-        this.displayPath = this.path || this.randomPath;
+        this.displayPath = this.path || this.randomPath || '';
         var query = new AV.Query('Article');
         query.equalTo('path', this.displayPath);
         query.select(['path']);

@@ -25,8 +25,9 @@
   ],
   "extraDependencies": [
     "bower_components/webcomponentsjs/webcomponents-loader.js",
-    "node_modules/@webcomponents/webcomponentsjs/**",
-    "node_modules/@webcomponents/html-imports/**",
+    "node_modules/@webcomponents/webcomponentsjs/**/*",
+    "node_modules/@webcomponents/html-imports/**/*",
+    "bower_components/Han/dist/font/*",
     "static/**/*",
     "manifest.json",
     "favicon.ico"
@@ -48,6 +49,14 @@
       },
       "addServiceWorker": true,
       "basePath": false
+    },
+    {
+      "preset": "es6-unbundled",
+      "js": {
+        "minify": true
+      },
+      "addServiceWorker": true,
+      "basePath": true
     }
   ]
 }

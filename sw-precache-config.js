@@ -1,17 +1,19 @@
 module.exports = {
   staticFileGlobs: [
-    'manifest.json',
-    'bower_components/**/*',
-    'node_modules/**/*',
-    'static/**/*',
-    'favicon.ico',
-    'https://cdn.wilddog.com/sdk/js/2.5.6/wilddog-auth.js',
-    'https://cdn1.lncld.net/static/js/3.1.0/av-min.js',
   ],
   runtimeCaching: [
     {
-      urlPattern: /https:\/\/storage\.krrr\.party\/storage\/klog-avatar\/.*/,
+      urlPattern: /\/static\//,
       handler: 'fastest',
+      options: {
+        cache: {
+          name: 'static-files'
+        }
+      }
+    },
+    {
+      urlPattern: /^https:\/\/storage\.krrr\.party\/storage\/klog-avatar\/.*/,
+      handler: 'networkFirst',
       options: {
         cache: {
           name: 'data-storage-avatar'
@@ -20,7 +22,7 @@ module.exports = {
     },
     {
       urlPattern: /https:\/\/storage\.krrr\.party\/storage\/klog2\/.*\?Magic\/1\/.*/,
-      handler: 'fastest',
+      handler: 'cacheFirst',
       options: {
         cache: {
           name: 'data-storage-thumbnail'
@@ -29,7 +31,7 @@ module.exports = {
     },
     {
       urlPattern: /https:\/\/storage\.krrr\.party\/storage\/klog2\/.*\?Magic\/6/,
-      handler: 'fastest',
+      handler: 'cacheFirst',
       options: {
         cache: {
           name: 'data-storage-placeholder'

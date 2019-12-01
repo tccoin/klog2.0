@@ -9,18 +9,23 @@ const tls = require('tls');
 //environment
 const isDev = process.env.NODE_ENV == 'development';
 
-const httpserver = app(fastify());
-httpserver.listen(80, '0.0.0.0', err => {
-  if (err) throw err;
-  console.log('HTTP2 listening on port 80');
-});
-
-if (!isDev) {
+if (isDev) {
+  const httpserver = app(fastify());
+  httpserver.listen(3000, '0.0.0.0', (err, address) => {
+    if (err) {
+      console.log(err)
+      process.exit(1)
+    }
+    console.log(`server listening on ${address}`)
+  });
+} else {
   const opt = {
+    logger: false,
     http2: true,
     https: {
-      key: fs.readFileSync('/etc/letsencrypt/live/krrr.party/privkey.pem'),
-      cert: fs.readFileSync('/etc/letsencrypt/live/krrr.party/cert.pem'),
+      allowHTTP1: true,
+      key: fs.readFileSync('certs/krrr.party/krrr.party.key'),
+      cert: fs.readFileSync('certs/krrr.party/krrr.party.crt'),
       SNICallback: (servername, callback) => {
         if (servername === 'klog.app') {
           let ctx = tls.createSecureContext({
@@ -34,8 +39,11 @@ if (!isDev) {
     }
   };
   const http2server = app(fastify(opt));
-  http2server.listen(443, '0.0.0.0', err => {
-    if (err) throw err;
-    console.log('HTTP2 listening on port 443');
+  http2server.listen(3000, '0.0.0.0', (err, address) => {
+    if (err) {
+      console.log(err)
+      process.exit(1)
+    }
+    console.log(`server listening on ${address}`)
   });
 }

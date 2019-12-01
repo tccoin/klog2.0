@@ -6,6 +6,7 @@
   <title>Klog</title>
   <meta name="description" content="Share everything.">
   <meta charset="utf-8">
+  <base href="$GLOBAL_BASE">
 
   <!-- Web App -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -18,13 +19,13 @@
   <meta name="application-name" content="Klog">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Klog">
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="bookmark" href="/favicon.ico" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="/static/img/klog/klogapple.png">
-  <link rel="apple-touch-icon-precomposed" href="/static/img/klog/klogapple.png">
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="bookmark" href="favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="static/img/klog/klogapple.png">
+  <link rel="apple-touch-icon-precomposed" href="static/img/klog/klogapple.png">
 
   <!-- For Android -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="manifest.json">
 
   <!--Style-->
   <style>
@@ -111,7 +112,6 @@
 
   <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
   <script src="node_modules/@webcomponents/html-imports/html-imports.min.js"></script>
-  <!-- <script src="bower_components/webcomponentsjs/webcomponents-hi-ce.js"></script> -->
   <script src="https://c.lcfile.com/static/js/3.11.1/av-min.js"></script>
   <script type="module">
     window.WebComponents = window.WebComponents || {
@@ -122,14 +122,15 @@
       // appId and appKey will be replaced by app.js
       const appId = '$GLOBAL_APPID';
       const appKey = '$GLOBAL_APPKEY';
-      AV.init({
+      await AV.init({
         appId, appKey,
         serverURLs: 'https://us.leancloud.cn'
       });
 
       //serviceWorker
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js');
+        navigator.serviceWorker.register('service-worker.js', { scope: '/' });
+        navigator.serviceWorker.register('service-worker.js');
       }
       HTMLImports.loadImports(document.body);
 
@@ -137,7 +138,7 @@
       document.body.removeAttribute('unresolved');
     });
   </script>
-  <link rel="import" href="/src/klog-app.html" />
+  <link rel="import" href="src/klog-app.html" />
 </body>
 
 </html>

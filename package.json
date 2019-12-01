@@ -34,6 +34,7 @@
     "optipng": "^2.0.0",
     "pump-promise": "1.0.0",
     "sharp": "0.22.1",
+    "ua-device": "^0.1.10",
     "web-animations-js": "^2.3.1"
   },
   "devDependencies": {

@@ -1,13 +1,13 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="stylesheet" href="../bower_components/Han/dist/han.min.css">
+<link rel="stylesheet" href="../static/lib/prism/prism-dark.min.css">
+<link rel="stylesheet" href="../static/lib/prism/prism-light.min.css">
 <link rel="import" href="klog-style-scrollbar.html">
 <link rel="import" href="klog-image.html">
 <link rel="import" href="klog-player-lite.html">
 <link rel="import" href="klog-style-markdown.html">
 <dom-module id="klog-markdown">
   <template>
-    <link rel="stylesheet" media="all" href="../bower_components/Han/dist/han.min.css">
-    <link rel="stylesheet" href="../static/lib/prism/prism-dark.css">
-    <link rel="stylesheet" href="../static/lib/prism/prism-light.css">
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-markdown"></style>
     <article id="article" class="klog-article-content" theme$="[[theme]]">
@@ -18,7 +18,7 @@
   </template>
   <script src="../bower_components/Han/dist/han.min.js"></script>
   <script src="../static/lib/marked/marked.min.js"></script>
-  <script src="../static/lib/prism/prism.js"></script>
+  <script src="../static/lib/prism/prism.min.js"></script>
   <script>
     class KlogMarkdown extends Polymer.Element {
 
@@ -271,10 +271,11 @@
 
       _katex() {
         if (!this._initKatex) {
-          let element = document.createElement('script');
-          element.src = '/static/lib/katex/katex.min.js';
-          element.onload = () => Polymer.importHref(this.resolveUrl('klog-render-katex.html'));
-          this.appendChild(element);
+          // let element = document.createElement('script');
+          // element.src = 'static/lib/katex/katex.min.js';
+          // element.onload = () => Polymer.importHref(this.resolveUrl('klog-render-katex.html'));
+          // this.appendChild(element);
+          Polymer.importHref(this.resolveUrl('klog-render-katex.html'));
           this._initKatex = true;
         }
       }
