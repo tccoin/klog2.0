@@ -21,7 +21,7 @@ module.exports = function (app, opts, next) {
     };
     try {
       if (b.name in supportBrowser) {
-        if (parseInt(b.version.original.match(/(.*?)\./)[1]) >= supportBrowser[b.name]) {
+        if (b.version && parseInt(b.version.original.match(/(.*?)\./)[1]) >= supportBrowser[b.name]) {
           build = 'build/es6-unbundled';
         }
       }
