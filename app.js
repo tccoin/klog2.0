@@ -11,8 +11,10 @@ let staticDir = isDev ? __dirname : buildDir;
 console.log('isDev:', isDev);
 
 // set response header
-swHeader = (err, req, res, next) => {
-  res.header('service-worker-allowed', '/');
+swHeader = (request, reply, done) => {
+  // some code
+  reply.header('service-worker-allowed', '/');
+  done();
 };
 
 module.exports = (app) => {
@@ -20,7 +22,7 @@ module.exports = (app) => {
   app.register(require('fastify-multipart'));
   app.register(require('fastify-static'), { root: staticDir });
   app.register(require('fastify-compress'));
-  app.register(swHeader);
+  app.addHook('preHandler', swHeader)
   routes(app);
   return app;
 };
