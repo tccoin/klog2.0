@@ -1,7 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="stylesheet" href="../static/lib/katex/katex-font.min.css">
 <link rel="stylesheet" href="../static/lib/katex/katex-style.min.css">
-<link rel="stylesheet" href="../static/lib/katex/katex.min.js">
 <dom-module id="klog-render-katex">
   <template>
     <style>
@@ -32,6 +31,7 @@
     </span>
     <span id="container" class="formular-container"></span>
   </template>
+  <script src="../static/lib/katex/katex.min.js"></script>
 
   <script>
     class KlogRenderKatex extends Polymer.Element {

@@ -6,7 +6,7 @@
   <title>Klog</title>
   <meta name="description" content="Share everything.">
   <meta charset="utf-8">
-  <base href="$GLOBAL_BASE">
+  <base href="{{GLOBAL_BASE}}">
 
   <!-- Web App -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -120,8 +120,8 @@
     WebComponents.waitFor(async () => {
       // LeanClouds
       // appId and appKey will be replaced by app.js
-      const appId = '$GLOBAL_APPID';
-      const appKey = '$GLOBAL_APPKEY';
+      const appId = '{{GLOBAL_APPID}}';
+      const appKey = '{{GLOBAL_APPKEY}}';
       await AV.init({
         appId, appKey,
         serverURLs: 'https://us.leancloud.cn'
@@ -130,7 +130,6 @@
       //serviceWorker
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js', { scope: '/' });
-        navigator.serviceWorker.register('service-worker.js');
       }
       HTMLImports.loadImports(document.body);
 

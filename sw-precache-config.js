@@ -12,6 +12,24 @@ module.exports = {
       }
     },
     {
+      urlPattern: /\/es6-unbundled\//,
+      handler: 'fastest',
+      options: {
+        cache: {
+          name: 'es6-unbundled'
+        }
+      }
+    },
+    {
+      urlPattern: /\/es5-bundled\//,
+      handler: 'fastest',
+      options: {
+        cache: {
+          name: 'es5-bundled'
+        }
+      }
+    },
+    {
       urlPattern: /^https:\/\/storage\.krrr\.party\/storage\/klog-avatar\/.*/,
       handler: 'networkFirst',
       options: {
