@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'klog',
-    script: 'server.js',
+    script: 'klog/server.js',
 
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
     args: '',

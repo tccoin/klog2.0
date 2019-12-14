@@ -70,7 +70,7 @@ typings/
 pan/
 
 # app data
-settings.json
 certs/
 doc/
 index-debug.html
+klog/settings.js
