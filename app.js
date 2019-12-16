@@ -1,5 +1,5 @@
 const path = require('path');
-const routes = require('../routes/router');
+const routes = require('./routes/router');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 
