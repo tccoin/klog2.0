@@ -30,7 +30,7 @@
     "bower_components/Han/dist/font/*",
     "static/**/*",
     "manifest.json",
-    "favicon.ico"
+    "static/favicon.ico"
   ],
   "lint": {
     "rules": [

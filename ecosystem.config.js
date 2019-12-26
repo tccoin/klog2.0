@@ -11,7 +11,7 @@ module.exports = {
     watch_options: {
       "followSymlinks": true
     },
-    max_memory_restart: '512M',
+    max_memory_restart: '1024M',
     env: {
     },
     env_production: {
