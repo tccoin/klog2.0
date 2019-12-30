@@ -217,10 +217,13 @@
       }
 
       _tocRenderer() {
+        if (this._headings.length == 0) {
+          this.isIndependentTitle = false;
+          return;
+        }
         let headings = this._headings;
         let depth = 0;
         let bottom = 0;
-
         // determine lowest depth
         let h = Array.from(headings);
         h.sort((a, b) => a.depth - b.depth);
@@ -338,6 +341,7 @@
           // word count
           this._updateWordCount();
           // remove main title
+          this._tocRenderer();
           if (this.isIndependentTitle && this.hideIndependentTitle) {
             let headings = Array.from(this.$.content.querySelectorAll('h1,h2,h3,h4,h5,h6'));
             headings.sort((a, b) => a.getAttribute('depth') - b.getAttribute('depth'));
