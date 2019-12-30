@@ -225,8 +225,8 @@
         </div>
       </div>
       <!--article-->
-      <klog-markdown class="section article" id="markdown" markdown="{{article.markdown}}"
-        ignore-title="{{article.title}}" theme="{{theme}}" lazy></klog-markdown>
+      <klog-markdown class="section article" id="markdown" markdown="{{article.markdown}}" hide-independent-title="true"
+        theme="{{theme}}" lazy></klog-markdown>
     </div>
     <div class="footer">
       <span class="logo">
@@ -303,16 +303,16 @@
             this.$.header.classList.remove('collapsed');
           }
 
-          if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
-            let isLight = this.theme == 'light';
-            this.$.header.updateStyles({ '--klog-header-opacity': 1 - (isLight ? 0.3 : 0.2) });
-            this.$.header.style.backdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
-            this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
-          } else {
-            this.$.header.updateStyles({ '--klog-header-opacity': 1 });
-            this.$.header.style.backdropFilter = 'initial';
-            this.$.header.style.webkitBackdropFilter = 'initial';
-          }
+          // if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
+          //   let isLight = this.theme == 'light';
+          //   this.$.header.updateStyles({ '--klog-header-opacity': 1 - (isLight ? 0.3 : 0.2) });
+          //   this.$.header.style.backdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
+          //   this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
+          // } else {
+          // this.$.header.updateStyles({ '--klog-header-opacity': 1 });
+          // this.$.header.style.backdropFilter = 'initial';
+          // this.$.header.style.webkitBackdropFilter = 'initial';
+          // }
 
         };
       }

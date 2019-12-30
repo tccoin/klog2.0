@@ -307,17 +307,17 @@
           this.$.search.focus();
         }
         // blur
-        if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
-          let isLight = this.theme == 'light';
-          let process = Math.min(y / threshold, 1);
-          this.updateStyles({ '--klog-header-opacity': process * (isLight ? 0.4 : 0.8) });
-          this.$.header.style.backdropFilter = `saturate(180%) blur(${y > threshold ? process * (isLight ? 10 : 15) : 0}px)`;
-          this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${y > threshold ? process * (isLight ? 10 : 15) : 0}px)`;
-        } else {
-          this.updateStyles({ '--klog-header-opacity': 1 });
-          this.$.header.style.backdropFilter = 'initial';
-          this.$.header.style.webkitBackdropFilter = 'initial';
-        }
+        // if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
+        //   let isLight = this.theme == 'light';
+        //   let process = Math.min(y / threshold, 1);
+        //   this.updateStyles({ '--klog-header-opacity': process * (isLight ? 0.4 : 0.8) });
+        //   this.$.header.style.backdropFilter = `saturate(180%) blur(${y > threshold ? process * (isLight ? 10 : 15) : 0}px)`;
+        //   this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${y > threshold ? process * (isLight ? 10 : 15) : 0}px)`;
+        // } else {
+        this.updateStyles({ '--klog-header-opacity': 1 });
+        this.$.header.style.backdropFilter = 'initial';
+        this.$.header.style.webkitBackdropFilter = 'initial';
+        // }
       }
 
       load() {

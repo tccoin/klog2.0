@@ -1,8 +1,10 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="stylesheet" href="../static/lib/katex/katex-font.min.css">
-<link rel="stylesheet" href="../static/lib/katex/katex-style.min.css">
+<link rel="import" href="../static/lib/katex/katex-style.html">
+<!-- <link rel="stylesheet" href="../static/lib/katex/katex-font.min.css">
+<link rel="stylesheet" href="../static/lib/katex/katex-style.min.css"> -->
 <dom-module id="klog-render-katex">
   <template>
+    <style include="katex-style"></style>
     <style>
       :host {
         display: inline;

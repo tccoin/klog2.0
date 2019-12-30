@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="klog-style-layout.html">
 <link rel="import" href="klog-style-card.html">
+<link rel="import" href="klog-markdown.html">
 
 <dom-module id="klog-lab">
   <template>
@@ -19,7 +20,7 @@
       }
     </style>
     <div class="klog-card main-container">
-      Nothing here.
+      <klog-markdown id="markdown"></klog-markdown>
     </div>
   </template>
 
@@ -27,6 +28,11 @@
     class KlogLab extends Polymer.Element {
 
       static get is() { return 'klog-lab'; }
+
+      ready() {
+        super.ready();
+        this.$.markdown.markdown = '```c\nint a = 5;\n```\n$$abc=123$$';
+      }
 
     }
 

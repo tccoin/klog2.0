@@ -1,24 +1,22 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="stylesheet" href="../bower_components/Han/dist/han.min.css">
-<link rel="stylesheet" href="../static/lib/prism/prism-dark.min.css">
-<link rel="stylesheet" href="../static/lib/prism/prism-light.min.css">
 <link rel="import" href="klog-style-scrollbar.html">
 <link rel="import" href="klog-image.html">
 <link rel="import" href="klog-player-lite.html">
 <link rel="import" href="klog-style-markdown.html">
+<link rel="import" href="../static/lib/Han/han-style.html">
 <dom-module id="klog-markdown">
   <template>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-markdown"></style>
+    <style include="han-style"></style>
     <article id="article" class="klog-article-content" theme$="[[theme]]">
       <slot></slot>
       <div id="content"></div>
       <slot name="after"></slot>
     </article>
   </template>
-  <script src="../bower_components/Han/dist/han.min.js"></script>
+  <script src="../static/lib/Han/han.min.js"></script>
   <script src="../static/lib/marked/marked.min.js"></script>
-  <script src="../static/lib/prism/prism.min.js"></script>
   <script>
     class KlogMarkdown extends Polymer.Element {
 
@@ -32,11 +30,13 @@
           },
           theme: {
             type: String,
-            value: false,
-            reflectToAttribute: true
+            value: '',
+            reflectToAttribute: true,
+            observer: 'updateTheme'
           },
-          ignoreTitle: {
-            type: String
+          hideIndependentTitle: {
+            type: Boolean,
+            value: false
           },
           collection: {
             type: String,
@@ -56,7 +56,18 @@
           lazy: {
             type: Boolean,
             value: false
-          }
+          },
+          sanitize: {
+            type: Boolean,
+            value: true
+          },
+        }
+      }
+
+      updateTheme() {
+        let elements = this.$.article.querySelectorAll('[theme]');
+        for (let element of elements) {
+          element.theme = this.theme;
         }
       }
 
@@ -115,22 +126,11 @@
           return out;
         };
 
-        renderer.code = function (code, lang, escaped) {
-          lang = lang || '';
-          var _lang = lang.replace(/cpp/i, 'c++').toUpperCase();
-          lang = Prism.languages[lang] ? lang : 'clike';
-          var grammar = Prism.languages[lang];
-          var out = Prism.highlight(code, grammar, lang);
-          if (out != null) {
-            escaped = true;
-            code = out;
-          }
-          var lang_escape = escape(lang, true);
-          var code_escape = escaped ? code : escape(code, true);
-          var out_lang = _lang ? `<div class="meta"><span class="code-lang">${_lang}</span></div>` : '';
-          out = `<pre class="language-${lang_escape}">${out_lang}<code>${code_escape}\n</code></pre>\n`;
+        renderer.code = (code, lang, escaped) => {
+          this.initCodeRenderer();
+          let out = `<klog-render-code lang="${lang || ''}" code="${escape(code)}" theme="${this.theme}"></klog-render-code>\n`;
           return out
-        }
+        };
 
         renderer.link = function (href, title, text = '') {
           if (/^&lt;V&gt;/.test(text)) {
@@ -156,7 +156,7 @@
           },
           parse: () => {
             this._hasToc = true;
-            return '<span toc></span>'
+            return '{{KLOG-MARKDOWN-TOC}}'
           }
         };
 
@@ -179,7 +179,7 @@
         inline.katex = {
           reg: /^\$([^\$]+?)\$/,
           parse: (src, cap) => {
-            this._katex();
+            this.initKatexRenderer();
             src = src.substring(cap[0].length);
             cap = marked.escape(cap[0].replace(/\$/gm, ''));
             return {
@@ -192,7 +192,7 @@
         inline.katexblock = {
           reg: /^\$\$([^\$]+?)\$\$/,
           parse: (src, cap) => {
-            this._katex();
+            this.initKatexRenderer();
             src = src.substring(cap[0].length);
             cap = marked.escape(cap[0].replace(/\$\$/gm, ''));
             return {
@@ -208,7 +208,7 @@
           gfm: true,
           tables: true,
           breaks: true,
-          sanitize: true,
+          sanitize: this.sanitize,
           renderer: renderer,
           block: block,
           inline: inline,
@@ -218,32 +218,48 @@
 
       _tocRenderer() {
         let headings = this._headings;
-        headings.push({ depth: 0 });
-        let _depth = 0;
-        let out = '<div toc>';
+        let depth = 0;
+        let bottom = 0;
+
+        // determine lowest depth
+        let h = Array.from(headings);
+        h.sort((a, b) => a.depth - b.depth);
+        this.isIndependentTitle = false;
+        if (h[0].depth != h[1].depth) {
+          // 如果最高级的heading只有一个，则它不应该出现在toc中
+          this.isIndependentTitle = true;
+          depth = headings[0].depth;
+          bottom = depth;
+          headings.splice(0, 1);
+        }
+
+        // output
+        headings.push({ depth: depth });
+        let out = '<div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><div class="toc">';
         for (let heading of headings) {
           let newli = '';
-          if (heading.text) newli = `<li name="${heading.id}"><span>${heading.text}</span>`;
-          if (heading.depth == _depth) {
-            out += `</li>${newli}`;
+          if (heading.depth < bottom + 3) {
+            if (heading.text) newli = `<li name="${heading.id}" depth="${depth}"><span>${heading.text}</span>`;
+            if (heading.depth == depth) {
+              out += `</li>${newli}`;
+            }
+            while (heading.depth > depth) {
+              ++depth;
+              out += `<ol>${newli}`;
+            }
+            while (heading.depth < depth) {
+              --depth;
+              out += '</li></ol>';
+              if (heading.text) out += `</li>${newli}`;
+            }
           }
-          while (heading.depth > _depth) {
-            ++_depth;
-            out += `<ol>${newli}`;
-          }
-          while (heading.depth < _depth) {
-            --_depth;
-            out += '</li></ol>';
-            if (heading.text) out += `</li>${newli}`;
-          }
-
         }
         out += '</div>';
         return out
       }
 
       _tocEvent() {
-        let links = this.$.content.querySelectorAll('div[toc] li');
+        let links = this.$.content.querySelectorAll('div.toc li');
         for (let link of links) {
           link.addEventListener('mouseover', (e) => {
             e.stopPropagation();
@@ -269,14 +285,17 @@
         }
       }
 
-      _katex() {
-        if (!this._initKatex) {
-          // let element = document.createElement('script');
-          // element.src = 'static/lib/katex/katex.min.js';
-          // element.onload = () => Polymer.importHref(this.resolveUrl('klog-render-katex.html'));
-          // this.appendChild(element);
+      initKatexRenderer() {
+        if (!this._isKatexInit) {
           Polymer.importHref(this.resolveUrl('klog-render-katex.html'));
-          this._initKatex = true;
+          this._isKatexInit = true;
+        }
+      }
+
+      initCodeRenderer() {
+        if (!this._isCodeInit) {
+          Polymer.importHref(this.resolveUrl('klog-render-code.html'));
+          this._isCodeInit = true;
         }
       }
 
@@ -311,7 +330,7 @@
           if (err) throw err;
           //toc
           if (this._hasToc) {
-            out = out.replace(/<span toc><\/span>/g, this._tocRenderer());
+            out = out.replace(/{{KLOG-MARKDOWN-TOC}}/g, this._tocRenderer());
             setTimeout(() => this._tocEvent(), 1);
           }
           //render
@@ -319,19 +338,16 @@
           // word count
           this._updateWordCount();
           // remove main title
-          let headings = this.$.content.querySelectorAll('[depth]');
-          let title;
-          for (let heading of headings) {
-            if (!title || heading.getAttribute('depth') < title.getAttribute('depth')) {
-              title = heading;
-            }
-          }
-          if (title && title.innerText == this.ignoreTitle) {
+          if (this.isIndependentTitle && this.hideIndependentTitle) {
+            let headings = Array.from(this.$.content.querySelectorAll('h1,h2,h3,h4,h5,h6'));
+            headings.sort((a, b) => a.getAttribute('depth') - b.getAttribute('depth'));
+            let title = headings[0];
             title.parentNode.removeChild(title);
           }
           //Han
           Han(this.$.article, this.$.article).render();
           setTimeout(() => this.dispatchEvent(new CustomEvent('markdown-rendered', { bubbles: true, composed: true })), 1);
+          // lazy load image
           if (this.lazy) setTimeout(() => this.lazyObserve(), 1);
         });
       }

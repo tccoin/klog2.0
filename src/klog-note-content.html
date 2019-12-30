@@ -188,8 +188,8 @@
 
     <div class="main-container" id="scrollTarget">
       <div class="body">
-        <klog-markdown class="markdown" id="markdown" ignore-title-disabled="{{article.title}}"
-          markdown="{{article.markdown}}" theme="{{theme}}" scroll-bias="{{_getBias(mobile)}}">
+        <klog-markdown class="markdown" id="markdown" hide-independent-title="false" markdown="{{article.markdown}}"
+          theme="{{theme}}" scroll-bias="{{_getBias(mobile)}}">
           <div class="breadcrumbs" on-click="_setFilter">
             <div class="collection" hidden$="{{!article.collection}}">{{article.collection}}</div>
             <div class="tags" hidden$="{{_isNull(article.tags)}}">

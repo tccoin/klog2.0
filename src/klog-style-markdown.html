@@ -14,6 +14,13 @@
         min-height: calc(100% - 2 * var(--klog-markdown-padding));
       }
 
+      .klog-article-content hr {
+        border: 2px solid var(--divider-color);
+        margin: 4em auto;
+        width: 3em;
+        border-radius: 2px;
+      }
+
       .klog-article-content p {
         margin: 0 0 1.5em;
         text-align: justify;
@@ -88,62 +95,6 @@
         border-radius: 2px;
       }
 
-      .klog-article-content code,
-      .klog-article-content pre {
-        font-family: Menlo, Monaco, Consolas, "Andale Mono", "lucida console", "Courier New", -apple-system, "PingFang SC", "Hiragino Sans GB", "Source Han Sans CN", "Source Han Sans SC", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif !important;
-        background: var(--klog-markdown-block-color);
-      }
-
-      .klog-article-content pre {
-        padding: 16px 0 0;
-        line-height: 1.5;
-        border-radius: 5px;
-        text-align: left;
-        white-space: pre;
-        word-spacing: normal;
-        word-break: normal;
-        word-wrap: normal;
-        -moz-tab-size: 4;
-        -o-tab-size: 4;
-        tab-size: 4;
-        overflow: hidden;
-      }
-
-      .klog-article-content pre code {
-        display: block;
-        width: 100%;
-        padding: 16px;
-        overflow: auto;
-        box-sizing: border-box;
-      }
-
-      .klog-article-content :not(pre)>code,
-      .klog-article-content>code {
-        padding: 1px 4px;
-        border-radius: 3px;
-        word-break: break-all;
-        white-space: normal;
-      }
-
-      .klog-article-content .meta {
-        padding: 0 16px;
-      }
-
-      .klog-article-content pre .code-lang {
-        padding: 2px 10px;
-        border-top: 1px solid var(--divider-color);
-        border-radius: 12px;
-        background: var(--primary-background-color);
-        font-size: 0.875em;
-        color: var(--secondary-text-color);
-        user-select: none;
-        cursor: default;
-      }
-
-      .klog-article-content pre code:first-child {
-        padding-top: 0;
-      }
-
       .klog-article-content klog-player-lite {
         width: 100%;
         --klog-player-border-radius: 5px;
@@ -194,25 +145,49 @@
         padding-right: 8px;
       }
 
-      .klog-article-content [toc]>ol {
+      .klog-article-content .toc {
+        overflow-y: scroll;
+        max-height: 33vh;
+        padding: 16px 8px 16px 16px;
+        border-radius: 5px;
+        background: var(--klog-markdown-block-color);
+      }
+
+      .klog-article-content .toc-icon-container {
+        position: relative;
+        height: 16px;
+        z-index: 10;
+      }
+
+      .klog-article-content .toc-icon {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+        position: absolute;
+        left: 11px;
+        color: var(--primary-color);
+        width: 32px;
+        height: 32px;
+      }
+
+      .klog-article-content .toc>ol {
         padding-left: 0;
       }
 
-      .klog-article-content [toc] ol {
+      .klog-article-content .toc ol {
         counter-reset: section;
         list-style-type: none;
+        margin: 0;
       }
 
-      .klog-article-content [toc] li::before {
+      .klog-article-content .toc li::before {
         counter-increment: section;
         content: counters(section, ".") " ";
       }
 
-      .klog-article-content [toc] li>span {
+      .klog-article-content .toc li>span {
         cursor: pointer;
       }
 
-      .klog-article-content [toc] li.selected:hover>span {
+      .klog-article-content .toc li.selected:hover>span {
         text-decoration: underline;
       }
 
