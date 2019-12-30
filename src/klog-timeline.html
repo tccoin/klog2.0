@@ -231,32 +231,35 @@
         this._initScroller();
         this._initPageloader();
         this.activeReminder();
-        this._lazyObserver = new IntersectionObserver((entries, observer) => {
-          // [intersecting]
-          for (let entry of entries) {
-            let target = entry.target;
-            if (entry.isIntersecting) {
-              target.setAttribute("intersecting", '');
-            } else {
-              target.removeAttribute("intersecting");
+
+        if ("IntersectionObserver" in window) {
+          this._lazyObserver = new IntersectionObserver((entries, observer) => {
+            // [intersecting]
+            for (let entry of entries) {
+              let target = entry.target;
+              if (entry.isIntersecting) {
+                target.setAttribute("intersecting", '');
+              } else {
+                target.removeAttribute("intersecting");
+              }
             }
-          }
-          // [overflow]
-          let lastOverflowTarget = this.$.container.querySelector('klog-timeline-item[overflow]');
-          let overflowTarget = this.$.container.querySelector('klog-timeline-item[intersecting]');
-          if (!lastOverflowTarget) {
-            overflowTarget.setAttribute("overflow", '');
-          } else if (overflowTarget !== lastOverflowTarget) {
-            lastOverflowTarget.removeAttribute("overflow");
-            overflowTarget.setAttribute("overflow", '');
-          }
-        });
+            // [overflow]
+            let lastOverflowTarget = this.$.container.querySelector('klog-timeline-item[overflow]');
+            let overflowTarget = this.$.container.querySelector('klog-timeline-item[intersecting]');
+            if (!lastOverflowTarget) {
+              overflowTarget.setAttribute("overflow", '');
+            } else if (overflowTarget !== lastOverflowTarget) {
+              lastOverflowTarget.removeAttribute("overflow");
+              overflowTarget.setAttribute("overflow", '');
+            }
+          });
+        }
       }
 
       activeReminder() {
         setTimeout(() => {
           this.$.reminder.setAttribute('active', true);
-        }, 2000);
+        }, 5000);
       }
 
       _initScroller() {
@@ -345,7 +348,9 @@
           this._eof = true;
         }
         // lazy oberser
-        setTimeout(() => this.enableObserver(), 1);
+        if ("IntersectionObserver" in window) {
+          setTimeout(() => this.enableObserver(), 1);
+        }
       }
 
       enableObserver() {

@@ -164,8 +164,13 @@
 
           <div class="divider"></div>
 
+          <div class="item" on-click="changelog">
+            <iron-icon icon="swap_vertical_circle"></iron-icon>更新日志
+            <paper-ripple></paper-ripple>
+          </div>
+
           <div class="item" on-click="about">
-            <iron-icon icon="info"></iron-icon>关于
+            <iron-icon icon="flag"></iron-icon>版本信息
             <paper-ripple></paper-ripple>
           </div>
         </iron-selector>
@@ -174,10 +179,12 @@
 
     <paper-dialog id="aboutDialog" with-backdrop>
       <h2>$klog -V</h2>
-      <p>v2.8.3<br>2017-2019<br>Powered by Kr with Love.</p>
+      <p>v2.8.5<br>2017-2020<br>Powered by Kr with Love.</p>
+
       <div class="actions">
-        <paper-button on-click="changelog">更新日志</paper-button>
+        <paper-button dialog-confirm on-click="github">git clone klog</paper-button>
       </div>
+
     </paper-dialog>
   </template>
   <script>
@@ -232,8 +239,12 @@
       }
 
       changelog() {
-        this.$.aboutDialog.close();
+        this.close();
         this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/about-klog-2-0' } }));
+      }
+
+      github() {
+        window.open("https://github.com/tccoin/klog2.0");
       }
 
     }

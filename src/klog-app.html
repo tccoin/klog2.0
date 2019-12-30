@@ -63,6 +63,7 @@
 
       paper-dialog {
         max-width: 450px;
+        --klog-markdown-padding: 0px;
       }
 
       paper-dialog .actions {
@@ -78,6 +79,7 @@
     </style>
     <!-- Preference -->
     <app-localstorage-document id="preference" key="preference" data="{{preference}}"></app-localstorage-document>
+    <app-localstorage-document id="hny2020" key="hny2020" data="{{hny2020}}"></app-localstorage-document>
     <!-- Route -->
     <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{_subroute}}"></app-route>
@@ -112,11 +114,17 @@
     <paper-toast text="没有网啦！！(´ﾟДﾟ`)" id="offlineToast"></paper-toast>
     <paper-toast text="Klog 更新已就绪" id="reloadToast" duration="10000"><a on-click="reload">Link Start!</a></paper-toast>
     <paper-dialog id="happynewyearDialog" with-backdrop>
-      <h2>Hi, 新年快乐！</h2>
-      <p>说来 Klog 已经走过了差不多一年半，不温不火，却是我最满意的样子。感谢各位一直以来的支持。</p>
-      <p>Tccoin, <br>在新年之夜送上祝福</p>
+      <klog-markdown sanitize="false" markdown="
+## Hi, 新年快乐！
+
+感谢你陪着我们迎来Klog的第三个新年。虽然没有什么旁的宏大目标，Klog将作为一个朴素又忠实的博客平台继续一日复一日地运作下去。同时，欢迎你在[GitHub](https://github.com/tccoin/klog2.0)上订阅Klog的开发进展。
+
+Happy bloging,<br>
+Tccoin
+">
+      </klog-markdown>
       <div class="actions">
-        <paper-button dialog-confirm autofocus>新年快乐</paper-button>
+        <paper-button dialog-confirm on-click="confirmHNY">新年快乐</paper-button>
       </div>
     </paper-dialog>
   </template>
@@ -150,6 +158,10 @@
           },
           gesture: {
             type: Boolean
+          },
+          hny2020: {
+            type: Boolean,
+            value: false
           }
         }
       }
@@ -171,8 +183,27 @@
         });
       }
 
+      checkNewYear() {
+        let t = new Date().valueOf();
+        if (t >= 1577808000000 && t <= 1578067200000 && !this.hny2020) {
+          this.$.happynewyearDialog.open();
+          this.scrollTo(Math.min(document.body.offsetHeight, 1000), 15000, 'easeInOutQuad');
+        } else if (t < 1577808000000) {
+          console.log((1577808000000 - t) / 3600);
+          setTimeout(() => this.checkNewYear(), 5000);
+        }
+      }
+
+      confirmHNY() {
+        this.hny2020 = true;
+        this.stopScroll();
+        setTimeout(() => { this.scrollTo(0, 300, 'easeInOutQuad') }, 300);
+      }
+
       ready() {
         super.ready();
+        // happy new year
+        setTimeout(() => this.checkNewYear(), 3000);
         // event
         this.addEventListener('klog-app-load', (e) => {
           this._now = e.detail.now == undefined ? true : e.detail.now;
@@ -390,6 +421,44 @@
         if (this._waitingToLoadDefaultPage) {
           this._loadDefaultPage();
         }
+      }
+
+      scrollTo(destination, duration = 200, easing = 'linear') {
+        const easings = {
+          linear(t) { return t },
+          easeInQuad(t) { return t * t },
+          easeOutQuad(t) { return t * (2 - t) },
+          easeInOutQuad(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t },
+        };
+        const start = window.pageYOffset;
+        const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
+        const documentHeight = Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
+        const windowHeight = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
+        const destinationOffset = typeof destination === 'number' ? destination : destination.offsetTop;
+        const destinationOffsetToScroll = Math.round(documentHeight - destinationOffset < windowHeight ? documentHeight - windowHeight : destinationOffset);
+        if ('requestAnimationFrame' in window === false) {
+          window.scroll(0, destinationOffsetToScroll);
+          return;
+        }
+        document.querySelector('html').style.scrollBehavior = 'auto';
+        this._stopScroll = false;
+        const scroll = () => {
+          const now = 'now' in window.performance ? performance.now() : new Date().getTime();
+          const time = Math.min(1, ((now - startTime) / duration));
+          const timeFunction = easings[easing](time);
+          window.scroll(0, Math.ceil((timeFunction * (destinationOffsetToScroll - start)) + start));
+          if (window.pageYOffset === destinationOffsetToScroll || this._stopScroll) {
+            this._stopScroll = false;
+            document.querySelector('html').style.scrollBehavior = 'smooth';
+            return;
+          }
+          requestAnimationFrame(scroll);
+        };
+        scroll();
+      }
+
+      stopScroll() {
+        this._stopScroll = true;
       }
 
     }
