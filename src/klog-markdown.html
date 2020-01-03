@@ -219,7 +219,7 @@
       _tocRenderer() {
         if (this._headings.length == 0) {
           this.isIndependentTitle = false;
-          return;
+          return '';
         }
         let headings = this._headings;
         let depth = 0;
@@ -228,7 +228,9 @@
         let h = Array.from(headings);
         h.sort((a, b) => a.depth - b.depth);
         this.isIndependentTitle = false;
-        if (h[0].depth != h[1].depth) {
+        if (h.length == 1) {
+          this.isIndependentTitle = true;
+        } else if (h.length >= 2 && h[0].depth != h[1].depth) {
           // 如果最高级的heading只有一个，则它不应该出现在toc中
           this.isIndependentTitle = true;
           depth = headings[0].depth;

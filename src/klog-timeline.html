@@ -246,11 +246,13 @@
             // [overflow]
             let lastOverflowTarget = this.$.container.querySelector('klog-timeline-item[overflow]');
             let overflowTarget = this.$.container.querySelector('klog-timeline-item[intersecting]');
-            if (!lastOverflowTarget) {
-              overflowTarget.setAttribute("overflow", '');
-            } else if (overflowTarget !== lastOverflowTarget) {
-              lastOverflowTarget.removeAttribute("overflow");
-              overflowTarget.setAttribute("overflow", '');
+            if (overflowTarget) {
+              if (!lastOverflowTarget) {
+                overflowTarget.setAttribute("overflow", '');
+              } else if (overflowTarget !== lastOverflowTarget) {
+                lastOverflowTarget.removeAttribute("overflow");
+                overflowTarget.setAttribute("overflow", '');
+              }
             }
           });
         }
