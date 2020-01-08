@@ -107,7 +107,6 @@
         if (!this.preference) {
           this.preference = this.$.user.defaultMarkdownPreference;
         }
-        console.log(this.preference);
 
 
         //lazy-init
@@ -119,10 +118,11 @@
         renderer.heading = (text, depth) => {
           let id = 'heading' + (++this._headingId);
           let classList = '';
-          classList += this.preference.centeredHeading ? 'centered' : '';
-          classList += this.preference.numberedHeading ? 'numbered' : '';
+          classList += this.preference.centeredHeading ? 'centered-heading ' : '';
+          classList += this.preference.numberedHeading ? 'numbered-heading ' : '';
+          classList = classList ? `class="${classList}" ` : '';
           this._headings.push({ depth: depth, text: text, id: id });
-          return `<h${depth} id="${id}" depth="${depth}">${text}</h${depth}>\n`;
+          return `<h${depth} ${classList} id="${id}" depth="${depth}">${text}</h${depth}>\n`;
         };
 
         renderer.image = (href, title, text) => {
@@ -143,7 +143,11 @@
 
         renderer.code = (code, lang, escaped) => {
           this.initCodeRenderer();
-          let out = `<klog-render-code lang="${lang || ''}" code="${escape(code)}" theme="${this.theme}"></klog-render-code>\n`;
+          let classList = '';
+          classList += this.preference.overflowCode ? 'overflow-code ' : '';
+          classList += lang ? 'has-meta' : '';
+          classList = classList ? `class="${classList}" ` : '';
+          let out = `<klog-render-code ${classList} lang="${lang || ''}" code="${escape(code)}" theme="${this.theme}"></klog-render-code>\n`;
           return out
         };
 
@@ -170,8 +174,7 @@
             return { src: src, text: '' }
           },
           parse: () => {
-            this._hasToc = true;
-            return '{{KLOG-MARKDOWN-TOC}}'
+            return '<div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><div class="toc"></div>'
           }
         };
 
@@ -231,80 +234,6 @@
         };
       }
 
-      _tocRenderer() {
-        if (this._headings.length == 0) {
-          this.isIndependentTitle = false;
-          return '';
-        }
-        let headings = this._headings;
-        let depth = 0;
-        let bottom = 0;
-        // determine lowest depth
-        let h = Array.from(headings);
-        h.sort((a, b) => a.depth - b.depth);
-        this.isIndependentTitle = false;
-        if (h.length == 1) {
-          this.isIndependentTitle = true;
-        } else if (h.length >= 2 && h[0].depth != h[1].depth) {
-          // 如果最高级的heading只有一个，则它不应该出现在toc中
-          this.isIndependentTitle = true;
-          depth = headings[0].depth;
-          bottom = depth;
-          headings.splice(0, 1);
-        }
-
-        // output
-        headings.push({ depth: depth });
-        let out = '<div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><div class="toc">';
-        for (let heading of headings) {
-          let newli = '';
-          if (heading.depth < bottom + 3) {
-            if (heading.text) newli = `<li name="${heading.id}" depth="${depth}"><span>${heading.text}</span>`;
-            if (heading.depth == depth) {
-              out += `</li>${newli}`;
-            }
-            while (heading.depth > depth) {
-              ++depth;
-              out += `<ol>${newli}`;
-            }
-            while (heading.depth < depth) {
-              --depth;
-              out += '</li></ol>';
-              if (heading.text) out += `</li>${newli}`;
-            }
-          }
-        }
-        out += '</div>';
-        return out
-      }
-
-      _tocEvent() {
-        let links = this.$.content.querySelectorAll('div.toc li');
-        for (let link of links) {
-          link.addEventListener('mouseover', (e) => {
-            e.stopPropagation();
-            let _selected = this.$.content.querySelector('li.selected');
-            if (_selected) _selected.classList.remove('selected');
-            e.currentTarget.classList.add('selected');
-          });
-          link.addEventListener('click', (e) => {
-            e.stopPropagation();
-            let i = 0;
-            while (e.currentTarget.tagName != 'LI') i++;
-            let name = e.currentTarget.getAttribute('name');
-            let element = this.$.content.querySelector('#' + name);
-            if (element) {
-              let bias = this.scrollBias || 0;
-              let scrollTarget = this.scrollTarget || document.scrollingElement;
-              //html will move while scrolling
-              let htmlFix = scrollTarget.tagName == 'HTML' ? 0 : scrollTarget.getBoundingClientRect().top;
-              let y = scrollTarget.scrollTop + element.getBoundingClientRect().top - htmlFix;
-              this.scrollTarget.scrollTop = y;
-            }
-          });
-        }
-      }
-
       initKatexRenderer() {
         if (!this._isKatexInit) {
           Polymer.importHref(this.resolveUrl('klog-render-katex.html'));
@@ -332,6 +261,129 @@
           .length;
       }
 
+      _updateHeadings() {
+        let headings = this._headings;
+
+        // if there is no headings
+        if (headings.length == 0) {
+          this.hasIndependentTitle = false;
+          return;
+        }
+
+        // determine independent title
+        let sortedHeadings = Array.from(headings); //copy array fro sorting
+        sortedHeadings.sort((a, b) => a.depth - b.depth);
+        this.hasIndependentTitle = false;
+        if (sortedHeadings.length == 1) {
+          // 如果只有一个标题，则它是独立标题
+          sortedHeadings[0].isIndependentTitle = true;
+          this.hasIndependentTitle = true;
+        } else if (sortedHeadings[0].depth != sortedHeadings[1].depth && sortedHeadings[0] === headings[0]) {
+          // 如果第一个标题是唯一的最高级标题，则它是独立标题
+          sortedHeadings[0].isIndependentTitle = true;
+          this.hasIndependentTitle = true;
+        }
+
+        let numbers = [0, 0, 0, 0, 0, 0];
+        let bottom = this.hasIndependentTitle ? sortedHeadings[0].depth + 1 : sortedHeadings[0].depth; // min of headings.depth
+
+        // calculate number
+        for (let heading of headings) {
+          if (heading.isIndependentTitle) {
+            heading.number = '';
+            continue;
+          }
+          let depth = heading.depth - bottom;
+          numbers[depth] += 1;
+          for (let i = 0; i < 5 - depth; i++) {
+            numbers[depth + 1 + i] = 0;
+          }
+          heading.number = numbers.slice(0, depth + 1).join('.') + '.';
+        }
+
+        // update elements
+        for (let heading of headings) {
+          let element = this.$.content.querySelector(`#${heading.id}`);
+          if (heading.isIndependentTitle && this.hideIndependentTitle) {
+            element.style.display = 'none';
+            continue;
+          }
+          if (this.preference.numberedHeading) {
+            let numberSpan = element.querySelector('.heading-number');
+            if (numberSpan) { numberSpan.parentNode.removeChild(numberSpan) }
+            element.innerHTML = `<span class="heading-number">${heading.number}</span> ${element.innerHTML}`;
+          }
+        }
+
+        // update heading elements
+        for (let heading of headings) {
+          let element = this.$.content.querySelector(`#${heading.id}`);
+          if (heading.isIndependentTitle && this.hideIndependentTitle) {
+            element.style.display = 'none';
+            continue;
+          }
+          if (this.preference.numberedHeading) {
+            let numberSpan = element.querySelector('.heading-number');
+            if (numberSpan) { numberSpan.parentNode.removeChild(numberSpan) }
+            element.innerHTML = `<span class="heading-number">${heading.number}</span> ${element.innerHTML}`;
+          }
+        }
+
+        // update toc elements
+        let tocs = this.$.content.querySelectorAll('.toc');
+        let tocHTML = '';
+        if (tocs.length > 0) {
+          let depth = bottom, lastDepth = 0, outDepth = 0;
+          for (let heading of headings) {
+            let newli = '';
+            if (!heading.isIndependentTitle && heading.depth - bottom < 3) {
+              if (heading.text) newli = `<li name="${heading.id}" depth="${depth}"><span>${heading.number}  ${heading.text}</span>`;
+              if (heading.depth == depth) {
+                tocHTML += `</li>${newli}`;
+              }
+              while (heading.depth > depth) {
+                ++depth;
+                tocHTML += `<ol>${newli}`;
+              }
+              while (heading.depth < depth) {
+                --depth;
+                tocHTML += '</li></ol>';
+                if (heading.text) tocHTML += `</li>${newli}`;
+              }
+            }
+          }
+          for (let toc of tocs) {
+            toc.innerHTML = tocHTML;
+          }
+        }
+
+        // set toc event
+        let links = this.$.content.querySelectorAll('div.toc li');
+        for (let link of links) {
+          link.addEventListener('mouseover', (e) => {
+            e.stopPropagation();
+            let _selected = this.$.content.querySelector('li.selected');
+            if (_selected) _selected.classList.remove('selected');
+            e.currentTarget.classList.add('selected');
+          });
+          link.addEventListener('click', (e) => {
+            e.stopPropagation();
+            let i = 0;
+            while (e.currentTarget.tagName != 'LI') i++;
+            let name = e.currentTarget.getAttribute('name');
+            let element = this.$.content.querySelector('#' + name);
+            if (element) {
+              let bias = this.scrollBias || 0;
+              let scrollTarget = this.scrollTarget || document.scrollingElement;
+              //html will move while scrolling
+              let htmlFix = scrollTarget.tagName == 'HTML' ? 0 : scrollTarget.getBoundingClientRect().top;
+              let y = scrollTarget.scrollTop + element.getBoundingClientRect().top - htmlFix;
+              this.scrollTarget.scrollTop = y;
+            }
+          });
+        }
+      }
+
       _render() {
         // reset attributes
         this.$.content.innerHTML = '';
@@ -339,7 +391,6 @@
         this.tags = [];
         this._headingId = 0;
         this._headings = [];
-        this._hasToc = false;
         // no markdown
         if (!this.markdown) {
           this._updateWordCount();
@@ -348,23 +399,12 @@
         // translate markdown
         marked(this.markdown, this.options, (err, out) => {
           if (err) throw err;
-          //toc
-          if (this._hasToc) {
-            out = out.replace(/{{KLOG-MARKDOWN-TOC}}/g, this._tocRenderer());
-            setTimeout(() => this._tocEvent(), 1);
-          }
           //render
           this.$.content.innerHTML = out;
+          //update headings
+          this._updateHeadings();
           // word count
           this._updateWordCount();
-          // remove main title
-          this._tocRenderer();
-          if (this.isIndependentTitle && this.hideIndependentTitle) {
-            let headings = Array.from(this.$.content.querySelectorAll('h1,h2,h3,h4,h5,h6'));
-            headings.sort((a, b) => a.getAttribute('depth') - b.getAttribute('depth'));
-            let title = headings[0];
-            title.parentNode.removeChild(title);
-          }
           //Han
           Han(this.$.article, this.$.article).render();
           setTimeout(() => this.dispatchEvent(new CustomEvent('markdown-rendered', { bubbles: true, composed: true })), 1);

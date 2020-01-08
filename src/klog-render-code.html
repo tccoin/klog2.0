@@ -49,8 +49,16 @@
         white-space: normal;
       }
 
+      :host(.has-meta) code {
+        padding-top: 24px;
+      }
+
+      :host(.overflow-code) code {
+        max-height: 50vh;
+        overflow-y: scroll;
+      }
+
       .meta {
-        height: 12px;
         padding: 0 16px;
       }
 

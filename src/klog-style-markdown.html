@@ -49,6 +49,18 @@
         color: var(--klog-markdown-title-color);
       }
 
+      .klog-article-content h1.centered-heading,
+      .klog-article-content h2.centered-heading,
+      .klog-article-content h3.centered-heading,
+      .klog-article-content h4.centered-heading,
+      .klog-article-content h5.centered-heading,
+      .klog-article-content h6.centered-heading {
+        text-align: center;
+        line-height: 3;
+      }
+
+
+
       .klog-article-content a {
         color: var(--primary-color);
         text-decoration: none;
@@ -168,6 +180,10 @@
         height: 32px;
       }
 
+      .klog-article-content .toc li {
+        list-style: none;
+      }
+
       .klog-article-content .toc>ol {
         padding-left: 0;
       }
@@ -178,10 +194,10 @@
         margin: 0;
       }
 
-      .klog-article-content .toc li::before {
+      /* .klog-article-content .toc li::before {
         counter-increment: section;
         content: counters(section, ".") " ";
-      }
+      } */
 
       .klog-article-content .toc li>span {
         cursor: pointer;
