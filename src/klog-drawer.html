@@ -164,7 +164,7 @@
 
           <div class="divider"></div>
 
-          <div class="item" on-click="changelog">
+          <div class="item" name="article/about-klog-2-0">
             <iron-icon icon="swap_vertical_circle"></iron-icon>更新日志
             <paper-ripple></paper-ripple>
           </div>
@@ -236,11 +236,6 @@
         this.close();
         this.$.aboutDialog.open();
         this.dispatchEvent(new CustomEvent('klog-update', { bubbles: true, composed: true }));
-      }
-
-      changelog() {
-        this.close();
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/about-klog-2-0' } }));
       }
 
       github() {
