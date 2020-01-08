@@ -226,7 +226,8 @@
       </div>
       <!--article-->
       <klog-markdown class="section article" id="markdown" markdown="{{article.markdown}}" hide-independent-title="true"
-        theme="{{theme}}" lazy preference="{{userinfo.preference.markdown}}"></klog-markdown>
+        theme="{{theme}}" lazy preference="{{userinfo.preference.markdown}}">
+      </klog-markdown>
     </div>
     <div class="footer">
       <span class="logo">
@@ -264,7 +265,8 @@
           'handleError(error)',
           'updateDocumentTitle(article.title)',
           'updateImmersiveMode(article.immersive)',
-          'enableSmoothScroll(article.title)'
+          'enableSmoothScroll(article.title)',
+          'render(article.markdown)'
         ]
       }
 
@@ -341,6 +343,7 @@
         setTimeout(() => {
           this.setAttribute('loaded', true);
         }, 1);
+        this.$.markdown.render();
       }
 
       unload() {

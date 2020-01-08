@@ -63,6 +63,10 @@
             type: Boolean,
             value: true
           },
+          disabled: {
+            type: Boolean,
+            value: false
+          },
           preference: {
             type: Object
           },
@@ -103,12 +107,6 @@
       ready() {
         super.ready();
 
-        //load preference
-        if (!this.preference) {
-          this.preference = this.$.user.defaultMarkdownPreference;
-        }
-
-
         //lazy-init
         if (this.lazy) this.lazyInit();
 
@@ -118,8 +116,8 @@
         renderer.heading = (text, depth) => {
           let id = 'heading' + (++this._headingId);
           let classList = '';
-          classList += this.preference.centeredHeading ? 'centered-heading ' : '';
-          classList += this.preference.numberedHeading ? 'numbered-heading ' : '';
+          classList += this.preference.centeredHeading == 'true' ? 'centered-heading ' : '';
+          classList += this.preference.numberedHeading == 'true' ? 'numbered-heading ' : '';
           classList = classList ? `class="${classList}" ` : '';
           this._headings.push({ depth: depth, text: text, id: id });
           return `<h${depth} ${classList} id="${id}" depth="${depth}">${text}</h${depth}>\n`;
@@ -144,7 +142,7 @@
         renderer.code = (code, lang, escaped) => {
           this.initCodeRenderer();
           let classList = '';
-          classList += this.preference.overflowCode ? 'overflow-code ' : '';
+          classList += this.preference.overflowCode == 'true' ? 'overflow-code ' : '';
           classList += lang ? 'has-meta' : '';
           classList = classList ? `class="${classList}" ` : '';
           let out = `<klog-render-code ${classList} lang="${lang || ''}" code="${escape(code)}" theme="${this.theme}"></klog-render-code>\n`;
@@ -301,20 +299,6 @@
           heading.number = numbers.slice(0, depth + 1).join('.') + '.';
         }
 
-        // update elements
-        for (let heading of headings) {
-          let element = this.$.content.querySelector(`#${heading.id}`);
-          if (heading.isIndependentTitle && this.hideIndependentTitle) {
-            element.style.display = 'none';
-            continue;
-          }
-          if (this.preference.numberedHeading) {
-            let numberSpan = element.querySelector('.heading-number');
-            if (numberSpan) { numberSpan.parentNode.removeChild(numberSpan) }
-            element.innerHTML = `<span class="heading-number">${heading.number}</span> ${element.innerHTML}`;
-          }
-        }
-
         // update heading elements
         for (let heading of headings) {
           let element = this.$.content.querySelector(`#${heading.id}`);
@@ -322,7 +306,8 @@
             element.style.display = 'none';
             continue;
           }
-          if (this.preference.numberedHeading) {
+          console.log(this.preference.numberedHeading);
+          if (this.preference.numberedHeading == 'true') {
             let numberSpan = element.querySelector('.heading-number');
             if (numberSpan) { numberSpan.parentNode.removeChild(numberSpan) }
             element.innerHTML = `<span class="heading-number">${heading.number}</span> ${element.innerHTML}`;
@@ -383,8 +368,17 @@
           });
         }
       }
-
       _render() {
+        if (!this.disabled) {
+          this.render();
+        }
+      }
+
+      render() {
+        //load preference
+        if (!this.preference) {
+          this.preference = this.$.user.defaultMarkdownPreference;
+        }
         // reset attributes
         this.$.content.innerHTML = '';
         this.collection = 'Daily';

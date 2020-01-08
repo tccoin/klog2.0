@@ -19,6 +19,7 @@
 <link rel="import" href="klog-render-timestamp.html">
 <link rel="import" href="klog-upload-zone.html">
 <link rel="import" href="klog-data-list.html">
+<link rel="import" href="klog-data-user.html">
 <link rel="import" href="klog-input.html">
 <link rel="import" href="klog-dropdown-menu.html">
 <dom-module id="klog-userpanel">
@@ -150,6 +151,7 @@
       }
     </style>
     <klog-data-list id="data" last-response="{{list}}" userinfo="{{userinfo}}"></klog-data-list>
+    <klog-data-user id="user" disabled></klog-data-user>
 
     <app-toolbar>
       <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
@@ -179,25 +181,9 @@
 
     <div class="userpanel-card klog-card">
       <div class="card-meta header">
-        <div class="title">我就喜欢</div>
+        <div class="title">外观</div>
       </div>
       <div class="form">
-        <!-- <paper-dropdown-menu label="主题">
-          <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{preference.theme}}">
-            <paper-item name="light">浅色</paper-item>
-            <paper-item name="dark">深色</paper-item>
-            <paper-item name="system">跟随系统</paper-item>
-            <paper-item name="time">跟随时间</paper-item>
-          </paper-listbox>
-        </paper-dropdown-menu> -->
-        <!-- <klog-dropdown-menu label="主题">
-            <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{preference.theme}}">
-              <paper-item name="light">浅色</paper-item>
-              <paper-item name="dark">深色</paper-item>
-              <paper-item name="system">跟随系统</paper-item>
-              <paper-item name="time">跟随时间</paper-item>
-            </paper-listbox>
-          </klog-dropdown-menu> -->
         <klog-dropdown-menu label="主题" outlined vertical-align="top" horizontal-align="left" vertical-offset="62"
           horizontal-offset="-16">
           <paper-tabs selected="{{preference.theme}}" slot="dropdown-content" class="dropdown-content"
@@ -212,6 +198,43 @@
         <!-- <paper-toggle-button checked="{{preference.darkThemeDisabled}}">没有黑夜</paper-toggle-button> -->
         <!-- <paper-toggle-button checked="{{preference.gestureDisabled}}">手势什么的最讨厌了</paper-toggle-button> -->
       </div>
+      <div class="fit"></div>
+    </div>
+
+    <div class="userpanel-card klog-card">
+      <div class="card-meta header">
+        <div class="title">阅读偏好</div>
+      </div>
+      <div class="form">
+        <klog-dropdown-menu label="标题序号" outlined vertical-align="top" horizontal-align="left" vertical-offset="62"
+          horizontal-offset="-16">
+          <paper-tabs selected="{{preference.markdown.numberedHeading}}" slot="dropdown-content"
+            class="dropdown-content" attr-for-selected="name">
+            <paper-tab name="true">显示</paper-tab>
+            <paper-tab name="false">隐藏</paper-tab>
+          </paper-tabs>
+        </klog-dropdown-menu>
+        <klog-dropdown-menu label="标题位置" outlined vertical-align="top" horizontal-align="left" vertical-offset="62"
+          horizontal-offset="-16">
+          <paper-tabs selected="{{preference.markdown.centeredHeading}}" slot="dropdown-content"
+            class="dropdown-content" attr-for-selected="name">
+            <paper-tab name="false">正常</paper-tab>
+            <paper-tab name="true">居中</paper-tab>
+          </paper-tabs>
+        </klog-dropdown-menu>
+        <klog-dropdown-menu label="大段代码" outlined vertical-align="top" horizontal-align="left" vertical-offset="62"
+          horizontal-offset="-16">
+          <paper-tabs selected="{{preference.markdown.overflowCode}}" slot="dropdown-content" class="dropdown-content"
+            attr-for-selected="name">
+            <paper-tab name="true">滚动</paper-tab>
+            <paper-tab name="false">全部显示</paper-tab>
+          </paper-tabs>
+        </klog-dropdown-menu>
+        <paper-button on-click="resetMarkdownPreference">
+          <iron-icon icon="settings_backup_restore"></iron-icon>重设
+        </paper-button>
+        <div class="fit"></div>
+      </div>
     </div>
 
     <div class="userpanel-card klog-card">
@@ -224,6 +247,7 @@
           <paper-radio-button name="note">笔记</paper-radio-button>
         </paper-radio-group>
       </div>
+      <div class="fit"></div>
     </div>
 
     <paper-dialog id="uploadAvatarDialog" with-backdrop>
@@ -240,8 +264,19 @@
         return [
           'loadList(userinfo.publicinfo.id)',
           'updateAvatarUrl(avatarinfo)',
-          'updatePreference(preference.theme,preference.defaultPage,preference.backdropBlurEnabled)'
+          'updatePreference(preference.theme,preference.defaultPage,preference.backdropBlurEnabled,preference.markdown.numberedHeading,preference.markdown.centeredHeading,preference.markdown.overflowCode)',
         ]
+      }
+
+      load() {
+        document.title = '个人资料 - Klog';
+        if (!this.userinfo.createdAt) {
+          this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
+          return;
+        }
+        this.preference = this.userinfo.preference;
+        console.log(this.preference);
+        this.loadList();
       }
 
       openDrawer() {
@@ -257,14 +292,8 @@
         this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
       }
 
-      load() {
-        document.title = '个人资料 - Klog';
-        if (!this.userinfo.createdAt) {
-          this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
-          return;
-        }
-        this.preference = this.userinfo.preference;
-        this.loadList();
+      resetMarkdownPreference() {
+        this.set("preference.markdown", this.$.user.defaultMarkdownPreference);
       }
 
       loadList() {
@@ -317,6 +346,7 @@
           this._preferenceInit = true;
           return;
         }
+        this.userinfo.preference = this.preference;
         this._updateUserinfo({ preference: { value: this.preference } });
       }
 
