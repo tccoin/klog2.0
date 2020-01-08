@@ -34,32 +34,46 @@
             type: Boolean,
             value: false
           },
+          disabled: {
+            type: Boolean,
+            value: false
+          },
         }
       }
 
       ready() {
         super.ready();
-        this._defaultPreference = {
+        this.defaultMarkdownPreference = {
+          numberedHeading: true,
+          centeredHeading: true,
+          overflowCode: true
+        };
+        this.defaultPreference = {
           theme: 'time',
           darkThemeDisabled: false,
-          gestureDisabled: true,
+          gestureDisabled: false,
           backdropBlurEnabled: false,
           defaultPage: 'timeline',
-          stt: []
+          stt: [],
+          markdown: this.defaultMarkdownPreference
         };
-        if (AV.User.current()) this.user = AV.User.current();
-        this.updateUserinfo();
+        if (!this.disabled) {
+          if (AV.User.current()) this.user = AV.User.current();
+          this.updateUserinfo();
+        }
       }
 
       updateUserinfo() {
         if (!this.user) {
-          this.userinfo = { preference: this._defaultPreference };
+          this.userinfo = { preference: this.defaultPreference };
           return;
         }
         this.user.fetch()
           .then((user) => {
             let userJson = user.toJSON();
-            let preference = Object.assign(this._defaultPreference, userJson.preference || {});
+            let preference = Object.assign(this.defaultPreference, userJson.preference || {});
+            let markdownPreference = Object.assign(this.defaultMarkdownPreference, preference.markdown || {});
+            preference.markdown = markdownPreference;
             let userinfo = {
               createdAt: userJson.createdAt,
               updatedAt: userJson.updatedAt,

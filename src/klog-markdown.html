@@ -3,12 +3,14 @@
 <link rel="import" href="klog-image.html">
 <link rel="import" href="klog-player-lite.html">
 <link rel="import" href="klog-style-markdown.html">
+<link rel="import" href="klog-data-user.html">
 <link rel="import" href="../static/lib/Han/han-style.html">
 <dom-module id="klog-markdown">
   <template>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-markdown"></style>
     <style include="han-style"></style>
+    <klog-data-user disabled id="user"></klog-data-user>
     <article id="article" class="klog-article-content" theme$="[[theme]]">
       <slot></slot>
       <div id="content"></div>
@@ -61,6 +63,9 @@
             type: Boolean,
             value: true
           },
+          preference: {
+            type: Object
+          },
         }
       }
 
@@ -98,6 +103,13 @@
       ready() {
         super.ready();
 
+        //load preference
+        if (!this.preference) {
+          this.preference = this.$.user.defaultMarkdownPreference;
+        }
+        console.log(this.preference);
+
+
         //lazy-init
         if (this.lazy) this.lazyInit();
 
@@ -106,6 +118,9 @@
 
         renderer.heading = (text, depth) => {
           let id = 'heading' + (++this._headingId);
+          let classList = '';
+          classList += this.preference.centeredHeading ? 'centered' : '';
+          classList += this.preference.numberedHeading ? 'numbered' : '';
           this._headings.push({ depth: depth, text: text, id: id });
           return `<h${depth} id="${id}" depth="${depth}">${text}</h${depth}>\n`;
         };

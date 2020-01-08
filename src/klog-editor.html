@@ -162,7 +162,7 @@
           <klog-editor-textarea id="textarea" loading="{{loading}}" value="{{markdown}}" preview="{{preview}}"
             placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
           <klog-markdown id="markdown" markdown="{{preview}}" theme="[[theme]]" word-count="{{wordCount}}"
-            collection="{{collection}}">
+            collection="{{collection}}" preference="{{userinfo.preference.markdown}}">
             <span slot="after" class="info">字数统计: {{wordCount}}</span>
           </klog-markdown>
         </klog-pages>

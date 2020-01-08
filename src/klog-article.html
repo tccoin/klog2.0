@@ -226,7 +226,7 @@
       </div>
       <!--article-->
       <klog-markdown class="section article" id="markdown" markdown="{{article.markdown}}" hide-independent-title="true"
-        theme="{{theme}}" lazy></klog-markdown>
+        theme="{{theme}}" lazy preference="{{userinfo.preference.markdown}}"></klog-markdown>
     </div>
     <div class="footer">
       <span class="logo">
@@ -277,6 +277,7 @@
 
       loadArticle(path) {
         if (window.location.hash.indexOf('#/article') == -1) return
+        if (!path || this.path == path) return
         this.path = path;
       }
 
