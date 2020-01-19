@@ -386,7 +386,7 @@
           element.removeAttribute('watch');
           element.removeAttribute('intersecting');
           element.removeAttribute('overflow');
-          element.setAttribute('style', '');
+          // element.setAttribute('style', '');
           this._lazyObserver.unobserve(element);
         }
       }
@@ -424,6 +424,7 @@
         document.title = '时间轴 - Klog';
         window.addEventListener('scroll', this._scrollHandler);
         window.addEventListener('scroll', this._pageScrollHandler);
+        this.enableObserver();
         return new Promise((resolve) => {
           setTimeout(() => {
             if (!this.isTimelineInit) {
@@ -434,6 +435,7 @@
             } else {
               const y = this._lastScrollY || 0;
               this.instantScrollTo(0, y);
+              this._scrollHandler();
               this.checkUpdate();
             }
             resolve();
