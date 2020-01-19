@@ -96,7 +96,8 @@
     <!-- Pages -->
     <iron-pages id="pages" role="main" selected="{{page}}" attr-for-selected="name" selected-attribute="visible">
       <klog-404 name="404" page="{{page}}"></klog-404>
-      <klog-timeline name="timeline" userinfo="[[userinfo]]" theme="[[theme]]"></klog-timeline>
+      <klog-timeline name="timeline" id="timeline" userinfo="[[userinfo]]" mobile="{{mobile}}" theme="[[theme]]">
+      </klog-timeline>
       <klog-article name="article" route="{{subroute}}" userinfo="[[userinfo]]" theme="{{theme}}"></klog-article>
       <klog-editor id="editor" name="editor" mobile="{{mobile}}" userinfo="[[userinfo]]" route="{{subroute}}"
         theme="{{theme}}"></klog-editor>
