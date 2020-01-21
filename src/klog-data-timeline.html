@@ -2,8 +2,8 @@
 <link rel="import" href="klog-data-list.html">
 <dom-module id="klog-data-timeline">
   <template>
-    <klog-data-list id="list" type="timeline" last-response="{{lastResponse}}" loading="{{loading}}" keyword="{{keyword}}"
-      key="date"></klog-data-list>
+    <klog-data-list id="list" type="timeline" last-response="{{lastResponse}}" loading="{{loading}}"
+      keyword="{{keyword}}" key="date"></klog-data-list>
   </template>
 
   <script>
@@ -43,7 +43,7 @@
       }
 
       load() {
-        this.$.list.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'date'];
+        this.$.list.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'date', 'attachments', 'collection', 'tags'];
         this.$.list.include = ['author', 'topic'];
         this.$.list.load();
       }

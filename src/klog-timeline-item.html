@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/app-layout/app-layout.html">
 <link rel="import" href="../bower_components/paper-ripple/paper-ripple.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="klog-icons.html">
 <link rel="import" href="klog-data-timeline.html">
 <link rel="import" href="klog-data-image.html">
@@ -63,14 +64,12 @@
         white-space: nowrap;
       }
 
-      .card-meta+.card-title {
-        margin-top: var(--klog-card-padding);
-      }
 
       /*card-body*/
 
       .card-title {
         color: var(--primary-text-color);
+        margin-top: var(--klog-card-padding) !important;
       }
 
       .card-title+.card-content {
@@ -78,7 +77,7 @@
       }
 
       .card-content {
-        display: flex !important;
+        display: flex;
         flex-direction: row;
       }
 
@@ -92,6 +91,7 @@
         color: var(--klog-card-content-color, var(--primary-text-color));
       }
 
+
       .content-thumbnail {
         width: 160px;
         height: 90px;
@@ -99,6 +99,29 @@
       }
 
       /*card-attachments*/
+
+      .card-gallery {
+        @apply --layout-horizontal;
+        @apply --layout-start-center;
+        flex-wrap: wrap;
+        overflow: auto;
+        flex: 1;
+        margin: 0;
+        font-size: var(--secondary-font-size);
+        color: var(--klog-card-content-color, var(--primary-text-color));
+      }
+
+      .card-gallery-item {
+        margin-right: 1px;
+        margin-top: 1px;
+        flex-grow: 1;
+        flex-shrink: 0;
+        flex-basis: calc(50% - 0.5px);
+      }
+
+      .card-gallery-item:nth-child(even) {
+        margin-right: 0;
+      }
 
       .attachments {
         position: relative;
@@ -122,26 +145,50 @@
         display: none !important;
       }
     </style>
-    <div class="card klog-card" attachment$="{{has(data.attachment)}}" comment$="{{has(data.attachment)}}"
-      raised$="{{expended}}" on-click="read">
+    <!--header-->
+    <div class="card klog-card" raised$="{{expended}}" on-click="read">
       <div class="card-meta">
         <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" avatar></klog-data-image>
         <div class="meta">
           <span class="meta-name">{{data.author.displayName}}</span>
-          <span class="meta-collection">发布在&nbsp;{{data.collection}}</span>
+          <span class="meta-collection">
+            <template is="dom-if" if="{{data.view.gallery}}">发布了{{imageCount}}张照片</template>
+            <template is="dom-if" if="{{data.view.default}}">发布在&nbsp;{{data.collection}}</template>
+          </span>
+
         </div>
         <div class="divider"></div>
         <div class="date">
           <klog-render-timestamp time-stamp="{{data.date}}"></klog-render-timestamp>
         </div>
       </div>
-      <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
-      <div class="card-content" hidden$="{{!data.text}}">
-        <p class="content-text" id="text">{{data.text}}</p>
-        <template is="dom-if" if="{{data.image.url}}">
-          <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
-        </template>
-      </div>
+      <!--default view-->
+      <template is="dom-if" if="{{data.view.default}}">
+        <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
+        <div class="card-content" hidden$="{{!data.text}}">
+          <p class="content-text" id="text">{{data.text}}</p>
+          <template is="dom-if" if="{{data.image.url}}">
+            <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
+          </template>
+        </div>
+        <!-- <div class="card-content">
+          <template is="dom-if" if="{{has(links)}}">
+            <template is="dom-repeat" items="{{links}}">
+              <paper-chip outlined>{{item.text}}</paper-chip>
+            </template>
+          </template>
+        </div> -->
+
+      </template>
+      <!--gallery view-->
+      <template is="dom-if" if="{{data.view.gallery}}">
+        <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
+        <div class="card-gallery">
+          <template is="dom-repeat" items="{{gallery}}">
+            <klog-data-image class="card-gallery-item" src="{{item.url}}" timeline></klog-data-image>
+          </template>
+        </div>
+      </template>
     </div>
   </template>
   <script src="../static/lib/Clamp.js/clamp.min.js"></script>
@@ -152,7 +199,14 @@
 
       ready() {
         super.ready();
-        setTimeout(() => $clamp(this.$.text, { clamp: 4 }), 1);
+        if (this.data.view.gallery) {
+          this._calculateGallery();
+        }
+        this._calculateLinks();
+        setTimeout(() => {
+          if (this.$.text)
+            $clamp(this.$.text, { clamp: 4 });
+        }, 1);
       }
 
       has(sth) {
@@ -161,6 +215,22 @@
 
       read() {
         this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/' + this.data.path, now: false } }));
+      }
+
+      _calculateGallery() {
+        let gallery = this.data.attachments.filter(x => x.image);
+        this.imageCount = gallery.length;
+        gallery.splice(6);
+        this.hiddenImageCount = this.imageCount - gallery.length;
+        this.gallery = gallery;
+        return gallery;
+      }
+
+      _calculateLinks() {
+        let links = this.data.attachments.filter(x => x.link);
+        this.links = links;
+        console.log(links);
+        return links;
       }
     }
 

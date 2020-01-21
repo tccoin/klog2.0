@@ -64,7 +64,7 @@
       }
 
       paper-chip[name=search] {
-        --primary-color: var(--paper-amber-900);
+        --primary-color: var(--paper-cyan-700);
         --paper-chip-expand-width: 64px;
       }
 
@@ -87,9 +87,9 @@
         --primary-color: var(--paper-green-700);
       }
 
-      /* paper-chip#projectFilter {
+      paper-chip[name=gallery] {
         --primary-color: var(--paper-blue-grey-500);
-      } */
+      }
 
       .item {
         max-width: 600px;
@@ -176,7 +176,7 @@
         opacity: 0;
       }
     </style>
-    <klog-data-timeline id="data" last-response="{{list}}" keyword="{{keyword}}"></klog-data-timeline>
+    <klog-data-timeline id="data" last-response="{{list}}"></klog-data-timeline>
     <app-header id="header" fixed short>
       <app-toolbar>
         <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
@@ -198,19 +198,17 @@
       hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
       <div class="filter-container item" id="filter" on-click="setFilter">
-        <paper-chip name="search" data-keyword="search" data-view="default" icon="search" outlined
-          checkmark-animation-disabled>
+        <paper-chip name="search" icon="search" outlined checkmark-animation-disabled>
           <input slot="expand-content" id="keywordInput" />
           </iron-icon>
         </paper-chip>
-        <paper-chip name="default" data-keyword="" data-view="default" outlined active id="defaultFilter" active>全部文章
-        </paper-chip>
-        <paper-chip name="daily" data-keyword="日常" data-view="default" outlined>日常</paper-chip>
-        <paper-chip name="note" data-keyword="笔记" data-view="default" outlined>笔记</paper-chip>
-        <paper-chip name="gallery" data-keyword="" data-view="only-gallery" outlined>相册</paper-chip>
+        <paper-chip name="default" outlined>全部文章</paper-chip>
+        <paper-chip name="daily" outlined>日常</paper-chip>
+        <paper-chip name="note" outlined>笔记</paper-chip>
+        <paper-chip name="gallery" outlined>相册</paper-chip>
       </div>
       <div class="timeline-container" id="scrollTarget">
-        <template is="dom-repeat" items="{{items}}">
+        <template is="dom-repeat" items="{{cards}}">
           <klog-timeline-item class="item" data="{{item}}"></klog-timeline-item>
         </template>
         <div class="eof" hidden="{{!_eof}}">Klog 奇点</div>
@@ -241,12 +239,18 @@
             type: Array,
             observer: 'newDataLoaded'
           },
-          keyword: {
-            type: String
-          },
           filterName: {
             type: String,
+            value: 'default',
             observer: '_filterNameUpdate'
+          },
+          keyword: {
+            type: String,
+            value: ''
+          },
+          view: {
+            type: String,
+            value: 'default'
           },
           updateButtonHidden: {
             type: Boolean,
@@ -311,6 +315,49 @@
         }
       }
 
+      load() {
+        document.title = '时间轴 - Klog';
+        window.addEventListener('scroll', this._scrollHandler);
+        window.addEventListener('scroll', this._pageScrollHandler);
+        this.enableObserver();
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            if (!this.isTimelineInit) {
+              window.scrollTo(0, 0);
+              this._scrollHandler();
+              this.refresh();
+              this.isTimelineInit = true;
+            } else {
+              const y = this._lastScrollY || 0;
+              this.instantScrollTo(0, y);
+              this._scrollHandler();
+              this.checkUpdate();
+            }
+            resolve();
+          }, 1);
+        });
+      }
+
+      unload() {
+        window.removeEventListener('scroll', this._scrollHandler);
+        window.removeEventListener('scroll', this._pageScrollHandler);
+        this.$.reminder.removeAttribute('active');
+        this.disableObserver();
+        this._lastScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.dispatchEvent(new CustomEvent('theme-update', { bubbles: true, composed: true }));
+            resolve();
+          }, this.refreshAnimationDuration + 1);
+        });
+      }
+
+      instantScrollTo(x, y) {
+        document.querySelector('html').style.scrollBehavior = 'auto';
+        window.scrollTo(x, y);
+        setTimeout(() => { document.querySelector('html').style.scrollBehavior = 'smooth' }, 1);
+      }
+
       activeReminder() {
         setTimeout(() => {
           this.$.reminder.setAttribute('active', true);
@@ -370,45 +417,6 @@
         };
       }
 
-
-      _initPageloader() {
-        this._pageSize = 20;
-        this._resetPage();
-        this._pageScrollHandler = e => {
-          let y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-          let wh = window.innerHeight; // container height
-          let eh = this.scrollHeight;  // element height
-          if (y + wh * 1.4 >= eh) {
-            this._loadNextPage();
-          }
-        };
-      }
-
-      _loadNewPage(list) {
-        this._items = list;
-        this._resetPage();
-        this._loadNextPage();
-      }
-
-      _resetPage() {
-        this._pageNumber = 0;
-        this._eof = false;
-      }
-
-
-      _loadNextPage() {
-        // page control
-        this._pageNumber++;
-        this.items = this._items.slice(0, this._pageNumber * this._pageSize);
-        if (this._pageNumber * this._pageSize >= this._items.length) {
-          this._eof = true;
-        }
-        // lazy oberser
-        if ("IntersectionObserver" in window) {
-          setTimeout(() => this.enableObserver(), 1);
-        }
-      }
-
       enableObserver() {
         let lazyElements = this.$.container.querySelectorAll('klog-timeline-item:not([watch])');
         for (let element of lazyElements) {
@@ -423,21 +431,132 @@
           element.removeAttribute('watch');
           element.removeAttribute('intersecting');
           element.removeAttribute('overflow');
-          // element.setAttribute('style', '');
           this._lazyObserver.unobserve(element);
         }
       }
 
+
+      _initPageloader() {
+        this.pageSize = 20;
+        this._resetPage();
+        this._pageScrollHandler = e => {
+          let y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+          let wh = window.innerHeight; // container height
+          let eh = this.scrollHeight;  // element height
+          if (y + wh * 1.4 >= eh) {
+            this._loadNextPage();
+          }
+        };
+      }
+
+      _loadNewPage(list) {
+        this._cards = this._calculateCards(list);
+        this._resetPage();
+        this._loadNextPage();
+      }
+
+      _resetPage() {
+        this._pageNumber = 0;
+        this._eof = false;
+      }
+
+      _loadNextPage() {
+        // page control
+        this._pageNumber++;
+        this.cards = this._cards.slice(0, this._pageNumber * this.pageSize);
+
+        if (this._pageNumber * this.pageSize >= this._cards.length) {
+          this._eof = true;
+        }
+        // lazy oberser
+        if ("IntersectionObserver" in window) {
+          setTimeout(() => this.enableObserver(), 1);
+        }
+      }
+
+      _calculateCards(list) {
+        // process the original article list with filter settings
+        if (!list) return [];
+        let cards = list;
+        // filter
+        if (this.keyword != '') {
+          cards = cards.filter(x => {
+            const attrs = ['title', 'text', 'collection', 'tags'];
+            let hasKeyword = false;
+            for (let attr of attrs) {
+              if (x[attr]) {
+                let value = typeof (x[attr]) == 'string' ? x[attr] : x[attr].toString();
+                hasKeyword |= value.indexOf(this.keyword) > -1
+              }
+            }
+            return hasKeyword;
+          });
+        }
+        // view
+        for (let [attr, len] of this.viewPreset[this.view].requiredAttachments) {
+          cards = cards.filter(x => x.attachments.filter(x => x[attr]).length >= len);
+        }
+        for (let card of cards) {
+          card.view = {
+            default: this.view == 'default',
+            gallery: this.view == 'gallery',
+          };
+        }
+        return cards;
+      }
+
+      filterPreset = {
+        default: {
+          view: 'default',
+          keyword: ''
+        },
+        search: {
+          view: 'default',
+          keyword: ''
+        },
+        note: {
+          view: 'default',
+          keyword: '笔记'
+        },
+        daily: {
+          view: 'default',
+          keyword: '日常'
+        },
+        gallery: {
+          view: 'gallery',
+          keyword: ''
+        },
+      };
+
+      viewPreset = {
+        default: {
+          pageSize: 20,
+          requiredAttachments: []
+        },
+        gallery: {
+          pageSize: 10,
+          requiredAttachments: [['image', 2]]
+        }
+      };
+
       setFilter(e) {
         if (e.target.tagName == 'PAPER-CHIP') {
-          if (e.target.getAttribute('name') == 'search') {
+          const filterName = e.target.getAttribute('name');
+          if (filterName == 'search') {
             this.$.keywordInput.focus();
             this.keyword = this.$.keywordInput.value;
           } else {
-            this.keyword = e.target.getAttribute('data-keyword');
+            this.view = this.filterPreset[filterName].view || 'default';
+            this.keyword = this.filterPreset[filterName].keyword || '';
           }
-          this.filterName = e.target.getAttribute('name');
+          this.filterName = filterName;
+          this.updateTimeline();
+          this.updateView();
         }
+      }
+
+      updateView(e) {
+        this.pageSize = this.viewPreset[this.view].pageSize;
       }
 
       _filterNameUpdate(filterName, oldFilterName) {
@@ -453,53 +572,10 @@
           oldActiveChip.active = false;
           this.$.defaultFilter.active = true;
         } else {
-          oldActiveChip.active = false;
+          if (oldActiveChip)
+            oldActiveChip.active = false;
           activeChip.active = true;
         }
-        this.refresh();
-      }
-
-      load() {
-        document.title = '时间轴 - Klog';
-        window.addEventListener('scroll', this._scrollHandler);
-        window.addEventListener('scroll', this._pageScrollHandler);
-        this.enableObserver();
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            if (!this.isTimelineInit) {
-              window.scrollTo(0, 0);
-              this._scrollHandler();
-              this.refresh();
-              this.isTimelineInit = true;
-            } else {
-              const y = this._lastScrollY || 0;
-              this.instantScrollTo(0, y);
-              this._scrollHandler();
-              this.checkUpdate();
-            }
-            resolve();
-          }, 1);
-        });
-      }
-
-      unload() {
-        window.removeEventListener('scroll', this._scrollHandler);
-        window.removeEventListener('scroll', this._pageScrollHandler);
-        this.$.reminder.removeAttribute('active');
-        this.disableObserver();
-        this._lastScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            this.dispatchEvent(new CustomEvent('theme-update', { bubbles: true, composed: true }));
-            resolve();
-          }, this.refreshAnimationDuration + 1);
-        });
-      }
-
-      instantScrollTo(x, y) {
-        document.querySelector('html').style.scrollBehavior = 'auto';
-        window.scrollTo(x, y);
-        setTimeout(() => { document.querySelector('html').style.scrollBehavior = 'smooth' }, 1);
       }
 
       add() {
@@ -523,7 +599,7 @@
           this.refreshed();
         } else {
           const token = x => x.objectId + x.updatedAt + x.title + x.path + x.text;
-          if (token(this.list[0]) != token(this._items[0])) {
+          if (token(this._calculateCards(this.list)[0]) != token(this._cards[0])) {
             this.updateButtonHidden = false;
           }
         }
