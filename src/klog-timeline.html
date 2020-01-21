@@ -43,13 +43,17 @@
       }
 
       .filter-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100vw !important;
+        overflow: auto;
         padding: 0 8px;
         box-sizing: border-box;
         overflow: auto;
         white-space: nowrap;
         width: fit-content;
         font-size: 0;
-        /* transform-origin: left center; */
         transition: all .15s ease;
       }
 
@@ -72,6 +76,8 @@
       }
 
       paper-chip[name=search] input {
+        width: 100%;
+        height: 19px;
         color: var(--primary-color);
         font-weight: bold;
         font-size: inherit;
@@ -79,7 +85,6 @@
         background: none;
         border-bottom: 1px solid var(--primary-color);
         outline: none;
-        width: 100%;
       }
 
       paper-chip[name=daily] {
