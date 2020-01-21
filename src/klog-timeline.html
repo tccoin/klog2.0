@@ -48,11 +48,14 @@
         overflow: auto;
         white-space: nowrap;
         width: fit-content;
+        font-size: 0;
         /* transform-origin: left center; */
         transition: all .15s ease;
       }
 
       paper-chip {
+        font-size: 14px;
+        padding: 0 4px;
         --paper-chip-text-color: var(--secondary-text-color);
         --divider-color: var(--secondary-text-color);
 
@@ -275,6 +278,42 @@
         this._initScroller();
         this._initPageloader();
         this.activeReminder();
+
+
+
+        this.filterPreset = {
+          default: {
+            view: 'default',
+            keyword: ''
+          },
+          search: {
+            view: 'default',
+            keyword: ''
+          },
+          note: {
+            view: 'default',
+            keyword: '笔记'
+          },
+          daily: {
+            view: 'default',
+            keyword: '日常'
+          },
+          gallery: {
+            view: 'gallery',
+            keyword: ''
+          },
+        };
+
+        this.viewPreset = {
+          default: {
+            pageSize: 20,
+            requiredAttachments: []
+          },
+          gallery: {
+            pageSize: 7,
+            requiredAttachments: [['image', 1]]
+          }
+        };
 
         this.$.keywordInput.addEventListener('input', () => {
           const cb = () => {
@@ -508,40 +547,6 @@
         }
         return cards;
       }
-
-      filterPreset = {
-        default: {
-          view: 'default',
-          keyword: ''
-        },
-        search: {
-          view: 'default',
-          keyword: ''
-        },
-        note: {
-          view: 'default',
-          keyword: '笔记'
-        },
-        daily: {
-          view: 'default',
-          keyword: '日常'
-        },
-        gallery: {
-          view: 'gallery',
-          keyword: ''
-        },
-      };
-
-      viewPreset = {
-        default: {
-          pageSize: 20,
-          requiredAttachments: []
-        },
-        gallery: {
-          pageSize: 7,
-          requiredAttachments: [['image', 1]]
-        }
-      };
 
       setFilter(e) {
         if (e.target.tagName == 'PAPER-CHIP') {
