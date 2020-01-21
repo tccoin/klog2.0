@@ -173,7 +173,7 @@
         </div>
         <!-- <div class="card-content">
           <template is="dom-if" if="{{has(links)}}">
-            <template is="dom-repeat" items="{{links}}">
+            <template is="dom-repeat" items="{{_calculateLinks(data.attachments)}}">
               <paper-chip outlined>{{item.text}}</paper-chip>
             </template>
           </template>
@@ -184,7 +184,7 @@
       <template is="dom-if" if="{{data.view.gallery}}">
         <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
         <div class="card-gallery">
-          <template is="dom-repeat" items="{{gallery}}">
+          <template is="dom-repeat" items="{{_calculateGallery(data.view.gallery)}}">
             <klog-data-image class="card-gallery-item" src="{{item.url}}" timeline></klog-data-image>
           </template>
         </div>
@@ -199,9 +199,6 @@
 
       ready() {
         super.ready();
-        if (this.data.view.gallery) {
-          this._calculateGallery();
-        }
         this._calculateLinks();
         setTimeout(() => {
           if (this.$.text)
@@ -229,7 +226,6 @@
       _calculateLinks() {
         let links = this.data.attachments.filter(x => x.link);
         this.links = links;
-        console.log(links);
         return links;
       }
     }
