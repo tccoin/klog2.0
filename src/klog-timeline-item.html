@@ -220,8 +220,6 @@
 
       ready() {
         super.ready();
-        this._calculateLinks();
-        this._calculateFiles();
         this.refresh();
       }
 
@@ -234,7 +232,12 @@
       }
 
       refresh() {
-        this.notifyPath('data.view'); setTimeout(() => {
+        this._calculateLinks();
+        this._calculateFiles();
+        this.notifyPath('files');
+        this.notifyPath('links');
+        this.notifyPath('data.view');
+        setTimeout(() => {
           let text = this.$.card.querySelector('#text');
           if (text) {
             $clamp(text, { clamp: 4 });
