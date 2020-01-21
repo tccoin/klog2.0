@@ -139,21 +139,20 @@
       }
     </style>
     <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
-    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" title="{{title}}"
-      auto-title="{{autoTitle}}" display-title="{{displayTitle}}" path="{{path}}" random-Path="{{randomPath}}"
-      display-path="{{displayPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}"
-      private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}" current-line="{{currentLine}}">
+    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}"
+      random-Path="{{randomPath}}" display-path="{{displayPath}}" attachments="{{attachments}}" previews="{{previews}}"
+      markdown="{{markdown}}" private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}"
+      current-line="{{currentLine}}">
     </klog-data-editor>
     <div class="layout">
       <klog-backdrop id="backdrop">
-        <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}"
-          display-title="{{displayTitle}}" title="{{title}}" auto-title="{{autoTitle}}" path="{{path}}"
-          random-Path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}" mobile="{{mobile}}"
-          userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}"></klog-editor-header>
+        <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}"
+          path="{{path}}" random-Path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}"
+          mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}"></klog-editor-header>
         <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
           <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}"
-            display-title="{{displayTitle}}" title="{{title}}" auto-title="{{autoTitle}}" path="{{path}}"
-            random-Path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}"></klog-editor-info-form>
+            title="{{title}}" path="{{path}}" random-Path="{{randomPath}}" private="{{private}}"
+            immersive="{{immersive}}"></klog-editor-info-form>
           <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
           <klog-editor-browser name="browser" disabled="{{loading}}" article-id="{{articleId}}"
             collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser>

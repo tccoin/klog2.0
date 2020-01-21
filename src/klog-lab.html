@@ -1,7 +1,14 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="klog-style-layout.html">
 <link rel="import" href="klog-style-card.html">
 <link rel="import" href="klog-markdown.html">
+<link rel="import" href="klog-data-editor.html">
+<link rel="import" href="klog-input.html">
+<link rel="import" href="klog-data-list.html">
 
 <dom-module id="klog-lab">
   <template>
@@ -14,13 +21,48 @@
       }
 
       .main-container {
+        max-height: 500px;
         max-width: 720px;
-        margin: auto;
+        margin: 32px auto;
         padding: 16px;
+        overflow: auto;
+      }
+
+      textarea {
+        height: calc(60vh - 72px);
+        padding: 8px;
+        width: 100%;
+        box-sizing: border-box;
       }
     </style>
+    <app-localstorage-document key="masterKey" data="{{masterKey}}"></app-localstorage-document>
+    <app-localstorage-document key="articleId" data="{{articleId}}"></app-localstorage-document>
+    <klog-data-editor id="data" markdown="{{markdown}}" quiet data="{{article}}"></klog-data-editor>
+    <klog-data-list id="list" last-response="{{list}}" limit="1000"></klog-data-list>
     <div class="klog-card main-container">
-      <klog-markdown id="markdown"></klog-markdown>
+      <klog-input outlined value="{{masterKey}}" label="Master Key"></klog-input>
+      <klog-input outlined value="{{articleId}}" label="Article Id"></klog-input>
+      <klog-input outlined value="{{article.title}}" label="Title"></klog-input>
+      <paper-button on-click="login">登录</paper-button>
+      <paper-button on-click="loadArticle">打开文章</paper-button>
+      <paper-button on-click="saveArticle">保存文章</paper-button>
+      <br>
+      <paper-button on-click="loadList">加载列表</paper-button>
+      <paper-button on-click="loadNext">打开下一篇文章</paper-button>
+      <paper-button on-click="saveNext">更新下一篇文章</paper-button>
+      <paper-button on-click="saveList">更新所有文章</paper-button>
+      <paper-toggle-button checked="{{stop}}">急停</paper-toggle-button>
+    </div>
+    <div class="klog-card main-container">
+      <paper-progress value="[[listProgress]]"></paper-progress>
+      等待处理：{{list.length}}
+    </div>
+    <div class="klog-card main-container">
+      {{article.updatedAt}}:{{listProgressDelta}}
+      <klog-markdown id="markdown" markdown="{{markdown}}"></klog-markdown>
+    </div>
+    <div class="klog-card main-container">
+      <textarea value="{{markdown::input}}"></textarea>
     </div>
   </template>
 
@@ -31,7 +73,59 @@
 
       ready() {
         super.ready();
-        this.$.markdown.markdown = '```c\nint a = 5;\n```\n$$abc=123$$';
+        this.addEventListener('klog-app-load', (e) => {
+          e.stopPropagation();
+        });
+        // this.login();
+        this.listProgress = 0;
+        this.loadArticle();
+        AV._config.useMasterKey = true;
+      }
+
+      login() {
+        window.process = { env: { CLIENT_PLATFORM: 'hahaha' } };
+        AV.masterKey = this.masterKey;
+      }
+
+      loadArticle() {
+        this.$.data.articleId = this.articleId;
+        return this.$.data.load();
+      }
+
+      saveArticle() {
+        return this.$.data.save();
+      }
+
+      loadList() {
+        this.$.list.load().then(() => {
+          this.listProgressDelta = 100 / this.list.length;
+          this.listProgress = 0;
+          console.log(this.listProgressDelta, this.list.length);
+        });
+      }
+
+      loadNext() {
+        if (this.list.length > 0) {
+          this.articleId = this.pop('list').objectId;
+          this.loadArticle();
+        }
+      }
+
+      saveNext() {
+        if (this.list.length > 0) {
+          this.articleId = this.pop('list').objectId;
+          this.loadArticle().then(() => this.saveArticle());
+        }
+      }
+
+      saveList() {
+        if (this.stop) return;
+        if (this.list.length > 0) {
+          this.articleId = this.pop('list').objectId;
+          // this.loadArticle().then(() => true).then(() => this.saveList());
+          this.loadArticle().then(() => this.saveArticle()).then(() => this.saveList());
+        }
+        this.listProgress += this.listProgressDelta;
       }
 
     }

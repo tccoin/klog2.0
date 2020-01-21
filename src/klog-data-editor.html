@@ -25,16 +25,10 @@
           },
           title: {
             type: String,
-            observer: '_updateDisplayTitle',
             notify: true,
           },
-          autoTitle: {
-            type: String,
-            value: '',
-            notify: true,
-          },
-          displayTitle: {
-            type: String,
+          data: {
+            type: Object,
             notify: true,
           },
           path: {
@@ -73,34 +67,40 @@
           fileinfo: {
             type: Object,
             observer: '_updateFileinfo',
+          },
+          quiet: {
+            type: Boolean,
+            value: false
           }
+        }
+      }
+
+      ready() {
+        super.ready();
+        if (!this.userinfo) {
+          this.userinfo = { publicinfo: { id: null } }
         }
       }
 
       _markdownChanged() {
         let lexer = new marked.Lexer();
         let tokens = lexer.lex(this.markdown);
-        this._updateAutoTitle(tokens);
+        this._updateTitle(tokens);
         this._updateMeta(tokens);
         this._updateAttachments(tokens);
       }
 
-      _updateAutoTitle(tokens) {
-        let autoTitle = '';
+      _updateTitle(tokens) {
+        let title = '';
         let depth = 7;
         for (let token of tokens) {
           if (token.type == 'heading' && token.depth < depth) {
-            autoTitle = token.text;
+            title = token.text;
             depth = token.depth;
             if (depth == 1) break
           }
         }
-        this.autoTitle = autoTitle;
-        this._updateDisplayTitle();
-      }
-
-      _updateDisplayTitle() {
-        this.displayTitle = this.title || this.autoTitle.replace(/^\s+|\s+$/g, "") || '无题';
+        this.title = title;
       }
 
       _updateMeta(tokens) {
@@ -164,8 +164,8 @@
             attachment.title = title;
           }
           this.push('attachments', attachment);
-          if (!this.image) {
-            this.push('image', attachment);
+          if (!this.image['url']) {
+            this.image = attachment;
           }
           return '';
         };
@@ -278,8 +278,8 @@
         this.immersive = false;
       }
 
-      load(id) {
-        var article = AV.Object.createWithoutData('Article', this.articleId);
+      load() {
+        let article = AV.Object.createWithoutData('Article', this.articleId);
         return article.fetch()
           .then(data => {
             if (!data.get('updatedAt')) {
@@ -288,24 +288,17 @@
               return
             }
             data = Object.assign({ private: true, immersive: false }, data.toJSON());
-            if (data.author.objectId != this.userinfo.publicinfo.id) {
+            if (data.author.objectId != this.userinfo.publicinfo.id && !AV._config.useMasterKey) {
               this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
+              return;
             }
             this.markdown = data.markdown;
             this.path = data.path;
             this.randomPath = data.path;
             this.private = data.immersive ? true : data.private;
             this.immersive = data.immersive;
+            this.data = data;
             this._pathChanged();
-            setTimeout(() => {
-              if (this.autoTitle == data.title) {
-                // 自动生成标题
-                this.title = ''
-              } else {
-                // 自定义标题
-                this.title = data.title
-              }
-            }, 1);
             return;
           });
       }
@@ -324,8 +317,7 @@
         let topic = AV.Object.createWithoutData('Topic', '59bcb4d3128fe158340be1b5');
         let author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
         // set attributes
-        article.set('author', author);
-        article.set('title', this.title || this.autoTitle);
+        article.set('title', this.title);
         article.set('markdown', this.markdown);
         article.set('text', this.text);
         article.set('path', this.path || this.randomPath);
@@ -338,7 +330,13 @@
         article.set('keywords', this.keywords);
         article.set('comments', []);
         article.set('topic', topic);
-        article.set('updateTimeline', this.updateTimeline == false);
+        if (!this.quiet) {
+          article.set('author', author);
+          article.set('updateTimeline', true);
+        } else {
+          console.log('Updated in quite mode.');
+          article.set('updateTimeline', false);
+        }
         //save
         return article.save();
       }
