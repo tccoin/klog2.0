@@ -40,6 +40,20 @@
         stroke: var(--primary-color);
       }
 
+      .checkmark[hidden] {
+        display: none;
+      }
+
+      :host .expand-container {
+        overflow: hidden;
+        width: 0px;
+        transition: width .15s cubic-bezier(.4, 0, .6, 1) 50ms;
+      }
+
+      :host([active]) .expand-container {
+        width: var(--paper-chip-expand-width, 0px);
+      }
+
       paper-button {
         padding: 4px 12px;
         min-width: auto;
@@ -81,10 +95,17 @@
     </style>
 
     <paper-button disabled="{{disabled}}">
-      <svg class="checkmark" viewBox="-2 -3 30 30">
+      <svg class="checkmark" hidden$="{{checkmarkAnimationDisabled}}" viewBox="-2 -3 30 30">
         <path fill="none" stroke="black" d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
       </svg>
+      <template is="dom-if" if="{{icon}}">
+        <iron-icon icon="{{icon}}"></iron-icon>
+      </template>
+      </iron-icon>
       <slot></slot>
+      <div class="expand-container">
+        <slot name="expand-content"></slot>
+      </div>
     </paper-button>
 
   </template>
@@ -103,7 +124,14 @@
           disabled: {
             type: Boolean,
             reflectToAttribute: true
-          }
+          },
+          checkmarkAnimationDisabled: {
+            type: Boolean,
+            value: false
+          },
+          icon: {
+            type: String
+          },
         }
       }
 

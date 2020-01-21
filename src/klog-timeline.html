@@ -63,17 +63,33 @@
         }
       }
 
-      paper-chip#dailyFilter {
+      paper-chip[name=search] {
+        --primary-color: var(--paper-amber-900);
+        --paper-chip-expand-width: 64px;
+      }
+
+      paper-chip[name=search] input {
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: inherit;
+        border: none;
+        background: none;
+        border-bottom: 1px solid var(--primary-color);
+        outline: none;
+        width: 100%;
+      }
+
+      paper-chip[name=daily] {
         --primary-color: var(--paper-amber-900);
       }
 
-      paper-chip#noteFilter {
+      paper-chip[name=note] {
         --primary-color: var(--paper-green-700);
       }
 
-      paper-chip#projectFilter {
+      /* paper-chip#projectFilter {
         --primary-color: var(--paper-blue-grey-500);
-      }
+      } */
 
       .item {
         max-width: 600px;
@@ -160,8 +176,7 @@
         opacity: 0;
       }
     </style>
-    <app-localstorage-document key="timelineFilter" data="{{filter}}"></app-localstorage-document>
-    <klog-data-timeline id="data" last-response="{{list}}" keyword="{{filter}}"></klog-data-timeline>
+    <klog-data-timeline id="data" last-response="{{list}}" keyword="{{keyword}}"></klog-data-timeline>
     <app-header id="header" fixed short>
       <app-toolbar>
         <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
@@ -183,10 +198,16 @@
       hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
       <div class="filter-container item" id="filter" on-click="setFilter">
-        <paper-chip for='' outlined active id="defaultFilter">全部文章</paper-chip>
-        <paper-chip for="日常" id="dailyFilter" outlined>日常</paper-chip>
-        <paper-chip for="笔记" id="noteFilter" outlined>笔记</paper-chip>
-        <paper-chip for="项目" id="projectFilter" outlined>创意</paper-chip>
+        <paper-chip name="search" data-keyword="search" data-view="default" icon="search" outlined
+          checkmark-animation-disabled>
+          <input slot="expand-content" id="keywordInput" />
+          </iron-icon>
+        </paper-chip>
+        <paper-chip name="default" data-keyword="" data-view="default" outlined active id="defaultFilter" active>全部文章
+        </paper-chip>
+        <paper-chip name="daily" data-keyword="日常" data-view="default" outlined>日常</paper-chip>
+        <paper-chip name="note" data-keyword="笔记" data-view="default" outlined>笔记</paper-chip>
+        <paper-chip name="gallery" data-keyword="" data-view="only-gallery" outlined>相册</paper-chip>
       </div>
       <div class="timeline-container" id="scrollTarget">
         <template is="dom-repeat" items="{{items}}">
@@ -220,9 +241,12 @@
             type: Array,
             observer: 'newDataLoaded'
           },
-          filter: {
+          keyword: {
+            type: String
+          },
+          filterName: {
             type: String,
-            observer: '_filterUpdate'
+            observer: '_filterNameUpdate'
           },
           updateButtonHidden: {
             type: Boolean,
@@ -247,6 +271,19 @@
         this._initScroller();
         this._initPageloader();
         this.activeReminder();
+
+        this.$.keywordInput.addEventListener('input', () => {
+          const cb = () => {
+            if (this.filterName == 'search') {
+              this.keyword = this.$.keywordInput.value;
+              this.refresh();
+            }
+          };
+          if (this._keywordInputTimeout) {
+            clearTimeout(this._keywordInputTimeout);
+          }
+          setTimeout(cb, 1000);
+        });
 
         if ("IntersectionObserver" in window) {
           this._lazyObserver = new IntersectionObserver((entries, observer) => {
@@ -393,23 +430,25 @@
 
       setFilter(e) {
         if (e.target.tagName == 'PAPER-CHIP') {
-          if (e.target.active) {
-            this.filter = '';
+          if (e.target.getAttribute('name') == 'search') {
+            this.$.keywordInput.focus();
+            this.keyword = this.$.keywordInput.value;
           } else {
-            this.filter = e.target.getAttribute('for');
+            this.keyword = e.target.getAttribute('data-keyword');
           }
+          this.filterName = e.target.getAttribute('name');
         }
       }
 
-      _filterUpdate(filter, oldFilter) {
+      _filterNameUpdate(filterName, oldFilterName) {
         let activeChip, oldActiveChip;
-        activeChip = filter ? this.$.filter.querySelector(`[for=${filter}]`) : this.$.defaultFilter;
-        if (oldFilter) {
-          oldActiveChip = this.$.filter.querySelector(`[for=${oldFilter}]`);
+        activeChip = filterName ? this.$.filter.querySelector(`[name=${filterName}]`) : this.$.defaultFilter;
+        if (oldFilterName) {
+          oldActiveChip = this.$.filter.querySelector(`[name=${oldFilterName}]`);
         } else {
           oldActiveChip = this.$.defaultFilter;
         }
-        if (!filter) {
+        if (!filterName) {
           if (this.$.defaultFilter.active) return
           oldActiveChip.active = false;
           this.$.defaultFilter.active = true;
