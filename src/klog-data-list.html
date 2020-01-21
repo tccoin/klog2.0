@@ -28,6 +28,10 @@
             value: false,
             notify: true
           },
+          limit: {
+            type: Number,
+            value: 200,
+          },
           userinfo: {
             type: Object
           },
@@ -55,9 +59,10 @@
         // 列表类型
         if (this.type == 'user') {
           // 验证登录
-          if (!this.userinfo || !this.userinfo.publicinfo) {
-            setTimeout(() => this.load(promise), 100);
-            return promise;
+          if ((!this.userinfo || !this.userinfo.publicinfo) && !AV._config.useMasterKey) {
+            return new Promise(resolve => {
+              setTimeout(() => resolve(this.load()), 100);
+            });
           }
           // 用户文章列表
           type = 'Article';
@@ -90,12 +95,12 @@
         }
         query.select(this.select);
         query.include(this.include);
-        query.limit(200);
+        query.limit(this.limit);
         if (this.key) query.descending(this.key);
         else query.descending('createdAt');
         this.loading = true;
         this.query = query;
-        query.find().then((list) => {
+        return query.find().then((list) => {
           this.loading = false;
           let response = [];
           for (let _item of list) {
@@ -106,9 +111,8 @@
           }
           this._response = response;
           this.lastResponse = this.stt ? this._updateStt(response) : response;
-          promise.resolve(this.lastResponse);
+          return this.lastResponse;
         });
-        return promise;
       }
 
       _updateStt(_items) {

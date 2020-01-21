@@ -76,9 +76,12 @@
             type: Boolean,
             reflectToAttribute: true,
           },
-          lazy: {
+          content: {
             type: Boolean,
-            value: false,
+            reflectToAttribute: true,
+          },
+          gallery: {
+            type: Boolean,
             reflectToAttribute: true
           },
           theme: {
@@ -101,6 +104,8 @@
             src += '?Magic/1/w/320/h/180/q/75';
           } else if (this.content) {
             src += '?Magic/2/w/1440/q/90';
+          } else if (this.gallery) {
+            src += '?Magic/1/w/584/h/584/q/75';
           }
           if (this.lazy) {
             // disable image

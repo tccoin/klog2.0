@@ -207,7 +207,7 @@
         <paper-chip name="note" outlined>笔记</paper-chip>
         <paper-chip name="gallery" outlined>相册</paper-chip>
       </div>
-      <div class="timeline-container" id="scrollTarget">
+      <div class="timeline-container" id="timelineContainer">
         <template is="dom-repeat" items="{{cards}}">
           <klog-timeline-item class="item" data="{{item}}"></klog-timeline-item>
         </template>
@@ -453,6 +453,10 @@
         this._cards = this._calculateCards(list);
         this._resetPage();
         this._loadNextPage();
+        setTimeout(() => {
+          for (let item of this.$.timelineContainer.querySelectorAll('.item'))
+            item.refresh();
+        }, 1);
       }
 
       _resetPage() {
@@ -534,8 +538,8 @@
           requiredAttachments: []
         },
         gallery: {
-          pageSize: 10,
-          requiredAttachments: [['image', 2]]
+          pageSize: 7,
+          requiredAttachments: [['image', 1]]
         }
       };
 
@@ -549,9 +553,9 @@
             this.view = this.filterPreset[filterName].view || 'default';
             this.keyword = this.filterPreset[filterName].keyword || '';
           }
-          this.filterName = filterName;
           this.updateTimeline();
           this.updateView();
+          this.filterName = filterName;
         }
       }
 

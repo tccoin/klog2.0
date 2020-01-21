@@ -25,11 +25,18 @@
         --secondary-font-size: 14px;
       }
 
-      .card {
+      a {
+        text-decoration: none;
         width: 100%;
+        display: block;
+      }
+
+      .card {
         width: calc(100% - 16px);
+        margin: auto;
         cursor: pointer;
         background: var(--klog-theme-surface);
+        overflow: hidden;
         -webkit-tap-highlight-color: transparent;
         transition: box-shadow .3s ease;
       }
@@ -116,7 +123,7 @@
         margin-top: 1px;
         flex-grow: 1;
         flex-shrink: 0;
-        flex-basis: calc(50% - 0.5px);
+        flex-basis: calc(33% - 0.7px);
       }
 
       .card-gallery-item:nth-child(even) {
@@ -132,9 +139,16 @@
 
       /*card-actions*/
 
-      .actions {
+      .card-actions {
         display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 8px !important;
         color: var(--secondary-text-color);
+      }
+
+      .card-actions>paper-chip {
+        margin: 0 8px 8px 0;
+        max-width: 200px;
       }
 
       .divider {
@@ -146,50 +160,57 @@
       }
     </style>
     <!--header-->
-    <div class="card klog-card" raised$="{{expended}}" on-click="read">
-      <div class="card-meta">
-        <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" avatar></klog-data-image>
-        <div class="meta">
-          <span class="meta-name">{{data.author.displayName}}</span>
-          <span class="meta-collection">
-            <template is="dom-if" if="{{data.view.gallery}}">发布了{{imageCount}}张照片</template>
-            <template is="dom-if" if="{{data.view.default}}">发布在&nbsp;{{data.collection}}</template>
-          </span>
+    <a href="#/article/{{data.path}}">
+      <div class="card klog-card" raised$="{{expended}}" on-click="read" id="card">
+        <div class="card-meta">
+          <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" avatar></klog-data-image>
+          <div class="meta">
+            <span class="meta-name">{{data.author.displayName}}</span>
+            <span class="meta-collection">
+              <template is="dom-if" if="{{data.view.gallery}}">发布了{{imageCount}}张照片</template>
+              <template is="dom-if" if="{{data.view.default}}">发布在&nbsp;{{data.collection}}</template>
+            </span>
 
+          </div>
+          <div class="divider"></div>
+          <div class="date">
+            <klog-render-timestamp time-stamp="{{data.date}}"></klog-render-timestamp>
+          </div>
         </div>
-        <div class="divider"></div>
-        <div class="date">
-          <klog-render-timestamp time-stamp="{{data.date}}"></klog-render-timestamp>
-        </div>
-      </div>
-      <!--default view-->
-      <template is="dom-if" if="{{data.view.default}}">
-        <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
-        <div class="card-content" hidden$="{{!data.text}}">
-          <p class="content-text" id="text">{{data.text}}</p>
-          <template is="dom-if" if="{{data.image.url}}">
-            <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
-          </template>
-        </div>
-        <!-- <div class="card-content">
-          <template is="dom-if" if="{{has(links)}}">
-            <template is="dom-repeat" items="{{_calculateLinks(data.attachments)}}">
-              <paper-chip outlined>{{item.text}}</paper-chip>
+        <!--default view-->
+        <template is="dom-if" if="{{data.view.default}}">
+          <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
+          <div class="card-content" hidden$="{{!data.text}}">
+            <p class="content-text" id="text">{{data.text}}</p>
+            <template is="dom-if" if="{{data.image.url}}">
+              <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
             </template>
-          </template>
-        </div> -->
+          </div>
+          <div class="card-actions">
+            <template is="dom-if" if="{{has(files)}}">
+              <template is="dom-repeat" items="{{_calculateFiles(data.attachments)}}">
+                <paper-chip outlined icon="inbox" href="{{item.url}}">{{item.text}}</paper-chip>
+              </template>
+            </template>
+            <template is="dom-if" if="{{has(links)}}">
+              <template is="dom-repeat" items="{{_calculateLinks(data.attachments)}}">
+                <paper-chip outlined icon="link" href="{{item.url}}">{{item.text}}</paper-chip>
+              </template>
+            </template>
+          </div>
 
-      </template>
-      <!--gallery view-->
-      <template is="dom-if" if="{{data.view.gallery}}">
-        <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
-        <div class="card-gallery">
-          <template is="dom-repeat" items="{{_calculateGallery(data.view.gallery)}}">
-            <klog-data-image class="card-gallery-item" src="{{item.url}}" timeline></klog-data-image>
-          </template>
-        </div>
-      </template>
-    </div>
+        </template>
+        <!--gallery view-->
+        <template is="dom-if" if="{{data.view.gallery}}">
+          <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
+          <div class="card-gallery">
+            <template is="dom-repeat" items="{{_calculateGallery(data.view.gallery)}}">
+              <klog-data-image class="card-gallery-item" src="{{item.url}}" gallery></klog-data-image>
+            </template>
+          </div>
+        </template>
+      </div>
+    </a>
   </template>
   <script src="../static/lib/Clamp.js/clamp.min.js"></script>
   <script>
@@ -200,10 +221,8 @@
       ready() {
         super.ready();
         this._calculateLinks();
-        setTimeout(() => {
-          if (this.$.text)
-            $clamp(this.$.text, { clamp: 4 });
-        }, 1);
+        this._calculateFiles();
+        this.refresh();
       }
 
       has(sth) {
@@ -214,10 +233,22 @@
         this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/' + this.data.path, now: false } }));
       }
 
+      refresh() {
+        this.notifyPath('data.view'); setTimeout(() => {
+          let text = this.$.card.querySelector('#text');
+          if (text) {
+            $clamp(text, { clamp: 4 });
+          }
+        }, 1);
+      }
+
       _calculateGallery() {
         let gallery = this.data.attachments.filter(x => x.image);
         this.imageCount = gallery.length;
-        gallery.splice(6);
+        if (this.imageCount == 4) gallery.splice(3);
+        else if (this.imageCount == 7) gallery.splice(6);
+        else gallery.splice(9);
+
         this.hiddenImageCount = this.imageCount - gallery.length;
         this.gallery = gallery;
         return gallery;
@@ -227,6 +258,12 @@
         let links = this.data.attachments.filter(x => x.link);
         this.links = links;
         return links;
+      }
+
+      _calculateFiles() {
+        let files = this.data.attachments.filter(x => x.file);
+        this.files = files;
+        return files;
       }
     }
 
