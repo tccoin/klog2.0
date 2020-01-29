@@ -29,6 +29,8 @@
         text-decoration: none;
         width: 100%;
         display: block;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -webkit-tap-highlight-color: transparent;
       }
 
       .card {
@@ -59,6 +61,12 @@
 
       .card-meta .date {
         white-space: nowrap;
+      }
+
+      .card-meta .meta {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .meta-name {
@@ -148,7 +156,7 @@
 
       .card-actions>paper-chip {
         margin: 0 8px 8px 0;
-        max-width: 200px;
+        max-width: calc(50vw - 32px);
       }
 
       .divider {
@@ -160,7 +168,7 @@
       }
     </style>
     <!--header-->
-    <a href="#/article/{{data.path}}">
+    <a href="/#/article/{{data.path}}">
       <div class="card klog-card" raised$="{{expended}}" on-click="read" id="card">
         <div class="card-meta">
           <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" avatar></klog-data-image>
@@ -170,9 +178,7 @@
               <template is="dom-if" if="{{data.view.gallery}}">发布了{{imageCount}}张照片</template>
               <template is="dom-if" if="{{data.view.default}}">发布在&nbsp;{{data.collection}}</template>
             </span>
-
           </div>
-          <div class="divider"></div>
           <div class="date">
             <klog-render-timestamp time-stamp="{{data.date}}"></klog-render-timestamp>
           </div>
