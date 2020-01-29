@@ -32,7 +32,7 @@
       app-header {
         --klog-header-background-color: var(--klog-article-theme-color);
         --klog-header-text-color: var(--secondary-text-color);
-        --klog-header-short-width: 128px;
+        --klog-header-short-width: 80px;
         @apply --shadow-none;
       }
 
@@ -202,10 +202,12 @@
         <div class="title">
           <div>{{article.title}}</div>
         </div>
-        <paper-icon-button icon="edit" on-click="edit" hidden$="{{!isOwner}}"></paper-icon-button>
+        <!-- <paper-icon-button icon="edit" on-click="edit" hidden$="{{!isOwner}}"></paper-icon-button> -->
       </app-toolbar>
       <paper-progress indeterminate disabled="{{!loading}}"></paper-progress>
     </app-header>
+    <klog-fab icon="edit" id="fab" class="edit-fab" label="编辑" on-click="edit" hidden="{{!isOwner}}"
+      extended="{{fabExtended}}"></klog-fab>
     <div class="content">
       <!--immersive title-->
       <div class="section immersive-title immersive">
@@ -294,12 +296,10 @@
           }
         });
 
-        this._scrollHandler = e => {
+        this._scrollHandler = () => {
           let y = document.scrollingElement.scrollTop;
+          this.fabExtended = y < 48 && !this.mobile;
           if (y > 0) {
-            this.$.header.updateStyles({
-              '--klog-header-short-width': (this.isOwner ? 128 : 80) + 'px',
-            });
             this.$.header.classList.add('collapsed');
           } else {
             this.$.header.classList.remove('collapsed');
@@ -337,9 +337,9 @@
         html.style.scrollBehavior = 'initial';
         html.scrollTop = 0;
         html.style.scrollBehavior = 'smooth';
-        this._scrollHandler();
         window.addEventListener('scroll', this._scrollHandler);
         setTimeout(() => {
+          this._scrollHandler();
           this.setAttribute('loaded', true);
         }, 1);
         this.$.markdown.render();

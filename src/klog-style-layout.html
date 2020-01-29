@@ -3,9 +3,18 @@
   <template>
     <style include="klog-style-toolbar"></style>
     <style>
-       :host {
+      :host {
         display: block;
         padding: 96px 0 32px;
+      }
+
+      klog-fab {
+        position: fixed;
+        right: 48px;
+        bottom: 48px;
+        background-color: var(--primary-background-color);
+        color: var(--primary-color);
+        z-index: 99;
       }
     </style>
   </template>

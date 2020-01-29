@@ -1,20 +1,6 @@
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="../bower_components/paper-behaviors/paper-button-behavior.html">
-<link rel="import" href="../bower_components/paper-styles/element-styles/paper-material-styles.html">
-<link rel="import" href="../bower_components/paper-styles/color.html">
-<link rel="import" href="../bower_components/paper-styles/default-theme.html">
+<link rel="import" href="../bower_components/paper-ripple/paper-ripple.html">
 
 <dom-module id="klog-fab">
   <template strip-whitespace>
@@ -46,8 +32,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         /* NOTE: Both values are needed, since some phones require the value `transparent`. */
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         -webkit-tap-highlight-color: transparent;
-
-        @apply --klog-fab;
       }
 
       iron-icon {
@@ -58,27 +42,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         transition: all 150ms ease;
       }
 
-      span {
-        width: 0%;
+      .label-container {
+        overflow: hidden;
+      }
+
+      #label {
+        opacity: 0;
         white-space: nowrap;
         overflow: hidden;
         text-align: center;
         transition: all 150ms ease;
-
-        @apply --paper-fab-label;
       }
 
       :host([extended]) {
         height: 48px;
-        width: 128px;
       }
 
       :host([extended]) iron-icon {
         margin-right: 12px;
       }
 
-      :host([extended]) span {
-        width: 100%;
+      :host([extended]) #label {
+        opacity: 1;
       }
 
       :host([hidden]) {
@@ -90,14 +75,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: none !important;
       }
 
-      :host([mini]) {
-        width: 40px;
-        height: 40px;
-        padding: 8px;
-
-        @apply --klog-fab-mini;
-      }
-
       :host([disabled]) {
         color: var(--klog-fab-disabled-text, var(--paper-grey-500));
         background: var(--klog-fab-disabled-background, var(--paper-grey-300));
@@ -105,67 +82,74 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply --klog-fab-disabled;
       }
 
-      :host(.keyboard-focus) {
-        background: var(--paper-fab-keyboard-focus-background, var(--paper-pink-900));
+      :host {
+        @apply(--shadow-elevation-2dp);
       }
 
-      :host([elevation="1"]) {
-        @apply --paper-material-elevation-1;
+      :host(:hover) {
+        @apply(--shadow-elevation-6dp);
       }
 
-      :host([elevation="2"]) {
-        @apply --paper-material-elevation-2;
-      }
-
-      :host([elevation="3"]) {
-        @apply --paper-material-elevation-3;
-      }
-
-      :host([elevation="4"]) {
-        @apply --paper-material-elevation-4;
-      }
-
-      :host([elevation="5"]) {
-        @apply --paper-material-elevation-5;
+      :host(:active) {
+        @apply(--shadow-elevation-4dp);
       }
     </style>
 
     <iron-icon id="icon" src="[[src]]" icon="[[icon]]"></iron-icon>
-    <span>{{label}}</span>
+    <div class="label-container">
+      <span id="label">{{label}}</span>
+    </div>
+    <paper-ripple></paper-ripple>
   </template>
 
   <script>
-    Polymer({
-      is: 'klog-fab',
+    class KlogFab extends Polymer.Element {
 
-      behaviors: [
-        Polymer.PaperButtonBehavior
-      ],
+      static get is() { return 'klog-fab'; }
 
-      properties: {
-        icon: {
-          type: String,
-          value: ''
-        },
-        mini: {
-          type: Boolean,
-          value: false,
-          reflectToAttribute: true
-        },
-        label: {
-          type: String,
-          observer: '_labelChanged'
-        },
-        extended: {
-          type: Boolean,
-          value: false,
-          reflectToAttribute: true
+      static get properties() {
+        return {
+          icon: {
+            type: String,
+            value: ''
+          },
+          label: {
+            type: String
+          },
+          extended: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
+          },
+          hidden: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
+          }
         }
-      },
-
-      _labelChanged: function () {
-        this.setAttribute('aria-label', this.label);
       }
-    });
+
+      static get observers() {
+        return [
+          '_updateStyle(extended,label,hidden)'
+        ]
+      }
+
+      _updateStyle() {
+        let width;
+        if (this.extended) {
+          this._labelWidth = this.$.label.offsetWidth || this._labelWidth;
+          if (!this._labelWidth && this.label && !this.hidden) {
+            setTimeout(() => this._updateStyle(), 10);
+            return;
+          }
+          width = 68 + this._labelWidth;
+        } else {
+          width = 56;
+        }
+        this.style.width = width + 'px';
+      }
+    }
+    window.customElements.define(KlogFab.is, KlogFab);
   </script>
 </dom-module>

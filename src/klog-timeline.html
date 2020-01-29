@@ -154,6 +154,12 @@
         width: 0px;
       }
 
+      /*fab*/
+      klog-fab {
+        background-color: var(--primary-color);
+        color: var(--on-primary-color);
+      }
+
       /*when header is not collapsed and reminder is active*/
       app-header:not(.collapsed) .reminder[active] {
         color: var(--primary-color);
@@ -165,15 +171,6 @@
 
       app-header:not(.collapsed) .reminder[active] .reminder-label {
         width: 56px;
-      }
-
-      .update-button {
-        position: fixed;
-        right: 64px;
-        bottom: 64px;
-        background-color: var(--primary-color);
-        color: var(--on-primary-color);
-        z-index: 99;
       }
 
       /*animation*/
@@ -202,8 +199,8 @@
       </app-toolbar>
       <paper-progress indeterminate disabled="{{!loading}}"></paper-progress>
     </app-header>
-    <klog-fab icon="refresh" id="updateButton" class="update-button" label="立即刷新" on-click="updateTimeline"
-      hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
+    <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="updateTimeline" hidden="{{updateButtonHidden}}"
+      extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
       <div class="filter-container item" id="filter" on-click="setFilter">
         <paper-chip name="search" icon="search" outlined checkmark-animation-disabled>
@@ -554,11 +551,11 @@
       setFilter(e) {
         if (e.target.tagName == 'PAPER-CHIP') {
           const filterName = e.target.getAttribute('name');
+          this.view = this.filterPreset[filterName].view || 'default';
           if (filterName == 'search') {
             this.$.keywordInput.focus();
             this.keyword = this.$.keywordInput.value;
           } else {
-            this.view = this.filterPreset[filterName].view || 'default';
             this.keyword = this.filterPreset[filterName].keyword || '';
           }
           this.updateTimeline();

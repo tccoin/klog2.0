@@ -71,12 +71,14 @@
       <paper-icon-button icon="arrow_back" on-click="back"></paper-icon-button>
       <div class="divider"></div>
       <paper-toggle-button checked="{{preview}}" mobile></paper-toggle-button>
-      <paper-icon-button for="infoform" icon="info" on-click="activeFront"></paper-icon-button>
-      <paper-icon-button for="uploadzone" icon="cloud_upload" on-click="upload"></paper-icon-button>
+      <!-- <paper-icon-button for="infoform" icon="highlight" on-click="activeFront"></paper-icon-button> -->
+      <paper-icon-button for="infoform" icon="settings" on-click="activeFront">
+      </paper-icon-button>
+      <paper-icon-button for="uploadzone" icon="insert_drive_file" on-click="upload"></paper-icon-button>
       <paper-icon-button for="browser" icon="book" on-click="activeFront" disabled="{{loading}}" hidden>
       </paper-icon-button>
       <paper-button raised on-click="save" disabled="{{loading}}">
-        <iron-icon icon="save"></iron-icon>保存
+        <iron-icon icon="save_alt"></iron-icon>保存
       </paper-button>
       <paper-progress indeterminate disabled="{{!loading}}"></paper-progress>
     </app-toolbar>

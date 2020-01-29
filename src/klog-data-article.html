@@ -44,8 +44,17 @@
           },
           key: {
             type: String
+          },
+          userinfo: {
+            type: Object
           }
         }
+      }
+
+      static get observers() {
+        return [
+          '_updateIsOwner(userinfo.publicinfo.id,_article.author.id)'
+        ]
       }
 
       _onIdChanged(id, _id) {
@@ -113,19 +122,12 @@
       }
 
       _onLoad(article) {
+        this._article = article;
         this.loading = false;
         let articleToJson = article.toJSON();
-        let isOwner = this._calcIsOwner(article);
-        //process data
-        articleToJson.isOwner = isOwner;
-        //set prototype
-        this.isOwner = isOwner;
         this.set('lastResponse', articleToJson);
         //event
         this.dispatchEvent(new CustomEvent('success', { bubbles: true, composed: true, detail: { data: articleToJson } }));
-        //save pointer
-        this._article = article;
-
         return Promise.resolve(articleToJson);
       }
 
@@ -136,13 +138,14 @@
         return Promise.reject();
       }
 
-      _calcIsOwner(article) {
-        if (!this.userinfo) {
+      _updateIsOwner() {
+        if (!this.userinfo || !this._article) {
           return false;
         }
+        let article = this._article;
         let publicinfo = this.userinfo.publicinfo;
         let userid = publicinfo ? publicinfo.id : null;
-        return this.userinfo ? (article.get('author').id == userid) : false;
+        this.isOwner = article.get('author').id == userid;
       }
 
     }
