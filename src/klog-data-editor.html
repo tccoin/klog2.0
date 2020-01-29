@@ -190,7 +190,7 @@
         };
         let Inlinelexer = new marked.InlineLexer(tokens.links, { gfw: true, renderer: renderer });
         for (let token of tokens) {
-          if (token.type == 'paragraph') {
+          if (token.type == 'paragraph' || token.type == 'heading' || token.type == 'text' || token.type == 'blockquote_start') {
             Inlinelexer.output(token.text);
           }
         }

@@ -332,7 +332,7 @@
               while (heading.depth < depth) {
                 --depth;
                 tocHTML += '</li></ol>';
-                if (heading.text) tocHTML += `</li>${newli}`;
+                if (heading.text && heading.depth == depth) tocHTML += `</li>${newli}`;
               }
             }
           }
