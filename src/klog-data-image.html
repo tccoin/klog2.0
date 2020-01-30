@@ -126,6 +126,7 @@
 
       loadPlaceholder(url) {
         this.$.bg.style.height = '300px';
+        this.$.bg.style.width = "1000px";
         let req = new XMLHttpRequest();
         req.onload = () => {
           this._placeholderData = JSON.parse(req.response);
@@ -137,28 +138,33 @@
 
       updatePlaceholder() {
         let data = this._placeholderData;
-        let maxWidth = parseInt(getComputedStyle(this).getPropertyValue('--klog-media-width'));
-        if (!maxWidth) {
-          this.$.bg.style.width = "1000px";
-          maxWidth = this.offsetWidth;
+        let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
+        let maxWidth = parseInt(mediaWidth);
+        // if (!mediaWidth) {
+        //   setTimeout(() => this.updatePlaceholder(), 100);
+        //   return;
+        // } else
+        if (!mediaWidth) {
+          this.$.bg.style.width = `0px`;
+          this.$.bg.style.height = `0px`;
+          this.$.img.style.position = `initial`;
+        } else {
+          console.log(this, mediaWidth, maxWidth);
+          let w = Math.min(maxWidth, data.w);
+          let h = w / data.w * data.h;
+          this.$.bg.style.width = `${w}px`;
+          this.$.bg.style.height = `${h}px`;
+          this.$.img.style.position = 'absolute';
         }
-        if (!maxWidth) {
-          setTimeout(() => this.updatePlaceholder(), 10);
-          return;
-        }
-        let w = Math.min(maxWidth, data.w);
-        let h = w / data.w * data.h;
         let c = this.theme == 'light' ? data.palette.LightVibrant.rgb : data.palette.DarkVibrant.rgb;
         this.$.bg.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
         this.$.img.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
-        this.$.bg.style.width = `${w}px`;
-        this.$.bg.style.height = `${h}px`;
       }
 
       lazyload() {
         setTimeout(() => {
           this.lazy = false;
-          this.$.img.style.position = 'absolute';
+          // this.$.img.style.position = 'absolute';
           this.src = this._lazySrc;
           this.$.img.onload = () => this.$.bg.style.opacity = 0;
         }, 1);
