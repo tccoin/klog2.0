@@ -21,7 +21,8 @@
       }
 
       iron-icon {
-        height: 24px;
+        height: var(--paper-chip-icon-size, 24px);
+        width: var(--paper-chip-icon-size, 24px);
         flex-shrink: 0;
       }
 
@@ -73,17 +74,18 @@
       }
 
       paper-button {
-        padding: 4px 12px;
+        padding: 6px 16px;
+        font-size: 14px;
         margin: 0;
         min-width: auto;
-        border-radius: 18px;
+        border-radius: 20px;
         color: var(--paper-chip-text-color, --primary-text-color);
         overflow: hidden;
         text-transform: none;
         background: transparent;
         width: 100%;
         outline: none;
-        @apply --paper-button-style;
+        @apply --paper-chip-style;
       }
 
       paper-button::after {

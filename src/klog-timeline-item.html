@@ -149,16 +149,22 @@
       .card-actions {
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: var(--klog-card-padding) !important;
+        margin-bottom: calc(var(--klog-card-padding) * 2 - 4px) !important;
         color: var(--secondary-text-color);
         overflow: hidden;
         transition: height .15s ease;
       }
 
       .card-actions>paper-chip {
-        margin: 0 8px 8px 0;
         max-width: 268px;
         min-width: 80px;
+        margin: 0 8px 4px 0;
+        --paper-chip-icon-size: 20px;
+
+        --paper-chip-style: {
+          font-size: 12px;
+          padding: 4px 10px;
+        }
       }
 
       .card-actions>paper-chip[animated] {
@@ -258,6 +264,16 @@
         ]
       }
 
+      ready() {
+        super.ready();
+        window.addEventListener('resize', () => {
+          if (this._resizeTimeout) {
+            clearTimeout(this._resizeTimeout);
+          }
+          this._resizeTimeout = setTimeout(() => this.refresh(), 100);
+        });
+      }
+
       has(sth) {
         return !(sth == false)
       }
@@ -314,21 +330,24 @@
         const actionsContainer = this.$.card.querySelector('.card-actions');
         actionsContainer.style.height = 'initial';
         if (this._shrinkedChip) {
-          this._shrinkedChip.style.width = 'initial';
+          this._shrinkedChip.style.maxWidth = 'initial';
         }
         return new Promise((resolve) => {
           const actionsContainer = this.$.card.querySelector('.card-actions');
           let chips = Array.from(actionsContainer.querySelectorAll('paper-chip:not([style^=display])'));
+          let remainWidth = actionsContainer.offsetWidth;
           for (let i = 0; i < chips.length; i++) {
             let chip = chips[i];
-            if (chip.offsetTop - chips[0].offsetTop > 40) {
+            if (chip.offsetTop != chips[0].offsetTop) {
               this.splice('actions', i, 0, { more: true });
               this._shrinkedChip = chips[i - 1];
               this._shrinkedChipWidth = chips[i - 1].offsetWidth + 1;
-              this._shrinkedChip.style.width = (this._shrinkedChipWidth - 60) + 'px';
-              actionsContainer.style.height = (chips[0].offsetHeight + 8) + 'px';
+              console.log();
+              this._shrinkedChip.style.maxWidth = (this._shrinkedChipWidth + remainWidth - 60) + 'px';
+              actionsContainer.style.height = (Math.floor(chips[0].offsetHeight) + 3) + 'px';
               break;
             }
+            remainWidth -= Math.ceil(chip.offsetWidth) + 8;
           }
           setTimeout(() => {
             const elements = actionsContainer.querySelectorAll('[more]');
