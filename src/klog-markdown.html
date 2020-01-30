@@ -59,6 +59,10 @@
             type: Boolean,
             value: false
           },
+          breadcrumbs: {
+            type: Boolean,
+            value: false
+          },
           sanitize: {
             type: Boolean,
             value: true
@@ -186,7 +190,18 @@
           parse: (cap) => {
             this.collection = cap[0] || '';
             this.tags = cap[1] ? cap[1].toLowerCase().split(',') : [];
-            return `<!--collection:${cap[0]};tags:${this.tags}-->`
+            if (this.breadcrumbs) {
+              return `
+              <div class="breadcrumbs">
+              <div class="collection">${cap[0] || '日常'}</div>
+              ${cap[1]
+                  ? `<div class="tags">${this.tags.map(t => `<span class="tag">${t}</span>`)}</div>`
+                  : ''
+                }
+              </div>`;
+            } else {
+              return `<!--collection:${cap[0]};tags:${this.tags}-->`;
+            }
           }
         };
 

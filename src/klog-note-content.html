@@ -103,52 +103,6 @@
         @apply(--shadow-elevation-2dp);
       }
 
-      .breadcrumbs {
-        white-space: nowrap;
-        overflow: hidden;
-        font-size: 12px;
-        text-overflow: ellipsis;
-        cursor: default;
-        user-select: none;
-      }
-
-      .breadcrumbs .collection,
-      .breadcrumbs .tags {
-        display: inline;
-      }
-
-      .breadcrumbs .collection[hidden],
-      .breadcrumbs .tags[hidden] {
-        display: none !important;
-      }
-
-      .breadcrumbs .tags {
-        color: var(--secondary-text-color);
-      }
-
-      .breadcrumbs .tags::before {
-        content: '/';
-        margin: 0 8px;
-        color: var(--secondary-text-color);
-      }
-
-      .breadcrumbs .collection:hover,
-      .breadcrumbs .tag:hover {
-        cursor: pointer;
-        text-decoration: underline;
-      }
-
-      .breadcrumbs .tag:not(:first-child) {
-        position: relative;
-        padding-left: 6px;
-      }
-
-      .breadcrumbs .tag:not(:first-child)::before {
-        content: ', ';
-        position: absolute;
-        left: 0;
-      }
-
       @media (min-width: 768px) {
         [mobile] {
           display: none !important;
@@ -189,15 +143,15 @@
     <div class="main-container" id="scrollTarget">
       <div class="body">
         <klog-markdown class="markdown" id="markdown" markdown="{{article.markdown}}" theme="{{theme}}"
-          scroll-bias="{{_getBias(mobile)}}" preference="{{userinfo.preference.markdown}}">
-          <div class="breadcrumbs" on-click="_setFilter">
+          scroll-bias="{{_getBias(mobile)}}" preference="{{userinfo.preference.markdown}}" breadcrumbs>
+          <!-- <div class="breadcrumbs" on-click="_setFilter">
             <div class="collection" hidden$="{{!article.collection}}">{{article.collection}}</div>
             <div class="tags" hidden$="{{_isNull(article.tags)}}">
               <template is="dom-repeat" items="{{article.tags}}">
                 <span class="tag">{{_uppercase(item)}}</span>
               </template>
             </div>
-          </div>
+          </div> -->
         </klog-markdown>
       </div>
     </div>
@@ -263,6 +217,12 @@
           } else {
             this.$.notetool.classList.remove('raised');
             this.$.notetool.classList.remove('collapsed');
+          }
+        });
+        this.$.markdown.addEventListener('markdown-rendered', () => {
+          const elements = this.$.markdown.$.content.querySelectorAll('.tag,.collection');
+          for (let element of elements) {
+            element.addEventListener('click', e => this._setFilter(e));
           }
         });
       }
