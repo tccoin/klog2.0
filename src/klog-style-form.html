@@ -1,0 +1,51 @@
+<dom-module id="klog-style-form">
+  <template>
+    <style>
+      .form-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 20px;
+      }
+
+      .form-item[hidden] {
+        display: none;
+      }
+
+      .form-item .text-container {
+        flex: 1;
+        user-select: none;
+      }
+
+      .form-item .title {
+        color: var(--primary-text-color);
+        font-weight: bold;
+      }
+
+      .form-item .description {
+        color: var(--secondary-text-color);
+      }
+
+      klog-input {
+        --primary-background-color: var(--klog-page-background);
+      }
+
+      .form-item paper-button {
+        padding: 6px 8px;
+        font-weight: bold;
+        color: var(--secondary-text-color);
+        border: var(--outlined-border-width) solid currentColor;
+        border-radius: 4px;
+        transition: all .2s ease;
+      }
+
+      .form-item paper-button:hover {
+        color: var(--primary-text-color);
+      }
+
+      paper-button[disabled] {
+        color: var(--disabled-text-color) !important;
+      }
+    </style>
+  </template>
+</dom-module>

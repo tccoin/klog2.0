@@ -3,61 +3,60 @@
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="klog-style-form.html">
 <link rel="import" href="klog-input.html">
 <link rel="import" href="klog-style.html">
 <dom-module id="klog-editor-info-form">
   <template>
+    <style include="klog-style-form"></style>
     <style>
       :host {
         display: block;
       }
 
-      .toggle-button {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        margin-top: 16px;
-      }
-
-      .toggle-button .label {
-        color: var(--primary-text-color);
-        flex: 1;
-      }
-
-      klog-input {
-        --primary-background-color: var(--klog-page-background);
-      }
-
-      paper-button {
-        margin: 16px 0 0 0;
-      }
-
-      .align-right {
-        text-align: right;
-      }
-
       #deleteButton {
-        border-radius: 23px;
-        border: var(--outlined-border-width) solid var(--paper-red-500);
         color: var(--paper-red-500);
       }
 
-      #deleteButton[disabled] {
-        background: transparent;
+      #deleteButton:hover {
+        color: var(--paper-red-700);
       }
     </style>
     <!-- <klog-input label="标题" value="{{title}}" outlined></klog-input> -->
     <klog-input label="路径" id="pathInput" placeholder="{{randomPath}}" value="{{path}}" outlined></klog-input>
-    <div class="toggle-button">
-      <span class="label">不推送至时间轴</span>
+
+    <div class="form-item">
+      <div class="text-container">
+        <span class="title">私有</span><br>
+        <span class="description">这篇文章不会被推送至时间轴</span>
+      </div>
       <paper-toggle-button checked="{{private}}" disabled="{{immersive}}"></paper-toggle-button>
     </div>
-    <div class="toggle-button">
-      <span class="label">独立页面</span>
+
+    <div class="form-item">
+      <div class="text-container">
+        <span class="title">独立页面</span><br>
+        <span class="description">分享时关闭 Klog UI</span>
+      </div>
       <paper-toggle-button checked="{{immersive}}"></paper-toggle-button>
     </div>
-    <div class="align-right">
-      <paper-button id="deleteButton" on-click="delete" hidden$="{{!articleId}}" disabled="{{loading}}">
+
+    <div class="form-item" hidden$="{{!articleId}}">
+      <div class="text-container">
+        <span class="title">保存但不置顶</span><br>
+        <span class="description">防止时间轴扰动</span>
+      </div>
+      <paper-button on-click="save" disabled="{{_calcSaveButtonDisabled(articleId,loading,private,immersive)}}">
+        <iron-icon icon="save_alt"></iron-icon>
+      </paper-button>
+    </div>
+
+    <div class="form-item" hidden$="{{!articleId}}">
+      <div class="text-container">
+        <span class="title">销毁</span><br>
+        <span class="description">连击按钮以确认执行</span>
+      </div>
+      <paper-button id="deleteButton" on-click="delete" disabled="{{_calcDeleteButtonDisabled(articleId,loading)}}">
         <iron-icon icon="delete"></iron-icon>
         {{deleteCountdown}}
       </paper-button>
@@ -117,6 +116,10 @@
         this.dispatchEvent(new CustomEvent('klog-backdrop-update', { bubbles: true, composed: true }));
       }
 
+      save() {
+        this.dispatchEvent(new CustomEvent('save', { bubbles: true, composed: true, detail: { quiet: true } }));
+      }
+
       delete() {
         this.dispatchEvent(new CustomEvent('vibrate-start', { bubbles: true, composed: true, detail: { duration: (4 - this.deleteCountdown) * 50 } }));
         if (this.deleteCountdown > 0) {
@@ -134,6 +137,14 @@
 
       _resetCountdown() {
         if (!this.loading) this.deleteCountdown = 3;
+      }
+
+      _calcSaveButtonDisabled() {
+        return !this.articleId || this.private || this.loading || this.immersive;
+      }
+
+      _calcDeleteButtonDisabled() {
+        return !this.articleId || this.loading;
       }
 
     }
