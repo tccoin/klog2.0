@@ -200,7 +200,6 @@
           let listGrammar = /^(\s*)(\-|\d{1}\.)(\s+)(.*)/.exec(this.currentLine);
           //[1]=list level;[2]=['-','1'];[3]=space after[2];[4]list content
           if (listGrammar) {
-            console.log(listGrammar);
             let isOrdered = listGrammar[2] != '-';
             if (!listGrammar[4]) {
               //remove list
