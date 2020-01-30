@@ -121,14 +121,14 @@
         transform: translateX(-50%);
         height: 4px;
         width: 24px;
-        background-color: var(--overlay-background-color);
+        background-color: var(--overlay-background);
         opacity: var(--overlay-opacity);
         border-radius: 2px;
         transition: opacity .1s ease;
       }
 
       :host([gesture][moving]) .gesture-indicator {
-        opacity: var(--focus-opacity);
+        opacity: var(--secondary-overlay-opacity);
       }
 
       .header-container klog-note-search {

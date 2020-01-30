@@ -19,7 +19,7 @@
       }
 
       :host(:not([outlined])) paper-dropdown-menu {
-        background: var(--hover-overlay-background-color);
+        background: var(--primary-overlay-color);
         padding-top: 8px;
         border-radius: 4px;
 
@@ -32,7 +32,7 @@
 
         /*input*/
         --paper-input-container-underline: {
-          border-color: var(--focus-overlay-background-color);
+          border-color: var(--secondary-overlay-color);
         }
 
         --paper-input-container: {
@@ -61,7 +61,7 @@
         width: calc(100% - 32px);
         background: none;
         padding: 16px 14px 16px;
-        border: var(--outlined-border-width) solid var(--focus-overlay-background-color);
+        border: var(--outlined-border-width) solid var(--secondary-overlay-color);
         border-radius: 4px;
         transition: border-color .2s ease;
 

@@ -26,25 +26,29 @@
         color: var(--secondary-text-color);
       }
 
-      klog-input {
-        --primary-background-color: var(--klog-page-background);
-      }
-
       .form-item paper-button {
         padding: 6px 8px;
         font-weight: bold;
         color: var(--secondary-text-color);
-        border: var(--outlined-border-width) solid currentColor;
+        border: var(--outlined-border-width) solid var(--outline-color);
         border-radius: 4px;
         transition: all .2s ease;
       }
 
       .form-item paper-button:hover {
         color: var(--primary-text-color);
+        border-color: var(--hover-outline-color);
       }
 
-      paper-button[disabled] {
+      .form-item paper-button[disabled] {
         color: var(--disabled-text-color) !important;
+      }
+
+      klog-dropdown-menu paper-tabs {
+        max-width: 352px;
+        width: calc(100vw - 16px);
+        --paper-tabs-selection-bar-color: transparent;
+        --paper-tab-ink: var(--primary-color);
       }
     </style>
   </template>

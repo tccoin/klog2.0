@@ -79,7 +79,7 @@
       }
 
       .item:not(.iron-selected):hover::after {
-        opacity: var(--hover-opacity);
+        opacity: var(--secondary-overlay-opacity);
       }
 
       .item.iron-selected {
@@ -89,7 +89,7 @@
       }
 
       .item.iron-selected::after {
-        @apply --overlay-style-activated;
+        opacity: var(--secondary-overlay-opacity);
         background-color: var(--primary-color);
       }
 

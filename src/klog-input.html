@@ -14,12 +14,12 @@
       }
 
       :host(:not([outlined])) paper-input {
-        background: var(--hover-overlay-background-color);
+        background: var(--primary-overlay-color);
         padding-top: 8px;
         border-radius: 4px;
 
         --paper-input-container-underline: {
-          border-color: var(--focus-overlay-background-color);
+          border-color: var(--secondary-overlay-color);
         }
 
         --paper-input-container: {
@@ -47,7 +47,7 @@
         height: 24px;
         background: none;
         padding: 16px 14px 16px;
-        border: var(--outlined-border-width) solid var(--focus-overlay-background-color);
+        border: var(--outlined-border-width) solid var(--outline-color);
         border-radius: 4px;
         transition: border-color .2s ease;
 
@@ -74,7 +74,7 @@
       }
 
       :host([outlined]) paper-input:hover {
-        border-color: var(--primary-text-color);
+        border-color: var(--hover-outline-color);
       }
 
       :host([outlined]) paper-input[focused] {

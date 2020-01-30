@@ -149,7 +149,6 @@
           this.$.bg.style.height = `0px`;
           this.$.img.style.position = `initial`;
         } else {
-          console.log(this, mediaWidth, maxWidth);
           let w = Math.min(maxWidth, data.w);
           let h = w / data.w * data.h;
           this.$.bg.style.width = `${w}px`;

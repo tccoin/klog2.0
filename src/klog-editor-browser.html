@@ -14,7 +14,6 @@
         width: 100%;
         max-width: 378px;
         border-radius: 5px;
-        background: var(--hover-overlay-background-color);
         overflow: hidden;
       }
 
@@ -100,7 +99,8 @@
         padding: 0;
       }
     </style>
-    <klog-data-list id="data" last-response="{{list}}" collection="{{collection}}" userinfo="{{userinfo}}" loading="{{loading}}"></klog-data-list>
+    <klog-data-list id="data" last-response="{{list}}" collection="{{collection}}" userinfo="{{userinfo}}"
+      loading="{{loading}}"></klog-data-list>
     <div class="actions" id="actions">
       <paper-button on-click="reset" disabled="{{disabled}}">
         <iron-icon icon="add"></iron-icon>

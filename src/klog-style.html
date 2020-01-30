@@ -13,17 +13,9 @@
         left: 0;
         right: 0;
         z-index: -1;
-        background-color: var(--overlay-background-color);
+        background-color: var(--overlay-background);
         opacity: var(--overlay-opacity);
         transition: opacity .15s ease-out;
-      }
-
-      --overlay-style-selected: {
-        opacity: var(--selected-opacity);
-      }
-
-      --overlay-style-activated: {
-        opacity: var(--activated-opacity);
       }
 
       --fit-layout: {
@@ -77,16 +69,16 @@
       --light-accent-color: #FFF;
       --dark-accent-color: var(--paper-grey-200);
 
-      --overlay-background-color: rgb(0, 0, 0);
-      --hover-overlay-background-color: rgba(0, 0, 0, .04);
-      --focus-overlay-background-color: rgba(0, 0, 0, .12);
-      --pressed-overlay-background-color: rgba(0, 0, 0, .16);
-      --dragged-overlay-background-color: rgba(0, 0, 0, .08);
+
+      --overlay-background: rgb(0, 0, 0);
+      --primary-overlay-color: rgb(0, 0, 0, .06);
+      --secondary-overlay-color: rgba(0, 0, 0, .12);
       --overlay-opacity: .06;
-      --hover-opacity: .04;
-      --focus-opacity: .12;
-      --selected-opacity: .08;
-      --activated-opacity: .12;
+      --primary-overlay-opacity: .06;
+      --secondary-overlay-opacity: .12;
+
+      --outline-color: var(--secondary-overlay-color);
+      --hover-outline-color: var(--primary-text-color);
 
       /*md2.0 color*/
       --klog-theme-primary: var(--paper-indigo-500);
@@ -135,16 +127,15 @@
       --light-accent-color: var(--paper-grey-700);
       --dark-accent-color: #000;
 
-      --overlay-background-color: rgb(255, 255, 255);
-      --hover-overlay-background-color: rgba(255, 255, 255, 0.08);
-      --focus-overlay-background-color: rgba(255, 255, 255, .24);
-      --pressed-overlay-background-color: rgba(255, 255, 255, .32);
-      --dragged-overlay-background-color: rgba(255, 255, 255, 0.16);
+      --overlay-background: rgb(255, 255, 255);
+      --primary-overlay-color: rgba(255, 255, 255, 0.12);
+      --secondary-overlay-color: rgba(255, 255, 255, .24);
       --overlay-opacity: .12;
-      --hover-opacity: .08;
-      --focus-opacity: .24;
-      --selected-opacity: .16;
-      --activated-opacity: .24;
+      --primary-overlay-opacity: .12;
+      --secondary-overlay-opacity: .24;
+
+      --outline-color: var(--secondary-overlay-color);
+      --hover-outline-color: var(--primary-text-color);
 
       /*md2.0 color*/
       --klog-theme-primary: var(--paper-blue-500);

@@ -16,6 +16,7 @@
 <link rel="import" href="klog-style-card.html">
 <link rel="import" href="klog-style-toolbar.html">
 <link rel="import" href="klog-style-dialog.html">
+<link rel="import" href="klog-style-form.html">
 <link rel="import" href="klog-render-timestamp.html">
 <link rel="import" href="klog-upload-zone.html">
 <link rel="import" href="klog-data-list.html">
@@ -27,6 +28,7 @@
     <style include="klog-style-card"></style>
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-dialog"></style>
+    <style include="klog-style-form"></style>
     <style>
       :host {
         display: block;
@@ -98,56 +100,8 @@
         color: var(--primary-text-color);
       }
 
-      .list .article-item .header {
-        width: 8em;
-      }
-
-      .list .article-item .header b {
-        display: block;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-
-      .list .article-item .header b[hidden] {
-        display: none;
-      }
-
-      .list .article-item .meta {
-        color: var(--secondary-text-color);
-        font-size: 0.8em;
-      }
-
-      .list .article-item .text {
-        flex: 1;
-        padding-left: 8px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        -webkit-box-orient: vertical;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        max-height: 5.1em;
-        color: var(--secondary-text-color);
-      }
-
       klog-upload-zone {
         width: 200px;
-      }
-
-      .form paper-button {
-        color: var(--primary-text-color);
-      }
-
-      .form paper-button iron-icon {
-        color: var(--secondary-text-color);
-        padding-right: 8px;
-      }
-
-      .form paper-tabs {
-        max-width: 352px;
-        width: calc(100vw - 16px);
-        --paper-tabs-selection-bar-color: transparent;
-        --paper-tab-ink: var(--primary-color);
       }
     </style>
     <klog-data-list id="data" last-response="{{list}}" userinfo="{{userinfo}}"></klog-data-list>
@@ -164,16 +118,21 @@
     <div class="userpanel-card klog-card">
       <div class="card-meta header">
         <div class="title">公开信息</div>
-        <div class="divider"></div>
-        <paper-icon-button icon="save" on-click="updatePublicinfo"></paper-icon-button>
       </div>
       <div class="form">
-        <klog-input label="头像路径" value="{{userinfo.avatarUrl}}" outlined hidden></klog-input>
-        <klog-input label="昵称" value="{{userinfo.displayName}}" outlined></klog-input>
+        <klog-input label="头像路径" value="{{userinfo.avatarUrl}}" outlined hidden>
+        </klog-input>
+        <klog-input label="昵称" on-change="updatePublicinfo" value="{{userinfo.displayName}}" outlined></klog-input>
         <klog-input label="个人介绍" value="{{userinfo.introduction}}" outlined></klog-input>
-        <paper-button on-click="openUploadAvatarDialog">
-          <iron-icon icon="cloud_upload"></iron-icon>上传头像
-        </paper-button>
+
+        <div class="form-item">
+          <div class="text-container">
+            <span class="title">上传头像</span>
+          </div>
+          <paper-button on-click="openUploadAvatarDialog">
+            <iron-icon icon="cloud_upload"></iron-icon>
+          </paper-button>
+        </div>
         <div class="fit">
         </div>
       </div>
@@ -194,11 +153,23 @@
             <paper-tab name="time">根据时间</paper-tab>
           </paper-tabs>
         </klog-dropdown-menu>
-        <paper-toggle-button checked="{{preference.backdropBlurEnabled}}">毛玻璃效果</paper-toggle-button>
-        <!-- <paper-toggle-button checked="{{preference.darkThemeDisabled}}">没有黑夜</paper-toggle-button> -->
-        <!-- <paper-toggle-button checked="{{preference.gestureDisabled}}">手势什么的最讨厌了</paper-toggle-button> -->
+
+        <div class="form-item">
+          <div class="text-container">
+            <span class="title">毛玻璃效果</span><br>
+            <span class="description">实验性</span>
+          </div>
+          <paper-toggle-button checked="{{preference.backdropBlurEnabled}}"></paper-toggle-button>
+        </div>
+        <div class="fit">
+        </div>
       </div>
-      <div class="fit"></div>
+
+
+      <!-- <paper-toggle-button checked="{{preference.darkThemeDisabled}}">没有黑夜</paper-toggle-button> -->
+      <!-- <paper-toggle-button checked="{{preference.gestureDisabled}}">手势什么的最讨厌了</paper-toggle-button> -->
+    </div>
+    <div class="fit"></div>
     </div>
 
     <div class="userpanel-card klog-card">
@@ -230,9 +201,16 @@
             <paper-tab name="false">全部显示</paper-tab>
           </paper-tabs>
         </klog-dropdown-menu>
-        <paper-button on-click="resetMarkdownPreference">
-          <iron-icon icon="settings_backup_restore"></iron-icon>重设
-        </paper-button>
+
+        <div class="form-item">
+          <div class="text-container">
+            <span class="title">重设</span><br>
+            <span class="description">恢复默认</span>
+          </div>
+          <paper-button on-click="resetMarkdownPreference">
+            <iron-icon icon="settings_backup_restore"></iron-icon>
+          </paper-button>
+        </div>
         <div class="fit"></div>
       </div>
     </div>
