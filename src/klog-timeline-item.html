@@ -221,12 +221,10 @@
             <div class="card-actions">
               <template is="dom-repeat" items="{{actions}}">
                 <template is="dom-if" if="{{item.file}}">
-                  <paper-chip outlined icon="inbox" href="{{item.url}}">{{item.text}}
-                  </paper-chip>
+                  <paper-chip outlined icon="inbox" href="{{item.url}}" label="{{item.text}}"></paper-chip>
                 </template>
                 <template is="dom-if" if="{{item.link}}">
-                  <paper-chip outlined icon="link" href="{{item.url}}">{{item.text}}
-                  </paper-chip>
+                  <paper-chip outlined icon="link" href="{{item.url}}" label="{{item.text}}"></paper-chip>
                 </template>
                 <template is="dom-if" if="{{item.more}}">
                   <paper-chip outlined icon="more_horiz" more animated on-click="expand"></paper-chip>
@@ -254,16 +252,9 @@
 
       static get is() { return 'klog-timeline-item'; }
 
-      ready() {
-        super.ready();
-        setTimeout(() => {
-          this.refresh();
-        }, 1);
-      }
-
       static get observers() {
         return [
-          '_calculateAttachments(data.attachments, data.view.gallery)'
+          'refresh(data.attachments)'
         ]
       }
 
@@ -277,25 +268,13 @@
 
       refresh() {
         return new Promise((resolve) => {
-          // reset actions
-          const actionsContainer = this.$.card.querySelector('.card-actions');
-          const more = actionsContainer.querySelector('[more]');
-          actionsContainer.style.height = 'initial';
-          if (this._moreIndex && more) {
-            more.hidden = false;
-            this.splice('actions', this._moreIndex, 1);
-          }
-          if (this._shrinkedChip) {
-            this._shrinkedChip.style.width = 'initial';
-          }
           setTimeout(() => {
             const promises = [];
             // update styles
-            this._actionInitialized = false;
-            this._moreIndex = undefined;
-            promises.push(this._calculateAttachments());
-            this.notifyPath('actions');
-            this.notifyPath('data.view');
+            promises.push(
+              this._calculateAttachments()
+                .then(() => this._updateActionsContainer())
+            );
             // clamp
             let text = this.$.card.querySelector('#text');
             if (text) {
@@ -323,38 +302,50 @@
           let files = this.data.attachments.filter(x => x.file);
           this.files = files;
           // actions
-          let actions = links.concat(files);
-          setTimeout(() => {
-            const actionsContainer = this.$.card.querySelector('.card-actions');
-            let chips = Array.from(actionsContainer.querySelectorAll('paper-chip'));
-            if (!this._actionInitialized) {
-              this._actionInitialized = true;
-              for (let i = 0; i < chips.length; i++) {
-                let chip = chips[i];
-                if (chip.offsetTop != chips[0].offsetTop) {
-                  this._moreIndex = i;
-                  this.splice('actions', this._moreIndex, 0, { more: true });
-                  this._shrinkedChip = chips[i - 1];
-                  this._shrinkedChipWidth = chips[i - 1].offsetWidth + 1;
-                  this._shrinkedChip.style.width = (this._shrinkedChipWidth - 60) + 'px';
-                  actionsContainer.style.height = (chips[0].offsetHeight + 8) + 'px';
-                  break;
-                }
-              }
-              setTimeout(resolve, 1);
-            } else {
-              resolve();
-            }
-          }, 1);
+          let actions = files.concat(links);
           this.actions = actions;
+          this.notifyPath('actions');
+          this.notifyPath('data.view');
+          setTimeout(resolve, 1);
         });
+      }
+
+      _updateActionsContainer() {
+        const actionsContainer = this.$.card.querySelector('.card-actions');
+        actionsContainer.style.height = 'initial';
+        if (this._shrinkedChip) {
+          this._shrinkedChip.style.width = 'initial';
+        }
+        return new Promise((resolve) => {
+          const actionsContainer = this.$.card.querySelector('.card-actions');
+          let chips = Array.from(actionsContainer.querySelectorAll('paper-chip:not([style^=display])'));
+          for (let i = 0; i < chips.length; i++) {
+            let chip = chips[i];
+            if (chip.offsetTop - chips[0].offsetTop > 40) {
+              this.splice('actions', i, 0, { more: true });
+              this._shrinkedChip = chips[i - 1];
+              this._shrinkedChipWidth = chips[i - 1].offsetWidth + 1;
+              this._shrinkedChip.style.width = (this._shrinkedChipWidth - 60) + 'px';
+              actionsContainer.style.height = (chips[0].offsetHeight + 8) + 'px';
+              break;
+            }
+          }
+          setTimeout(() => {
+            const elements = actionsContainer.querySelectorAll('[more]');
+            for (let element of elements) {
+              element.hidden = false;
+            }
+            resolve();
+          }, 1);
+        });
+
       }
 
       expand(e) {
         e.stopPropagation();
         e.preventDefault();
         const actionsContainer = this.$.card.querySelector('.card-actions');
-        const more = actionsContainer.querySelector('[more]');
+        const more = e.target;
         const last = Array.from(actionsContainer.querySelectorAll('paper-chip')).pop();
         let height = last.offsetTop + last.offsetHeight - actionsContainer.offsetTop + 8;
         actionsContainer.style.height = `${height}px`;

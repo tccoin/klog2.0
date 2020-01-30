@@ -21,8 +21,12 @@
       }
 
       iron-icon {
-        height: 20px;
+        height: 24px;
         flex-shrink: 0;
+      }
+
+      :host([label]) iron-icon {
+        margin-right: 4px;
       }
 
       .checkmark {
@@ -120,6 +124,7 @@
       </template>
       </iron-icon>
       <div class="container">
+        {{label}}
         <slot></slot>
       </div>
       <div class="expand-container">
@@ -150,6 +155,10 @@
           },
           icon: {
             type: String
+          },
+          label: {
+            type: String,
+            reflectToAttribute: true
           },
           href: {
             type: String
