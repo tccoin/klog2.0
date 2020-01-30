@@ -329,11 +329,10 @@
       _updateActionsContainer() {
         if (this.actions.filter(x => x.more).length > 0) return;
         const actionsContainer = this.$.card.querySelector('.card-actions');
-        actionsContainer.removeAttribute('style');
+        actionsContainer.style.height = 'initial';
         if (this._shrinkedChip) {
           this._shrinkedChip.removeAttribute('style');
         }
-        console.log(this, this.actions);
         return new Promise((resolve) => {
           setTimeout(() => {
             const actionsContainer = this.$.card.querySelector('.card-actions');
