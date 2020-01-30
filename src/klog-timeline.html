@@ -493,10 +493,17 @@
         this._cards = this._calculateCards(list);
         this._resetPage();
         this._loadNextPage();
-        setTimeout(() => {
-          for (let item of this.$.timelineContainer.querySelectorAll('.item'))
-            item.refresh();
-        }, 1);
+      }
+
+      _refreshAllItems() {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            const promises = [];
+            for (let item of this.$.timelineContainer.querySelectorAll('.item'))
+              promises.push(item.refresh());
+            Promise.all(promises).then(resolve);
+          }, 1);
+        });
       }
 
       _resetPage() {
@@ -616,17 +623,21 @@
       }
 
       updateTimeline() {
-        window.scrollTo(0, 0);
+        window.scrollTo(0, 0)
+        const done = () => {
+          Promise.resolve(this._loadNewPage(this.list))
+            .then(() => this._refreshAllItems())
+            .then(() => { this.loading = false; });
+        };
         if (this.updateRequired) {
           this.updateRequired = false;
-          this._loadNewPage(this.list);
+          done();
         } else {
           this.loading = true;
           let wait = this.refreshAnimationDuration + 200;
           this.updateButtonHidden = true;
           setTimeout(() => {
-            this.loading = false;
-            this._loadNewPage(this.list);
+            done();
           }, wait)
         }
       }
@@ -645,7 +656,6 @@
         let delay = loadingTime >= duration ? 1 : duration - loadingTime;
         if (this._timer) clearTimeout(this._timer);
         this._timer = setTimeout(() => {
-          this.loading = false;
           this.updateTimeline();
         }, delay);
       }

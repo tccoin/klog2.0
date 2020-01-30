@@ -106,7 +106,6 @@
         color: var(--klog-card-content-color, var(--primary-text-color));
       }
 
-
       .content-thumbnail {
         width: 160px;
         height: 90px;
@@ -150,13 +149,33 @@
       .card-actions {
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 8px !important;
+        margin-bottom: var(--klog-card-padding) !important;
         color: var(--secondary-text-color);
+        overflow: hidden;
+        transition: height .15s ease;
       }
 
       .card-actions>paper-chip {
         margin: 0 8px 8px 0;
-        max-width: calc(50vw - 32px);
+        max-width: 268px;
+        min-width: 80px;
+      }
+
+      .card-actions>paper-chip[animated] {
+        transition: all .15s ease;
+      }
+
+      .card-actions>paper-chip[more] {
+        margin-right: 0;
+        min-width: 0;
+        width: 52px;
+      }
+
+      .card-actions>paper-chip[more][hidden] {
+        display: initial !important;
+        transform: scale(0);
+        opacity: 0;
+        width: 0;
       }
 
       .divider {
@@ -165,6 +184,12 @@
 
       [hidden] {
         display: none !important;
+      }
+
+      @media (max-width: 632px) {
+        .card-actions>paper-chip {
+          max-width: calc(50vw - 32px);
+        }
       }
     </style>
     <!--header-->
@@ -192,31 +217,36 @@
               <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
             </template>
           </div>
-          <div class="card-actions">
-            <template is="dom-if" if="{{has(files)}}">
-              <template is="dom-repeat" items="{{_calculateFiles(data.attachments)}}">
-                <paper-chip outlined icon="inbox" href="{{item.url}}">{{item.text}}</paper-chip>
+          <template is="dom-if" if="{{actions}}">
+            <div class="card-actions">
+              <template is="dom-repeat" items="{{actions}}">
+                <template is="dom-if" if="{{item.file}}">
+                  <paper-chip outlined icon="inbox" href="{{item.url}}">{{item.text}}
+                  </paper-chip>
+                </template>
+                <template is="dom-if" if="{{item.link}}">
+                  <paper-chip outlined icon="link" href="{{item.url}}">{{item.text}}
+                  </paper-chip>
+                </template>
+                <template is="dom-if" if="{{item.more}}">
+                  <paper-chip outlined icon="more_horiz" more animated on-click="expand"></paper-chip>
+                </template>
               </template>
-            </template>
-            <template is="dom-if" if="{{has(links)}}">
-              <template is="dom-repeat" items="{{_calculateLinks(data.attachments)}}">
-                <paper-chip outlined icon="link" href="{{item.url}}">{{item.text}}</paper-chip>
-              </template>
-            </template>
-          </div>
-
-        </template>
-        <!--gallery view-->
-        <template is="dom-if" if="{{data.view.gallery}}">
-          <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
-          <div class="card-gallery">
-            <template is="dom-repeat" items="{{_calculateGallery(data.view.gallery)}}">
-              <klog-data-image class="card-gallery-item" src="{{item.url}}" gallery></klog-data-image>
-            </template>
-          </div>
-        </template>
+          </template>
       </div>
-    </a>
+
+  </template>
+  <!--gallery view-->
+  <template is="dom-if" if="{{data.view.gallery}}">
+    <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
+    <div class="card-gallery">
+      <template is="dom-repeat" items="{{gallery}}">
+        <klog-data-image class="card-gallery-item" src="{{item.url}}" gallery></klog-data-image>
+      </template>
+    </div>
+  </template>
+  </div>
+  </a>
   </template>
   <script src="../static/lib/Clamp.js/clamp.min.js"></script>
   <script>
@@ -226,7 +256,15 @@
 
       ready() {
         super.ready();
-        this.refresh();
+        setTimeout(() => {
+          this.refresh();
+        }, 1);
+      }
+
+      static get observers() {
+        return [
+          '_calculateAttachments(data.attachments, data.view.gallery)'
+        ]
       }
 
       has(sth) {
@@ -238,41 +276,91 @@
       }
 
       refresh() {
-        this._calculateLinks();
-        this._calculateFiles();
-        this.notifyPath('files');
-        this.notifyPath('links');
-        this.notifyPath('data.view');
-        setTimeout(() => {
-          let text = this.$.card.querySelector('#text');
-          if (text) {
-            $clamp(text, { clamp: 4 });
+        return new Promise((resolve) => {
+          // reset actions
+          const actionsContainer = this.$.card.querySelector('.card-actions');
+          const more = actionsContainer.querySelector('[more]');
+          actionsContainer.style.height = 'initial';
+          if (this._moreIndex && more) {
+            more.hidden = false;
+            this.splice('actions', this._moreIndex, 1);
           }
-        }, 1);
+          if (this._shrinkedChip) {
+            this._shrinkedChip.style.width = 'initial';
+          }
+          setTimeout(() => {
+            const promises = [];
+            // update styles
+            this._actionInitialized = false;
+            this._moreIndex = undefined;
+            promises.push(this._calculateAttachments());
+            this.notifyPath('actions');
+            this.notifyPath('data.view');
+            // clamp
+            let text = this.$.card.querySelector('#text');
+            if (text) {
+              promises.push(Promise.resolve($clamp(text, { clamp: 4 })));
+            }
+            Promise.all(promises).then(resolve);
+          }, 1);
+        });
       }
 
-      _calculateGallery() {
-        let gallery = this.data.attachments.filter(x => x.image);
-        this.imageCount = gallery.length;
-        if (this.imageCount == 4) gallery.splice(3);
-        else if (this.imageCount == 7) gallery.splice(6);
-        else gallery.splice(9);
-
-        this.hiddenImageCount = this.imageCount - gallery.length;
-        this.gallery = gallery;
-        return gallery;
+      _calculateAttachments() {
+        return new Promise((resolve) => {
+          // gallery
+          let gallery = this.data.attachments.filter(x => x.image);
+          this.imageCount = gallery.length;
+          if (this.imageCount == 4) gallery.splice(3);
+          else if (this.imageCount == 7) gallery.splice(6);
+          else gallery.splice(9);
+          this.hiddenImageCount = this.imageCount - gallery.length;
+          this.gallery = gallery;
+          // links
+          let links = this.data.attachments.filter(x => x.link);
+          this.links = links;
+          // files
+          let files = this.data.attachments.filter(x => x.file);
+          this.files = files;
+          // actions
+          let actions = links.concat(files);
+          setTimeout(() => {
+            const actionsContainer = this.$.card.querySelector('.card-actions');
+            let chips = Array.from(actionsContainer.querySelectorAll('paper-chip'));
+            if (!this._actionInitialized) {
+              this._actionInitialized = true;
+              for (let i = 0; i < chips.length; i++) {
+                let chip = chips[i];
+                if (chip.offsetTop != chips[0].offsetTop) {
+                  this._moreIndex = i;
+                  this.splice('actions', this._moreIndex, 0, { more: true });
+                  this._shrinkedChip = chips[i - 1];
+                  this._shrinkedChipWidth = chips[i - 1].offsetWidth + 1;
+                  this._shrinkedChip.style.width = (this._shrinkedChipWidth - 60) + 'px';
+                  actionsContainer.style.height = (chips[0].offsetHeight + 8) + 'px';
+                  break;
+                }
+              }
+              setTimeout(resolve, 1);
+            } else {
+              resolve();
+            }
+          }, 1);
+          this.actions = actions;
+        });
       }
 
-      _calculateLinks() {
-        let links = this.data.attachments.filter(x => x.link);
-        this.links = links;
-        return links;
-      }
-
-      _calculateFiles() {
-        let files = this.data.attachments.filter(x => x.file);
-        this.files = files;
-        return files;
+      expand(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        const actionsContainer = this.$.card.querySelector('.card-actions');
+        const more = actionsContainer.querySelector('[more]');
+        const last = Array.from(actionsContainer.querySelectorAll('paper-chip')).pop();
+        let height = last.offsetTop + last.offsetHeight - actionsContainer.offsetTop + 8;
+        actionsContainer.style.height = `${height}px`;
+        this._shrinkedChip.setAttribute('animated', true);
+        this._shrinkedChip.style.width = this._shrinkedChipWidth + 'px';
+        more.hidden = true;
       }
     }
 
