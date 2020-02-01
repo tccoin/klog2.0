@@ -5,6 +5,7 @@
       :host {
         display: block;
         overflow: hidden;
+        position: relative;
       }
 
       /* :host([theme="dark"]) img {
@@ -14,8 +15,29 @@
       img {
         display: block;
         max-width: 100%;
+        width: var(--klog-media-override-width, auto);
         border-radius: var(--klog-image-border-radius, 0px);
-        z-index: 0;
+        z-index: 1;
+      }
+
+      :host #bg {
+        opacity: 1;
+        display: block;
+        position: relative;
+        max-width: var(--klog-media-width, 100%);
+        width: var(--klog-media-override-width, auto);
+        border-radius: var(--klog-image-border-radius, 0px);
+        transition: opacity var(--klog-image-transition-time, 1s) ease;
+        z-index: 2;
+      }
+
+      :host([gallery]) img {
+        position: absolute;
+      }
+
+      :host([gallery]) #bg {
+        background-color: var(--paper-blue-50);
+        padding-bottom: 100%;
       }
 
       :host([content]) img {
@@ -26,20 +48,9 @@
         opacity: 0;
       }
 
-      :host #bg {
-        opacity: 1;
-        display: block;
-        position: relative;
-        max-width: var(--klog-media-width, 100%);
-        border-radius: var(--klog-image-border-radius, 0px);
-        transition: opacity 1s ease;
-        z-index: 1;
-      }
-
-
       :host([avatar]) {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         margin-right: 8px;
         flex-shrink: 0;
         --klog-image-border-radius: 50%;
@@ -86,11 +97,20 @@
           },
           theme: {
             type: String
+          },
+          lazy: {
+            type: Boolean
+          },
+          fixed: {
+            type: Boolean,
+            value: false
           }
         }
       }
 
       srcChanged(src) {
+        if (!src) return;
+        this._initQueue();
         // process url
         let oriSrc = src;
         if (this.avatar && !src) {
@@ -98,6 +118,9 @@
         } else if (this.content && src.indexOf('clouddn.com') > -1 && !src.indexOf(/\.svg$/)) {
           src += '?imageView2/2/w/1440/q/85/interlace/1';
         } else if (src.indexOf('storage.krrr.party') > -1 && src.indexOf('gif') == -1) {
+          let result = src.replace(/(\?.*)?$/, '').match(/(.*\/)(.*)$/);
+          src = result[1] + encodeURIComponent(result[2]);
+          oriSrc = src;
           if (this.avatar) {
             src += '?Magic/1/w/100/h/100/q/90';
           } else if (this.timeline) {
@@ -105,68 +128,127 @@
           } else if (this.content) {
             src += '?Magic/2/w/1440/q/90';
           } else if (this.gallery) {
-            src += '?Magic/1/w/584/h/584/q/75';
+            // src += '?Magic/1/w/584/h/584/q/75';
+            src += '?Magic/1/w/274/h/274/q/75';
           }
           if (this.lazy) {
-            // disable image
-            this.wasLazy = true;
-            this._lazySrc = src;
-            src = '';
             this.loadPlaceholder(oriSrc + '?Magic/6');
-            //window resize
-            window.addEventListener('resize', () => {
-              if (this.wasLazy)
-                this.updatePlaceholder();
-            });
           }
         }
-        // set property
-        this._src = src;
+        if (this.lazy) {
+          this.wasLazy = true;
+          this._lazySrc = src;
+        } else {
+          this._addToQueue(this.load(src));
+        }
+      }
+
+      lazyload() {
+        setTimeout(() => {
+          this.lazy = false;
+          this.load(this._lazySrc)();
+        }, 1);
+      }
+
+      load(src) {
+        this.resolve();
+        const onload = () => {
+          this.$.bg.style.opacity = 0;
+          this.$.img.style.opacity = 1;
+          this.resolve();
+        };
+        const onerror = () => {
+          this._src = '';
+          this.$.img.removeEventListener('load', onload);
+          this.$.img.removeEventListener('error', onerror);
+          setTimeout(() => this._addToQueue(this.load(src)), 3000);
+          this.resolve();
+        };
+        return resolve => {
+          this._resolve = resolve;
+          this._src = src;
+          this.$.img.style.opacity = 0;
+          if (this.$.img.complete) {
+            onload();
+          } else {
+            this.$.img.addEventListener('load', onload);
+            this.$.img.addEventListener('error', onerror);
+          }
+        };
+      }
+
+      resolve() {
+        if (this._resolve) {
+          this._resolve();
+          this._resolve = undefined;
+        }
+      }
+
+      _initQueue() {
+        if (!window._imageLoadingQueue) {
+          window._imageLoadingCount = 0;
+          window._imageLoadingQueue = [];
+          for (let i = 0; i < 8; i++) {
+            window._imageLoadingQueue.push(Promise.resolve());
+          }
+        }
+      }
+
+      _addToQueue(cb) {
+        const queue = window._imageLoadingQueue;
+        const count = window._imageLoadingCount;
+        queue[count] = queue[count].then(() => new Promise(cb));
+        window._imageLoadingCount = (window._imageLoadingCount + 1) % (queue.length - 1);
+      }
+
+      ready() {
+        super.ready();
+        //window resize
+        window.addEventListener('resize', () => {
+          if (this.wasLazy)
+            this.updatePlaceholder();
+        });
       }
 
       loadPlaceholder(url) {
-        this.$.bg.style.height = '300px';
-        this.$.bg.style.width = "1000px";
+        if (!this.fixed) {
+          this.$.bg.style.height = '300px';
+          this.$.bg.style.width = "1000px";
+        }
         let req = new XMLHttpRequest();
-        req.onload = () => {
+        req.addEventListener('load', () => {
           this._placeholderData = JSON.parse(req.response);
           this.updatePlaceholder();
-        };
+        });
         req.open('get', url, true);
         req.send();
       }
 
       updatePlaceholder() {
         let data = this._placeholderData;
-        let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
-        let maxWidth = parseInt(mediaWidth);
-        // if (!mediaWidth) {
-        //   setTimeout(() => this.updatePlaceholder(), 100);
-        //   return;
-        // } else
-        if (!mediaWidth) {
-          this.$.bg.style.width = `0px`;
-          this.$.bg.style.height = `0px`;
-          this.$.img.style.position = `initial`;
-        } else {
-          let w = Math.min(maxWidth, data.w);
-          let h = w / data.w * data.h;
+        if (!this.fixed) {
+          let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
+          let maxWidth = parseInt(mediaWidth);
+          let w, h;
+          if (!mediaWidth) {
+            w = Math.min(this.offsetWidth, data.w);
+          } else {
+            w = Math.min(maxWidth, data.w);
+          }
+          h = w / data.w * data.h;
           this.$.bg.style.width = `${w}px`;
           this.$.bg.style.height = `${h}px`;
-          this.$.img.style.position = 'absolute';
+        } else if (this.gallery) {
+          this.$.bg.style.width = '100%';
+          this.$.bg.style.height = '0';
+        } else {
+          this.$.bg.style.width = '100%';
+          this.$.bg.style.height = '100%';
         }
+        this.$.img.style.position = 'absolute';
         let c = this.theme == 'light' ? data.palette.LightVibrant.rgb : data.palette.DarkVibrant.rgb;
         this.$.bg.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
         this.$.img.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
-      }
-
-      lazyload() {
-        setTimeout(() => {
-          this.lazy = false;
-          // this.$.img.style.position = 'absolute';
-          this.src = this._lazySrc;
-          this.$.img.onload = () => this.$.bg.style.opacity = 0;
-        }, 1);
       }
 
     }

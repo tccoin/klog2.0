@@ -132,9 +132,24 @@ const sendImage = async (request, reply, filePath, query) => {
   outputStream.pipe(cacheStream);
 };
 
+const unicode2utf8 = str => {
+  let result = '';
+  while (true) {
+    m = str.match(/(.*?)&#(.*?);(.*)/);
+    if (!m) {
+      result += str;
+      break;
+    } else {
+      result += m[1] + String.fromCharCode(m[2]);
+      str = m[3];
+    }
+  }
+  return result;
+};
+
 const router = function (app, opts, next) {
   app.get('/:bucketname/:key', function (request, reply, next) {
-    let filePath = path.join('pan', request.params.bucketname, request.params.key);
+    let filePath = path.join('pan', request.params.bucketname, unicode2utf8(request.params.key));
     console.log('LOG download file ', filePath);
     if (fs.existsSync(filePath)) {
       let mimeType = mime.lookup(filePath) || 'unknown';

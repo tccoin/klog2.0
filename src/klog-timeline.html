@@ -212,7 +212,7 @@
       </div>
       <div class="timeline-container" id="timelineContainer">
         <template is="dom-repeat" items="{{cards}}">
-          <klog-timeline-item class="item" data="{{item}}"></klog-timeline-item>
+          <klog-timeline-item class="item" data="{{item}}" mobile="{{mobile}}" theme="{{theme}}"></klog-timeline-item>
         </template>
         <div class="eof" hidden="{{!_eof}}">Klog 奇点</div>
       </div>
@@ -309,7 +309,7 @@
           },
           gallery: {
             pageSize: 7,
-            requiredAttachments: [['image', 1]]
+            requiredAttachments: [['image', 3]]
           }
         };
 
@@ -406,6 +406,7 @@
         this._scrollHandler = e => {
           let y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
           this.updateButtonExtended = y == 0 || !this.mobile;
+          // filter animation
           if (y > 16) {
             let progress = Math.max(0, Math.min(1, (y - 16) / 30));
             this.$.filter.style.transform = `scale(${1 - progress * 0.05})`;
@@ -419,7 +420,7 @@
             this.$.filter.style.transform = `scale(1)`;
             this.$.filter.style.opacity = 1;
           }
-
+          // blur
           if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
             const statusBar = document.querySelector('#statusbarFix');
             const statusBarBackground = document.querySelector('#statusbarFixBackground');
@@ -440,6 +441,7 @@
             this.$.header.style.backdropFilter = 'initial';
             this.$.header.style.webkitBackdropFilter = 'initial';
           }
+          // update intersecting animation
           let intersectinglist = this.$.container.querySelectorAll('klog-timeline-item[intersecting]');
           for (let target of intersectinglist) {
             let margin = target.offsetTop + target.offsetHeight - y;
@@ -450,6 +452,13 @@
               target.style.opacity = 1;
             } else {
               target.style.opacity = progress1;
+            }
+          }
+          // lazy load
+          for (let target of intersectinglist) {
+            if (!target.hasAttribute("lazy-loaded")) {
+              target.setAttribute("lazy-loaded", '');
+              target.lazyload();
             }
           }
         };
@@ -546,10 +555,7 @@
           cards = cards.filter(x => x.attachments.filter(x => x[attr]).length >= len);
         }
         for (let card of cards) {
-          card.view = {
-            default: this.view == 'default',
-            gallery: this.view == 'gallery',
-          };
+          card.view = this.view;
         }
         return cards;
       }
@@ -622,10 +628,13 @@
 
       updateTimeline() {
         // 数据加载完成,更新UI
+        window._imageLoadingQueue = undefined;
         this.scrollTo(0, 150);
         const done = () => {
-          Promise.resolve(this._loadNewPage(this.list))
+          Promise.resolve(this._clearLazyState())
+            .then(() => this._loadNewPage(this.list))
             .then(() => this._refreshAllItems())
+            .then(() => this._scrollHandler())
             .then(() => {
               this.loading = false;
               setTimeout(() => this._clearItemsStyle(), 1);
@@ -641,6 +650,13 @@
           setTimeout(() => {
             done();
           }, wait)
+        }
+      }
+
+      _clearLazyState() {
+        const elements = this.$.timelineContainer.querySelectorAll('klog-timeline-item[lazy-loaded]');
+        for (let element of elements) {
+          element.removeAttribute('lazy-loaded');
         }
       }
 
