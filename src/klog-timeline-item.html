@@ -22,6 +22,7 @@
         color: var(--primary-text-color);
         --primary-font-size: 14px;
         --secondary-font-size: 12px;
+        --klog-image-transition-time: .2s;
       }
 
       a {
@@ -246,7 +247,8 @@
 
         <!--meta-->
         <div class="card-meta">
-          <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" avatar></klog-data-image>
+          <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" theme="{{theme}}" lazy fixed avatar>
+          </klog-data-image>
           <div class="meta-content">
             <div class="meta-title">{{data.author.displayName}}</div>
             <template is="dom-if" if="{{data.view.gallery}}">
@@ -264,7 +266,8 @@
         </div>
 
         <!--media-->
-        <klog-data-image class="card-media" src="{{data.image.url}}" hidden$="{{!view.fullWidthMedia}}" content>
+        <klog-data-image class="card-media" src="{{data.image.url}}" hidden$="{{!view.fullWidthMedia}}"
+          theme="{{theme}}" lazy content>
         </klog-data-image>
 
         <!--title-->
@@ -275,7 +278,9 @@
         <div class="card-content" hidden$="{{!data.text}}">
           <p class="content-text" id="text">{{data.text}}</p>
           <template is="dom-if" if="{{view.thumbnail}}">
-            <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
+            <klog-data-image class="content-thumbnail" src="{{data.image.url}}" theme="{{theme}}" lazy fixed timeline>
+            </klog-data-image>
+            </klog-data-image>
           </template>
         </div>
 
@@ -283,7 +288,8 @@
         <template is="dom-if" if="{{view.gallery}}">
           <div class="card-gallery">
             <template is="dom-repeat" items="{{gallery}}">
-              <klog-data-image class="card-gallery-item" src="{{item.url}}" gallery large$="{{item.large}}">
+              <klog-data-image class="card-gallery-item" src="{{item.url}}" theme="{{theme}}" lazy fixed gallery
+                large$="{{item.large}}">
               </klog-data-image>
             </template>
           </div>
@@ -353,7 +359,7 @@
       }
 
       refresh() {
-        return new Promise((resolve) => {
+        this.refreshPromise = new Promise((resolve) => {
           setTimeout(() => {
             this.view = {
               gallery: false,
@@ -376,6 +382,7 @@
             Promise.all(promises).then(resolve);
           }, 1);
         });
+        return this.refreshPromise;
       }
 
       _calculateCardStyle() {
@@ -477,7 +484,15 @@
             }, 1);
           }, 1);
         });
+      }
 
+      lazyload() {
+        setTimeout(() => {
+          const images = this.$.card.querySelectorAll('klog-data-image:not([hidden])');
+          for (let image of images) {
+            image.lazyload();
+          }
+        }, 1);
       }
 
       expand(e) {
