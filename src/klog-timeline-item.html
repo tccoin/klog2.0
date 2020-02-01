@@ -175,6 +175,10 @@
         flex-basis: calc(25% - 1px);
       }
 
+      :host([mobile]) .card-gallery-item {
+        flex-basis: calc(33% - 1px);
+      }
+
       .card-gallery-item[large] {
         flex-basis: calc(50% - 1px);
       }
@@ -317,6 +321,10 @@
           view: {
             type: Object
           },
+          mobile: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
         }
       }
 
@@ -415,7 +423,7 @@
           // gallery
           let gallery = this.data.attachments.filter(x => x.image);
           this.imageCount = gallery.length;
-          gallery.splice(8);
+          gallery.splice(this.mobile ? 6 : 8);
           // if (gallery.length >= 1 && gallery.length <= 3) {
           //   gallery[0].large = true;
           // }

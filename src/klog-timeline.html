@@ -212,7 +212,7 @@
       </div>
       <div class="timeline-container" id="timelineContainer">
         <template is="dom-repeat" items="{{cards}}">
-          <klog-timeline-item class="item" data="{{item}}"></klog-timeline-item>
+          <klog-timeline-item class="item" data="{{item}}" mobile="{{mobile}}"></klog-timeline-item>
         </template>
         <div class="eof" hidden="{{!_eof}}">Klog 奇点</div>
       </div>
@@ -619,6 +619,7 @@
 
       updateTimeline() {
         // 数据加载完成,更新UI
+        window._imageLoadingQueue = undefined;
         this.scrollTo(0, 150);
         const done = () => {
           Promise.resolve(this._loadNewPage(this.list))
