@@ -5,6 +5,7 @@
       :host {
         display: block;
         overflow: hidden;
+        position: relative;
       }
 
       /* :host([theme="dark"]) img {
@@ -16,15 +17,7 @@
         max-width: 100%;
         width: var(--klog-media-override-width, auto);
         border-radius: var(--klog-image-border-radius, 0px);
-        z-index: 0;
-      }
-
-      :host([content]) img {
-        max-width: var(--klog-media-width, 100%);
-      }
-
-      :host([lazy]) img {
-        opacity: 0;
+        z-index: 1;
       }
 
       :host #bg {
@@ -35,9 +28,26 @@
         width: var(--klog-media-override-width, auto);
         border-radius: var(--klog-image-border-radius, 0px);
         transition: opacity 1s ease;
-        z-index: 1;
+        z-index: 2;
       }
 
+      :host([gallery]) img {
+        position: absolute;
+      }
+
+      :host([gallery]) #bg {
+        padding-bottom: 100%;
+        background-color: var(--paper-blue-50);
+        z-index: 0;
+      }
+
+      :host([content]) img {
+        max-width: var(--klog-media-width, 100%);
+      }
+
+      :host([lazy]) img {
+        opacity: 0;
+      }
 
       :host([avatar]) {
         width: 32px;
@@ -126,11 +136,25 @@
         if (this.lazy) {
           this._src = src
         } else {
-          this._addToQueue(resolve => {
+          const load = resolve => {
             this._src = src;
-            this.$.img.onload = resolve;
-            this.$.img.onerror = resolve;
-          });
+            this.$.img.style.opacity = 0;
+            const onload = () => {
+              this.$.bg.style.opacity = 0;
+              this.$.img.style.opacity = 1;
+              resolve();
+            };
+            const onerror = () => {
+              this._src = '';
+              this.$.img.removeEventListener('load', onload);
+              this.$.img.removeEventListener('error', onerror);
+              setTimeout(() => this._addToQueue(load), 2000);
+              resolve();
+            };
+            this.$.img.addEventListener('load', onload);
+            this.$.img.addEventListener('error', onerror);
+          };
+          this._addToQueue(load);
         }
       }
 
@@ -164,10 +188,10 @@
         this.$.bg.style.height = '300px';
         this.$.bg.style.width = "1000px";
         let req = new XMLHttpRequest();
-        req.onload = () => {
+        req.addEventListener('load', () => {
           this._placeholderData = JSON.parse(req.response);
           this.updatePlaceholder();
-        };
+        });
         req.open('get', url, true);
         req.send();
       }
@@ -176,17 +200,16 @@
         let data = this._placeholderData;
         let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
         let maxWidth = parseInt(mediaWidth);
+        let w, h;
         if (!mediaWidth) {
-          this.$.bg.style.width = `0px`;
-          this.$.bg.style.height = `0px`;
-          this.$.img.style.position = `initial`;
+          w = Math.min(this.offsetWidth, data.w);
         } else {
-          let w = Math.min(maxWidth, data.w);
-          let h = w / data.w * data.h;
-          this.$.bg.style.width = `${w}px`;
-          this.$.bg.style.height = `${h}px`;
-          this.$.img.style.position = 'absolute';
+          w = Math.min(maxWidth, data.w);
         }
+        h = w / data.w * data.h;
+        this.$.bg.style.width = `${w}px`;
+        this.$.bg.style.height = `${h}px`;
+        this.$.img.style.position = 'absolute';
         let c = this.theme == 'light' ? data.palette.LightVibrant.rgb : data.palette.DarkVibrant.rgb;
         this.$.bg.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
         this.$.img.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
@@ -197,7 +220,9 @@
           this.lazy = false;
           // this.$.img.style.position = 'absolute';
           this.src = this._lazySrc;
-          this.$.img.onload = () => this.$.bg.style.opacity = 0;
+          this.$.img.addEventListener('load', () => {
+            this.$.bg.style.opacity = 0;
+          });
         }, 1);
       }
 
