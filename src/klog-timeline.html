@@ -98,7 +98,7 @@
 
       .item {
         max-width: 600px;
-        margin: 0 auto 16px;
+        margin: 0 auto 24px;
         transition: width .2s ease;
       }
 
@@ -309,7 +309,7 @@
           },
           gallery: {
             pageSize: 7,
-            requiredAttachments: [['image', 1]]
+            requiredAttachments: [['image', 3]]
           }
         };
 
@@ -546,10 +546,7 @@
           cards = cards.filter(x => x.attachments.filter(x => x[attr]).length >= len);
         }
         for (let card of cards) {
-          card.view = {
-            default: this.view == 'default',
-            gallery: this.view == 'gallery',
-          };
+          card.view = this.view;
         }
         return cards;
       }

@@ -19,17 +19,16 @@
         align-items: center;
         cursor: default;
         width: 100%;
-        --app-grid-columns: 3;
-        --app-grid-item-height: 100%;
-        --app-grid-gutter: 1px;
-        --secondary-font-size: 14px;
+        color: var(--primary-text-color);
+        --primary-font-size: 14px;
+        --secondary-font-size: 12px;
       }
 
       a {
         text-decoration: none;
         width: 100%;
         display: block;
-        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        color: inherit -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         -webkit-tap-highlight-color: transparent;
       }
 
@@ -38,6 +37,9 @@
         margin: auto;
         cursor: pointer;
         background: var(--klog-theme-surface);
+        /* background: transparent;
+        border: 1px solid var(--border-color, --divider-color);
+        @apply --shadow-none; */
         overflow: hidden;
         -webkit-tap-highlight-color: transparent;
         transition: box-shadow .3s ease;
@@ -52,48 +54,88 @@
       .card-meta {
         display: flex;
         align-items: center;
-        line-height: 1.3;
+        font-size: 0.9em;
+        line-height: 1;
         margin: 0 !important;
         padding: calc(var(--klog-card-padding) * 2);
         color: var(--secondary-text-color);
-        font-size: var(--secondary-font-size);
       }
 
-      .card-meta .date {
-        white-space: nowrap;
+      .card-meta .meta-avatar {
+        width: 32px;
+        height: 32px;
       }
 
-      .card-meta .meta {
+      .card-meta .meta-content {
         flex: 1;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
-      .meta-name {
-        margin-right: 4px;
+      .meta-title {
         font-weight: bold;
         color: var(--primary-text-color);
+        font-size: var(--primary-font-size);
+      }
+
+      .meta-subtitle {
+        display: flex;
+        flex-flow: row;
+        align-items: center;
+        white-space: nowrap;
+        font-size: var(--primary-font-size);
+        margin-top: 4px;
       }
 
       .meta-collection {
-        white-space: nowrap;
+        color: var(--dark-primary-color);
+      }
+
+      .meta-subtitle .divider {
+        display: inline-block;
+        height: 4px;
+        width: 4px;
+        margin: 0 6px;
+        border-radius: 2px;
+        background: var(--border-color);
       }
 
 
       /*card-body*/
+
+      .card-media {
+        max-height: 328px;
+        margin: 0;
+        --klog-media-override-width: 100%;
+      }
+
+      .card-subtitle {
+        margin: var(--klog-card-padding) calc(var(--klog-card-padding) * 2) 0;
+        line-height: 1;
+        color: var(--secondary-text-color);
+        font-weight: bold;
+      }
+
+      .card-media:not([hidden])+.card-subtitle {
+        margin: calc(var(--klog-card-padding) * 2) calc(var(--klog-card-padding) * 2) 0;
+      }
 
       .card-title {
         color: var(--primary-text-color);
         margin-top: var(--klog-card-padding) !important;
       }
 
-      .card-title+.card-content {
-        margin-top: 0;
+      .card-subtitle+.card-title {
+        margin-top: calc(var(--klog-card-padding) * 0.5) !important;
       }
 
       .card-content {
         display: flex;
         flex-direction: row;
+      }
+
+      .card-title:not([hidden])+.card-content {
+        margin-top: 0;
       }
 
       .content-text {
@@ -102,7 +144,7 @@
         flex: 1;
         margin: 0;
         padding-right: calc(var(--klog-card-padding) * 2);
-        font-size: var(--secondary-font-size);
+        font-size: var(--primary-font-size);
         color: var(--klog-card-content-color, var(--primary-text-color));
       }
 
@@ -112,7 +154,7 @@
         border-radius: 3px;
       }
 
-      /*card-attachments*/
+      /*card-gallery*/
 
       .card-gallery {
         @apply --layout-horizontal;
@@ -120,7 +162,7 @@
         flex-wrap: wrap;
         overflow: auto;
         flex: 1;
-        margin: 0;
+        margin: calc(var(--klog-card-padding) * 2);
         font-size: var(--secondary-font-size);
         color: var(--klog-card-content-color, var(--primary-text-color));
       }
@@ -128,13 +170,13 @@
       .card-gallery-item {
         margin-right: 1px;
         margin-top: 1px;
-        flex-grow: 1;
+        flex-grow: 0;
         flex-shrink: 0;
-        flex-basis: calc(33% - 0.7px);
+        flex-basis: calc(25% - 1px);
       }
 
-      .card-gallery-item:nth-child(even) {
-        margin-right: 0;
+      .card-gallery-item[large] {
+        flex-basis: calc(50% - 1px);
       }
 
       .attachments {
@@ -162,8 +204,8 @@
         --paper-chip-icon-size: 20px;
 
         --paper-chip-style: {
-          font-size: 12px;
-          padding: 4px 10px;
+          font-size: var(--secondary-font-size);
+          padding: 3px 10px;
         }
       }
 
@@ -184,10 +226,6 @@
         width: 0;
       }
 
-      .divider {
-        flex: 1;
-      }
-
       [hidden] {
         display: none !important;
       }
@@ -201,62 +239,86 @@
     <!--header-->
     <a href="/#/article/{{data.path}}">
       <div class="card klog-card" raised$="{{expended}}" on-click="read" id="card">
+
+        <!--meta-->
         <div class="card-meta">
           <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" avatar></klog-data-image>
-          <div class="meta">
-            <span class="meta-name">{{data.author.displayName}}</span>
-            <span class="meta-collection">
-              <template is="dom-if" if="{{data.view.gallery}}">发布了{{imageCount}}张照片</template>
-              <template is="dom-if" if="{{data.view.default}}">发布在&nbsp;{{data.collection}}</template>
-            </span>
+          <div class="meta-content">
+            <div class="meta-title">{{data.author.displayName}}</div>
+            <template is="dom-if" if="{{data.view.gallery}}">
+              <div class="meta-subtitle">
+                发布了{{imageCount}}张照片
+              </div>
+              <!-- <template is="dom-if" if="{{data.view.default}}">
+              发布在&nbsp;<span class="meta-collection">{{data.collection}}</span>
+              </template> -->
+            </template>
           </div>
-          <div class="date">
+          <div class="meta-date">
             <klog-render-timestamp time-stamp="{{data.date}}"></klog-render-timestamp>
           </div>
         </div>
-        <!--default view-->
-        <template is="dom-if" if="{{data.view.default}}">
-          <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
-          <div class="card-content" hidden$="{{!data.text}}">
-            <p class="content-text" id="text">{{data.text}}</p>
-            <template is="dom-if" if="{{data.image.url}}">
-              <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
+
+        <!--media-->
+        <klog-data-image class="card-media" src="{{data.image.url}}" hidden$="{{!view.fullWidthMedia}}" content>
+        </klog-data-image>
+
+        <!--title-->
+        <div class="card-subtitle" hidden$="{{!data.title}}">{{data.collection}}</div>
+        <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
+
+        <!--content-->
+        <div class="card-content" hidden$="{{!data.text}}">
+          <p class="content-text" id="text">{{data.text}}</p>
+          <template is="dom-if" if="{{view.thumbnail}}">
+            <klog-data-image class="content-thumbnail" src="{{data.image.url}}" timeline></klog-data-image>
+          </template>
+        </div>
+
+        <!--gallery-->
+        <template is="dom-if" if="{{view.gallery}}">
+          <div class="card-gallery">
+            <template is="dom-repeat" items="{{gallery}}">
+              <klog-data-image class="card-gallery-item" src="{{item.url}}" gallery large$="{{item.large}}">
+              </klog-data-image>
             </template>
           </div>
-          <template is="dom-if" if="{{actions}}">
-            <div class="card-actions">
-              <template is="dom-repeat" items="{{actions}}">
-                <template is="dom-if" if="{{item.file}}">
-                  <paper-chip outlined icon="inbox" href="{{item.url}}" label="{{item.text}}"></paper-chip>
-                </template>
-                <template is="dom-if" if="{{item.link}}">
-                  <paper-chip outlined icon="link" href="{{item.url}}" label="{{item.text}}"></paper-chip>
-                </template>
-                <template is="dom-if" if="{{item.more}}">
-                  <paper-chip outlined icon="more_horiz" more animated on-click="expand"></paper-chip>
-                </template>
-              </template>
-          </template>
-      </div>
+        </template>
 
-  </template>
-  <!--gallery view-->
-  <template is="dom-if" if="{{data.view.gallery}}">
-    <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
-    <div class="card-gallery">
-      <template is="dom-repeat" items="{{gallery}}">
-        <klog-data-image class="card-gallery-item" src="{{item.url}}" gallery></klog-data-image>
-      </template>
-    </div>
-  </template>
-  </div>
-  </a>
+        <!--actions-->
+        <div class="card-actions" hidden$="{{!view.actions}}">
+          <template is="dom-repeat" items="{{actions}}">
+            <template is="dom-if" if="{{item.file}}">
+              <paper-chip outlined icon="inbox" href="{{item.url}}" label="{{item.text}}"></paper-chip>
+            </template>
+            <template is="dom-if" if="{{item.link}}">
+              <paper-chip outlined icon="link" href="{{item.url}}" label="{{item.text}}"></paper-chip>
+            </template>
+            <template is="dom-if" if="{{item.more}}">
+              <paper-chip outlined icon="more_horiz" more animated on-click="expand"></paper-chip>
+            </template>
+          </template>
+        </div>
+
+      </div>
+    </a>
   </template>
   <script src="../static/lib/Clamp.js/clamp.min.js"></script>
   <script>
     class KlogTimelineItem extends Polymer.Element {
 
       static get is() { return 'klog-timeline-item'; }
+
+      static get properties() {
+        return {
+          data: {
+            type: Object,
+          },
+          view: {
+            type: Object
+          },
+        }
+      }
 
       static get observers() {
         return [
@@ -285,10 +347,17 @@
       refresh() {
         return new Promise((resolve) => {
           setTimeout(() => {
+            this.view = {
+              gallery: false,
+              fullWidthMedia: false,
+              thumbnail: false,
+              actions: true
+            };
             const promises = [];
             // update styles
             promises.push(
               this._calculateAttachments()
+                .then(() => this._calculateCardStyle())
                 .then(() => this._updateActionsContainer())
             );
             // clamp
@@ -301,14 +370,55 @@
         });
       }
 
+      _calculateCardStyle() {
+        // 识别只有图片的文章等
+        return new Promise((resolve) => {
+          const view = this.view;
+          const data = this.data;
+          const text = this.data.text || '';
+          const shortenText = text.replace(/\[图片\]/g, '').trim();
+          const gallery = this.gallery;
+          const actions = this.actions;
+          /* 可用性 */
+          view.thumbnail = Boolean(data.image.url);
+          view.fullWidthMedia = Boolean(data.image.url);
+          view.actions = actions.length != 0;
+          /* 显示相册 */
+          if (gallery.length >= 3) {
+            view.gallery = true;
+            view.fullWidthMedia = false;
+            view.thumbnail = false;
+            view.actions = false;
+            data.text = shortenText;
+          }
+          /* 显示缩略图或大图 */
+          if (!view.gallery) {
+            if (shortenText.length > 40) {
+              view.fullWidthMedia = false;
+            } else {
+              data.text = shortenText;
+              view.thumbnail = false;
+            }
+          }
+          /*更新样式*/
+          this.notifyPath('data.text');
+          this.notifyPath('view.actions');
+          this.notifyPath('view.gallery');
+          this.notifyPath('view.thumbnail');
+          this.notifyPath('view.fullWidthMedia');
+          setTimeout(resolve, 1);
+        });
+      }
+
       _calculateAttachments() {
         return new Promise((resolve) => {
           // gallery
           let gallery = this.data.attachments.filter(x => x.image);
           this.imageCount = gallery.length;
-          if (this.imageCount == 4) gallery.splice(3);
-          else if (this.imageCount == 7) gallery.splice(6);
-          else gallery.splice(9);
+          gallery.splice(8);
+          // if (gallery.length >= 1 && gallery.length <= 3) {
+          //   gallery[0].large = true;
+          // }
           this.hiddenImageCount = this.imageCount - gallery.length;
           this.gallery = gallery;
           // links
@@ -321,7 +431,6 @@
           let actions = files.concat(links);
           this.actions = actions;
           this.notifyPath('actions');
-          this.notifyPath('data.view');
           setTimeout(resolve, 1);
         });
       }
