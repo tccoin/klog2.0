@@ -139,6 +139,7 @@
         return [].concat(text
           .replace(/@\(([\s\S]*?)\)(\[([\s\S]*?)\])?/g, '') // at
           .replace(/\[toc\]/ig, '') // toc
+          .replace(/^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\n? *\1 *(?:\n+|$)/ig, '\\[代码\\]') // toc
           .replace(/\${1,2}([\s\S]+?)\${1,2}/g, '\\[公式\\]') // katex
           .replace(/~{1,2}[\s\S]+~{1,2}/g, '\\[Biii\\]') // del
           .replace(/!\[(.*)\]\(.*\)/g, '\\[图片\\]') // image

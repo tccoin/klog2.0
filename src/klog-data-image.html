@@ -68,8 +68,7 @@
         return {
           src: {
             type: String,
-            reflectToAttribute: true,
-            observer: 'srcChanged',
+            reflectToAttribute: true
           },
           avatar: {
             type: Boolean,
@@ -99,13 +98,20 @@
             type: String
           },
           lazy: {
-            type: Boolean
+            type: Boolean,
+            reflectToAttribute: true
           },
           fixed: {
             type: Boolean,
             value: false
           }
         }
+      }
+
+      static get observers() {
+        return [
+          'srcChanged(src)'
+        ]
       }
 
       srcChanged(src) {
@@ -135,22 +141,22 @@
             this.loadPlaceholder(oriSrc + '?Magic/6');
           }
         }
+        this._lazySrc = src;
         if (this.lazy) {
           this.wasLazy = true;
-          this._lazySrc = src;
         } else {
-          this._addToQueue(this.load(src));
+          this._addToQueue(this.load());
         }
       }
 
       lazyload() {
         setTimeout(() => {
           this.lazy = false;
-          this.load(this._lazySrc)();
+          this.load()();
         }, 1);
       }
 
-      load(src) {
+      load() {
         this.resolve();
         const onload = () => {
           this.$.bg.style.opacity = 0;
@@ -161,12 +167,13 @@
           this._src = '';
           this.$.img.removeEventListener('load', onload);
           this.$.img.removeEventListener('error', onerror);
-          setTimeout(() => this._addToQueue(this.load(src)), 3000);
+          setTimeout(() => this._addToQueue(this.load()), 3000);
           this.resolve();
         };
         return resolve => {
+          this.__console = this._lazySrc + ',' + this.$.img.complete;
           this._resolve = resolve;
-          this._src = src;
+          this._src = this._lazySrc;
           this.$.img.style.opacity = 0;
           if (this.$.img.complete) {
             onload();
@@ -197,7 +204,9 @@
       _addToQueue(cb) {
         const queue = window._imageLoadingQueue;
         const count = window._imageLoadingCount;
+        this.__console1 = [queue[count]];
         queue[count] = queue[count].then(() => new Promise(cb));
+        this.__console1.push(queue[count]);
         window._imageLoadingCount = (window._imageLoadingCount + 1) % (queue.length - 1);
       }
 
