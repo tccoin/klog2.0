@@ -176,6 +176,7 @@
             return { src: src, text: '' }
           },
           parse: () => {
+            this._hasToc = true;
             return '<div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><div class="toc"></div>'
           }
         };
@@ -316,12 +317,13 @@
 
         // update heading elements
         for (let heading of headings) {
-          let element = this.$.content.querySelector(`#${heading.id}`);
+          const element = this.$.content.querySelector(`#${heading.id}`);
           if (heading.isIndependentTitle && this.hideIndependentTitle) {
             element.style.display = 'none';
             continue;
           }
-          if (this.preference.numberedHeading == 'true') {
+          const numbered = this.preference.numberedHeading;
+          if (numbered == 'true' || this._hasToc && numbered == 'auto') {
             let numberSpan = element.querySelector('.heading-number');
             if (numberSpan) { numberSpan.parentNode.removeChild(numberSpan) }
             element.innerHTML = `<span class="heading-number">${heading.number}</span> ${element.innerHTML}`;

@@ -182,6 +182,7 @@
           <paper-tabs selected="{{preference.markdown.numberedHeading}}" slot="dropdown-content"
             class="dropdown-content" attr-for-selected="name">
             <paper-tab name="true">显示</paper-tab>
+            <paper-tab name="auto">自动</paper-tab>
             <paper-tab name="false">隐藏</paper-tab>
           </paper-tabs>
         </klog-dropdown-menu>
@@ -236,7 +237,9 @@
   <script>
     class KlogUserpanel extends Polymer.Element {
 
-      static get is() { return 'klog-userpanel'; }
+      static get is() {
+        return 'klog-userpanel';
+      }
 
       static get observers() {
         return [
@@ -249,7 +252,10 @@
       load() {
         document.title = '个人资料 - Klog';
         if (!this.userinfo.createdAt) {
-          this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
+          this.dispatchEvent(new CustomEvent('user-login-page-open', {
+            bubbles: true,
+            composed: true
+          }));
           return;
         }
         this.preference = this.userinfo.preference;
@@ -257,16 +263,28 @@
       }
 
       openDrawer() {
-        this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent('drawer-toggle', {
+          bubbles: true,
+          composed: true
+        }));
       }
 
       logout() {
         this.userinfo.klogUser.logout();
-        this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent('user-login-page-open', {
+          bubbles: true,
+          composed: true
+        }));
       }
 
       newArticle() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
+        this.dispatchEvent(new CustomEvent('klog-app-load', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            page: 'editor/'
+          }
+        }));
       }
 
       resetMarkdownPreference() {
@@ -324,7 +342,11 @@
           return;
         }
         this.userinfo.preference = this.preference;
-        this._updateUserinfo({ preference: { value: this.preference } });
+        this._updateUserinfo({
+          preference: {
+            value: this.preference
+          }
+        });
       }
 
     }
