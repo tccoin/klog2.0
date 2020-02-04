@@ -139,7 +139,7 @@
         return [].concat(text
           .replace(/@\(([\s\S]*?)\)(\[([\s\S]*?)\])?/g, '') // at
           .replace(/\[toc\]/ig, '') // toc
-          .replace(/\${1,2}([\s\S]+?)\${1,2}/g, '\\[$1\\]') // katex
+          .replace(/\${1,2}([\s\S]+?)\${1,2}/g, '\\[公式\\]') // katex
           .replace(/~{1,2}[\s\S]+~{1,2}/g, '\\[Biii\\]') // del
           .replace(/!\[(.*)\]\(.*\)/g, '\\[图片\\]') // image
           .replace(/\[<V>.*\]\(.*\)/g, '\\[视频\\]') // video
