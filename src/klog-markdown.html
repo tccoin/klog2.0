@@ -319,7 +319,7 @@
         for (let heading of headings) {
           const element = this.$.content.querySelector(`#${heading.id}`);
           if (heading.isIndependentTitle && this.hideIndependentTitle) {
-            element.style.display = 'none';
+            element.parentNode.removeChild(element);
             continue;
           }
           const numbered = this.preference.numberedHeading;

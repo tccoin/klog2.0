@@ -171,7 +171,6 @@
           this.resolve();
         };
         return resolve => {
-          this.__console = this._lazySrc + ',' + this.$.img.complete;
           this._resolve = resolve;
           this._src = this._lazySrc;
           this.$.img.style.opacity = 0;
@@ -204,9 +203,7 @@
       _addToQueue(cb) {
         const queue = window._imageLoadingQueue;
         const count = window._imageLoadingCount;
-        this.__console1 = [queue[count]];
         queue[count] = queue[count].then(() => new Promise(cb));
-        this.__console1.push(queue[count]);
         window._imageLoadingCount = (window._imageLoadingCount + 1) % (queue.length - 1);
       }
 
