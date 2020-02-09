@@ -37,15 +37,41 @@
         cursor: default;
       }
 
-      .divider {
-        margin-top: 8px;
+      iron-selector>.divider {
         margin: 8px 0;
         border-top: 1px solid var(--divider-color);
       }
 
       .subtitle {
+        display: flex;
+        align-items: center;
+        height: 24px;
         font-size: .9em;
-        padding: 16px 16px 8px;
+        padding: 16px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .subtitle>.divider {
+        width: 16px;
+      }
+
+      .label-item-container {
+        overflow: hidden;
+        transition: all .2s ease;
+      }
+
+      :host([collapsed]) .label-item-container {
+        height: 0 !important;
+      }
+
+      .subtitle.button .collapsed-icon {
+        transform: rotate(0);
+        transition: all .2s ease;
+      }
+
+      :host([collapsed]) .subtitle.button .collapsed-icon {
+        transform: rotate(90deg);
       }
 
       .title {
@@ -108,12 +134,24 @@
       }
 
       paper-dialog {
-        min-width: 300px;
+        max-width: 300px;
+        width: 100%;
       }
 
       paper-dialog .actions {
-        text-align: right;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 16px;
+        margin-top: 16px;
         color: var(--klog-theme-primary);
+      }
+
+      paper-dialog .actions paper-button {
+        margin: 0;
+        text-transform: none;
+        width: 100%;
+        justify-content: flex-start;
       }
     </style>
     <klog-data-collection id="collection" userinfo="[[userinfo]]" last-response="{{collections}}">
@@ -121,71 +159,88 @@
     <app-drawer id="drawer" swipe-open="{{!disabled}}" opened="{{opened}}">
       <div class="container" id="scrollTarget">
         <div class="title">记录未来</div>
-        <iron-selector attr-for-selected="name" selected="{{page}}" on-iron-select="close" on-click="updatePage">
+        <iron-selector attr-for-selected="name" id="selector" selected="{{page}}" on-iron-select="close"
+          on-click="updatePage">
 
           <div class="item" name="timeline">
-            <iron-icon icon="timeline"></iron-icon>时间轴
+            <iron-icon icon="timeline"></iron-icon>
+            <span>时间轴</span>
             <paper-ripple></paper-ripple>
           </div>
 
           <template is="dom-if" if="{{!isLogin}}">
             <div class="item" name="login">
-              <iron-icon icon="account_circle"></iron-icon>登录
+              <iron-icon icon="account_circle"></iron-icon>
+              <span>登录</span>
               <paper-ripple></paper-ripple>
             </div>
             <div class="item" name="signup">
-              <iron-icon icon="account_box"></iron-icon>注册
+              <iron-icon icon="account_box"></iron-icon>
+              <span>注册</span>
               <paper-ripple></paper-ripple>
             </div>
           </template>
 
           <template is="dom-if" if="{{isLogin}}">
+
+            <div class="item" name="note/all/">
+              <iron-icon icon="book"></iron-icon>
+              <span>笔记本</span>
+              <paper-ripple></paper-ripple>
+            </div>
+
             <div class="item" name="userpanel">
-              <iron-icon icon="account_circle"></iron-icon>个人设置
+              <iron-icon icon="account_circle"></iron-icon>
+              <span>个人设置</span>
               <paper-ripple></paper-ripple>
             </div>
-
-            <div class="divider"></div>
-
-            <div class="subtitle">分类</div>
-
-            <div class="item secondary" name="note/all/">
-              <iron-icon icon="book"></iron-icon>全部文章
-              <paper-ripple></paper-ripple>
-            </div>
-
-            <template is="dom-repeat" items="{{collections}}">
-              <div class="item secondary" name="note/{{item}}/">
-                <iron-icon icon="label"></iron-icon>{{item}}
-                <paper-ripple></paper-ripple>
-              </div>
-            </template>
           </template>
 
-          <div class="divider"></div>
-
-          <div class="item" name="article/about-klog-2-0">
-            <iron-icon icon="swap_vertical_circle"></iron-icon>更新日志
-            <paper-ripple></paper-ripple>
-          </div>
-
           <div class="item" on-click="about">
-            <iron-icon icon="flag"></iron-icon>版本信息
+            <iron-icon icon="console"></iron-icon>
+            <span>控制台</span>
             <paper-ripple></paper-ripple>
           </div>
+
+          <template is="dom-if" if="{{isLogin}}">
+            <div class="divider"></div>
+
+            <div class="subtitle button" on-click="toggleCollapsed">
+              <span>分类</span>
+              <div class="divider"></div>
+              <iron-icon icon="keyboard_arrow_down" class="collapsed-icon"></iron-icon>
+              <paper-ripple></paper-ripple>
+            </div>
+
+            <div class="label-item-container">
+              <template is="dom-repeat" items="{{collections}}">
+                <div class="item secondary" name="note/{{item}}/">
+                  <iron-icon icon="label"></iron-icon>
+                  <span>{{item}}</span>
+                  <paper-ripple></paper-ripple>
+                </div>
+              </template>
+            </div>
+
+          </template>
         </iron-selector>
       </div>
     </app-drawer>
 
     <paper-dialog id="aboutDialog" with-backdrop>
-      <h2>$klog -V</h2>
-      <p>v2.9.10<br>2017-2020<br>Powered by Kr with Love.</p>
+      <h2>> klog -V</h2>
+      <p>v2.9.11<br>2017-2020<br>Powered by Kr with Love.</p>
 
       <div class="actions">
-        <paper-button dialog-confirm on-click="github">git clone klog</paper-button>
+        <paper-button on-click="log">> klog log</paper-button>
+        <paper-button on-click="update">> klog update</paper-button>
+        <paper-button on-click="github">> git clone klog</paper-button>
       </div>
 
     </paper-dialog>
+
+    <paper-toast text="Klog 已是最新版本" id="noUpdateToast"></paper-toast>
+
   </template>
   <script>
     class KlogDrawer extends Polymer.Element {
@@ -203,18 +258,30 @@
           },
           opened: {
             type: Boolean
-          }
+          },
+          collapsed: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
         }
       }
 
       ready() {
         super.ready();
         this.isLogin = false;
-        document.querySelector('klog-app').addEventListener('userinfo-updated', e => this.openHandle(e.detail.isLogin));
+        document.querySelector('klog-app').addEventListener('userinfo-updated', e => {
+          this.openHandle(e.detail.isLogin);
+        });
       }
 
       openHandle(isLogin = fasle) {
-        this.$.collection.list();
+        this.$.collection.list().then(() => {
+          const container = this.$.selector.querySelector('.label-item-container');
+          container.style.height = (48 * this.collections.length + 4) + 'px';
+          if (this.collections.length >= 3 && this.mobile) {
+            this.collapsed = true;
+          }
+        });
         this.isLogin = isLogin;
       }
 
@@ -224,18 +291,44 @@
 
       updatePage() {
         setTimeout(() => {
-          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: this.page } }));
+          this.dispatchEvent(new CustomEvent('klog-app-load', {
+            bubbles: true,
+            composed: true,
+            detail: { page: this.page }
+          }));
         }, 1);
       }
 
+
       close() {
         this.$.drawer.close();
+      }
+
+      log() {
+        this.dispatchEvent(new CustomEvent('klog-app-load', {
+          bubbles: true,
+          composed: true,
+          detail: { page: 'article/about-klog-2-0' }
+        }));
       }
 
       about() {
         this.close();
         this.$.aboutDialog.open();
         this.dispatchEvent(new CustomEvent('klog-update', { bubbles: true, composed: true }));
+      }
+
+      update() {
+        const noUpdateFound = swreg => {
+          if (!swreg.installing) {
+            this.$.noUpdateToast.open();
+          }
+        };
+        this.dispatchEvent(new CustomEvent('update-service-worker', { bubbles: true, composed: true, detail: { callback: noUpdateFound } }));
+      }
+
+      toggleCollapsed() {
+        this.collapsed = !this.collapsed;
       }
 
       github() {

@@ -92,7 +92,7 @@
     <!-- User -->
     <klog-data-user id="user" userinfo="{{userinfo}}"></klog-data-user>
     <!-- Drawer -->
-    <klog-drawer id="drawer" userinfo="[[userinfo]]" page="{{page}}"></klog-drawer>
+    <klog-drawer id="drawer" userinfo="[[userinfo]]" page="{{page}}" mobile="{{mobile}}"></klog-drawer>
     <!-- Pages -->
     <iron-pages id="pages" role="main" selected="{{page}}" attr-for-selected="name" selected-attribute="visible">
       <klog-404 name="404" page="{{page}}"></klog-404>
@@ -244,19 +244,29 @@
           navigator.serviceWorker.getRegistration().then(reg => {
             if (!reg) return;
             this.swReg = reg;
-            // check for update every 10 mins
-            this.swReg.update();
-            // setTimeout(() => this.swReg.update(), 3600 * 10);
             // reload if update required
             reg.onupdatefound = () => {
-              let installing = reg.installing;
-              installing.onstatechange = () => {
-                if (installing.state == 'installed') {
-                  console.log('need reload');
+              let sw = reg.installing;
+              sw.onstatechange = () => {
+                if (sw.state == 'installed') {
+                  console.log('Update for Klog found.');
                   this.$.reloadToast.open();
+                  this._swUpdateFound = true;
                 }
               };
             };
+            // check for update every 10 mins
+            reg.update();
+          });
+          this.addEventListener('update-service-worker', (e) => {
+            if (this._swUpdateFound) {
+              this.$.reloadToast.open();
+            } else {
+              const promise = this.swReg.update();
+              if (e.detail.callback) {
+                promise.then(e.detail.callback);
+              }
+            }
           });
         }
         // listen for online/offline
