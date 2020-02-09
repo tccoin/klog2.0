@@ -47,9 +47,13 @@
         align-items: center;
         height: 24px;
         font-size: .9em;
-        padding: 16px;
+        padding: 16px 16px 8px;
         overflow: hidden;
         position: relative;
+      }
+
+      .subtitle.button {
+        padding: 16px;
       }
 
       .subtitle>.divider {
@@ -205,22 +209,24 @@
           <template is="dom-if" if="{{isLogin}}">
             <div class="divider"></div>
 
-            <div class="subtitle button" on-click="toggleCollapsed">
+            <!-- <div class="subtitle button" on-click="toggleCollapsed">
               <span>分类</span>
               <div class="divider"></div>
               <iron-icon icon="keyboard_arrow_down" class="collapsed-icon"></iron-icon>
               <paper-ripple></paper-ripple>
-            </div>
-
             <div class="label-item-container">
-              <template is="dom-repeat" items="{{collections}}">
-                <div class="item secondary" name="note/{{item}}/">
-                  <iron-icon icon="label"></iron-icon>
-                  <span>{{item}}</span>
-                  <paper-ripple></paper-ripple>
-                </div>
-              </template>
             </div>
+            </div> -->
+
+            <div class="subtitle"><span>分类</span></div>
+
+            <template is="dom-repeat" items="{{collections}}">
+              <div class="item secondary" name="note/{{item}}/">
+                <iron-icon icon="label"></iron-icon>
+                <span>{{item}}</span>
+                <paper-ripple></paper-ripple>
+              </div>
+            </template>
 
           </template>
         </iron-selector>
@@ -275,13 +281,14 @@
       }
 
       openHandle(isLogin = fasle) {
-        this.$.collection.list().then(() => {
-          const container = this.$.selector.querySelector('.label-item-container');
-          container.style.height = (48 * this.collections.length + 4) + 'px';
-          if (this.collections.length >= 3 && this.mobile) {
-            this.collapsed = true;
-          }
-        });
+        // const initCollapsedState = () => {
+        //   const container = this.$.selector.querySelector('.label-item-container');
+        //   container.style.height = (48 * this.collections.length + 4) + 'px';
+        //   if (this.collections.length >= 3 && this.mobile) {
+        //     this.collapsed = true;
+        //   }
+        // };
+        this.$.collection.list();
         this.isLogin = isLogin;
       }
 
