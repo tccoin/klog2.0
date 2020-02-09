@@ -51,9 +51,23 @@
         display: flex !important;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         background: var(--klog-page-background, #000);
-        opacity: 1;
+        opacity: 0.8;
         transition: all .5s ease;
+      }
+
+      .spinner-container .spinner-text {
+        margin-top: 8px;
+        color: var(--secondary-text-color);
+      }
+
+      .spinner-container .spinner-text a {
+        color: var(--primary-color);
+        text-decoration: none;
+        border-bottom: 1px solid currentColor;
+        margin: 0 2px;
+        cursor: pointer;
       }
 
       .spinner-container[hidden] {
@@ -86,6 +100,11 @@
     <!-- Loading -->
     <div class="spinner-container" hidden$="{{!loading}}">
       <paper-spinner active="{{loading}}"></paper-spinner>
+      <span class="spinner-text" hidden$="{{loadingTimeoutPrompt}}">加载中……</span>
+      <span class="spinner-text" hidden$="{{!loadingTimeoutPrompt}}">
+        加载比预想得慢…要试试<a on-click="back">返回</a>或者<a on-click="reload">刷新</a>么？
+      </span>
+
     </div>
     <!-- Media query -->
     <iron-media-query query="max-width: 767px" query-matches="{{mobile}}"></iron-media-query>
@@ -160,7 +179,10 @@
           gesture: {
             type: Boolean
           },
-          hny2020: {
+          gesture: {
+            type: Boolean
+          },
+          loadingTimeoutPrompt: {
             type: Boolean,
             value: false
           }
@@ -287,6 +309,10 @@
         location.reload();
       }
 
+      back() {
+        window.history.back();
+      }
+
       _routePageChanged(page) {
         /*
            app-route
@@ -340,8 +366,17 @@
           this.$.drawer.disabled = false;
           //加载
           this.loading = true;
+          //加载倒计时
+          this.loadingTimeoutPrompt = false;
+          this._loadingTimeout = setTimeout(() => {
+            console.log('Loading timeout.');
+            this.loadingTimeoutPrompt = true;
+          }, 5000);
           //加载Html并触发load
           Polymer.importHref(this.resolveUrl('klog-' + page + '.html'), () => {
+            if (this._loadingTimeout) {
+              clearTimeout(this._loadingTimeout);
+            }
             this._updateUserinfo(e => {
               let promise;
               if (!pageElement.load || !(promise = pageElement.load(this))) {
