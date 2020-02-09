@@ -208,9 +208,8 @@
         this.addEventListener('klog-app-load', (e) => {
           this._now = e.detail.now == undefined ? true : e.detail.now;
           if (e.detail.page) window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
-          if (this.swReg) this.swReg.update();
+          this.dispatchEvent(new CustomEvent('update-service-worker', { bubbles: true, composed: true }));
         });
-        this.addEventListener('klog-update', () => { if (this.swReg) this.swReg.update() });
         this.addEventListener('drawer-disable', () => this.$.drawer.disabled = true);
         this.addEventListener('user-login-page-open', (e) => {
           setTimeout(() => {
@@ -255,18 +254,19 @@
                 }
               };
             };
-            // check for update every 10 mins
+            // check now
             reg.update();
-          });
-          this.addEventListener('update-service-worker', (e) => {
-            if (this._swUpdateFound) {
-              this.$.reloadToast.open();
-            } else {
-              const promise = this.swReg.update();
-              if (e.detail.callback) {
-                promise.then(e.detail.callback);
+            // add event
+            this.addEventListener('update-service-worker', (e) => {
+              if (this._swUpdateFound) {
+                this.$.reloadToast.open();
+              } else if (this.swReg) {
+                const promise = this.swReg.update();
+                if (e.detail && e.detail.callback) {
+                  promise.then(e.detail.callback);
+                }
               }
-            }
+            });
           });
         }
         // listen for online/offline

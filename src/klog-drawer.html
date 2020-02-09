@@ -315,7 +315,6 @@
       about() {
         this.close();
         this.$.aboutDialog.open();
-        this.dispatchEvent(new CustomEvent('klog-update', { bubbles: true, composed: true }));
       }
 
       update() {
