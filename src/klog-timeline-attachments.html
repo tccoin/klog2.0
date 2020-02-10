@@ -2,7 +2,7 @@
 <dom-module id="klog-timeline-attachments">
   <template>
     <style>
-       :host {
+      :host {
         display: block;
       }
 
@@ -68,12 +68,13 @@
         background: rgba(0, 0, 0, .3);
         color: var(--dark-theme-text-color);
         user-select: none;
+        -webkit-user-select: none;
         cursor: default;
         transition: height 0.2s ease, opacity 0.15s ease;
       }
 
       .attachments-expend-button[hidden] {
-        display: flex!important;
+        display: flex !important;
         height: 0;
         opacity: 0;
       }
@@ -98,7 +99,8 @@
         </div>
       </template>
     </div>
-    <div class="attachments-expend-button" on-click="_attachmentExpendedToggle" hidden$="{{!_shouldShowAttachmentsExpendButton}}">
+    <div class="attachments-expend-button" on-click="_attachmentExpendedToggle"
+      hidden$="{{!_shouldShowAttachmentsExpendButton}}">
       <iron-icon icon="expand_more"></iron-icon>
       显示更多
       <paper-ripple></paper-ripple>

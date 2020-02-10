@@ -53,8 +53,13 @@
         justify-content: center;
         flex-direction: column;
         background: var(--klog-page-background, #000);
-        opacity: 0.8;
-        transition: all .5s ease;
+        opacity: 1;
+        transition: all .3s ease;
+      }
+
+      .spinner-container[hidden] {
+        z-index: -1;
+        opacity: 0;
       }
 
       .spinner-container .spinner-text {
@@ -68,11 +73,6 @@
         border-bottom: 1px solid currentColor;
         margin: 0 2px;
         cursor: pointer;
-      }
-
-      .spinner-container[hidden] {
-        z-index: -1;
-        opacity: 0;
       }
 
       paper-dialog {
@@ -443,7 +443,7 @@
         const statusBar = document.querySelector('#statusbarFix');
         const statusBarBackground = document.querySelector('#statusbarFixBackground');
         window.ShadyCSS && window.ShadyCSS.styleSubtree(statusBarBackground, {
-          '--klog-statusbar-opacity': theme == 'light' ? 0.8 : 0.3,
+          '--klog-statusbar-opacity': 0.8,
           '--klog-statusbar-color': theme == 'light' ? '#e0e0e0' : '#000000'
         });
         statusBar.style.backdropFilter = 'initial';

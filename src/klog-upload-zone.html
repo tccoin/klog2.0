@@ -11,6 +11,7 @@
         min-width: 208px;
         cursor: default;
         user-select: none;
+        -webkit-user-select: none;
       }
 
       input[type=file] {
@@ -67,8 +68,8 @@
         }
       }
     </style>
-    <klog-data-uploader id="uploader" uploading="{{uploading}}" bucketname="{{bucketname}}" remaining-number="{{remainingNumber}}"
-      fileinfo="{{fileinfo}}" progress="{{progress}}"></klog-data-uploader>
+    <klog-data-uploader id="uploader" uploading="{{uploading}}" bucketname="{{bucketname}}"
+      remaining-number="{{remainingNumber}}" fileinfo="{{fileinfo}}" progress="{{progress}}"></klog-data-uploader>
     <input id="input" type="file" on-change="inputChange" />
     <div id="info" class="info">
       <iron-icon icon="cloud_upload"></iron-icon>

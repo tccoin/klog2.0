@@ -19,6 +19,7 @@
       app-drawer {
         z-index: 10000;
         user-select: none;
+        -webkit-user-select: none;
         --app-drawer-width: 272px;
 
         --app-drawer-content-container: {
@@ -34,6 +35,7 @@
         -webkit-overflow-scrolling: touch;
         overscroll-behavior: contain;
         user-select: none;
+        -webkit-user-select: none;
         cursor: default;
       }
 
@@ -96,7 +98,13 @@
         font-size: 14px;
         cursor: pointer;
         user-select: none;
+        -webkit-user-select: none;
         -webkit-tap-highlight-color: transparent;
+      }
+
+      .item span {
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       .item iron-icon {
@@ -156,6 +164,7 @@
         text-transform: none;
         width: 100%;
         justify-content: flex-start;
+        outline: none;
       }
     </style>
     <klog-data-collection id="collection" userinfo="[[userinfo]]" last-response="{{collections}}">
@@ -238,6 +247,7 @@
       <p>v2.9.11<br>2017-2020<br>Powered by Kr with Love.</p>
 
       <div class="actions">
+        <paper-button on-click="help">> klog help</paper-button>
         <paper-button on-click="log">> klog log</paper-button>
         <paper-button on-click="update">> klog update</paper-button>
         <paper-button on-click="github">> git clone klog</paper-button>
@@ -309,6 +319,14 @@
 
       close() {
         this.$.drawer.close();
+      }
+
+      help() {
+        this.dispatchEvent(new CustomEvent('klog-app-load', {
+          bubbles: true,
+          composed: true,
+          detail: { page: 'article/klog-help' }
+        }));
       }
 
       log() {
