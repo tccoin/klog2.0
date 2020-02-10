@@ -1,0 +1,1 @@
+sftp -b scripts/sftp.txt klog

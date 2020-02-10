@@ -1,1 +1,1 @@
-polymer build && node build.js
+polymer build

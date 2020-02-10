@@ -18,7 +18,11 @@ function waitFor(stream) {
 }
 
 function build() {
-  return run('polymer build').exec();
+  return run('call scripts/build.bat', { verbosity: 3 }).exec();
+};
+
+function pushOTA() {
+  return run('call scripts/push_ota.bat', { verbosity: 3 }).exec();
 };
 
 function insertVariable() {
@@ -80,4 +84,5 @@ exports.build = build;
 exports.insert = insertVariable;
 exports.google = byeGoogleFont;
 exports.sw = fixServiceWorkerPath;
+exports.push = pushOTA;
 exports.default = gulp.series(build, insertVariable, byeGoogleFont);
