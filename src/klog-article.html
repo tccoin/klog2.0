@@ -8,7 +8,7 @@
 <link rel="import" href="klog-markdown.html">
 <link rel="import" href="klog-icons.html">
 <link rel="import" href="klog-data-article.html">
-<link rel="import" href="klog-data-image.html">
+<link rel="import" href="klog-image.html">
 <link rel="import" href="klog-render-timestamp.html">
 <dom-module id="klog-article">
   <template>
@@ -166,14 +166,14 @@
         :host {
           --klog-media-width: 850px;
 
-          --klog-markdown-image-container: {
+          --klog-markdown-media-container: {
             min-width: 100%;
             margin: 0 0 12px 50%;
             width: max-content;
             transform: translateX(-50%);
           }
 
-          --klog-markdown-image: {
+          --klog-markdown-media: {
             width: fit-content;
             @apply(--shadow-elevation-16dp);
           }
@@ -218,7 +218,7 @@
       </div>
       <!--author-->
       <div class="section author" theme$="{{theme}}">
-        <klog-data-image class="avatar" src="{{article.author.avatarUrl}}" avatar></klog-data-image>
+        <klog-image class="avatar" src="{{article.author.avatarUrl}}" avatar></klog-image>
         <div class="meta">
           <div class="meta-user">
             <span class="meta-name">{{article.author.displayName}}<template is="dom-if"

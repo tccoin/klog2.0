@@ -5,7 +5,7 @@
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="klog-icons.html">
 <link rel="import" href="klog-data-timeline.html">
-<link rel="import" href="klog-data-image.html">
+<link rel="import" href="klog-image.html">
 <link rel="import" href="klog-style-card.html">
 <link rel="import" href="klog-timeline-attachments.html">
 <link rel="import" href="klog-render-timestamp.html">
@@ -22,7 +22,7 @@
         color: var(--primary-text-color);
         --primary-font-size: 14px;
         --secondary-font-size: 12px;
-        --klog-image-transition-time: .2s;
+        --klog-media-transition-time: .2s;
         user-select: none;
         -webkit-user-select: none;
       }
@@ -244,8 +244,8 @@
 
         <!--meta-->
         <div class="card-meta">
-          <klog-data-image class="meta-avatar" src="{{data.author.avatarUrl}}" theme="{{theme}}" lazy fixed avatar>
-          </klog-data-image>
+          <klog-image class="meta-avatar" src="{{data.author.avatarUrl}}" theme="{{theme}}" lazy fixed avatar>
+          </klog-image>
           <div class="meta-content">
             <div class="meta-title">{{data.author.displayName}}</div>
             <template is="dom-if" if="{{data.view.gallery}}">
@@ -263,9 +263,9 @@
         </div>
 
         <!--media-->
-        <klog-data-image class="card-media" src="{{data.image.url}}" hidden$="{{!view.fullWidthMedia}}"
-          theme="{{theme}}" lazy content>
-        </klog-data-image>
+        <klog-image class="card-media" src="{{data.image.url}}" hidden$="{{!view.fullWidthMedia}}" theme="{{theme}}"
+          lazy content>
+        </klog-image>
 
         <!--title-->
         <div class="card-subtitle" hidden$="{{!data.title}}">{{data.collection}}</div>
@@ -275,9 +275,9 @@
         <div class="card-content" hidden$="{{!data.text}}">
           <p class="content-text" id="text">{{data.text}}</p>
           <template is="dom-if" if="{{view.thumbnail}}">
-            <klog-data-image class="content-thumbnail" src="{{data.image.url}}" theme="{{theme}}" lazy fixed timeline>
-            </klog-data-image>
-            </klog-data-image>
+            <klog-image class="content-thumbnail" src="{{data.image.url}}" theme="{{theme}}" lazy fixed timeline>
+            </klog-image>
+            </klog-image>
           </template>
         </div>
 
@@ -285,9 +285,9 @@
         <template is="dom-if" if="{{view.gallery}}">
           <div class="card-gallery">
             <template is="dom-repeat" items="{{gallery}}">
-              <klog-data-image class="card-gallery-item" src="{{item.url}}" theme="{{theme}}" lazy fixed gallery
+              <klog-image class="card-gallery-item" src="{{item.url}}" theme="{{theme}}" lazy fixed gallery
                 large$="{{item.large}}">
-              </klog-data-image>
+              </klog-image>
             </template>
           </div>
         </template>
@@ -485,7 +485,7 @@
 
       lazyload() {
         setTimeout(() => {
-          const images = this.$.card.querySelectorAll('klog-data-image:not([hidden])');
+          const images = this.$.card.querySelectorAll('klog-image:not([hidden])');
           for (let image of images) {
             image.lazyload();
           }

@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="klog-style-scrollbar.html">
 <link rel="import" href="klog-image.html">
+<link rel="import" href="klog-video.html">
 <link rel="import" href="klog-player-lite.html">
 <link rel="import" href="klog-style-markdown.html">
 <link rel="import" href="klog-data-user.html">
@@ -128,18 +129,22 @@
         };
 
         renderer.image = (href, title, text) => {
-          var out = '<klog-image src="' + href + '" alt="' + text + '"';
-          if (title) {
-            out += ' title="' + title + '"';
+          let mediaType = 'image';
+          if (href.match(/\.mp4$/)) {
+            mediaType = 'video';
           }
-          if (this.lazy) out += ` lazy theme="${this.theme}"`;
-          out += '></klog-image>';
+          let tip = (mediaType == 'video') ? `<span class="media-tip${text ? ' with-text' : ''}">单击以暂停，双击切换静音</span>` : '';
+          let out = `<klog-${mediaType}  content
+          src="${href}"
+          alt="${text}"
+          ${title ? ` title="${title}"` : ''}
+          ${this.lazy ? ` lazy theme="${this.theme}"` : ''}
+          ></klog-${mediaType}>`;
           if (text) {
-            out = `<div image description>${out}<div class="description">${text}</div></div>`;
+            out = `<div media description>${out}<div class="description">${text}${tip}</div></div>`;
           } else {
-            out = `<div image>${out}</div>`;
+            out = `<div media>${out}</div>`;
           }
-
           return out;
         };
 

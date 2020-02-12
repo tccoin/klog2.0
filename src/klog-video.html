@@ -1,0 +1,138 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-ripple/paper-ripple.html">
+<dom-module id="klog-video">
+  <template>
+    <style>
+      :host {
+        display: block;
+        overflow: hidden;
+        position: relative;
+      }
+
+      video {
+        display: block;
+        max-width: 100%;
+        width: var(--klog-media-override-width, auto);
+        border-radius: var(--klog-video-border-radius, 0px);
+        z-index: 1;
+      }
+
+      :host #bg {
+        opacity: 1;
+        display: block;
+        position: relative;
+        background: var(--secondary-background-color);
+        max-width: var(--klog-media-width, 100%);
+        width: var(--klog-media-override-width, auto);
+        border-radius: var(--klog-video-border-radius, 0px);
+        transition: opacity var(--klog-video-transition-time, 1s) ease;
+        z-index: 2;
+      }
+
+      paper-ripple {
+        color: var(--primary-color);
+        z-index: 3;
+      }
+
+      :host([content]) video {
+        max-width: var(--klog-media-width, 100%);
+      }
+    </style>
+    <video id="video" preload="metadata" loop muted>
+      <source src="{{_src}}" type="video/mp4">
+    </video>
+    <paper-ripple></paper-ripple>
+    <div id="bg"></div>
+  </template>
+  <script>
+    class KlogVideo extends Polymer.Element {
+
+      static get is() { return 'klog-video'; }
+
+      static get properties() {
+        return {
+          src: {
+            type: String,
+            reflectToAttribute: true
+          }
+        }
+      }
+
+      static get observers() {
+        return [
+          'srcChanged(src)'
+        ]
+      }
+
+      ready() {
+        super.ready();
+        this.addEventListener('click', () => this.clickHandle());
+        this.$.video.addEventListener('canplay', () => this.playable = true);
+        this.updatePlaceholder();
+      }
+
+      clickHandle() {
+        const video = this.$.video;
+        if (this._clicking) {
+          if (this._singleClickTimeout) {
+            clearTimeout(this._singleClickTimeout);
+          }
+          video.muted = !video.muted;
+          this._clicking = false;
+        } else {
+          this._clicking = true;
+          this._singleClickTimeout = setTimeout(() => {
+            if (video.paused) {
+              video.play();
+            } else {
+              video.pause();
+            }
+            this._clicking = false;
+          }, 300);
+        }
+      }
+
+
+
+      updatePlaceholder() {
+        let data = this._placeholderData;
+        if (!this.fixed) {
+          let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
+          let maxWidth = parseInt(mediaWidth);
+          let w, h;
+          w = mediaWidth ? maxWidth : this.offsetWidth;
+          h = w / 16 * 9;
+          this.$.bg.style.width = `${w}px`;
+          this.$.bg.style.height = `${h}px`;
+        }
+        this.$.video.style.position = 'absolute';
+      }
+
+      srcChanged(src) {
+        if (!src) return;
+        this._src = src;
+      }
+
+      lazyload() {
+        const loadHandle = () => {
+          this.$.video.play();
+          this.$.bg.style.opacity = 0;
+          this.$.bg.style.width = 0;
+          this.$.bg.style.height = 0;
+          this.$.video.style.opacity = 1;
+          this.$.video.style.position = 'relative';
+        };
+        if (this.playable) {
+          loadHandle();
+        } else {
+          new Promise(resolve => {
+            this.$.video.addEventListener('canplay', resolve);
+          }).then(loadHandle);
+        }
+      }
+
+    }
+
+    window.customElements.define(KlogVideo.is, KlogVideo);
+  </script>
+</dom-module>
