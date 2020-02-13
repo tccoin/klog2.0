@@ -10,15 +10,57 @@ const OptiPng = require('optipng');
 const stream = require('stream');
 const Vibrant = require('node-vibrant');
 
-const sendStream = (reply, filePath) => {
+const sendStream = (request, reply, filePath) => {
   let stat = fs.statSync(filePath);
+  // json type
   if (filePath.match(/.*\.json/)) {
     reply.header('content-type', 'text/plain');
-    reply.header('Access-Control-Allow-Origin', '*');
   }
-  reply.header('content-length', stat.size);
-  let stream = fs.createReadStream(filePath);
-  reply.send(stream);
+  // cross-origin
+  reply.header('Access-Control-Allow-Origin', '*');
+
+  // range
+  const rawrange = request.raw.headers.range;
+  let streamOption = {};
+  if (rawrange) {
+    let chunkSize = 2 * 1024 * 1024;//2 * 1024
+    let range = rawrange.replace(/bytes=/, "").split("-");
+
+    range[0] = range[0] ? parseInt(range[0], 10) : 0;
+    range[1] = range[1] ? parseInt(range[1], 10) : range[0] + chunkSize;
+    if (range[1] > stat.size - 1) {
+      range[1] = stat.size - 1;
+    }
+    streamOption = { start: range[0], end: range[1] };
+
+    reply.code(206);
+    reply.headers({
+      'Accept-Ranges': 'bytes',
+      'Content-Range': 'bytes ' + range[0] + '-' + range[1] + '/' + stat.size,
+      'Content-Length': range[1] - range[0] + 1,
+    });
+  } else {
+    reply.code(200);
+    reply.headers({
+      'Content-Length': stat.size,
+    });
+  }
+  // last-modified
+  const modifiedSince = request.raw.headers['if-modified-since'];
+  const statModifiedTime = stat.mtime.toUTCString();
+  reply.headers({
+    'Cache-Control': 'max-age=94608000',
+    'Last-Modified': stat.mtime.toUTCString()
+  });
+  if (modifiedSince == statModifiedTime) {
+    reply.code(304);
+    reply.send('');
+  } else {
+    // send
+    let stream = fs.createReadStream(filePath, streamOption);
+    reply.send(stream);
+  }
+
 };
 
 const sendImage = async (request, reply, filePath, query) => {
@@ -69,7 +111,7 @@ const sendImage = async (request, reply, filePath, query) => {
   if (fs.existsSync(cachePath)) {
     let size = await fs.statSync(cachePath).size;
     if (size != 0) {
-      sendStream(reply, cachePath);
+      sendStream(request, reply, cachePath);
       return;
     }
   }
@@ -125,10 +167,13 @@ const sendImage = async (request, reply, filePath, query) => {
     console.log('LOG OptiPng running...');
     sourceStream.pipe(optimizer).pipe(outputStream);
   }
-  //pipe to reply
-  reply.send(outputStream);
   // save to cache
   let cacheStream = fs.createWriteStream(cachePath);
+  let promise = new Promise(resolve => cacheStream.on('finish', resolve));
+  promise.then(() => {
+    //send
+    sendStream(request, reply, cachePath);
+  });
   outputStream.pipe(cacheStream);
 };
 
@@ -161,7 +206,7 @@ const router = function (app, opts, next) {
       if (query && isImage && hasMagic) {
         sendImage(request, reply, filePath, query);
       } else {
-        sendStream(reply, filePath);
+        sendStream(request, reply, filePath);
       }
     } else {
       reply.redirect('/#/404');
