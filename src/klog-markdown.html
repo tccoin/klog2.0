@@ -140,7 +140,7 @@
           ${title ? ` title="${title}"` : ''}
           ${this.lazy ? ` lazy theme="${this.theme}"` : ''}
           ></klog-${mediaType}>`;
-          if (text) {
+          if (text || tip) {
             out = `<div media description>${out}<div class="description">${text}${tip}</div></div>`;
           } else {
             out = `<div media>${out}</div>`;

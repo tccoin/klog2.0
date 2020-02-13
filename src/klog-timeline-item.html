@@ -272,8 +272,8 @@
         <h1 class="card-title" hidden$="{{!data.title}}">{{data.title}}</h1>
 
         <!--content-->
-        <div class="card-content" hidden$="{{!data.text}}">
-          <p class="content-text" id="text">{{data.text}}</p>
+        <div class="card-content" hidden$="{{!data._text}}">
+          <p class="content-text" id="text">{{data._text}}</p>
           <template is="dom-if" if="{{view.thumbnail}}">
             <klog-image class="content-thumbnail" src="{{data.image.url}}" theme="{{theme}}" lazy fixed timeline>
             </klog-image>
@@ -391,6 +391,8 @@
           const shortenText = text.replace(/\[图片\]/g, '').trim();
           const gallery = this.gallery;
           const actions = this.actions;
+          /*避免修改原数据*/
+          data._text = data.text;
           /* 可用性 */
           view.thumbnail = Boolean(data.image.url);
           view.fullWidthMedia = Boolean(data.image.url);
@@ -401,19 +403,19 @@
             view.fullWidthMedia = false;
             view.thumbnail = false;
             view.actions = false;
-            data.text = shortenText;
+            data._text = shortenText;
           }
           /* 显示缩略图或大图 */
           if (!view.gallery) {
             if (shortenText.length > 40) {
               view.fullWidthMedia = false;
             } else {
-              data.text = shortenText;
+              data._text = shortenText;
               view.thumbnail = false;
             }
           }
           /*更新样式*/
-          this.notifyPath('data.text');
+          this.notifyPath('data._text');
           this.notifyPath('view.actions');
           this.notifyPath('view.gallery');
           this.notifyPath('view.thumbnail');

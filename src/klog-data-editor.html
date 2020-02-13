@@ -156,16 +156,21 @@
         this.image = {};
         this.attachments = [];
         renderer.image = (href, title, text) => {
+          const isVideo = Boolean(href.match(/\.mp4$/));
           let attachment = {
-            image: true,
             url: href,
             text: this.unescape(text),
+          }
+          if (isVideo) {
+            attachment.video = true;
+          } else {
+            attachment.image = true;
           }
           if (title) {
             attachment.title = title;
           }
           this.push('attachments', attachment);
-          if (!this.image['url']) {
+          if (!this.image['url'] && !isVideo) {
             this.image = attachment;
           }
           return '';

@@ -622,6 +622,7 @@
         } else {
           const token = x => x.objectId + x.updatedAt + x.title + x.path + x.text;
           if (token(this._calculateCards(this.list)[0]) != token(this._cards[0])) {
+            console.log(token(this._calculateCards(this.list)[0]), token(this._cards[0]));
             this.updateButtonHidden = false;
           }
         }
