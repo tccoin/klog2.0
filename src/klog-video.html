@@ -14,6 +14,7 @@
         max-width: 100%;
         width: var(--klog-media-override-width, auto);
         border-radius: var(--klog-video-border-radius, 0px);
+        overflow: hidden;
         z-index: 1;
       }
 
@@ -38,7 +39,7 @@
         max-width: var(--klog-media-width, 100%);
       }
     </style>
-    <video id="video" preload="metadata" loop muted>
+    <video id="video" preload="metadata" loop muted playsinline>
       <source src="{{_src}}" type="video/mp4">
     </video>
     <paper-ripple></paper-ripple>
