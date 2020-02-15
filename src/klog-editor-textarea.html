@@ -204,7 +204,6 @@
             if (!listGrammar[4]) {
               //remove list
               e.preventDefault();
-              console.log('>', this.currentLine, '<', listGrammar[1].length, listGrammar[3].length, isOrdered ? 2 : 1);
               this.backspace(listGrammar[1].length + listGrammar[3].length + (isOrdered ? 2 : 1));
               return;
             } else if (listGrammar[4]) {

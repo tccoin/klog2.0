@@ -168,7 +168,7 @@
         </klog-pages>
       </klog-backdrop>
     </div>
-    <klog-editor-helper id="helper"></klog-editor-helper>
+    <!-- <klog-editor-helper id="helper"></klog-editor-helper> -->
     <paper-toast text="{{err}}" id="toast0"></paper-toast>
     <paper-toast text="已保存" id="toast1">
       <a on-click="back">查看</a>
@@ -253,9 +253,9 @@
           //browser
           this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
         });
-        this.$.textarea.addEventListener('klog-editor-input', (e) => {
-          this.$.helper.load(e.detail.currentLine);
-        });
+        // this.$.textarea.addEventListener('klog-editor-input', (e) => {
+        //   this.$.helper.load(e.detail.currentLine);
+        // });
         this.addEventListener('save', (e) => {
           e.stopPropagation();
           if (this.loading) return
