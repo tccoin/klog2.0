@@ -172,6 +172,10 @@
           return out;
         };
 
+        renderer.text = function (text) {
+          return '<span>' + text + '</span>';
+        }
+
         let block = {};
 
         block.toc = {
@@ -321,17 +325,23 @@
         }
 
         // update heading elements
+        const numbered = this.preference.numberedHeading;
         for (let heading of headings) {
           const element = this.$.content.querySelector(`#${heading.id}`);
           if (heading.isIndependentTitle && this.hideIndependentTitle) {
             element.parentNode.removeChild(element);
             continue;
           }
-          const numbered = this.preference.numberedHeading;
           if (numbered == 'true' || this._hasToc && numbered == 'auto') {
             let numberSpan = element.querySelector('.heading-number');
             if (numberSpan) { numberSpan.parentNode.removeChild(numberSpan) }
             element.innerHTML = `<span class="heading-number">${heading.number}</span> ${element.innerHTML}`;
+          }
+        }
+        if (numbered == 'true' || this._hasToc && numbered == 'auto') {
+          let lists = this.$.content.querySelectorAll('li>[depth]:first-child');
+          for (let list of lists) {
+            list.parentNode.classList.add('hide-number');
           }
         }
 

@@ -5,6 +5,7 @@
         display: block;
         position: relative;
         color: var(--klog-markdown-text-color);
+        --klog-markdown-line-height: 1.7;
       }
 
       .klog-article-content {
@@ -12,6 +13,7 @@
         font-size: var(--klog-markdown-font-size, 14px);
         word-break: break-word;
         min-height: calc(100% - 2 * var(--klog-markdown-padding));
+        line-height: var(--klog-markdown-line-height, 1.7);
       }
 
       .klog-article-content hr {
@@ -30,13 +32,13 @@
         margin-bottom: 0;
       }
 
-      .klog-article-content p:first-child,
-      .klog-article-content h1:first-child,
-      .klog-article-content h2:first-child,
-      .klog-article-content h3:first-child,
-      .klog-article-content h4:first-child,
-      .klog-article-content h5:first-child,
-      .klog-article-content h6:first-child {
+      .klog-article-content>p:first-child,
+      .klog-article-content>h1:first-child,
+      .klog-article-content>h2:first-child,
+      .klog-article-content>h3:first-child,
+      .klog-article-content>h4:first-child,
+      .klog-article-content>h5:first-child,
+      .klog-article-content>h6:first-child {
         margin-top: 0;
       }
 
@@ -47,7 +49,6 @@
       .klog-article-content h5,
       .klog-article-content h6 {
         color: var(--klog-markdown-title-color);
-        line-height: 2;
       }
 
       .klog-article-content h1.centered-heading,
@@ -57,7 +58,6 @@
       .klog-article-content h5.centered-heading,
       .klog-article-content h6.centered-heading {
         text-align: center;
-        line-height: 3;
       }
 
       .klog-article-content a {
@@ -174,10 +174,12 @@
         max-height: 33vh;
         padding: 16px 8px 16px 16px;
         border-radius: 5px;
+        margin-bottom: 2em;
         background: var(--klog-markdown-block-color);
       }
 
       .klog-article-content .toc-icon-container {
+        margin-top: 2em;
         position: relative;
         height: 16px;
         z-index: 10;
@@ -212,6 +214,64 @@
 
       .klog-article-content .toc li.selected:hover>span {
         text-decoration: underline;
+      }
+
+      /*list*/
+
+      .klog-article-content ul {
+        list-style-type: none;
+      }
+
+      /*custom list-style-type*/
+      .klog-article-content ol,
+      .klog-article-content ul,
+      .klog-article-content ol>li,
+      .klog-article-content ul>li {
+        position: relative;
+      }
+
+      .klog-article-content ul>li:not(.hide-number)>*:first-child:before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        position: absolute;
+        left: -12px;
+        top: calc(1em * var(--klog-markdown-line-height) / 2 - 3px);
+        background-color: var(--primary-text-color);
+        border-radius: 50%;
+      }
+
+      /*replace index if there is numbered heading*/
+      .klog-article-content li.hide-number {
+        list-style-type: none;
+      }
+
+      .klog-article-content li.hide-number>[depth] {
+        transform: translateX(-12px);
+      }
+
+      /*indent line*/
+      .klog-article-content ul>li>ul::after,
+      .klog-article-content ol>li>ul::after,
+      .klog-article-content ul>li>ol::after,
+      .klog-article-content ol>li>ol::after {
+        content: '';
+        display: inline-block;
+        width: 1px;
+        position: absolute;
+        left: -10px;
+        top: 4px;
+        bottom: 0;
+        background-color: var(--border-color);
+      }
+
+      /*subtitle style for pure-text list*/
+
+      .klog-article-content ul li>br+span,
+      .klog-article-content ol li>br+span {
+        font-size: 0.9em;
+        color: var(--secondary-text-color);
       }
 
       /*breadcrumbs*/
