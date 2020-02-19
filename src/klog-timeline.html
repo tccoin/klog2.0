@@ -509,6 +509,7 @@
       }
 
       _loadNextPage() {
+        if (!this._cards) return;
         // page control
         this._pageNumber++;
         this.cards = this._cards.slice(0, this._pageNumber * this.pageSize);

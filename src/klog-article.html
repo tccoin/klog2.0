@@ -10,10 +10,12 @@
 <link rel="import" href="klog-data-article.html">
 <link rel="import" href="klog-image.html">
 <link rel="import" href="klog-render-timestamp.html">
+<link rel="import" href="klog-style-toast.html">
 <dom-module id="klog-article">
   <template>
     <style include="klog-style-layout"></style>
     <style include="klog-style-card"></style>
+    <style include="klog-style-toast"></style>
     <style>
       :host {
         display: block;
@@ -196,7 +198,8 @@
         }
       }
     </style>
-    <app-route route="{{route}}" pattern="/:path" data="{{routeData}}"></app-route>
+    <app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{_subroute}}"></app-route>
+    <app-route route="{{_subroute}}" pattern="/:share" data="{{shareData}}"></app-route>
     <klog-data-article path="{{path}}" loading="{{loading}}" last-response="{{article}}" last-error="{{error}}"
       is-owner="{{isOwner}}" userinfo="{{userinfo}}"></klog-data-article>
     <app-header id="header" class="non-immersive" id="header" fixed short>
@@ -230,8 +233,9 @@
         </div>
       </div>
       <!--article-->
-      <klog-markdown class="section article" id="markdown" markdown="{{article.markdown}}" hide-independent-title="true"
-        theme="{{theme}}" lazy preference="{{userinfo.preference.markdown}}">
+      <klog-markdown class="section article" id="markdown" markdown="{{article.markdown}}"
+        link-prefix="article/{{path}}" hide-independent-title="true" theme="{{theme}}"
+        preference="{{userinfo.preference.markdown}}" lazy heading-actions>
       </klog-markdown>
     </div>
     <div class="footer">
@@ -240,6 +244,7 @@
         <a href="#/timeline/" class="immersive"></a>
       </span>
     </div>
+    <div id="toastContainer"></div>
   </template>
   <script>
     class KlogArticle extends Polymer.Element {
@@ -270,7 +275,7 @@
           'handleError(error)',
           'updateDocumentTitle(article.title)',
           'updateImmersiveMode(article.immersive)',
-          'enableSmoothScroll(article.title)'
+          'updateScrollerQuery(shareData.share)'
         ]
       }
 
@@ -289,7 +294,6 @@
 
       ready() {
         super.ready();
-        this.$.markdown.scrollTarget = document.scrollingElement;
         this.setAttribute('tabindex', 1);
         this.addEventListener('keydown', (e) => {
           if (e.ctrlKey == true && e.keyCode == 69) {
@@ -307,19 +311,14 @@
           } else {
             this.$.header.classList.remove('collapsed');
           }
-
-          // if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
-          //   let isLight = this.theme == 'light';
-          //   this.$.header.updateStyles({ '--klog-header-opacity': 1 - (isLight ? 0.3 : 0.2) });
-          //   this.$.header.style.backdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
-          //   this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
-          // } else {
-          // this.$.header.updateStyles({ '--klog-header-opacity': 1 });
-          // this.$.header.style.backdropFilter = 'initial';
-          // this.$.header.style.webkitBackdropFilter = 'initial';
-          // }
-
         };
+
+        /*markdown-scroller*/
+        this.$.markdown.updateScrollTarget(document.scrollingElement);
+      }
+
+      updateScrollerQuery(hash) {
+        this.$.markdown.$.scroller.updateQueryByHash(hash);
       }
 
       edit() {
@@ -345,7 +344,6 @@
           this._scrollHandler();
           this.setAttribute('loaded', true);
         }, 1);
-        this.$.markdown.render();
       }
 
       unload() {
@@ -365,10 +363,6 @@
 
       parseDate(date) {
         return Date.parse(date)
-      }
-
-      enableSmoothScroll() {
-        // document.querySelector('html').
       }
 
       updateDocumentTitle(title) {

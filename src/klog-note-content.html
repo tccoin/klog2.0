@@ -142,16 +142,9 @@
 
     <div class="main-container" id="scrollTarget">
       <div class="body">
-        <klog-markdown class="markdown" id="markdown" markdown="{{article.markdown}}" theme="{{theme}}"
-          scroll-bias="{{_getBias(mobile)}}" preference="{{userinfo.preference.markdown}}" breadcrumbs>
-          <!-- <div class="breadcrumbs" on-click="_setFilter">
-            <div class="collection" hidden$="{{!article.collection}}">{{article.collection}}</div>
-            <div class="tags" hidden$="{{_isNull(article.tags)}}">
-              <template is="dom-repeat" items="{{article.tags}}">
-                <span class="tag">{{_uppercase(item)}}</span>
-              </template>
-            </div>
-          </div> -->
+        <klog-markdown class="markdown" id="markdown" markdown="{{article.markdown}}" link-prefix="article/{{path}}"
+          theme="{{theme}}" scroll-bias="{{_getBias(mobile)}}" preference="{{userinfo.preference.markdown}}" breadcrumbs
+          heading-actions>
         </klog-markdown>
       </div>
     </div>
@@ -204,7 +197,7 @@
 
       ready() {
         super.ready();
-        this.$.markdown.scrollTarget = this.$.scrollTarget;
+        this.$.markdown.updateScrollTarget(this.$.scrollTarget);
         this.setAttribute('tabindex', 1);
         this.$.scrollTarget.addEventListener('scroll', () => {
           let y = this.$.scrollTarget.scrollTop;

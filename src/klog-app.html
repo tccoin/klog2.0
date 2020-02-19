@@ -12,6 +12,7 @@
 <link rel="import" href="klog-drawer.html">
 <link rel="import" href="klog-style.html">
 <link rel="import" href="klog-style-scrollbar.html">
+<link rel="import" href="klog-style-toast.html">
 <link rel="import" href="klog-style-dialog.html">
 <link rel="import" href="klog-timeline.html">
 <link rel="import" href="klog-article.html">
@@ -19,6 +20,7 @@
   <template>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-dialog"></style>
+    <style include="klog-style-toast"></style>
     <style>
       :host {
         display: block;
@@ -83,12 +85,6 @@
       paper-dialog .actions {
         text-align: right;
         color: var(--klog-theme-primary);
-      }
-
-      paper-toast a {
-        color: var(--paper-yellow-500);
-        float: right;
-        cursor: pointer;
       }
     </style>
     <!-- Preference -->

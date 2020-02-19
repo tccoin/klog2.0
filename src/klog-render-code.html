@@ -117,20 +117,24 @@
       ready() {
         super.ready();
         if (Prism) {
-          this.update();
+          this.placeHolderPromise = this.update();
         } else {
           console.error('Prism not found');
+          this.placeHolderPromise = Promise.resolve();
         }
       }
 
       update() {
-        this.lang = this.lang.replace(/cpp/i, 'c++').toUpperCase();
-        let highlightLang = this.lang in Prism.languages ? lang : 'clike';
-        let grammar = Prism.languages[highlightLang];
-        this.highlightCode = Prism.highlight(unescape(this.code), grammar, highlightLang) || '';
-        this.$.container.setAttribute('theme', this.theme);
-        this.$.pre.classList.add(`language-${this.lang}`);
-        this.$.code.innerHTML = this.highlightCode;
+        return new Promise(resolve => {
+          this.lang = this.lang.replace(/cpp/i, 'c++').toUpperCase();
+          let highlightLang = this.lang in Prism.languages ? lang : 'clike';
+          let grammar = Prism.languages[highlightLang];
+          this.highlightCode = Prism.highlight(unescape(this.code), grammar, highlightLang) || '';
+          this.$.container.setAttribute('theme', this.theme);
+          this.$.pre.classList.add(`language-${this.lang}`);
+          this.$.code.innerHTML = this.highlightCode;
+          setTimeout(resolve, 1);
+        });
       }
 
     }

@@ -331,6 +331,25 @@
         padding-left: 6px;
       }
 
+      /* heading actions */
+
+      .klog-article-content .heading-actions {
+        display: inline;
+        margin-left: 8px;
+      }
+
+      .klog-article-content [depth] .heading-actions .button {
+        width: 36px;
+        height: 36px;
+        line-height: 16px;
+        opacity: 0;
+        transition: opacity .1s ease;
+      }
+
+      .klog-article-content [depth]:hover .heading-actions .button {
+        opacity: 1;
+      }
+
       ::selection {
         background: var(--klog-markdown-selection-background);
       }

@@ -218,9 +218,12 @@
           this.$.bg.style.width = "1000px";
         }
         let req = new XMLHttpRequest();
-        req.addEventListener('load', () => {
-          this._placeholderData = JSON.parse(req.response);
-          this.updatePlaceholder();
+        this.placeHolderPromise = new Promise(resolve => {
+          req.addEventListener('load', () => {
+            this._placeholderData = JSON.parse(req.response);
+            this.updatePlaceholder();
+            setTimeout(resolve, 1);
+          });
         });
         req.open('get', url, true);
         req.send();

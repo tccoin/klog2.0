@@ -6,12 +6,14 @@
 <link rel="import" href="klog-style-markdown.html">
 <link rel="import" href="klog-data-user.html">
 <link rel="import" href="../static/lib/Han/han-style.html">
+<link rel="import" href="klog-markdown-scroller.html">
 <dom-module id="klog-markdown">
   <template>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-markdown"></style>
     <style include="han-style"></style>
     <klog-data-user disabled id="user"></klog-data-user>
+    <klog-markdown-scroller id="scroller" link-prefix="{{linkPrefix}}"></klog-markdown-scroller>
     <article id="article" class="klog-article-content" theme$="[[theme]]">
       <slot></slot>
       <div id="content"></div>
@@ -37,6 +39,9 @@
             reflectToAttribute: true,
             observer: 'updateTheme'
           },
+          linkPrefix: {
+            type: String
+          },
           hideIndependentTitle: {
             type: Boolean,
             value: false
@@ -52,9 +57,6 @@
           wordCount: {
             type: Number,
             notify: true
-          },
-          scrollBias: {
-            type: Number
           },
           lazy: {
             type: Boolean,
@@ -75,7 +77,29 @@
           preference: {
             type: Object
           },
+          headingActions: {
+            type: Boolean,
+            value: false
+          }
         }
+      }
+
+      ready() {
+        super.ready();
+
+        //lazy-init
+        if (this.lazy) this.lazyInit();
+
+        //renderer
+        this.initRanderer();
+
+        //scroller
+        this.$.scroller.$.markdown = this;
+      }
+
+      updateScrollTarget(scrollTarget) {
+        this.scrollTarget = scrollTarget;
+        this.$.scroller.$.target = this.scrollTarget;
       }
 
       updateTheme() {
@@ -109,24 +133,26 @@
         }
       }
 
-      ready() {
-        super.ready();
-
-        //lazy-init
-        if (this.lazy) this.lazyInit();
-
-        //render
+      initRanderer() {
         let renderer = new marked.Renderer();
 
         renderer.heading = (text, depth) => {
-          let id = 'heading' + (++this._headingId);
+          this._headingIndex += 1;
+          let id = 'heading-' + this.BKDRHash(text);
           let classList = '';
           classList += this.preference.centeredHeading == 'true' ? 'centered-heading ' : '';
           classList += this.preference.numberedHeading == 'true' ? 'numbered-heading ' : '';
           classList = classList ? `class="${classList}" ` : '';
           this._headings.push({ depth: depth, text: text, id: id });
-          return `<h${depth} ${classList} id="${id}" depth="${depth}">${text}</h${depth}>\n`;
+          let actions = '';
+          if (this.headingActions) {
+            const hash = 'id-' + id;
+            const button = `<paper-icon-button class="button" icon="link" for="${hash}" on-click="share"></paper-icon-button>`;
+            actions = `<div class="heading-actions">${button}</div>`;
+          }
+          return `<h${depth} ${classList} id="${id}" depth="${depth}">${text}${actions}</h${depth}>\n`;
         };
+
 
         renderer.image = (href, title, text) => {
           let mediaType = 'image';
@@ -250,6 +276,20 @@
           inline: inline,
           inlineText: inlineText
         };
+      }
+
+      share(e) {
+        this.$.scroller.generateLink(e.target.getAttribute('for'));
+      }
+
+      BKDRHash(str) {
+        str += '';
+        var seed = 131;  //  31 131 1313 13131 131313 etc..
+        var hash = 0, i = 0;
+        while (i < str.length) {
+          hash = parseFloat(((hash * seed) & 0xFFFFFFFF) >>> 0) + str.charCodeAt(i++);
+        }
+        return (hash & 0x7FFFFFFF);
       }
 
       initKatexRenderer() {
@@ -376,15 +416,8 @@
             let i = 0;
             while (e.currentTarget.tagName != 'LI') i++;
             let name = e.currentTarget.getAttribute('name');
-            let element = this.$.content.querySelector('#' + name);
-            if (element) {
-              let bias = this.scrollBias || 0;
-              let scrollTarget = this.scrollTarget || document.scrollingElement;
-              //html will move while scrolling
-              let htmlFix = scrollTarget.tagName == 'HTML' ? 0 : scrollTarget.getBoundingClientRect().top;
-              let y = scrollTarget.scrollTop + element.getBoundingClientRect().top - htmlFix;
-              this.scrollTarget.scrollTop = y;
-            }
+            this.$.scroller.updateQuery('#' + name);
+            this.$.scroller.scroll();
           });
         }
       }
@@ -423,10 +456,29 @@
         }
       }
 
+      _updateEvents() {
+        let triggers = this.$.content.querySelectorAll('[on-click]');
+        for (let trigger of triggers) {
+          const bindFunction = trigger.getAttribute('on-click');
+          trigger.addEventListener('click', e => { this[bindFunction](e) });
+        }
+      }
+
       _render() {
         if (!this.disabled) {
           this.render();
         }
+      }
+
+      waitPlaceholders() {
+        const promises = [];
+        const placeholders = this.$.content.querySelectorAll('klog-image,klog-render-code');
+        for (let placeholder of placeholders) {
+          promises.push(placeholder.placeHolderPromise);
+        }
+        return Promise.all(promises).then(() => new Promise(resolve => {
+          setTimeout(resolve, 1500);
+        }));
       }
 
       render() {
@@ -438,10 +490,11 @@
         this.$.content.innerHTML = '';
         this.collection = 'Daily';
         this.tags = [];
-        this._headingId = 0;
+        this._headingIndex = 0;
         this._headings = [];
         // no markdown
         if (!this.markdown) {
+          this.$.scroller.reset();
           this._updateWordCount();
           return;
         }
@@ -453,11 +506,16 @@
           //post-update
           this._updateHeadings();
           this._updateLists();
+          this._updateEvents();
           // word count
           this._updateWordCount();
           //Han
           Han(this.$.article, this.$.article).render();
           setTimeout(() => this.dispatchEvent(new CustomEvent('markdown-rendered', { bubbles: true, composed: true })), 1);
+          // scroller
+          if (this.$.scroller.query) {
+            this.waitPlaceholders().then(() => this.$.scroller.scroll());
+          }
           // lazy load image
           if (this.lazy) setTimeout(() => this.lazyObserve(), 1);
         });
