@@ -51,7 +51,7 @@
     "gulp-replace": "^1.0.0",
     "gulp-run": "^1.7.1",
     "merge-stream": "^1.0.1",
-    "vinyl": "^2.2.0",
-    "polymer-cli": "^1.6.0"
+    "polymer-cli": "^1.6.0",
+    "vinyl": "^2.2.0"
   }
 }
