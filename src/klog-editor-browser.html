@@ -103,7 +103,7 @@
     <klog-data-list id="data" last-response="{{list}}" collection="{{collection}}" userinfo="{{userinfo}}"
       loading="{{loading}}"></klog-data-list>
     <div class="actions" id="actions">
-      <paper-button on-click="reset" disabled="{{disabled}}">
+      <paper-button on-click="new" disabled="{{disabled}}">
         <iron-icon icon="add"></iron-icon>
         新建文章
       </paper-button>
@@ -174,8 +174,8 @@
         this.dispatchEvent(new CustomEvent('klog-backdrop-toggle', { bubbles: true, composed: true }));
       }
 
-      reset() {
-        this.dispatchEvent(new CustomEvent('reset', { bubbles: true, composed: true }));
+      new() {
+        this.dispatchEvent(new CustomEvent('new', { bubbles: true, composed: true }));
         this.dispatchEvent(new CustomEvent('klog-backdrop-toggle', { bubbles: true, composed: true }));
       }
 

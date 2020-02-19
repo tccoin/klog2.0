@@ -141,18 +141,18 @@
     </style>
     <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
     <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}"
-      random-Path="{{randomPath}}" display-path="{{displayPath}}" attachments="{{attachments}}" previews="{{previews}}"
-      markdown="{{markdown}}" private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}"
+      random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}"
+      private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}" error="{{err}}"
       current-line="{{currentLine}}">
     </klog-data-editor>
     <div class="layout">
       <klog-backdrop id="backdrop">
         <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}"
-          path="{{path}}" random-Path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}"
-          mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}"></klog-editor-header>
+          path="{{path}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
+        </klog-editor-header>
         <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
           <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}"
-            title="{{title}}" path="{{path}}" random-Path="{{randomPath}}" private="{{private}}"
+            title="{{title}}" path="{{path}}" random-path="{{randomPath}}" private="{{private}}"
             immersive="{{immersive}}"></klog-editor-info-form>
           <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
           <klog-editor-browser name="browser" disabled="{{loading}}" article-id="{{articleId}}"
@@ -245,6 +245,13 @@
           if (this.$.uploadzone.remainingNumber == 1) {
             this.$.backdrop.toggle();
           }
+        });
+        this.addEventListener('new', (e) => {
+          e.stopPropagation();
+          if (this.loading) return
+          this.$.data.reset(true);
+          //browser
+          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
         });
         this.addEventListener('reset', (e) => {
           e.stopPropagation();
@@ -346,17 +353,17 @@
         }
       }
 
-      reset() {
+      reset(requestNewPath) {
         this.loading = false;
         this.$.backdrop.hide();
-        this.$.data.reset();
+        this.$.data.reset(requestNewPath);
       }
 
       load() {
         document.title = '写作 - Klog';
         if (!this.userinfo.createdAt) this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
-        this.reset();
         this.articleId = this.routeData.id;
+        this.reset(!Boolean(this.articleId));
         this.$.textarea.load();
         this.dispatchEvent(new CustomEvent('editor-loaded', { bubbles: true, composed: true }));
         setTimeout(() => {
@@ -384,9 +391,12 @@
       }
 
       _errChanged() {
+        if (this._errChangedTimeout) {
+          clearTimeout(this._errChangedTimeout);
+        }
         if (this.err) {
           this.$.toast0.show();
-          setTimeout(() => this.err = null, 3000);
+          this._errChangedTimeout = setTimeout(() => this.err = null, 3000);
         }
       }
 

@@ -71,6 +71,10 @@
           quiet: {
             type: Boolean,
             value: false
+          },
+          error: {
+            type: String,
+            notify: true
           }
         }
       }
@@ -239,22 +243,53 @@
 
       _generateRandomPath() {
         this.randomPath = 'article-' + Math.floor(Math.random() * 1000000 + 100000);
-        this._pathChanged();
+        this._checkDuplicatePath(0);
       }
 
       _pathChanged() {
-        this.displayPath = this.path || this.randomPath || '';
-        var query = new AV.Query('Article');
-        query.equalTo('path', this.displayPath);
-        query.select(['path']);
-        query.find().then((results) => {
-          if (results.length == 0) return
-          if (!this.path && !this.articleId) {
-            this._generateRandomPath();
-          } else {
-            this.err = '路径不可用，请换一个( ´ー`)';
-          }
-        }, (err) => console.log(err));
+        if (this._verifyPath()) {
+          this._checkDuplicatePath();
+        }
+      }
+
+      _checkDuplicatePath(timeout = 500) {
+        let path = this.path || this.randomPath;
+        if (!path) return;
+        if (this._checkDuplicatePathTimeout) {
+          clearTimeout(this._checkDuplicatePathTimeout);
+        }
+        this._checkDuplicatePathTimeout = setTimeout(() => {
+          console.log('_checkDuplicatePath()', path);
+          this._checkDuplicatePathTimeout = false;
+          let query = new AV.Query('Article');
+          query.equalTo('path', path);
+          query.select(['path']);
+          query.find().then((results) => {
+            const pathIsDuplicate = results.length != 0;
+            if (pathIsDuplicate) {
+              let articleIsEmpty = !this.path && !this.articleId;
+              const thatIsThis = results[0].id == this.articleId;
+              if (articleIsEmpty) {
+                this._generateRandomPath();
+              } else if (!thatIsThis) {
+                this.error = '这个路径已经被使用啦，请换一个( ´ー`)';
+              }
+            }
+          }, (err) => console.log(err));
+        }, timeout);
+      }
+
+      _verifyPath() {
+        let illegal = true;
+        const illegalRe = /[^\d\w-]/g;
+        let _path = this.path || this.randomPath || '';
+        if (this.path && illegalRe.test(this.path)) {
+          this.path = this.path.replace(illegalRe, '-').replace(/-+/g, '-');
+          this.error = '这个路径不可以！( ´ー`)';
+          illegal = false;
+        }
+        this._pathIllegal = illegal;
+        return illegal;
       }
 
       _updateFileinfo(fileinfo) {
@@ -270,18 +305,18 @@
         }
         if (this.markdown) out = '\n' + out
         this.editor.$.textarea.insertLine('', out);
-        //console.log('write:', fileinfo);
       }
 
-      reset() {
-        this.articleId = '';
+      reset(requestNewPath = false) {
         this.markdown = '@(笔记)[]';
         this.title = null;
-        this._generateRandomPath();
-        this.path = null;
+        this.path = '';
         this.previews = [];
         this.attachments = [];
         this.immersive = false;
+        if (requestNewPath) {
+          this._generateRandomPath();
+        }
       }
 
       load() {
@@ -290,7 +325,7 @@
           .then(data => {
             if (!data.get('updatedAt')) {
               this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
-              this.reset();
+              this.reset(true);
               return
             }
             data = Object.assign({ private: true, immersive: false }, data.toJSON());
@@ -304,7 +339,6 @@
             this.private = data.immersive ? true : data.private;
             this.immersive = data.immersive;
             this.data = data;
-            this._pathChanged();
             return;
           });
       }
@@ -318,10 +352,13 @@
         } else {
           article = new AV.Object('Article');
         }
-        this.path = this.displayPath;
         // pointer
         let topic = AV.Object.createWithoutData('Topic', '59bcb4d3128fe158340be1b5');
         let author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
+        // path
+        if (this._pathIllegal) {
+          this.path = '';
+        }
         // set attributes
         article.set('title', this.title);
         article.set('markdown', this.markdown);
