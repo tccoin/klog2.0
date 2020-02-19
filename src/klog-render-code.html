@@ -55,7 +55,7 @@
 
       :host(.overflow-code) code {
         max-height: 80vh;
-        overflow-y: scroll;
+        overflow: auto;
       }
 
       .meta {
@@ -77,7 +77,7 @@
         cursor: default;
         position: absolute;
         top: -12px;
-        @apply(--shadow-elevation-4dp);
+        @apply(--shadow-elevation-2dp);
       }
 
       pre code:first-child {

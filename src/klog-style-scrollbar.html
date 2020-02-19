@@ -6,11 +6,16 @@
         :host::-webkit-scrollbar,
         ::-webkit-scrollbar {
           width: var(--scrollbar-width);
+          height: var(--scrollbar-width);
         }
 
         :host::-webkit-scrollbar-track,
         ::-webkit-scrollbar-track {
           background-color: transparent;
+        }
+
+        ::-webkit-scrollbar-corner {
+          display: none;
         }
 
         :host::-webkit-scrollbar-thumb,

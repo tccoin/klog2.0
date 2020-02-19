@@ -1,38 +1,29 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../static/lib/katex/katex-style.html">
 <link rel="stylesheet" href="../static/lib/katex/katex-font.min.css">
-<!-- <link rel="stylesheet" href="../static/lib/katex/katex-style.min.css"> -->
 <dom-module id="klog-render-katex">
     <template>
-    <style include="katex-style"></style>
-    <style>
-      :host {
-        display: inline;
-      }
+        <style include="katex-style"></style>
+        <style>
+            :host {
+                display: inline;
+            }
 
-      :host([block]) {
-        display: block;
-        text-align: center;
-        margin: 8px 0;
-        max-width: 100%;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 4px 0;
-      }
-
-      .formular-container {
-        font-size: 1.1em;
-      }
-
-      [block] .formular-container {
-        font-size: 1.2em;
-      }
-    </style>
-    <span id="placeholder">
-      <slot></slot>
-    </span>
-    <span id="container" class="formular-container"></span>
-  </template>
+            :host([block]) {
+                display: block;
+                text-align: center;
+                margin: 8px 0;
+                max-width: 100%;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 4px 0;
+            }
+        </style>
+        <span id="placeholder">
+            <slot></slot>
+        </span>
+        <span id="container" class="formular-container"></span>
+    </template>
     <script src="../static/lib/katex/katex.min.js"></script>
 
     <script>

@@ -159,11 +159,6 @@
         };
 
         renderer.link = function (href, title, text = '') {
-          if (/^&lt;V&gt;/.test(text)) {
-            text = text.replace(/^&lt;V&gt;/, '');
-            return `<a href="${href}">视频链接</a>`;
-            //return `<klog-player-lite src="${href}" alt="${text}"></klog-player-lite>`;
-          }
           var out = '<a href="' + href + '"';
           if (title) {
             out += ' title="' + title + '"';
@@ -338,12 +333,6 @@
             element.innerHTML = `<span class="heading-number">${heading.number}</span> ${element.innerHTML}`;
           }
         }
-        if (numbered == 'true' || this._hasToc && numbered == 'auto') {
-          let lists = this.$.content.querySelectorAll('li>[depth]:first-child');
-          for (let list of lists) {
-            list.parentNode.classList.add('hide-number');
-          }
-        }
 
         // update toc elements
         let tocs = this.$.content.querySelectorAll('.toc');
@@ -399,6 +388,41 @@
           });
         }
       }
+
+      _updateLists() {
+        // secondary-text
+        let lists = this.$.content.querySelectorAll('li');
+        for (let list of lists) {
+          let children = list.children;
+          let hasbr = false;
+          for (let child of children) {
+            if (child.tagName == 'BR') {
+              hasbr = true;
+              continue;
+            }
+            if (hasbr &&
+              (child.tagName == 'SPAN'
+                || child.tagName == 'EM'
+                || child.tagName == 'DEL'
+                || child.tagName == 'STRONG'
+                || child.tagName == 'CODE'
+                || child.tagName == 'KLOG-RENDER-KATEX' && !child.hasAttribute('block')
+              )
+            ) {
+              child.setAttribute('secondary', '');
+            }
+          }
+        }
+        // hide number
+        const numbered = this.preference.numberedHeading;
+        if (numbered == 'true' || this._hasToc && numbered == 'auto') {
+          let lists = this.$.content.querySelectorAll('li>[depth]:first-child');
+          for (let list of lists) {
+            list.parentNode.classList.add('hide-number');
+          }
+        }
+      }
+
       _render() {
         if (!this.disabled) {
           this.render();
@@ -426,8 +450,9 @@
           if (err) throw err;
           //render
           this.$.content.innerHTML = out;
-          //update headings
+          //post-update
           this._updateHeadings();
+          this._updateLists();
           // word count
           this._updateWordCount();
           //Han

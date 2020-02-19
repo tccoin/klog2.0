@@ -503,17 +503,6 @@
         this._loadNextPage();
       }
 
-      _refreshAllItems() {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            const promises = [];
-            for (let item of this.$.timelineContainer.querySelectorAll('.item'))
-              promises.push(item.refresh());
-            Promise.all(promises).then(resolve);
-          }, 1);
-        });
-      }
-
       _resetPage() {
         this._pageNumber = 0;
         this._eof = false;
@@ -653,6 +642,17 @@
             done();
           }, wait)
         }
+      }
+
+      _refreshAllItems() {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            const promises = [];
+            for (let item of this.$.timelineContainer.querySelectorAll('.item'))
+              promises.push(item.refresh());
+            Promise.all(promises).then(resolve);
+          }, 1);
+        });
       }
 
       _clearLazyState() {

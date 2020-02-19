@@ -24,7 +24,7 @@
       }
 
       .klog-article-content p {
-        margin: 0 0 1.5em;
+        margin: 0 0 1em;
         text-align: justify;
       }
 
@@ -49,6 +49,7 @@
       .klog-article-content h5,
       .klog-article-content h6 {
         color: var(--klog-markdown-title-color);
+        margin: 1em 0 0.5em;
       }
 
       .klog-article-content h1.centered-heading,
@@ -63,15 +64,19 @@
       .klog-article-content a {
         color: var(--primary-color);
         text-decoration: none;
-        border-bottom: 1px solid currentColor;
+        border-bottom: 1px solid var(--light-primary-color);
       }
 
       .klog-article-content a:visited {
         color: var(--primary-color);
       }
 
+      .klog-article-content code {
+        font-family: "Biaodian Pro Sans GB", Menlo, Consolas, Courier, "Han Heiti GB", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", monospace !important;
+      }
+
       .klog-article-content em {
-        font-family: "Biaodian Pro Serif GB", "Numeral LF Serif", Georgia, "Times New Roman", "Han Kaiti GB", cursive, serif;
+        box-shadow: 0 -0.5em 0px var(--light-primary-color) inset;
         padding: 0 2px;
         font-style: normal;
         -moz-text-emphasis: none !important;
@@ -81,7 +86,7 @@
       }
 
       .klog-article-content strong {
-        color: var(--primary-text-color);
+        color: var(--klog-markdown-title-color);
         font-weight: bold;
         font-family: inherit !important;
       }
@@ -145,7 +150,7 @@
       }
 
       .klog-article-content [media] .description {
-        color: var(--secondary-text-color);
+        color: var(--klog-markdown-secondary-text-color);
         padding: 12px 0 0;
       }
 
@@ -196,6 +201,7 @@
 
       .klog-article-content .toc li {
         list-style: none;
+        margin: 0;
       }
 
       .klog-article-content .toc>ol {
@@ -217,17 +223,27 @@
       }
 
       /*list*/
-
-      .klog-article-content ul {
-        list-style-type: none;
-      }
-
-      /*custom list-style-type*/
       .klog-article-content ol,
       .klog-article-content ul,
       .klog-article-content ol>li,
       .klog-article-content ul>li {
         position: relative;
+      }
+
+      .klog-article-content [depth]+ul,
+      .klog-article-content [depth]+ol {
+        margin-top: 1em;
+      }
+
+      .klog-article-content ol>li,
+      .klog-article-content ul>li {
+        position: relative;
+        margin: 0.5em 0;
+      }
+
+      /*custom list-style-type*/
+      .klog-article-content ul {
+        list-style-type: none;
       }
 
       .klog-article-content ul>li:not(.hide-number)>*:first-child:before {
@@ -238,7 +254,7 @@
         position: absolute;
         left: -12px;
         top: calc(1em * var(--klog-markdown-line-height) / 2 - 3px);
-        background-color: var(--primary-text-color);
+        background-color: var(--klog-markdown-text-color);
         border-radius: 50%;
       }
 
@@ -266,12 +282,18 @@
         background-color: var(--border-color);
       }
 
+      .klog-article-content ul>li>ul:hover::after,
+      .klog-article-content ol>li>ul:hover::after,
+      .klog-article-content ul>li>ol:hover::after,
+      .klog-article-content ol>li>ol:hover::after {
+        background-color: var(--primary-text-color);
+      }
+
       /*subtitle style for pure-text list*/
 
-      .klog-article-content ul li>br+span,
-      .klog-article-content ol li>br+span {
+      .klog-article-content li>[secondary] {
         font-size: 0.9em;
-        color: var(--secondary-text-color);
+        color: var(--klog-markdown-secondary-text-color);
       }
 
       /*breadcrumbs*/
@@ -296,13 +318,13 @@
       }
 
       .klog-article-content .breadcrumbs .tags {
-        color: var(--secondary-text-color);
+        color: var(--klog-markdown-secondary-text-color);
       }
 
       .klog-article-content .breadcrumbs .tags::before {
         content: '/';
         margin: 0 8px;
-        color: var(--secondary-text-color);
+        color: var(--klog-markdown-secondary-text-color);
       }
 
       .klog-article-content .breadcrumbs .collection:hover,
