@@ -7,7 +7,7 @@ const pump = require('pump-promise');
 const md5File = require('md5-file');
 var mime = require('mime-types');
 
-async function merge(bucketname, name, total) {
+async function merge(bucketname, name, total, rename) {
   let filePath = `pan/${bucketname}/${name}`;
   // merge the parts
   let writeStream = fs.createWriteStream(filePath);
@@ -30,10 +30,12 @@ async function merge(bucketname, name, total) {
   }
   writeStream.end();
   // rename by md5
-  let hash = md5File.sync(filePath);
-  let key;
-  if (name.indexOf('.') > -1) key = name.replace(/(.*\.)/, `$1${hash}.`);
-  else key = name + '.' + hash;
+  let key = name;
+  if (rename) {
+    let hash = md5File.sync(filePath);
+    if (name.indexOf('.') > -1) key = name.replace(/(.*\.)/, `$1${hash}.`);
+    else key = name + '.' + hash;
+  }
   let newPath = `pan/${bucketname}/${key}`;
   await (new Promise((resolve) => {
     fs.rename(filePath, newPath, (err) => {
@@ -69,6 +71,7 @@ module.exports = function (app, opts, next) {
     request.query.total = request.query.total || 1;
     request.query.index = request.query.index || 0;
     request.query.name = request.query.name || 'test';
+    request.query.rename = request.query.rename == 'off' ? false : true;
 
     const uploadDir = 'pan/' + request.query.bucketname;
 
@@ -89,7 +92,7 @@ module.exports = function (app, opts, next) {
       _uploadedPart++;
       if (_uploadedPart == request.query.total) {
         _uploadedPart = 0;
-        let result = await merge(request.query.bucketname, request.query.name, request.query.total);
+        let result = await merge(request.query.bucketname, request.query.name, request.query.total, request.query.addhash);
         reply.send(JSON.stringify([result]));
       } else {
         reply.send('[]');
