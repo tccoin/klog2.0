@@ -104,12 +104,12 @@
         request.upload.addEventListener('progress', (e) => {
           let progresses = this._progresses;
           let i = e.total - this.shardSize - 192;
-          if (i < 0) i = total-1;
+          if (i < 0) i = total - 1;
           progresses[i] = e.loaded / e.total;
-          this.progress = progresses.reduce((x,y)=>x+y)/progresses.length;
+          this.progress = progresses.reduce((x, y) => x + y) / progresses.length;
         });
         request.responseType = 'json';
-        request.open('POST', `${this.host}/upload?bucketname=${this.bucketname}&name=${name}&total=${total}&index=${index}`);
+        request.open('POST', `${this.host}/upload?bucketname=${this.bucketname}&rename=off&name=${name}&total=${total}&index=${index}`);
         request.send(data);
       }
 

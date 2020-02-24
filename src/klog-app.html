@@ -53,7 +53,7 @@
         display: flex !important;
         align-items: center;
         justify-content: center;
-        flex-direction: column;
+        flex-direction: row;
         background: var(--klog-page-background, #000);
         opacity: 1;
         transition: all .3s ease;
@@ -65,8 +65,11 @@
       }
 
       .spinner-container .spinner-text {
-        margin-top: 8px;
-        color: var(--secondary-text-color);
+        font-size: 1.5em;
+        margin-left: 24px;
+        color: var(--primary-color);
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       .spinner-container .spinner-text a {
@@ -96,9 +99,9 @@
     <!-- Loading -->
     <div class="spinner-container" hidden$="{{!loading}}">
       <paper-spinner active="{{loading}}"></paper-spinner>
-      <span class="spinner-text" hidden$="{{loadingTimeoutPrompt}}">加载中……</span>
+      <span class="spinner-text" hidden$="{{loadingTimeoutPrompt}}">加载中…</span>
       <span class="spinner-text" hidden$="{{!loadingTimeoutPrompt}}">
-        加载比预想得慢…要试试<a on-click="back">返回</a>或者<a on-click="reload">刷新</a>么？
+        加载比预想得慢…<br>要试试<a on-click="back">返回</a>或者<a on-click="reload">刷新</a>么？
       </span>
 
     </div>

@@ -342,6 +342,7 @@
       }
 
       _idChanged(id) {
+        this.reset(!Boolean(this.articleId));
         if (id) {
           this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' + this.articleId } }));
           this.loading = true;
@@ -363,7 +364,6 @@
         document.title = '写作 - Klog';
         if (!this.userinfo.createdAt) this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
         this.articleId = this.routeData.id;
-        this.reset(!Boolean(this.articleId));
         this.$.textarea.load();
         this.dispatchEvent(new CustomEvent('editor-loaded', { bubbles: true, composed: true }));
         setTimeout(() => {

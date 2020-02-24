@@ -44,7 +44,7 @@
           //html will move while scrolling
           const htmlFix = scrollTarget.tagName == 'HTML' ? 0 : scrollTarget.getBoundingClientRect().top;
           const y = scrollTarget.scrollTop + element.getBoundingClientRect().top - htmlFix;
-          scrollTarget.scrollTo(0, y);
+          scrollTarget.scrollTop = y;
         }
       }
 
