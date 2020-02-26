@@ -51,18 +51,15 @@
         }
       }
 
-      load(promise) {
+      load() {
         let query;
         let type;
         let author;
-        promise = promise || new Promise(() => { });
         // 列表类型
         if (this.type == 'user') {
           // 验证登录
           if ((!this.userinfo || !this.userinfo.publicinfo) && !AV._config.useMasterKey) {
-            return new Promise(resolve => {
-              setTimeout(() => resolve(this.load()), 100);
-            });
+            return new Promise(resolve => { setTimeout(resolve, 100) }).then(() => this.load());
           }
           // 用户文章列表
           type = 'Article';
@@ -100,18 +97,20 @@
         else query.descending('createdAt');
         this.loading = true;
         this.query = query;
-        return query.find().then((list) => {
-          this.loading = false;
-          let response = [];
-          for (let _item of list) {
-            let item = _item.toJSON();
-            //trim
-            item.text = item.text.trim();
-            response.push(item);
-          }
-          this._response = response;
-          this.lastResponse = this.stt ? this._updateStt(response) : response;
-          return this.lastResponse;
+        return new Promise(resolve => {
+          query.find().then((list) => {
+            this.loading = false;
+            let response = [];
+            for (let _item of list) {
+              let item = _item.toJSON();
+              //trim
+              item.text = item.text.trim();
+              response.push(item);
+            }
+            this._response = response;
+            this.lastResponse = this.stt ? this._updateStt(response) : response;
+            resolve(this.lastResponse);
+          });
         });
       }
 

@@ -15,8 +15,7 @@
       static get properties() {
         return {
           user: {
-            type: Object,
-            observer: 'updateUserinfo'
+            type: Object
           },
           userinfo: {
             type: Object,
@@ -57,133 +56,94 @@
           stt: [],
           markdown: this.defaultMarkdownPreference
         };
+        this.defaultUserinfo = { preference: this.defaultPreference };
         if (!this.disabled) {
           if (AV.User.current()) this.user = AV.User.current();
-          this.updateUserinfo();
+          this._updateUserinfo();
+        } else {
+          this.loadPromise = Promise.resolve();
         }
       }
 
-      updateUserinfo() {
+      _updateUserinfo() {
+        this.loadPromise = this.updateUserinfo();
+      }
+
+      async updateUserinfo() {
         if (!this.user) {
-          this.userinfo = { preference: this.defaultPreference };
-          return;
+          // 未登录
+          return this.userinfoUpdated(false, this.defaultUserinfo);
         }
-        this.user.fetch()
-          .then((user) => {
+        // 尝试抓取数据
+        try {
+          let user = await this.user.fetch()
+          if (!user.get('publicinfo')) {
+            // 创建用户时出错
+            let query = new AV.Query('UserPublic');
+            query.equalTo('userId', user.id);
+            query.limit(1);
+            let publicinfo = await query.find()
+            if (publicinfo.length > 0) {
+              return this.update({}, publicinfo[0]);
+            }
+          } else {
+            // 抓取公开数据
+            let publicinfo = await user.get('publicinfo').fetch();
             let userJson = user.toJSON();
-            let preference = Object.assign(this.defaultPreference, userJson.preference || {});
-            let markdownPreference = Object.assign(this.defaultMarkdownPreference, preference.markdown || {});
+            let preference = Object.assign({}, this.defaultPreference, userJson.preference || {});
+            let markdownPreference = Object.assign({}, this.defaultMarkdownPreference, preference.markdown || {});
             preference.markdown = markdownPreference;
-            let userinfo = {
+            let publicinfoJson = publicinfo.toJSON();
+            return this.userinfoUpdated(true, {
               createdAt: userJson.createdAt,
               updatedAt: userJson.updatedAt,
               emailVerified: userJson.emailVerified,
               preference: preference,
+              publicinfo: publicinfo,
+              displayName: publicinfoJson.displayName,
+              introduction: publicinfoJson.introduction,
+              avatarUrl: publicinfoJson.avatarUrl,
               klogUser: this
-            };
-            let _updatePublicInfo = (publicinfo) => {
-              let publicinfoJson = publicinfo.toJSON();
-              userinfo.publicinfo = publicinfo;
-              userinfo.displayName = publicinfoJson.displayName;
-              userinfo.introduction = publicinfoJson.introduction;
-              userinfo.avatarUrl = publicinfoJson.avatarUrl;
-              this.set('userinfo', userinfo);
-              this.dispatchEvent(new CustomEvent('userinfo-updated', { bubbles: true, composed: true, detail: { isLogin: true } }));
-            };
-            if (!user.get('publicinfo')) {
-              // 创建用户时出错
-              let query = new AV.Query('UserPublic');
-              query.equalTo('userId', user.id);
-              query.limit(1);
-              query.find().then((publicinfo) => {
-                if (publicinfo.length > 0) {
-                  this.update({}, publicinfo[0]);
-                }
-              }).catch(err => reject(err));
-            } else {
-              user.get('publicinfo').fetch().then(_updatePublicInfo);
-            }
-          })
-          .catch(err => {
-            console.log(err);
-            this.user = null;
-            this.updateUserinfo();
-          });
+            });
+          }
+        } catch (err) {
+          console.log(err);
+          return this.userinfoUpdated(false, this.defaultUserinfo);
+        }
       }
 
-      login(email, password) {
-        return this._loginByLeanCloud(email, password)
-          .then(
-            () => Promise.resolve(),
-            (err) => this._loginByWilddog(email, password)
-          )
-          .catch((err) => {
-            console.log(err);
-            return Promise.reject(err)
-          })
+      userinfoUpdated(login, userinfo) {
+        this.set('userinfo', userinfo);
+        const result = { login, userinfo, user: this };
+        this.dispatchEvent(new CustomEvent('userinfo-updated', {
+          bubbles: true,
+          composed: true,
+          detail: { result: result }
+        }));
+        return result;
       }
 
-      // Login with LeanCloud account
-      _loginByLeanCloud(email, password) {
-        return AV.User.logIn(email, password)
-          .then((user) => {
-            this.set('user', user);
-            return Promise.resolve();
-          })
-          .catch((err) => Promise.reject(err))
-      }
-
-      // Login with Wilddog account
-      _loginByWilddog(email, password) {
-        // return wilddog.auth().signInWithEmailAndPassword(email, password)
-        //   .then((wilddogUser) => { this.wilddogUser = wilddogUser; return this.signup(email, password) })
-        //   .then(() => this._updateUserInfofromWilddog(this.wilddogUser))
-        //   .then(() => this.login(email, password))
-        //   .catch((err) => Promise.reject(err))
-        return Promise.reject()
-      }
-
-      // Update account from Wilddog
-      _updateUserInfofromWilddog(wilddogUser) {
-        // return this.update({
-        //   displayName: {
-        //     value: wilddogUser.displayName,
-        //     publicRead: true
-        //   },
-        //   avatarUrl: {
-        //     value: wilddogUser.photoURL || 'https://storage.krrr.party/static/img/default_avatar.jpg',
-        //     publicRead: true
-        //   },
-        //   wilddogUid: {
-        //     value: wilddogUser.uid
-        //   },
-        // });
-        return Promise.reject()
+      async login(email, password) {
+        const user = await AV.User.logIn(email, password);
+        this.set('user', user);
+        this._updateUserinfo();
       }
 
       // Sign up
-      signup(email = this.email, password = this.password) {
-        return new Promise((resolve, reject) => {
-          let user = new AV.User();
-          user.setUsername(email);
-          user.setEmail(email);
-          user.setPassword(password);
-          user.signUp()
-            .then((user) => {
-              this.user = user;
-              return this._initUser(password);
-            })
-            .then(() => {
-              this.login(email, password);
-              resolve();
-            })
-            .catch((err) => reject(err))
-        })
+      async signup(email = this.email, password = this.password) {
+        let user = new AV.User();
+        user.setUsername(email);
+        user.setEmail(email);
+        user.setPassword(password);
+        user = await user.signUp()
+        this.user = user;
+        await this._initUser(password);
+        await this.login(email, password);
       }
 
       // User init
-      _initUser(p) {
-        return this.update({
+      async _initUser(p) {
+        await this.update({
           p: {
             value: p
           },
@@ -195,56 +155,32 @@
             value: 'https://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg',
             publicRead: true
           }
-        }
-        )
-          .catch(err => console.log(err))
-      }
-
-      // Update account
-      update(newInfo, publicinfo) {
-        publicinfo = publicinfo || this.user.get('publicinfo') || new AV.Object('UserPublic');
-        return new Promise((resolve, reject) => {
-          for (let key of Object.keys(newInfo)) {
-            let value = newInfo[key].value;
-            let publicRead = newInfo[key].publicRead || false;
-            if (publicRead) {
-              publicinfo.set(key, value);
-            } else {
-              this.user.set(key, value);
-            }
-          }
-          publicinfo.set('userId', this.user.id);
-          this.user.set('publicinfo', publicinfo);
-          this.user.save()
-            .then(() => {
-              this.updateUserinfo();
-              resolve();
-            })
-            .catch(err => reject(err));
         })
       }
 
-      // Check account
-      check() {
+      // Update account
+      async update(newInfo, publicinfo) {
+        if (!this.user) return;
+        publicinfo = publicinfo || this.user.get('publicinfo') || new AV.Object('UserPublic');
+        for (let key of Object.keys(newInfo)) {
+          let value = newInfo[key].value;
+          let publicRead = newInfo[key].publicRead || false;
+          if (publicRead) {
+            publicinfo.set(key, value);
+          } else {
+            this.user.set(key, value);
+          }
+        }
+        publicinfo.set('userId', this.user.id);
+        this.user.set('publicinfo', publicinfo);
+        await this.user.save();
+        return this._updateUserinfo();
       }
 
       logout() {
         AV.User.logOut();
         this.user = AV.User.current();
-        this.dispatchEvent(new CustomEvent('userinfo-updated', { bubbles: true, composed: true, detail: { isLogin: false } }));
-
-      }
-
-      _onLoginButtonClick() {
-        this.login(this.email, this.password).then(undefined,
-          (err) => this.result = err.code + '\n' + err.message
-        );
-      }
-
-      _onSignupButtonClick() {
-        this.signup(this.email, this.password).then(() => { },
-          (err) => this.result = err.code + '\n' + err.message
-        );
+        this.dispatchEvent(new CustomEvent('app-reload', { bubbles: true, composed: true }));
       }
 
     }

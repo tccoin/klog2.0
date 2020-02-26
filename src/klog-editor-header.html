@@ -19,6 +19,9 @@
       }
 
       app-toolbar {
+        width: 100vw;
+        position: fixed;
+        left: 0;
         color: var(--primary-text-color);
         background: transparent;
         --paper-progress-container-color: transparent;
@@ -68,6 +71,7 @@
       }
     </style>
     <app-toolbar>
+      <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden$="{{!mobile}}"></paper-icon-button>
       <paper-icon-button icon="arrow_back" on-click="back"></paper-icon-button>
       <div class="divider"></div>
       <paper-toggle-button checked="{{preview}}" mobile></paper-toggle-button>
@@ -103,6 +107,11 @@
             notify: true,
             observer: '_pathChanged'
           },
+          randomPath: {
+            type: String,
+            notify: true,
+            observer: '_pathChanged'
+          },
           backTo: {
             type: String
           },
@@ -133,7 +142,7 @@
       }
 
       back() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: this.backTo || '/', now: false } }));
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || '/', now: false } }));
       }
 
       publish() {

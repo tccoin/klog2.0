@@ -72,7 +72,7 @@
       ready() {
         super.ready();
         this.addEventListener('click', () => {
-          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: '/' } }));
+          this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '/' } }));
         });
       }
     }

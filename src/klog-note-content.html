@@ -64,7 +64,7 @@
         background: var(--primary-background-color);
         color: var(--secondary-text-color);
         @apply(--shadow-none);
-        transition: box-shadow .15s ease-out;
+        transition: all .15s ease-out;
       }
 
       app-toolbar::after {
@@ -190,7 +190,6 @@
 
       static get observers() {
         return [
-          'load(path)',
           'loaded(article.objectId)'
         ]
       }
@@ -205,11 +204,11 @@
             if (!this.mobile) {
               this.$.notetool.classList.add('raised');
             } else {
-              this.$.notetool.classList.add('collapsed');
+              this.$.notetool.setAttribute('collapsed', '');
             }
           } else {
             this.$.notetool.classList.remove('raised');
-            this.$.notetool.classList.remove('collapsed');
+            this.$.notetool.removeAttribute('collapsed');
           }
         });
         this.$.markdown.addEventListener('markdown-rendered', () => {
@@ -234,7 +233,7 @@
       }
 
       back() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' } }));
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' } }));
       }
 
       load(path) {
@@ -246,7 +245,7 @@
           this.selected = 1;
           let hash = 'note/' + this.collection + '/' + path;
           if (window.location.hash != '#/' + hash) {
-            this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: hash } }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: hash } }));
           }
         }
       }
@@ -269,7 +268,7 @@
           stt.push(this.articleId);
         }
         let klogUser = this.userinfo.klogUser;
-        let newPreference = Object.assign(this.userinfo.preference, { stt: stt });
+        let newPreference = Object.assign({}, this.userinfo.preference, { stt: stt });
         klogUser.update({ preference: { value: newPreference } }).then(() => {
           klogUser.updateUserinfo();
         });

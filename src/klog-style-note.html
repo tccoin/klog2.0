@@ -5,14 +5,21 @@
         display: block;
         background: var(--klog-page-background);
         outline: none;
-        --klog-note-list-width: 332px;
-        --klog-pages-width: 100vw;
+        overflow: hidden;
+        padding-left: var(--klog-layout-margin-left);
+        width: 100vw;
+        min-height: calc(100vh - 64px) !important;
+        box-sizing: border-box;
+        --klog-note-list-width: 300px;
+        --klog-pages-width: 100%;
         --klog-pages-height: 100vh;
         --klog-note-padding: 24px;
         --klog-markdown-padding: var(--klog-note-padding);
       }
 
       .layout {
+        width: 100%;
+        height: 100vh;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -21,7 +28,9 @@
       /*app-toolbar*/
 
       .layout .backdrop-back-toolbar {
-        width: 100vw;
+        position: fixed;
+        left: 0;
+        width: 100%;
         box-sizing: border-box;
       }
 
@@ -41,7 +50,7 @@
       /*front pages*/
 
       klog-pages.backdrop-front {
-        width: 100vw;
+        width: 100%;
         max-width: 1280px;
         height: calc(100vh - 64px);
         margin: auto;
@@ -59,6 +68,10 @@
         border-radius: 12px 0 0 0;
       }
 
+      klog-pages klog-note-content {
+        width: calc(100vw - 301px - var(--klog-layout-margin-left));
+      }
+
       /*dialog*/
 
       .share-dialog {
@@ -70,6 +83,10 @@
       @media (max-width: 767px) {
         :host {
           --klog-note-padding: 16px;
+        }
+
+        klog-pages.backdrop-front {
+          width: 100vw;
         }
 
         klog-pages.backdrop-front {
@@ -102,8 +119,6 @@
       :host([exit]) klog-pages.backdrop-back>app-toolbar {
         transform: translateY(-64px);
       }
-
-      /*animation*/
 
       .backdrop-back {
         transition: opacity .2s ease;

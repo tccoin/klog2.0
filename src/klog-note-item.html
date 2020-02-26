@@ -66,7 +66,7 @@
         super.ready();
         setTimeout(() => $clamp(this.$.text, { clamp: 2 }), 1);
         this.addEventListener('click', () => {
-          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' + this.data.path } }));
+          this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' + this.data.path } }));
         });
       }
 

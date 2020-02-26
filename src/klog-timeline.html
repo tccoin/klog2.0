@@ -20,18 +20,6 @@
         min-height: 100vh;
         overflow: hidden;
         padding: 0;
-        background: var(--klog-theme-background);
-      }
-
-      app-header {
-        transition: transform var(--refresh-animation-duration) ease !important;
-      }
-
-      app-toolbar .title {
-        flex: initial;
-        cursor: pointer;
-        pointer-events: auto;
-        -webkit-tap-highlight-color: transparent;
       }
 
       .main-container {
@@ -40,6 +28,7 @@
         box-sizing: border-box;
         overflow: hidden;
         justify-content: center;
+        transition: all .15s ease;
       }
 
       .filter-container {
@@ -64,6 +53,7 @@
 
         --paper-chip-style: {
           font-weight: bold;
+          padding: 8px 18px;
         }
       }
 
@@ -116,41 +106,7 @@
       }
 
       .timeline-container {
-        transition: all var(--refresh-animation-duration) ease-out;
-      }
-
-      /*header button transition*/
-      .reminder {
-        transition: color .5s ease, box-shadow .3s ease;
-      }
-
-      .reminder .reminder-label {
-        white-space: nowrap;
-        overflow: hidden;
-        transition: width .2s ease;
-      }
-
-      /*when header is collapsed or reminder is not active*/
-      .reminder:not([active]),
-      app-header.collapsed .reminder {
-        width: 48px;
-        height: 48px;
-        padding: 0px;
-        flex-basis: 48px;
-        flex-shrink: 0;
-        min-width: auto;
-        border-radius: 50%;
-        outline: none;
-      }
-
-      .reminder:not([active]) iron-icon,
-      app-header.collapsed .reminder iron-icon {
-        margin-right: 0;
-      }
-
-      .reminder:not([active]) .reminder-label,
-      app-header.collapsed .reminder .reminder-label {
-        width: 0px;
+        transition: all .2s ease-out;
       }
 
       /*fab*/
@@ -159,57 +115,30 @@
         color: var(--on-primary-color);
       }
 
-      /*when header is not collapsed and reminder is active*/
-      app-header:not(.collapsed) .reminder[active] {
-        color: var(--primary-color);
-      }
-
-      app-header:not(.collapsed) .reminder[active]:hover {
-        @apply(--shadow-elevation-4dp);
-      }
-
-      app-header:not(.collapsed) .reminder[active] .reminder-label {
-        width: 56px;
-      }
-
       /*animation*/
+      :host([exit]) .main-container {
+        transform: translateY(5vh);
+        opacity: 0;
+      }
 
-      :host([exit]) .timeline-container,
       :host([loading]) .timeline-container {
-        transform: translateY(30vh);
+        transform: translateY(25vh);
         opacity: 0;
       }
     </style>
     <klog-data-timeline id="data" last-response="{{list}}"></klog-data-timeline>
-    <app-header id="header" fixed short>
-      <app-toolbar>
-        <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
-        <div class="title" id="refreshButton">
-          <div main-title>Klog</div>
-          <div class="divider"></div>
-          <div page-title>时间轴</div>
-          <paper-ripple></paper-ripple>
-        </div>
-        <div class="divider"></div>
-        <paper-button class="reminder" id="reminder" on-click="add">
-          <iron-icon icon="edit"></iron-icon>
-          <span class="reminder-label">写点什么</span>
-        </paper-button>
-      </app-toolbar>
-      <paper-progress indeterminate disabled="{{!loading}}"></paper-progress>
-    </app-header>
-    <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="updateTimeline" hidden="{{updateButtonHidden}}"
+    <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}"
       extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
       <div class="filter-container item" id="filter" on-click="setFilter">
-        <paper-chip name="search" icon="search" outlined checkmark-animation-disabled>
+        <paper-chip name="search" icon="search" checkmark-animation-disabled>
           <input slot="expand-content" id="keywordInput" />
           </iron-icon>
         </paper-chip>
-        <paper-chip name="default" outlined label="全部文章"></paper-chip>
-        <paper-chip name="daily" outlined label="日常"></paper-chip>
-        <paper-chip name="note" outlined label="笔记"></paper-chip>
-        <paper-chip name="gallery" outlined label="相册"></paper-chip>
+        <paper-chip name="default" label="全部文章"></paper-chip>
+        <paper-chip name="daily" label="日常"></paper-chip>
+        <paper-chip name="note" label="笔记"></paper-chip>
+        <paper-chip name="gallery" label="相册"></paper-chip>
       </div>
       <div class="timeline-container" id="timelineContainer">
         <template is="dom-repeat" items="{{cards}}">
@@ -235,13 +164,8 @@
             value: true,
             reflectToAttribute: true
           },
-          refreshAnimationDuration: {
-            type: Number,
-            value: 200
-          },
           list: {
-            type: Array,
-            observer: 'newDataLoaded'
+            type: Array
           },
           filterName: {
             type: String,
@@ -260,6 +184,38 @@
             type: Boolean,
             value: true
           },
+          layout: {
+            type: Object,
+            value: {
+              documentTitle: '时间轴 - Klog',
+              drawer: 'auto',
+              menu: 'auto',
+              scrollToTop: false,
+              header: {
+                fixed: true,
+                short: false,
+                shadow: 'on',
+              },
+              styles: {
+                '--klog-header-background-color': 'var(--primary-background-color)',
+              },
+              toolbar: Polymer.html`
+                  <app-toolbar>
+                    <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
+                    <div class="title" on-click="refresh">
+                      <div main-title>Klog</div>
+                      <div class="divider"></div>
+                      <div page-title>时间轴</div>
+                      <paper-ripple></paper-ripple>
+                    </div>
+                    <div class="divider"></div>
+                    <paper-button on-click="add">
+                      <iron-icon icon="edit"></iron-icon>
+                      <span>写点什么</span>
+                    </paper-button>
+                  </app-toolbar>`
+            }
+          },
         }
       }
 
@@ -267,18 +223,42 @@
         this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
       }
 
+      async load(userLoadPromise) {
+        this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
+        this.$.scrollTarget.addEventListener('scroll', this._pageScrollHandler);
+        this.enableObserver();
+      }
+
+      async update(subroute) {
+        if (!this.isTimelineInit) {
+          this._scrollHandler();
+          this.$.scrollTarget.scrollTop = 0;
+          this.isTimelineInit = true;
+          await this.refresh();
+        } else {
+          const y = this._lastScrollY || 0;
+          this.$.scrollTarget.scrollTop = y;
+          this._scrollHandler();
+          await this.checkUpdate();
+          this.loading = false;
+        }
+      }
+
+      async unload() {
+        this.$.scrollTarget.removeEventListener('scroll', this._scrollHandler);
+        this.$.scrollTarget.removeEventListener('scroll', this._pageScrollHandler);
+        this.disableObserver();
+        this._lastScrollY = this.$.scrollTarget.scrollTop;
+        this.loading = true;
+        await this._timeout(new Promise(resolve => {
+          this.$.timelineContainer.addEventListener('transitionend', resolve)
+        }), 500);
+      }
+
       ready() {
         super.ready();
-        this.updateStyles({
-          '--refresh-animation-duration': this.refreshAnimationDuration + 'ms',
-        });
-        this.$.refreshButton.addEventListener('click', () => {
-          this.dispatchEvent(new CustomEvent('vibrate-start', { bubbles: true, composed: true, detail: { duration: 50 } }));
-          this.refresh();
-        });
         this._initScroller();
         this._initPageloader();
-        this.activeReminder();
 
         this.filterPreset = {
           default: {
@@ -318,7 +298,7 @@
           const cb = () => {
             if (this.filterName == 'search') {
               this.keyword = this.$.keywordInput.value;
-              this.refresh();
+              this.updateTimeline(false, true);
             }
           };
           if (this._keywordInputTimeout) {
@@ -353,65 +333,16 @@
         }
       }
 
-      load() {
-        document.title = '时间轴 - Klog';
-        window.addEventListener('scroll', this._scrollHandler);
-        window.addEventListener('scroll', this._pageScrollHandler);
-        this.enableObserver();
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            if (!this.isTimelineInit) {
-              this.scrollTo(0, 150);
-              setTimeout(() => this._clearItemsStyle(), 200);
-              this._scrollHandler();
-              this.refresh();
-              this.isTimelineInit = true;
-            } else {
-              const y = this._lastScrollY || 0;
-              this.instantScrollTo(0, y);
-              this._scrollHandler();
-              this.checkUpdate();
-            }
-            resolve();
-          }, 1);
-        });
-      }
-
-      unload() {
-        window.removeEventListener('scroll', this._scrollHandler);
-        window.removeEventListener('scroll', this._pageScrollHandler);
-        this.$.reminder.removeAttribute('active');
-        this.disableObserver();
-        this._lastScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            this.dispatchEvent(new CustomEvent('theme-update', { bubbles: true, composed: true }));
-            resolve();
-          }, this.refreshAnimationDuration + 1);
-        });
-      }
-
-      instantScrollTo(x, y) {
-        document.querySelector('html').style.scrollBehavior = 'auto';
-        window.scrollTo(x, y);
-        setTimeout(() => { document.querySelector('html').style.scrollBehavior = 'smooth' }, 1);
-      }
-
-      activeReminder() {
-        setTimeout(() => {
-          this.$.reminder.setAttribute('active', true);
-        }, 5000);
-      }
-
       _initScroller() {
         this._scrollHandler = e => {
-          let y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+          if (!this.$.scrollTarget) return;
+          let y = this.$.scrollTarget.scrollTop;
           this.updateButtonExtended = y == 0 || !this.mobile;
           // filter animation
           if (y > 16) {
             let progress = Math.max(0, Math.min(1, (y - 16) / 30));
             this.$.filter.style.transform = `scale(${1 - progress * 0.05})`;
-            if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
+            if (this.preference && this.preference.backdropBlurEnabled) {
               this.$.filter.style.opacity = 1;
             } else {
               this.$.filter.style.opacity = 1 - progress;
@@ -422,26 +353,26 @@
             this.$.filter.style.opacity = 1;
           }
           // blur
-          if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
-            const statusBar = document.querySelector('#statusbarFix');
-            const statusBarBackground = document.querySelector('#statusbarFixBackground');
-            const color = this.$.header.getComputedStyleValue("--klog-header-background-color") || this.$.header.getComputedStyleValue("--primary-background-color");
-            let progress = Math.max(0, Math.min(1, y / 66));
-            let isLight = this.theme == 'light';
-            this.$.header.updateStyles({ '--klog-header-opacity': 1 - progress * (isLight ? 0.3 : 0.2) });
-            this.$.header.style.backdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
-            this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
-            window.ShadyCSS && window.ShadyCSS.styleSubtree(statusBarBackground, {
-              '--klog-statusbar-opacity': 1 - progress * (isLight ? 0.1 : 0.05),
-              '--klog-statusbar-color': color
-            });
-            statusBar.style.backdropFilter = `saturate(180%) blur(${(isLight ? 15 : 20)}px)`;
-            statusBar.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 15 : 20)}px)`;
-          } else {
-            this.$.header.updateStyles({ '--klog-header-opacity': 1 });
-            this.$.header.style.backdropFilter = 'initial';
-            this.$.header.style.webkitBackdropFilter = 'initial';
-          }
+          // if (this.preference && this.preference.backdropBlurEnabled) {
+          //   const statusBar = document.querySelector('#statusbarFix');
+          //   const statusBarBackground = document.querySelector('#statusbarFixBackground');
+          //   const color = this.$.header.getComputedStyleValue("--klog-header-background-color") || this.$.header.getComputedStyleValue("--primary-background-color");
+          //   let progress = Math.max(0, Math.min(1, y / 66));
+          //   let isLight = this.theme == 'light';
+          //   this.$.header.updateStyles({ '--klog-header-opacity': 1 - progress * (isLight ? 0.3 : 0.2) });
+          //   this.$.header.style.backdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
+          //   this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 10 : 15)}px)`;
+          //   window.ShadyCSS && window.ShadyCSS.styleSubtree(statusBarBackground, {
+          //     '--klog-statusbar-opacity': 1 - progress * (isLight ? 0.1 : 0.05),
+          //     '--klog-statusbar-color': color
+          //   });
+          //   statusBar.style.backdropFilter = `saturate(180%) blur(${(isLight ? 15 : 20)}px)`;
+          //   statusBar.style.webkitBackdropFilter = `saturate(180%) blur(${(isLight ? 15 : 20)}px)`;
+          // } else {
+          //   this.$.header.updateStyles({ '--klog-header-opacity': 1 });
+          //   this.$.header.style.backdropFilter = 'initial';
+          //   this.$.header.style.webkitBackdropFilter = 'initial';
+          // }
           // update intersecting animation
           let intersectinglist = this.$.container.querySelectorAll('klog-timeline-item[intersecting]');
           for (let target of intersectinglist) {
@@ -449,7 +380,7 @@
             let progress1 = Math.max(0, Math.min(1, (margin - 64) / 64));
             let progress2 = Math.max(0, Math.min(1, (margin - 64) / (64 + target.offsetHeight)));
             target.style.transform = `scale(${0.9 + progress2 * 0.1})`;
-            if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
+            if (this.preference && this.preference.backdropBlurEnabled) {
               target.style.opacity = 1;
             } else {
               target.style.opacity = progress1;
@@ -463,6 +394,45 @@
             }
           }
         };
+      }
+
+      setFilter(e) {
+        if (e.target.tagName == 'PAPER-CHIP') {
+          const filterName = e.target.getAttribute('name');
+          this.view = this.filterPreset[filterName].view || 'default';
+          if (filterName == 'search') {
+            this.$.keywordInput.focus();
+            this.keyword = this.$.keywordInput.value;
+          } else {
+            this.keyword = this.filterPreset[filterName].keyword || '';
+          }
+          this.updateTimeline(false, true);
+          this.updateView();
+          this.filterName = filterName;
+        }
+      }
+
+      updateView(e) {
+        this.pageSize = this.viewPreset[this.view].pageSize;
+      }
+
+      _filterNameUpdate(filterName, oldFilterName) {
+        let activeChip, oldActiveChip;
+        activeChip = filterName ? this.$.filter.querySelector(`[name=${filterName}]`) : this.$.defaultFilter;
+        if (oldFilterName) {
+          oldActiveChip = this.$.filter.querySelector(`[name=${oldFilterName}]`);
+        } else {
+          oldActiveChip = this.$.defaultFilter;
+        }
+        if (!filterName) {
+          if (this.$.defaultFilter.active) return
+          oldActiveChip.active = false;
+          this.$.defaultFilter.active = true;
+        } else {
+          if (oldActiveChip)
+            oldActiveChip.active = false;
+          activeChip.active = true;
+        }
       }
 
       enableObserver() {
@@ -488,7 +458,7 @@
         this.pageSize = 20;
         this._resetPage();
         this._pageScrollHandler = e => {
-          let y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+          let y = this.$.scrollTarget.scrollTop;
           let wh = window.innerHeight; // container height
           let eh = this.scrollHeight;  // element height
           if (y + wh * 1.4 >= eh) {
@@ -551,45 +521,6 @@
         return cards;
       }
 
-      setFilter(e) {
-        if (e.target.tagName == 'PAPER-CHIP') {
-          const filterName = e.target.getAttribute('name');
-          this.view = this.filterPreset[filterName].view || 'default';
-          if (filterName == 'search') {
-            this.$.keywordInput.focus();
-            this.keyword = this.$.keywordInput.value;
-          } else {
-            this.keyword = this.filterPreset[filterName].keyword || '';
-          }
-          this.updateTimeline();
-          this.updateView();
-          this.filterName = filterName;
-        }
-      }
-
-      updateView(e) {
-        this.pageSize = this.viewPreset[this.view].pageSize;
-      }
-
-      _filterNameUpdate(filterName, oldFilterName) {
-        let activeChip, oldActiveChip;
-        activeChip = filterName ? this.$.filter.querySelector(`[name=${filterName}]`) : this.$.defaultFilter;
-        if (oldFilterName) {
-          oldActiveChip = this.$.filter.querySelector(`[name=${oldFilterName}]`);
-        } else {
-          oldActiveChip = this.$.defaultFilter;
-        }
-        if (!filterName) {
-          if (this.$.defaultFilter.active) return
-          oldActiveChip.active = false;
-          this.$.defaultFilter.active = true;
-        } else {
-          if (oldActiveChip)
-            oldActiveChip.active = false;
-          activeChip.active = true;
-        }
-      }
-
       add() {
         this.dispatchEvent(new CustomEvent('editor-open', {
           bubbles: true, composed: true, detail: {
@@ -603,57 +534,71 @@
       }
 
       checkUpdate() {
-        this.$.data.load();
+        return this.updateTimeline(true);
       }
 
-      newDataLoaded() {
-        if (this.updateRequired) {
-          this.refreshed();
+      refresh() {
+        this.dispatchEvent(new CustomEvent('vibrate-start', { bubbles: true, composed: true, detail: { duration: 50 } }));
+        this.$.scrollTarget.scrollTop = 0;
+        return this.updateTimeline(false);
+      }
+
+      async updateTimeline(background = true, offline = false) {
+        if (!background) {
+          let promises = [];
+          if (!this.loading) {
+            this.loading = true;
+
+            promises.push(this._timeout(new Promise(resolve => {
+              this.$.timelineContainer.addEventListener('transitionend', resolve)
+            }), 500));
+          }
+          if (!offline) {
+            promises.push(this.$.data.load());
+          }
+          await Promise.all(promises);
+          this.timelineUpdated(false);
         } else {
+          await this.$.data.load();
           const token = x => x.objectId + x.updatedAt + x.title + x.path + x.text;
           if (token(this._calculateCards(this.list)[0]) != token(this._cards[0])) {
-            console.log(token(this._calculateCards(this.list)[0]), token(this._cards[0]));
             this.updateButtonHidden = false;
           }
         }
       }
 
-      updateTimeline() {
+      async timelineUpdated(background = true) {
         // 数据加载完成,更新UI
         window._imageLoadingQueue = undefined;
         this.scrollTo(0, 150);
-        const done = () => {
-          Promise.resolve(this._clearLazyState())
-            .then(() => this._loadNewPage(this.list))
-            .then(() => this._refreshAllItems())
-            .then(() => this._scrollHandler())
-            .then(() => {
-              this.loading = false;
-              setTimeout(() => this._clearItemsStyle(), 1);
-            });
-        };
-        if (this.updateRequired) {
-          this.updateRequired = false;
-          done();
-        } else {
+        if (background) {
           this.loading = true;
-          let wait = this.refreshAnimationDuration + 100;
           this.updateButtonHidden = true;
-          setTimeout(() => {
-            done();
-          }, wait)
+          await this._timeout(new Promise(resolve => { this.$.timelineContainer.addEventListener('transitionend', resolve) }), 500);
         }
+        await this._clearLazyState()
+        await this._loadNewPage(this.list)
+        await new Promise(resolve => setTimeout(resolve, 1));
+        await this._refreshAllItems()
+        await this._scrollHandler()
+        await this._clearLazyState()
+        this.loading = false;
+        await new Promise(resolve => setTimeout(resolve, 1));
+        await this._clearItemsStyle()
+      }
+
+      _timeout(promise, timeout) {
+        return Promise.race([
+          promise,
+          new Promise(resolve => { setTimeout(resolve, timeout) })
+        ]);
       }
 
       _refreshAllItems() {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            const promises = [];
-            for (let item of this.$.timelineContainer.querySelectorAll('.item'))
-              promises.push(item.refresh());
-            Promise.all(promises).then(resolve);
-          }, 1);
-        });
+        const promises = [];
+        for (let item of this.$.timelineContainer.querySelectorAll('.item'))
+          promises.push(item.refresh());
+        return Promise.all(promises);
       }
 
       _clearLazyState() {
@@ -668,58 +613,6 @@
         for (let element of elements) {
           element.removeAttribute('style');
         }
-      }
-
-      refresh() {
-        this._refreshTimestamp = new Date().getTime();
-        this.loading = true;
-        this.$.data.load();
-        this.updateRequired = true;
-      }
-
-      refreshed() {
-        let loadingTime = new Date().getTime() - this._refreshTimestamp;
-        let wait = this.refreshAnimationDuration;
-        let duration = this.refreshAnimationDuration + wait;
-        let delay = loadingTime >= duration ? 1 : duration - loadingTime;
-        if (this._timer) clearTimeout(this._timer);
-        this._timer = setTimeout(() => {
-          this.updateTimeline();
-        }, delay);
-      }
-
-      scrollTo(destination, duration = 200, easing = 'linear') {
-        const easings = {
-          linear(t) { return t },
-          easeInQuad(t) { return t * t },
-          easeOutQuad(t) { return t * (2 - t) },
-          easeInOutQuad(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t },
-        };
-        const start = window.pageYOffset;
-        const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
-        const documentHeight = Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
-        const windowHeight = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
-        const destinationOffset = typeof destination === 'number' ? destination : destination.offsetTop;
-        const destinationOffsetToScroll = Math.round(documentHeight - destinationOffset < windowHeight ? documentHeight - windowHeight : destinationOffset);
-        if ('requestAnimationFrame' in window === false) {
-          window.scroll(0, destinationOffsetToScroll);
-          return;
-        }
-        document.querySelector('html').style.scrollBehavior = 'auto';
-        this._stopScroll = false;
-        const scroll = () => {
-          const now = 'now' in window.performance ? performance.now() : new Date().getTime();
-          const time = Math.min(1, ((now - startTime) / duration));
-          const timeFunction = easings[easing](time);
-          window.scroll(0, Math.ceil((timeFunction * (destinationOffsetToScroll - start)) + start));
-          if (window.pageYOffset === destinationOffsetToScroll || this._stopScroll) {
-            this._stopScroll = false;
-            document.querySelector('html').style.scrollBehavior = 'smooth';
-            return;
-          }
-          requestAnimationFrame(scroll);
-        };
-        scroll();
       }
 
     }

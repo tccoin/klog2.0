@@ -45,53 +45,7 @@
       load() {
         this.$.list.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'date', 'attachments', 'collection', 'tags'];
         this.$.list.include = ['author', 'topic'];
-        this.$.list.load();
-      }
-
-      loadFakeData() {
-        this.lastResponse = [];
-        for (let i = 0; i < 10; i++) {
-          let author1 = {
-            displayName: 'Tccoin',
-            avatarUrl: 'https://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg'
-          };
-          let author2 = {
-            displayName: 'Tccoin',
-            avatarUrl: 'https://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg'
-          };
-          let markdown = '# hello, world \n\r' + '烫'.repeat(200);
-          let timelineItem = {
-            title: 'hello, world',
-            author: author1,
-            text: '烫'.repeat(500),
-            markdown: markdown,
-            createTime: `8月${20 - i}日`,
-            type: 'article',
-            topic: '日常',
-            attachments: [{
-              image: true,
-              url: 'http://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg',
-              text: '用户头像',
-            },
-            {
-              image: true,
-              url: 'http://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg',
-              text: '用户头像',
-            },
-            {
-              file: true,
-              url: 'http://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg',
-              text: '用户头像',
-            }
-            ],
-            comment: [{
-              author: author2,
-              content: 'ﾟ ∀ﾟ)ノ',
-            }]
-          };
-          //new Date(new Date().getTime() - 3600000 * 24 * i)
-          this.push('lastResponse', timelineItem);
-        }
+        return this.$.list.load();
       }
 
     }

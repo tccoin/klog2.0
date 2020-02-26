@@ -9,42 +9,17 @@
 <link rel="import" href="klog-icons.html">
 <link rel="import" href="klog-data-article.html">
 <link rel="import" href="klog-image.html">
+<link rel="import" href="klog-fab.html">
 <link rel="import" href="klog-render-timestamp.html">
-<link rel="import" href="klog-style-toast.html">
 <dom-module id="klog-article">
   <template>
     <style include="klog-style-layout"></style>
     <style include="klog-style-card"></style>
-    <style include="klog-style-toast"></style>
     <style>
       :host {
         display: block;
         min-height: 100vh;
-        background-color: var(--klog-article-theme-color);
         outline: none;
-        opacity: 0;
-        transition: opacity .1s ease, transform .1s ease-out;
-      }
-
-      :host([loaded]) {
-        opacity: 1;
-        transform: none;
-      }
-
-      app-header {
-        --klog-header-background-color: var(--klog-article-theme-color);
-        --klog-header-text-color: var(--secondary-text-color);
-        --klog-header-short-width: 80px;
-        @apply --shadow-none;
-      }
-
-      .content {
-        transition: opacity .5s ease;
-      }
-
-      :host([loading]) .content,
-      :host([loading]) .footer {
-        opacity: 0;
       }
 
       .section,
@@ -52,6 +27,16 @@
         max-width: 720px;
         margin: auto;
         box-sizing: border-box;
+      }
+
+      .content,
+      .footer {
+        transition: opacity .3s ease, transform .2s ease-out;
+      }
+
+      :host([loading]) .content,
+      :host([loading]) .footer {
+        opacity: 0;
       }
 
       klog-markdown {
@@ -200,21 +185,12 @@
     </style>
     <app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{_subroute}}"></app-route>
     <app-route route="{{_subroute}}" pattern="/:share" data="{{shareData}}"></app-route>
-    <klog-data-article path="{{path}}" loading="{{loading}}" last-response="{{article}}" last-error="{{error}}"
-      is-owner="{{isOwner}}" userinfo="{{userinfo}}"></klog-data-article>
-    <app-header id="header" class="non-immersive" id="header" fixed short>
-      <app-toolbar>
-        <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
-        <div class="title">
-          <div>{{article.title}}</div>
-        </div>
-        <!-- <paper-icon-button icon="edit" on-click="edit" hidden$="{{!isOwner}}"></paper-icon-button> -->
-      </app-toolbar>
-      <paper-progress indeterminate disabled="{{!loading}}"></paper-progress>
-    </app-header>
+    <klog-data-article id="data" path="{{path}}" last-response="{{article}}" last-error="{{error}}"
+      is-owner="{{isOwner}}">
+    </klog-data-article>
     <klog-fab icon="edit" id="fab" class="edit-fab" label="编辑" on-click="edit" hidden="{{!isOwner}}"
       extended="{{fabExtended}}"></klog-fab>
-    <div class="content">
+    <div class="content" id="content">
       <!--immersive title-->
       <div class="section immersive-title immersive">
         <h1>{{article.title}}</h1>
@@ -259,21 +235,46 @@
           },
           loading: {
             type: Boolean,
-            notify: true,
+            value: true,
             reflectToAttribute: true,
           },
           immersive: {
             type: Boolean,
             reflectToAttribute: true,
+          },
+          layout: {
+            type: Object,
+            value: {
+              documentTitle: '文章 - Klog',
+              drawer: 'on',
+              menu: 'off',
+              header: {
+                fixed: true,
+                short: true,
+                shadow: 'scroll'
+              },
+              styles: {
+                '--klog-layout-background': 'var(--klog-article-theme-color)',
+                '--klog-header-background-color': 'var(--klog-article-theme-color)',
+              },
+              toolbar: Polymer.html`
+                <app-toolbar>
+                  <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
+                  <div class="title">
+                    <div name="page-title"></div>
+                  </div>
+                </app-toolbar>`
+            }
           }
         }
       }
 
       static get observers() {
         return [
-          'loadArticle(routeData.path)',
           'handleError(error)',
-          'updateDocumentTitle(article.title)',
+          'loadArticle(routeData.path)',
+          'updateTitle(article.title)',
+          'articleloaded(article.title)',
           'updateImmersiveMode(article.immersive)',
           'updateScrollerQuery(shareData.share)'
         ]
@@ -283,7 +284,7 @@
         if (!this.backTo) {
           this.backTo = 'timeline';
         }
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: this.backTo, now: false } }));
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo, now: false } }));
       }
 
       loadArticle(path) {
@@ -304,17 +305,48 @@
         });
 
         this._scrollHandler = () => {
-          let y = document.scrollingElement.scrollTop;
+          let y = this.$.scrollTarget.scrollTop;
           this.fabExtended = y < 48 && !this.mobile;
-          if (y > 0) {
-            this.$.header.classList.add('collapsed');
-          } else {
-            this.$.header.classList.remove('collapsed');
-          }
         };
+      }
 
-        /*markdown-scroller*/
-        this.$.markdown.updateScrollTarget(document.scrollingElement);
+      async load(userLoadPromise) {
+        this.$.markdown.updateScrollTarget(this.$.scrollTarget);
+        this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
+        this.loading = true;
+        userLoadPromise.then(result => {
+          this.$.data.userinfo = result.userinfo;
+          this.userinfo = result.userinfo;
+        });
+      }
+
+      articleloaded() {
+        if (this.article && this.article.title) {
+          this.loading = false;
+        }
+      }
+
+      async update(subroute) {
+        this._scrollHandler();
+        this.route = subroute;
+      }
+
+      async unload() {
+        this.$.scrollTarget.removeEventListener('scroll', this._scrollHandler);
+        this.loading = true;
+        await this._timeout(new Promise(resolve => { this.$.content.addEventListener('transitionend', resolve) }), 500);
+        this.path = '';
+        this.isOwner = false;
+        this.article = {
+          markdown: ''
+        };
+      }
+
+      _timeout(promise, timeout) {
+        return Promise.race([
+          promise,
+          new Promise(resolve => { setTimeout(resolve, timeout) })
+        ]);
       }
 
       updateScrollerQuery(hash) {
@@ -331,43 +363,23 @@
       }
 
       handleError() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
-      }
-
-      load() {
-        const html = document.querySelector('html');
-        html.style.scrollBehavior = 'initial';
-        html.scrollTop = 0;
-        html.style.scrollBehavior = 'smooth';
-        window.addEventListener('scroll', this._scrollHandler);
-        setTimeout(() => {
-          this._scrollHandler();
-          this.setAttribute('loaded', true);
-        }, 1);
-      }
-
-      unload() {
-        window.removeEventListener('scroll', this._scrollHandler);
-        this.removeAttribute('loaded');
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            this.path = '';
-            this.isOwner = false;
-            this.article = {
-              markdown: ''
-            };
-            resolve();
-          }, 301);
-        });
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
       }
 
       parseDate(date) {
         return Date.parse(date)
       }
 
-      updateDocumentTitle(title) {
+      updateTitle(title) {
         if (!title) return
-        document.title = title + ' - Klog';
+        this.dispatchEvent(new CustomEvent('layout-update', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            documentTitle: title + ' - Klog'
+          }
+        }));
+        this.$.header.querySelector('[name=page-title]').innerText = title;
       }
 
       updateImmersiveMode(immersive) {

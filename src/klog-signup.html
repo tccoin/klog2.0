@@ -15,11 +15,6 @@
   <template>
     <style include="klog-style-login"></style>
     <style include="klog-style-dialog"></style>
-    <app-header fixed>
-      <app-toolbar>
-        <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
-      </app-toolbar>
-    </app-header>
     <paper-dialog id="dialog" with-backdrop>
       <h2>注册之前…</h2>
       <p>
@@ -77,6 +72,30 @@
             value: 'welcome',
             observer: '_titleChanged'
           },
+          layout: {
+            type: Object,
+            value: {
+              documentTitle: '注册 - Klog',
+              drawer: 'auto',
+              menu: 'auto',
+              scrollToTop: false,
+              header: {
+                fixed: true,
+                short: false,
+                shadow: 'off',
+              },
+              styles: {
+                '--klog-layout-background': 'var(--primary-background-color)',
+              },
+              toolbar: Polymer.html`
+                  <app-toolbar>
+                    <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
+                    <div class="title">
+                      <div main-title>Klog</div>
+                    </div>
+                  </app-toolbar>`
+            }
+          },
         }
       }
 
@@ -94,12 +113,14 @@
         });
       }
 
-      load(app) {
-        document.title = '注册 - Klog';
+
+      load(userLoadPromise) {
         this.title = 'welcome';
-        this.user = app.$.user;
+        userLoadPromise.then(result => {
+          this.user = result.user;
+        });
         this.continue = this.continue || '#/timeline';
-        this.$.dialog.open();
+        setTimeout(() => this.$.dialog.open(), 500);
       }
 
       signup() {
@@ -107,7 +128,7 @@
         this.user.signup(this.email, this.password).then(() => {
           this.title = 'success';
           setTimeout(() => {
-            this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
           }, 1500);
         }, err => {
           window.err = err;

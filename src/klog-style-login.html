@@ -7,7 +7,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--primary-background-color);
+        padding-left: 0 !important;
       }
 
       app-header {
@@ -24,6 +24,7 @@
         margin: auto;
         padding: 0 24px;
         box-sizing: border-box;
+        transition: all .3s ease;
       }
 
       .titles {
@@ -76,6 +77,10 @@
 
       paper-dialog paper-button[primary] {
         color: var(--primary-color);
+      }
+
+      :host([exit]) .login-card {
+        opacity: 0;
       }
     </style>
   </template>

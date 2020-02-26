@@ -259,7 +259,6 @@
           clearTimeout(this._checkDuplicatePathTimeout);
         }
         this._checkDuplicatePathTimeout = setTimeout(() => {
-          console.log('_checkDuplicatePath()', path);
           this._checkDuplicatePathTimeout = false;
           let query = new AV.Query('Article');
           query.equalTo('path', path);
@@ -324,13 +323,13 @@
         return article.fetch()
           .then(data => {
             if (!data.get('updatedAt')) {
-              this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
+              this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
               this.reset(true);
               return
             }
             data = Object.assign({ private: true, immersive: false }, data.toJSON());
             if (data.author.objectId != this.userinfo.publicinfo.id && !AV._config.useMasterKey) {
-              this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
+              this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
               return;
             }
             this.markdown = data.markdown;
@@ -386,7 +385,7 @@
 
       delete() {
         let article = AV.Object.createWithoutData('Article', this.articleId);
-        return article.destroy()
+        return article.destroy();
       }
 
     }

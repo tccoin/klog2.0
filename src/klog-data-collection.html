@@ -10,7 +10,25 @@
           lastResponse: {
             type: Array,
             notify: true
+          },
+          userinfo: {
+            type: Object
+          },
+          login: {
+            type: Boolean,
+            value: false,
+            observe: '_list'
+          },
+          disabled: {
+            type: Boolean,
+            value: false
           }
+        }
+      }
+
+      _list() {
+        if (this.login && !this.disabled) {
+          this.list();
         }
       }
 
@@ -33,6 +51,7 @@
                 collections.add(article.get('collection'));
               }
             }
+            this.disabled = true;
             return this.lastResponse = Array.from(collections);
           });
       }

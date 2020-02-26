@@ -1,9 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="klog-style-toast.html">
 <dom-module id="klog-markdown-scroller">
   <template>
-    <style include="klog-style-toast"></style>
-    </style>
     <div id="toastContainer"></div>
   </template>
   <script>
@@ -81,14 +78,14 @@
       }
 
       showToast(text, link) {
-        const toast = document.createElement('paper-toast');
-        toast.text = text;
-        if (link) {
-          toast.innerHTML = `<a href="${link.href}">${link.title}</a>`;
-          toast.querySelector('a').addEventListener('click', e => link.onclick(e));
-        }
-        this.$.toastContainer.append(toast);
-        toast.open();
+        this.dispatchEvent(new CustomEvent('show-toast', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            text: text,
+            link: link
+          }
+        }));
       }
 
     }

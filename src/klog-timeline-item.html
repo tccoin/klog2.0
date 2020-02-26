@@ -248,14 +248,6 @@
           </klog-image>
           <div class="meta-content">
             <div class="meta-title">{{data.author.displayName}}</div>
-            <template is="dom-if" if="{{data.view.gallery}}">
-              <div class="meta-subtitle">
-                发布了{{imageCount}}张照片
-              </div>
-              <!-- <template is="dom-if" if="{{data.view.default}}">
-              发布在&nbsp;<span class="meta-collection">{{data.collection}}</span>
-              </template> -->
-            </template>
           </div>
           <div class="meta-date">
             <klog-render-timestamp time-stamp="{{data.date}}"></klog-render-timestamp>
@@ -352,7 +344,7 @@
       }
 
       read() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'article/' + this.data.path, now: false } }));
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'article/' + this.data.path, now: false } }));
       }
 
       refresh() {

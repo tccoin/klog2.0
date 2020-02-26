@@ -29,6 +29,7 @@
         display: block;
         overflow: hidden;
         padding: 0;
+        padding-left: var(--klog-layout-margin-left);
         background-color: var(--klog-page-background);
         --klog-editor-padding: 24px;
         --klog-markdown-padding: var(--klog-editor-padding);
@@ -38,9 +39,12 @@
       .layout {
         display: flex;
         flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
 
       klog-backdrop {
+        width: calc(100vw - var(--klog-layout-margin-left));
         display: flex;
         justify-content: center;
         align-content: center;
@@ -55,7 +59,7 @@
       }
 
       .klog-editor-back-pages {
-        margin: 16px auto;
+        margin: 64px auto 16px;
         padding: 16px;
         max-height: calc(100vh - 224px);
         box-sizing: border-box;
@@ -64,12 +68,8 @@
         justify-content: center;
       }
 
-      klog-editor-header {
-        width: 100vw;
-      }
-
       klog-editor-info-form {
-        width: 100%;
+        width: 100vw;
         max-width: 360px;
       }
 
@@ -78,7 +78,7 @@
       }
 
       .klog-editor-main-pages {
-        width: 100vw;
+        width: 100%;
         max-width: 1280px;
         height: calc(100vh - 64px);
         margin: auto;
@@ -88,13 +88,13 @@
       }
 
       klog-editor-textarea {
-        width: 50vw;
+        width: calc(50vw - var(--klog-layout-margin-left) / 2);
         border-right: 1px solid var(--divider-color);
       }
 
       klog-markdown {
+        width: calc(50vw - var(--klog-layout-margin-left) / 2);
         background: var(--primary-background-color);
-        width: calc(50vw - 1px);
       }
 
       klog-markdown .info {
@@ -119,8 +119,7 @@
 
       /*animation*/
 
-      :host([exit]) .klog-editor-back-pages,
-      klog-backdrop .klog-editor-main-pages {
+      .klog-editor-main-pages {
         transition: opacity .2s ease, transform .1s ease;
       }
 
@@ -130,8 +129,8 @@
         transform: translateY(5vh);
       }
 
-      klog-editor-helper {
-        display: none;
+      klog-editor-header {
+        opacity: 1;
         transition: opacity .15s ease-out;
       }
 
@@ -148,15 +147,16 @@
     <div class="layout">
       <klog-backdrop id="backdrop">
         <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}"
-          path="{{path}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
+          path="{{path}}" random-path="{{randomPath}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}"
+          selected="{{selected}}">
         </klog-editor-header>
         <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
           <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}"
             title="{{title}}" path="{{path}}" random-path="{{randomPath}}" private="{{private}}"
             immersive="{{immersive}}"></klog-editor-info-form>
-          <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
-          <klog-editor-browser name="browser" disabled="{{loading}}" article-id="{{articleId}}"
-            collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser>
+          <klog-upload-zone class="klog-editor-back-pages" name="uploadzone" id="uploadzone"></klog-upload-zone>
+          <klog-editor-browser class="klog-editor-back-pages" name="browser" disabled="{{loading}}"
+            article-id="{{articleId}}" collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser>
         </iron-pages>
         <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
           <klog-editor-textarea id="textarea" loading="{{loading}}" value="{{markdown}}" preview="{{preview}}"
@@ -168,12 +168,6 @@
         </klog-pages>
       </klog-backdrop>
     </div>
-    <!-- <klog-editor-helper id="helper"></klog-editor-helper> -->
-    <paper-toast text="{{err}}" id="toast0"></paper-toast>
-    <paper-toast text="已保存" id="toast1">
-      <a on-click="back">查看</a>
-    </paper-toast>
-    <paper-toast text="已删除" id="toast2"></paper-toast>
   </template>
   <script src="../static/lib/marked/marked.min.js"></script>
   <script>
@@ -197,6 +191,10 @@
           err: {
             observer: '_errChanged'
           },
+          routeData: {
+            type: Object,
+            observer: '_updateArticleId'
+          },
           mobile: {
             type: Boolean,
             reflectToAttribute: true
@@ -211,8 +209,64 @@
           },
           path: {
             type: String
-          }
+          },
+          layout: {
+            type: Object,
+            value: {
+              documentTitle: '写作 - Klog',
+              drawer: 'auto',
+              menu: 'auto',
+              scrollToTop: false,
+              header: {
+                fixed: true,
+                short: false,
+                shadow: 'off',
+              },
+              collections: [],
+              styles: {
+                '--klog-header-background-color': 'transparent',
+              },
+              toolbar: Polymer.html``
+            }
+          },
         }
+      }
+
+      load(userLoadPromise) {
+        return userLoadPromise.then(result => {
+          if (!result.login) {
+            this.dispatchEvent(new CustomEvent('user-login-page-open', {
+              bubbles: true,
+              composed: true
+            }));
+            return Promise.reject(new Error('Not Login.'))
+          } else {
+            this.userinfo = result.userinfo;
+          }
+        });
+      }
+
+      async update(route) {
+        this.route = route;
+        this.$.textarea.load();
+        this.dispatchEvent(new CustomEvent('editor-loaded', { bubbles: true, composed: true }));
+        setTimeout(() => {
+          this._loadPreset();
+        }, 1);
+      }
+      _updateArticleId() {
+        this.articleId = this.routeData.id;
+      }
+
+      unload() {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.routeData.id = ''
+            this.preset = {};
+            this.$.textarea.unload();
+            resolve();
+          }, 150);
+        });
       }
 
       ready() {
@@ -251,14 +305,14 @@
           if (this.loading) return
           this.$.data.reset(true);
           //browser
-          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
+          this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
         });
         this.addEventListener('reset', (e) => {
           e.stopPropagation();
           if (this.loading) return
           this.$.data.reset();
           //browser
-          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
+          this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
         });
         // this.$.textarea.addEventListener('klog-editor-input', (e) => {
         //   this.$.helper.load(e.detail.currentLine);
@@ -273,9 +327,9 @@
             this.$.data.articleId = updatedArticle.id;
             //ui
             this.loading = false;
-            this.$.toast1.open();
+            this.showToast('已保存', { title: '查看', onclick: () => this.back() });
             //browser
-            this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: '#/editor/' + this.articleId } }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '#/editor/' + this.articleId } }));
           }, err => {
             this.set('err', err);
             this.loading = false;
@@ -290,9 +344,9 @@
             this.$.data.reset();
             //ui
             this.loading = false;
-            this.$.toast2.noCancelOnOutsideClick = false;
-            this.$.toast2.open();
-            //browser
+            this.showToast('已删除', undefined, { noCancelOnOutsideClick: false });
+            //route
+            this.continue = '#/note/all/';
             setTimeout(() => {
               this.$.header.back();
             }, 500);
@@ -344,7 +398,7 @@
       _idChanged(id) {
         this.reset(!Boolean(this.articleId));
         if (id) {
-          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'editor/' + this.articleId } }));
+          this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'editor/' + this.articleId } }));
           this.loading = true;
           this.$.data.load(id)
             .then(() => {
@@ -360,31 +414,9 @@
         this.$.data.reset(requestNewPath);
       }
 
-      load() {
-        document.title = '写作 - Klog';
-        if (!this.userinfo.createdAt) this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
-        this.articleId = this.routeData.id;
-        this.$.textarea.load();
-        this.dispatchEvent(new CustomEvent('editor-loaded', { bubbles: true, composed: true }));
-        setTimeout(() => {
-          this._loadPreset();
-        }, 1);
-      }
-
-      unload() {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            this.routeData.id = ''
-            this.preset = {};
-            this.$.textarea.unload();
-            resolve();
-          }, 150);
-        });
-      }
-
       _loadPreset() {
         if (this.articleId) return;
-        let preset = Object.assign(this._defaultPreset, this.preset);
+        let preset = Object.assign({}, this._defaultPreset, this.preset);
         for (let key of Object.keys(preset)) {
           this[key] = preset[key];
         }
@@ -394,10 +426,30 @@
         if (this._errChangedTimeout) {
           clearTimeout(this._errChangedTimeout);
         }
-        if (this.err) {
-          this.$.toast0.show();
-          this._errChangedTimeout = setTimeout(() => this.err = null, 3000);
+        const err = this.err;
+        if (!err) return;
+        if (err.code == -1 && err.message.indexOf('offline') > -1) {
+          this.showToast('无法保存, 请检查网络连接');
+        } else if (err.code == 403) {
+          this.showToast('没有权限, 你只能编辑自己的文章哦');
+        } else if (err.code == 404) {
+          this.showToast('无法保存, 请备份后新建文章');
+        } else {
+          this.showToast('保存失败, 请备份文章后再试一次');
+          console.log(this.err);
         }
+        this._errChangedTimeout = setTimeout(() => this.err = null, 3000);
+      }
+
+      showToast(text, link) {
+        this.dispatchEvent(new CustomEvent('show-toast', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            text: text,
+            link: link
+          }
+        }));
       }
 
     }

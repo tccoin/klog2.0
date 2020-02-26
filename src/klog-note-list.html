@@ -76,7 +76,7 @@
         top: 0;
         bottom: 0;
         z-index: -1;
-        background-color: var(--klog-header-background-color, var(--primary-background-color));
+        background-color: var(--primary-background-color);
         border-radius: 12px 0 0 0;
         opacity: var(--klog-header-opacity, 1);
       }
@@ -191,9 +191,7 @@
 
     <div class="header-container" id="header">
       <!-- <div class="gesture-indicator"></div> -->
-      <div class="title" on-click="openDrawer">
-        {{getTitle(keyword,collection)}}
-      </div>
+      <div class="title">{{title}}</div>
       <klog-note-search id="search" keyword="{{keyword}}" userinfo="{{userinfo}}" on-click="search"></klog-note-search>
     </div>
 
@@ -241,13 +239,17 @@
           collection: {
             type: String,
             notify: true
+          },
+          title: {
+            type: String,
           }
         }
       }
 
       static get observers() {
         return [
-          'load(keyword, collection)'
+          'load(keyword, collection)',
+          'updateTitle(keyword,collection)'
         ]
       }
 
@@ -331,7 +333,7 @@
           let hasPath = Boolean(this.path);
           if (isMobile && isSearching && isOnly || !isMobile && isSearching) {
             // 加载第一项：手机上搜索时只有一个结果；电脑上搜索时
-            this.dispatchEvent(new CustomEvent('klog-app-load', {
+            this.dispatchEvent(new CustomEvent('app-load', {
               detail: {
                 page: 'note/' + this.collection + '/' + list[0].path
               }, bubbles: true, composed: true
@@ -345,7 +347,7 @@
                 break;
               }
             }
-            this.dispatchEvent(new CustomEvent('klog-app-load', {
+            this.dispatchEvent(new CustomEvent('app-load', {
               detail: {
                 page: 'note/' + this.collection + '/' + list[topArticleIndex].path
               }, bubbles: true, composed: true
@@ -375,10 +377,12 @@
         this.$.scrollTarget.scrollTop = 0;
       }
 
-      getTitle(keyword, collection) {
-        if (keyword) return `搜索“${keyword}”`;
-        else if (collection == 'all') return '所有笔记';
-        else if (collection) return collection;
+      updateTitle(keyword, collection) {
+        let title;
+        if (keyword) title = `搜索“${keyword}”`;
+        else if (collection == 'all') title = '所有笔记';
+        else if (collection) title = collection;
+        this.title = title;
       }
 
       _initPageloader() {

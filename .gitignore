@@ -1,3 +1,9 @@
+settings.json
+certs/
+doc/
+index-debug.html
+server-worker.js
+
 #vscode
 .vscode/
 
@@ -68,9 +74,3 @@ typings/
 
 # tests
 pan/
-
-# app data
-settings.json
-certs/
-doc/
-index-debug.html

@@ -10,11 +10,13 @@
 <link rel="import" href="klog-backdrop.html">
 <link rel="import" href="klog-note-list.html">
 <link rel="import" href="klog-note-content.html">
+<link rel="import" href="klog-data-collection.html">
 <dom-module id="klog-note">
   <template>
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-dialog"></style>
     <style include="klog-style-note"></style>
+    <klog-data-collection id="collection" disabled></klog-data-collection>
     <app-route route="{{route}}" pattern="/:collection" data="{{routeData}}" tail="{{subroute0}}"></app-route>
     <app-route route="{{subroute0}}" pattern="/:path" data="{{subrouteData}}" tail="{{subroute1}}"></app-route>
     <app-route route="{{subroute1}}" pattern="/:hash" data="{{shareData}}"></app-route>
@@ -25,7 +27,10 @@
       <klog-pages class="backdrop-back" slot="back" selected="0">
         <div>
           <app-toolbar class="backdrop-back-toolbar" id="toolbar">
-            <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
+            <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden$="{{!mobile}}"></paper-icon-button>
+            <div class="title">
+              <div main-title>Klog</div>
+            </div>
             <div class="divider"></div>
             <paper-button on-click="add">
               <iron-icon icon="add"></iron-icon>新建笔记
@@ -38,8 +43,7 @@
           </app-toolbar>
         </div>
       </klog-pages>
-
-      <klog-pages class="backdrop-front" slot="front" selected="{{selected}}" disabled="{{!mobile}}">
+      <klog-pages id="animation" class="backdrop-front" slot="front" selected="{{selected}}" disabled="{{!mobile}}">
         <klog-note-list id="list" userinfo="{{userinfo}}" keyword="{{keyword}}" theme="[[theme]]"
           collection="{{collection}}" stt="{{stt}}" gesture="{{gesture}}" moving="{{moving}}" mobile="{{mobile}}"
           path="{{path}}"></klog-note-list>
@@ -66,7 +70,26 @@
           mobile: {
             type: Boolean,
             reflectToAttribute: true
-          }
+          },
+          layout: {
+            type: Object,
+            value: {
+              documentTitle: '笔记 - Klog',
+              drawer: 'auto',
+              menu: 'auto',
+              scrollToTop: true,
+              header: {
+                fixed: true,
+                short: false,
+                shadow: 'off',
+              },
+              styles: {
+                '--klog-header-background-color': 'transparent',
+                '--klog-header-text-color': 'var(--primary-text-color)',
+              },
+              toolbar: Polymer.html``
+            }
+          },
         }
       }
 
@@ -98,25 +121,65 @@
         this.$.content.$.markdown.$.scroller.updateQueryByHash(hash);
       }
 
-      openDrawer() {
+      openKlogDrawer() {
         this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
       }
 
-      load() {
-        document.title = '笔记 - Klog';
-        if (!this.userinfo.createdAt) {
-          this.dispatchEvent(new CustomEvent('user-login-page-open', { bubbles: true, composed: true }));
-          return;
-        }
+      load(userLoadPromise) {
+        return userLoadPromise.then(result => {
+          if (!result.login) {
+            this.dispatchEvent(new CustomEvent('user-login-page-open', {
+              bubbles: true,
+              composed: true
+            }));
+            return Promise.reject(new Error('Not Login.'))
+          } else {
+            this.preference = result.userinfo.preference;
+            this.userinfo = result.userinfo;
+            this._loadCollection(result);
+          }
+        });
       }
 
-      unload() {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            this.path = '';
-            resolve();
-          }, 200);
-        });
+      async _loadCollection(result) {
+        let collections;
+        if (!this._initColletion) {
+          this._initColletion = true;
+          this.$.collection.login = result.login;
+          this.$.collection.userinfo = result.userinfo;
+          collections = await this.$.collection.list();
+          this._collections = collections;
+        } else {
+          collections = this._collections;
+        }
+        this.dispatchEvent(new CustomEvent('layout-update', {
+          bubbles: true,
+          composed: true,
+          detail: { collections: collections }
+        }));
+      }
+
+      update(route) {
+        this.route = route;
+      }
+
+      async unload() {
+        this.path = '';
+      }
+
+      _timeout(promise, timeout) {
+        return Promise.race([
+          promise,
+          new Promise(resolve => { setTimeout(resolve, timeout) })
+        ]);
+      }
+
+      setCollection(collection) {
+        this.dispatchEvent(new CustomEvent('app-load', {
+          bubbles: true,
+          composed: true,
+          detail: { page: `note/${collection}/` }
+        }));
       }
 
       share(path) {
@@ -130,19 +193,19 @@
 
       routeChanged(collection, path) {
         if (window.location.href.indexOf('#/note') == -1) return;
-        collection = collection || 'all';
+        collection = collection || this.collection || 'all';
         if (this.collection != collection) {
           this.collection = collection;
           this.$.list.keyword = '';
           if (!this.mobile) this.$.list.$.search.focus();
         }
+        if (path == this.path) return;
         if (path) {
           this.selected = 1;
           this.path = path;
           this.loadArticle(path);
         } else {
           this.selected = 0;
-          this.loadArticle();
         }
       }
 
@@ -151,10 +214,9 @@
       }
 
       articleError() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: 'note/' } }));
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'note/' } }));
         this.path = '';
         this.listLoaded();
-        console.log(this.error);
       }
 
       add() {

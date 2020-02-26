@@ -19,7 +19,6 @@
 <link rel="import" href="klog-style-form.html">
 <link rel="import" href="klog-render-timestamp.html">
 <link rel="import" href="klog-upload-zone.html">
-<link rel="import" href="klog-data-list.html">
 <link rel="import" href="klog-data-user.html">
 <link rel="import" href="klog-input.html">
 <link rel="import" href="klog-dropdown-menu.html">
@@ -33,7 +32,7 @@
       :host {
         display: block;
         background: var(--klog-page-background);
-        padding: 64px 0 32px;
+        padding: 64px 0 32px 0 !important;
       }
 
       app-toolbar {
@@ -53,6 +52,7 @@
         border-radius: 5px;
         box-sizing: border-box;
         background-color: var(--primary-background-color);
+        transition: all .15s ease-out;
         @apply --shadow-elevation-2dp;
       }
 
@@ -86,35 +86,18 @@
         margin: 0 8px;
       }
 
-      .list a {
-        text-decoration: none;
-      }
-
-      .list .article-item {
-        display: flex;
-        padding: 16px 24px;
-        border-top: 1px solid var(--divider-color);
-        position: relative;
-        user-select: none;
-        -webkit-user-select: none;
-        cursor: default;
-        color: var(--primary-text-color);
-      }
-
       klog-upload-zone {
         width: 200px;
       }
-    </style>
-    <klog-data-list id="data" last-response="{{list}}" userinfo="{{userinfo}}"></klog-data-list>
-    <klog-data-user id="user" disabled></klog-data-user>
 
-    <app-toolbar>
-      <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
-      <div class="divider"></div>
-      <paper-button on-click="logout">
-        <iron-icon icon="power_settings_new"></iron-icon>注销
-      </paper-button>
-    </app-toolbar>
+      /*animation*/
+
+      :host([exit]) .klog-card {
+        opacity: 0;
+        transform: translateY(5vh);
+      }
+    </style>
+    <klog-data-user id="user" disabled></klog-data-user>
 
     <div class="userpanel-card klog-card">
       <div class="card-meta header">
@@ -173,7 +156,7 @@
     <div class="fit"></div>
     </div>
 
-    <div class="userpanel-card klog-card">
+    <div class="userpanel-card klog-card" id="animation">
       <div class="card-meta header">
         <div class="title">阅读偏好</div>
       </div>
@@ -217,7 +200,7 @@
       </div>
     </div>
 
-    <div class="userpanel-card klog-card">
+    <!-- <div class="userpanel-card klog-card">
       <div class="card-meta header">
         <div class="title">启动时打开</div>
       </div>
@@ -228,12 +211,11 @@
         </paper-radio-group>
       </div>
       <div class="fit"></div>
-    </div>
+    </div> -->
 
     <paper-dialog id="uploadAvatarDialog" with-backdrop>
       <klog-upload-zone bucketname="klog-avatar" fileinfo="{{avatarinfo}}"></klog-upload-zone>
     </paper-dialog>
-    <paper-toast id="updateToast" text="已更新账户"></paper-toast>
   </template>
   <script>
     class KlogUserpanel extends Polymer.Element {
@@ -242,25 +224,63 @@
         return 'klog-userpanel';
       }
 
+      static get properties() {
+        return {
+          layout: {
+            type: Object,
+            value: {
+              documentTitle: '个人设置 - Klog',
+              drawer: 'auto',
+              menu: 'auto',
+              scrollToTop: false,
+              header: {
+                fixed: true,
+                short: false,
+                shadow: 'off',
+              },
+              styles: {
+                '--klog-header-background-color': 'transparent',
+                '--klog-header-text-color': 'var(--primary-text-color)',
+              },
+              toolbar: Polymer.html`
+                <app-toolbar>
+                  <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
+                    <div class="title">
+                      <div main-title>Klog</div>
+                    </div>
+                  <div class="divider"></div>
+                  <paper-button on-click="logout">
+                    <iron-icon icon="power_settings_new"></iron-icon>注销
+                  </paper-button>
+                </app-toolbar>`
+            }
+          },
+        }
+      }
+
       static get observers() {
         return [
-          'loadList(userinfo.publicinfo.id)',
           'updateAvatarUrl(avatarinfo)',
           'updatePreference(preference.theme,preference.defaultPage,preference.backdropBlurEnabled,preference.markdown.numberedHeading,preference.markdown.centeredHeading,preference.markdown.overflowCode)',
         ]
       }
 
-      load() {
-        document.title = '个人资料 - Klog';
-        if (!this.userinfo.createdAt) {
-          this.dispatchEvent(new CustomEvent('user-login-page-open', {
-            bubbles: true,
-            composed: true
-          }));
-          return;
+      load(userLoadPromise) {
+        if (!this.login) {
+          return userLoadPromise.then(result => {
+            if (!result.login) {
+              this.dispatchEvent(new CustomEvent('user-login-page-open', {
+                bubbles: true,
+                composed: true
+              }));
+              return Promise.reject(new Error('Not Login.'))
+            } else {
+              this.preference = result.userinfo.preference;
+              this.userinfo = result.userinfo;
+              this.login = result.login;
+            }
+          });
         }
-        this.preference = this.userinfo.preference;
-        this.loadList();
       }
 
       openDrawer() {
@@ -274,12 +294,15 @@
         this.userinfo.klogUser.logout();
         this.dispatchEvent(new CustomEvent('user-login-page-open', {
           bubbles: true,
-          composed: true
+          composed: true,
+          detail: {
+            continue: '#/timeline/'
+          }
         }));
       }
 
       newArticle() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', {
+        this.dispatchEvent(new CustomEvent('app-load', {
           bubbles: true,
           composed: true,
           detail: {
@@ -314,9 +337,20 @@
       _updateUserinfo(info) {
         let klogUser = this.userinfo.klogUser;
         klogUser.update(info).then(() => {
-          this.$.updateToast.show();
+          this.showToast('已更新账户');
           klogUser.updateUserinfo();
         });
+      }
+
+      showToast(text, link) {
+        this.dispatchEvent(new CustomEvent('show-toast', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            text: text,
+            link: link
+          }
+        }));
       }
 
       updatePublicinfo() {

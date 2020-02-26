@@ -1,5 +1,4 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/app-layout/app-layout.html">
 <link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
@@ -13,11 +12,6 @@
   <template>
     <style include="klog-style-login"></style>
     <app-localstorage-document key="email" data="{{email}}"></app-localstorage-document>
-    <app-header fixed>
-      <app-toolbar>
-        <paper-icon-button icon="menu" on-click="openDrawer"></paper-icon-button>
-      </app-toolbar>
-    </app-header>
     <div class="login-card">
       <div class="titles">
         <h1 name="welcome">你懂的：<br>请先登录</h1>
@@ -27,7 +21,8 @@
       </div>
       <div class="form">
         <klog-input label="邮箱地址" name="email" value="{{email}}" outlined></klog-input>
-        <klog-input id="passwordInput" label="密码" type="password" name="password" value="{{password}}" outlined></klog-input>
+        <klog-input id="passwordInput" label="密码" type="password" name="password" value="{{password}}" outlined>
+        </klog-input>
       </div>
       <div class="actions">
         <paper-icon-button id="go" icon="arrow_forward" on-click="login" primary></paper-icon-button>
@@ -42,85 +37,109 @@
     </div>
   </template>
   <script>
-  class KlogLogin extends Polymer.Element {
+    class KlogLogin extends Polymer.Element {
 
-    static get is() { return 'klog-login'; }
+      static get is() { return 'klog-login'; }
 
-    static get properties() {
-      return {
-        email: {
-          type: String,
-        },
-        password: {
-          type: String,
-        },
-        title: {
-          type: String,
-          value: 'welcome',
-          observer: '_titleChanged'
-        },
+      static get properties() {
+        return {
+          email: {
+            type: String,
+          },
+          password: {
+            type: String,
+          },
+          title: {
+            type: String,
+            value: 'welcome',
+            observer: '_titleChanged'
+          },
+          layout: {
+            type: Object,
+            value: {
+              documentTitle: '登录 - Klog',
+              drawer: 'auto',
+              menu: 'auto',
+              scrollToTop: false,
+              header: {
+                fixed: true,
+                short: false,
+                shadow: 'off',
+              },
+              styles: {
+                '--klog-layout-background': 'var(--primary-background-color)',
+              },
+              toolbar: Polymer.html`
+                  <app-toolbar>
+                    <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
+                    <div class="title">
+                      <div main-title>Klog</div>
+                    </div>
+                  </app-toolbar>`
+            }
+          },
+        }
       }
-    }
 
-    openDrawer() {
-      this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
-    }
-
-    ready() {
-      super.ready();
-      this.$.passwordInput.addEventListener('keyup', (e) => {
-        if (e.keyCode == 13) this.login();
-      });
-      this.$.go.addEventListener('mousedown', function() {
-        this.shadowRoot.querySelector('#ink').classList.remove('circle');
-      });
-    }
-
-    load(app) {
-      document.title = '登录 - Klog';
-      this.title = 'welcome';
-      this.user = app.$.user;
-      if (this.continue == undefined || this.continue == '#/userpanel')
-        this.continue = '#/timeline';
-    }
-
-    anonymousLogin() {
-      this.email = 'test@krrr.party';
-      this.password = '123456';
-      this.login();
-    }
-
-    login() {
-      this.title = 'loading';
-      this.user.login(this.email, this.password).then(() => {
-        this.title = 'success';
-        setTimeout(() => {
-          this.continue = this.continue || '#/';
-          this.dispatchEvent(new CustomEvent('klog-app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
-          this.password = '';
-        }, 1500);
-      }, () => {
-        this.title = 'error';
-      });
-    }
-
-    signup() {
-      this.dispatchEvent(new CustomEvent('user-signup-page-open', {
-        bubbles: true,
-        composed: true,
-        detail: { continue: this.continue }
-      }));
-    }
-
-    _titleChanged(title) {
-      this.shadowRoot.querySelector(`h1[name=${title}],h2[name=${title}]`).classList.remove('hidden');
-      for (let element of this.shadowRoot.querySelectorAll(`h1[name],h2[name]`)) {
-        if (element.getAttribute('name') != title) element.classList.add('hidden')
+      openDrawer() {
+        this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
       }
+
+      ready() {
+        super.ready();
+        this.$.passwordInput.addEventListener('keyup', (e) => {
+          if (e.keyCode == 13) this.login();
+        });
+        this.$.go.addEventListener('mousedown', function () {
+          this.shadowRoot.querySelector('#ink').classList.remove('circle');
+        });
+      }
+
+      load(userLoadPromise) {
+        this.title = 'welcome';
+        userLoadPromise.then(result => {
+          this.user = result.user;
+        });
+        this.continue = this.continue || '#/timeline';
+      }
+
+      anonymousLogin() {
+        this.email = 'test@krrr.party';
+        this.password = '123456';
+        this.login();
+      }
+
+      login() {
+        this.title = 'loading';
+        this.user.login(this.email, this.password).then(() => {
+          this.title = 'success';
+          setTimeout(() => {
+            this.continue = this.continue || '#/';
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
+            this.password = '';
+          }, 1500);
+        }, () => {
+          this.title = 'error';
+        });
+      }
+
+      signup() {
+        this.dispatchEvent(new CustomEvent('user-signup-page-open', {
+          bubbles: true,
+          composed: true,
+          detail: { continue: this.continue }
+        }));
+      }
+
+      _titleChanged(title) {
+        this.shadowRoot.querySelector(`h1[name=${title}],h2[name=${title}]`).classList.remove('hidden');
+        for (let element of this.shadowRoot.querySelectorAll(`h1[name],h2[name]`)) {
+          if (element.getAttribute('name') != title) element.classList.add('hidden')
+        }
+      }
+
     }
 
-  }
-
-  window.customElements.define(KlogLogin.is, KlogLogin);
+    window.customElements.define(KlogLogin.is, KlogLogin);
   </script>
 </dom-module>

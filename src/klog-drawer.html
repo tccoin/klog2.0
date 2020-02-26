@@ -1,15 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/app-layout/app-layout.html">
-<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="klog-style-scrollbar.html">
-<link rel="import" href="klog-style-dialog.html">
-<link rel="import" href="klog-icons.html">
-<link rel="import" href="klog-data-collection.html">
 <dom-module id="klog-drawer">
   <template>
     <style include="klog-style-scrollbar"></style>
-    <style include="klog-style-dialog"></style>
     <style>
       :host {
         display: block;
@@ -39,223 +33,19 @@
         cursor: default;
       }
 
-      iron-selector>.divider {
-        margin: 8px 0;
-        border-top: 1px solid var(--divider-color);
-      }
-
-      .subtitle {
-        display: flex;
-        align-items: center;
-        height: 24px;
-        font-size: .9em;
-        padding: 16px 16px 8px;
-        overflow: hidden;
-        position: relative;
-      }
-
-      .subtitle.button {
-        padding: 16px;
-      }
-
-      .subtitle>.divider {
-        width: 16px;
-      }
-
-      .label-item-container {
-        overflow: hidden;
-        transition: all .2s ease;
-      }
-
-      :host([collapsed]) .label-item-container {
-        height: 0 !important;
-      }
-
-      .subtitle.button .collapsed-icon {
-        transform: rotate(0);
-        transition: all .2s ease;
-      }
-
-      :host([collapsed]) .subtitle.button .collapsed-icon {
-        transform: rotate(90deg);
-      }
-
       .title {
         line-height: 32px;
         padding: 16px;
         box-sizing: border-box;
         font-size: 20px;
       }
-
-      .item {
-        line-height: 32px;
-        padding: 6px 8px;
-        margin: 4px 8px;
-        border-radius: 5px;
-        box-sizing: border-box;
-        overflow: hidden;
-        position: relative;
-        font-size: 14px;
-        cursor: pointer;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      .item span {
-        user-select: none;
-        -webkit-user-select: none;
-      }
-
-      .item iron-icon {
-        margin-right: 16px;
-      }
-
-      .item::after {
-        @apply --overlay-style;
-        opacity: 0;
-      }
-
-      .item:not(.iron-selected):hover::after {
-        opacity: var(--secondary-overlay-opacity);
-      }
-
-      .item.iron-selected {
-        font-weight: bolder;
-        color: var(--primary-color);
-        cursor: default;
-      }
-
-      .item.iron-selected::after {
-        opacity: var(--secondary-overlay-opacity);
-        background-color: var(--primary-color);
-      }
-
-      .item.secondary iron-icon {
-        opacity: 0.6;
-      }
-
-      .brand {
-        opacity: 0.2;
-        position: absolute;
-        bottom: 120px;
-        left: 0;
-        margin: 8px 16px;
-        font-size: 12px;
-        cursor: pointer;
-      }
-
-      paper-dialog {
-        max-width: 300px;
-        width: 100%;
-      }
-
-      paper-dialog .actions {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 0 16px;
-        margin-top: 16px;
-        color: var(--klog-theme-primary);
-      }
-
-      paper-dialog .actions paper-button {
-        margin: 0;
-        text-transform: none;
-        width: 100%;
-        justify-content: flex-start;
-        outline: none;
-      }
     </style>
-    <klog-data-collection id="collection" userinfo="[[userinfo]]" last-response="{{collections}}">
-    </klog-data-collection>
     <app-drawer id="drawer" swipe-open="{{!disabled}}" opened="{{opened}}">
       <div class="container" id="scrollTarget">
-        <div class="title">记录未来</div>
-        <iron-selector attr-for-selected="name" id="selector" selected="{{page}}" on-iron-select="close"
-          on-click="updatePage">
-
-          <div class="item" name="timeline">
-            <iron-icon icon="timeline"></iron-icon>
-            <span>时间轴</span>
-            <paper-ripple></paper-ripple>
-          </div>
-
-          <template is="dom-if" if="{{!isLogin}}">
-            <div class="item" name="login">
-              <iron-icon icon="account_circle"></iron-icon>
-              <span>登录</span>
-              <paper-ripple></paper-ripple>
-            </div>
-            <div class="item" name="signup">
-              <iron-icon icon="account_box"></iron-icon>
-              <span>注册</span>
-              <paper-ripple></paper-ripple>
-            </div>
-          </template>
-
-          <template is="dom-if" if="{{isLogin}}">
-
-            <div class="item" name="note/all/">
-              <iron-icon icon="book"></iron-icon>
-              <span>笔记本</span>
-              <paper-ripple></paper-ripple>
-            </div>
-
-            <div class="item" name="userpanel">
-              <iron-icon icon="account_circle"></iron-icon>
-              <span>个人设置</span>
-              <paper-ripple></paper-ripple>
-            </div>
-          </template>
-
-          <div class="item" on-click="about">
-            <iron-icon icon="console"></iron-icon>
-            <span>控制台</span>
-            <paper-ripple></paper-ripple>
-          </div>
-
-          <template is="dom-if" if="{{isLogin}}">
-            <div class="divider"></div>
-
-            <!-- <div class="subtitle button" on-click="toggleCollapsed">
-              <span>分类</span>
-              <div class="divider"></div>
-              <iron-icon icon="keyboard_arrow_down" class="collapsed-icon"></iron-icon>
-              <paper-ripple></paper-ripple>
-            <div class="label-item-container">
-            </div>
-            </div> -->
-
-            <div class="subtitle"><span>分类</span></div>
-
-            <template is="dom-repeat" items="{{collections}}">
-              <div class="item secondary" name="note/{{item}}/">
-                <iron-icon icon="label"></iron-icon>
-                <span>{{item}}</span>
-                <paper-ripple></paper-ripple>
-              </div>
-            </template>
-
-          </template>
-        </iron-selector>
+        <div class="title">{{heading}}</div>
+        <slot></slot>
       </div>
     </app-drawer>
-
-    <paper-dialog id="aboutDialog" with-backdrop>
-      <h2>> klog -V</h2>
-      <p>v2.9.14<br>2017-2020<br>Powered by Kr with Love.</p>
-
-      <div class="actions">
-        <paper-button on-click="help">> klog help</paper-button>
-        <paper-button on-click="log">> klog log</paper-button>
-        <paper-button on-click="update">> klog update</paper-button>
-        <paper-button on-click="github">> git clone klog</paper-button>
-      </div>
-
-    </paper-dialog>
-
-    <paper-toast text="Klog 已是最新版本" id="noUpdateToast"></paper-toast>
 
   </template>
   <script>
@@ -265,7 +55,7 @@
 
       static get properties() {
         return {
-          page: {
+          heading: {
             type: String
           },
           disabled: {
@@ -274,89 +64,26 @@
           },
           opened: {
             type: Boolean
-          },
-          collapsed: {
-            type: Boolean,
-            reflectToAttribute: true
-          },
+          }
         }
       }
 
       ready() {
         super.ready();
-        this.isLogin = false;
-        document.querySelector('klog-app').addEventListener('userinfo-updated', e => {
-          this.openHandle(e.detail.isLogin);
-        });
-      }
-
-      openHandle(isLogin = fasle) {
-        // const initCollapsedState = () => {
-        //   const container = this.$.selector.querySelector('.label-item-container');
-        //   container.style.height = (48 * this.collections.length + 4) + 'px';
-        //   if (this.collections.length >= 3 && this.mobile) {
-        //     this.collapsed = true;
-        //   }
-        // };
-        this.$.collection.list();
-        this.isLogin = isLogin;
+        this.addEventListener('menu-select', () => this.close());
+        this.addEventListener('collection-select', () => this.close());
       }
 
       toggle() {
         this.$.drawer.toggle();
       }
 
-      updatePage() {
-        setTimeout(() => {
-          this.dispatchEvent(new CustomEvent('klog-app-load', {
-            bubbles: true,
-            composed: true,
-            detail: { page: this.page }
-          }));
-        }, 1);
+      open() {
+        this.$.drawer.open();
       }
-
 
       close() {
         this.$.drawer.close();
-      }
-
-      help() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', {
-          bubbles: true,
-          composed: true,
-          detail: { page: 'article/klog-help' }
-        }));
-      }
-
-      log() {
-        this.dispatchEvent(new CustomEvent('klog-app-load', {
-          bubbles: true,
-          composed: true,
-          detail: { page: 'article/about-klog-2-0' }
-        }));
-      }
-
-      about() {
-        this.close();
-        this.$.aboutDialog.open();
-      }
-
-      update() {
-        const noUpdateFound = swreg => {
-          if (!swreg.installing) {
-            this.$.noUpdateToast.open();
-          }
-        };
-        this.dispatchEvent(new CustomEvent('update-service-worker', { bubbles: true, composed: true, detail: { callback: noUpdateFound } }));
-      }
-
-      toggleCollapsed() {
-        this.collapsed = !this.collapsed;
-      }
-
-      github() {
-        window.open("https://github.com/tccoin/klog2.0");
       }
 
     }
