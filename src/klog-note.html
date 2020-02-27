@@ -44,11 +44,12 @@
         </div>
       </klog-pages>
       <klog-pages id="animation" class="backdrop-front" slot="front" selected="{{selected}}" disabled="{{!mobile}}">
-        <klog-note-list id="list" userinfo="{{userinfo}}" keyword="{{keyword}}" theme="[[theme]]"
-          collection="{{collection}}" stt="{{stt}}" gesture="{{gesture}}" moving="{{moving}}" mobile="{{mobile}}"
-          path="{{path}}"></klog-note-list>
-        <klog-note-content id="content" userinfo="{{userinfo}}" keyword="{{keyword}}" collection="{{collection}}"
-          stt="{{stt}}" mobile="{{mobile}}" selected="{{selected}}" path="{{path}}"></klog-note-content>
+        <klog-note-list id="list" keyword="{{keyword}}" theme="[[theme]]" collection="{{collection}}"
+          gesture="{{gesture}}" moving="{{moving}}" mobile="{{mobile}}" path="{{path}}">
+        </klog-note-list>
+        <klog-note-content id="content" bookmarks="{{bookmarks}}" keyword="{{keyword}}" collection="{{collection}}"
+          mobile="{{mobile}}" selected="{{selected}}" path="{{path}}">
+        </klog-note-content>
       </klog-pages>
     </klog-backdrop>
     <paper-dialog id="shareDialog" class="share-dialog" with-backdrop>
@@ -70,6 +71,9 @@
           mobile: {
             type: Boolean,
             reflectToAttribute: true
+          },
+          bookmarks: {
+            type: Array
           },
           layout: {
             type: Object,
@@ -115,6 +119,10 @@
         this.addEventListener('note-share', (e) => {
           this.share(e.detail.path);
         });
+        this.addEventListener('update-bookmarks', (e) => {
+          this.bookmarks = e.detail.bookmarks;
+          this._updateCustomMenu();
+        });
       }
 
       updateScrollerQuery(hash) {
@@ -136,6 +144,11 @@
           } else {
             this.preference = result.userinfo.preference;
             this.userinfo = result.userinfo;
+            this.$.list.userinfo = result.userinfo;
+            this.$.content.userinfo = result.userinfo;
+            this.$.collection.userinfo = result.userinfo;
+            this.$.collection.login = result.login;
+            this.login = result.userinfo;
             this._loadCollection(result);
           }
         });
@@ -143,20 +156,64 @@
 
       async _loadCollection(result) {
         let collections;
-        if (!this._initColletion) {
-          this._initColletion = true;
-          this.$.collection.login = result.login;
-          this.$.collection.userinfo = result.userinfo;
+        if (!this.initColletion) {
+          this.initColletion = true;
           collections = await this.$.collection.list();
-          this._collections = collections;
-        } else {
-          collections = this._collections;
+          this.collections = collections;
+        }
+        this._updateCustomMenu();
+      }
+
+      _updateCustomMenu() {
+        let customMenu = [];
+        if (this.collections && this.collections.length > 0) {
+          let items = {
+            name: 'collection',
+            text: '分类',
+            items: []
+          };
+          for (let item of this.collections) {
+            items.items.push({ name: item, text: item, icon: 'label' });
+          }
+          customMenu.push(items);
+        }
+        if (this.bookmarks && this.bookmarks.length > 0) {
+          let items = {
+            name: 'bookmark',
+            text: '书签',
+            items: []
+          };
+          for (let item of this.bookmarks) {
+            items.items.push({ name: item.path, text: item.title, icon: 'bookmark' });
+          }
+          customMenu.push(items);
         }
         this.dispatchEvent(new CustomEvent('layout-update', {
           bubbles: true,
           composed: true,
-          detail: { collections: collections }
+          detail: { customMenu: customMenu }
         }));
+      }
+
+      menuSelect(category, item) {
+        if (category == 'collection') {
+          this.dispatchEvent(new CustomEvent('app-load', {
+            bubbles: true,
+            composed: true,
+            detail: { page: `note/${item}/` }
+          }));
+        } else if (category == 'bookmark') {
+          this.dispatchEvent(new CustomEvent('app-load', {
+            bubbles: true,
+            composed: true,
+            detail: { page: `note/${this.collection}/${item}` }
+          }));
+        }
+      }
+
+      loadPreference(preference) {
+        this.bookmarks = preference ? preference.bookmarks : [];
+        this._updateCustomMenu();
       }
 
       update(route) {
@@ -174,21 +231,9 @@
         ]);
       }
 
-      setCollection(collection) {
-        this.dispatchEvent(new CustomEvent('app-load', {
-          bubbles: true,
-          composed: true,
-          detail: { page: `note/${collection}/` }
-        }));
-      }
-
       share(path) {
         this.shareDialogPath = path || this.path;
         this.$.shareDialog.open();
-      }
-
-      loadPreference(preference) {
-        this.stt = preference ? preference.stt : [];
       }
 
       routeChanged(collection, path) {

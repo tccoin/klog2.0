@@ -319,6 +319,9 @@
           toast.querySelector('a').addEventListener('click', e => link.onclick(e));
         }
         this.shadowRoot.append(toast);
+        toast.addEventListener('opened-changed', function () {
+
+        });
         toast.open();
       }
     }

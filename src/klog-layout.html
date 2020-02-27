@@ -118,7 +118,7 @@
     </style>
     <!-- Drawer -->
     <klog-drawer id="drawer" heading="记录未来">
-      <klog-menu id="pageMenu" login="{{login}}" page="{{page}}" collections="{{collections}}">
+      <klog-menu login="{{login}}" page="{{page}}" custom-menu="{{customMenu}}">
       </klog-menu>
     </klog-drawer>
     <!-- Layout -->
@@ -131,7 +131,7 @@
       <app-header id="header"></app-header>
       <!-- Menu -->
       <div id="menu" class="menu-container">
-        <klog-menu id="pageMenu" login="{{login}}" page="{{page}}" collections="{{collections}}" round></klog-menu>
+        <klog-menu login="{{login}}" page="{{page}}" custom-menu="{{customMenu}}" round></klog-menu>
       </div>
       <!-- Pages -->
       <iron-pages id="page" class="page-container" role="main" selected="{{page}}" attr-for-selected="name"
@@ -160,10 +160,10 @@
     <!--about-->
     <paper-dialog id="about" with-backdrop>
       <h2>> klog -V</h2>
-      <p>v2.10.0<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.10.1<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column>
-        <paper-button on-click="aboutLoad" for="article/klog-help">> klog help</paper-button>
-        <paper-button on-click="aboutLoad" for="article/about-klog-2-0">> klog log</paper-button>
+        <paper-button on-click="aboutHelp">> klog help</paper-button>
+        <paper-button on-click="aboutLog">> klog log</paper-button>
         <paper-button on-click="aboutUpdate">> klog update</paper-button>
         <paper-button on-click="aboutGitHub">> git clone klog</paper-button>
       </div>
@@ -184,7 +184,7 @@
             type: Boolean,
             value: true
           },
-          collections: {
+          customMenu: {
             type: Array,
             value: []
           },
@@ -232,9 +232,12 @@
         this.$.scrollTarget = this.$.page;
         this.$.scrollTarget.style.scrollBehavior = 'smooth';
         this.addEventListener('layout-update', e => this.updateLayout(e.detail, false));
-        this.addEventListener('collection-select', e => this._setPageCollection(e.detail.collection));
+        this.addEventListener('custom-menu-select', e => this._pageMenuSelect(e.detail.category, e.detail.item));
         this.addEventListener('drawer-toggle', e => this.$.drawer.open());
         this.addEventListener('open-about', e => this.$.about.open());
+        this.addEventListener('about-help', e => this.aboutHelp());
+        this.addEventListener('about-log', e => this.aboutLog());
+        this.addEventListener('update-note-collection', e => this.$.note.initColletion = false);
       }
 
       async load(page, subroute, userLoadPromise) {
@@ -250,7 +253,7 @@
             await importPromise;
             this.page = page;
             await this._checkInterrupt(page);
-            this._getPageLayout(page);
+            await this._getPageLayout(page);
             this.loading = false;
             await this._loadPage(page, userLoadPromise);
             await this._checkInterrupt(page);
@@ -338,6 +341,7 @@
               background: 'var(--primary-background-color)',
               color: 'var(--secondary-text-color)',
             },
+            customMenu: [],
             styles: {
               '--klog-layout-background': 'var(--klog-page-background)',
               '--klog-header-background-color': 'var(--primary-background-color)',
@@ -476,10 +480,10 @@
         }
       }
 
-      _setPageCollection(collection) {
+      _pageMenuSelect(category, item) {
         let pageElement = this.$.page.querySelector(`[name='${this.page}']`);
-        if (pageElement && pageElement.setCollection) {
-          return pageElement.setCollection(collection);
+        if (pageElement && pageElement.menuSelect) {
+          return pageElement.menuSelect(category, item);
         }
       }
 
@@ -510,17 +514,24 @@
         }
       }
 
-      aboutLoad(e) {
+      aboutHelp(e) {
         this.dispatchEvent(new CustomEvent('app-load', {
           bubbles: true,
           composed: true,
-          detail: { page: e.target.getAttribute('for') }
+          detail: { page: 'article/klog-help' }
+        }));
+      }
+
+      aboutLog(e) {
+        this.dispatchEvent(new CustomEvent('app-load', {
+          bubbles: true,
+          composed: true,
+          detail: { page: 'article/about-klog-2-0' }
         }));
       }
 
       aboutUpdate() {
         const noUpdateFound = swreg => {
-          console.log(swreg, !swreg.installing);
           if (!swreg.installing) {
             this.showToast('Klog 已是最新版本');
           }

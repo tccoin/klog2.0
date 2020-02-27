@@ -381,6 +381,8 @@
         }
         //save
         return article.save();
+        //require updates
+        this.dispatchEvent(new CustomEvent('update-note-collection', { bubbles: true, composed: true }));
       }
 
       delete() {

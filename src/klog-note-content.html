@@ -121,9 +121,8 @@
       }
     </style>
 
-    <klog-data-article path="{{path}}" key="updatedAt" last-response="{{article}}" loading="{{loading}}"
-      last-error="{{error}}" userinfo="{{userinfo}}" type="user" default="{{!mobile}}" keyword="{{keyword}}"
-      collection="{{collection}}">
+    <klog-data-article key="updatedAt" path="{{path}}" last-response="{{article}}" loading="{{loading}}"
+      last-error="{{error}}" userinfo="{{userinfo}}" type="user" default="{{!mobile}}">
     </klog-data-article>
 
     <div class="spinner-container">
@@ -136,7 +135,7 @@
       <div class="actions">
         <paper-icon-button icon="edit" on-click="edit"></paper-icon-button>
         <paper-icon-button icon="share" on-click="share"></paper-icon-button>
-        <paper-icon-button icon="{{sttIcon}}" on-click="stickToTop"></paper-icon-button>
+        <paper-icon-button icon="{{bookmarksIcon}}" on-click="toggleBookmark"></paper-icon-button>
       </div>
     </app-toolbar>
 
@@ -177,9 +176,12 @@
             type: Number,
             notify: true
           },
-          sttIcon: {
+          bookmarksIcon: {
             type: String,
             value: 'bookmark_border'
+          },
+          bookmarks: {
+            type: Array
           },
           path: {
             type: String,
@@ -239,45 +241,48 @@
       load(path) {
         if (window.location.hash.indexOf('#/note') == -1) return;
         this.path = path || '';
-        if (!path) {
-          this.selected = 0;
-        } else {
-          this.selected = 1;
-          let hash = 'note/' + this.collection + '/' + path;
-          if (window.location.hash != '#/' + hash) {
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: hash } }));
-          }
-        }
+        this.selected = path ? 1 : 0;
       }
 
       loaded(articleId) {
         this.articleId = articleId;
-        //stt
-        this._updateSttIcon();
+        //bookmarks
+        this._updateBookmarksIcon(this._calcBookmarkPosition(this.articleId, this.bookmarks) > -1);
         //clean state
         this.$.scrollTarget.scrollTop = 0;
       }
 
-      stickToTop() {
-        let stt = this.stt;
+      toggleBookmark() {
+        let bookmarks = this.bookmarks;
         let articleId = this.articleId;
-        let i = stt.indexOf(articleId);
-        if (i > -1) {
-          stt.splice(i, 1);
+        let bookmarkPosition = this._calcBookmarkPosition(this.articleId, this.bookmarks);
+        if (bookmarkPosition > -1) {
+          bookmarks.splice(bookmarkPosition, 1);
         } else {
-          stt.push(this.articleId);
+          bookmarks.push({
+            id: this.articleId,
+            title: this.article.title,
+            path: this.article.path,
+            addedAt: new Date().toUTCString()
+          });
         }
         let klogUser = this.userinfo.klogUser;
-        let newPreference = Object.assign({}, this.userinfo.preference, { stt: stt });
-        klogUser.update({ preference: { value: newPreference } }).then(() => {
-          klogUser.updateUserinfo();
-        });
-        this.stt = stt;
-        this._updateSttIcon();
+        let newPreference = Object.assign({}, this.userinfo.preference, { bookmarks: bookmarks });
+        klogUser.update({ preference: { value: newPreference } });
+        this.bookmarks = bookmarks;
+        this.dispatchEvent(new CustomEvent('update-bookmarks', { bubbles: true, composed: true, detail: { bookmarks: bookmarks } }));
+        this._updateBookmarksIcon(bookmarkPosition == -1);
       }
 
-      _updateSttIcon() {
-        this.sttIcon = this.stt.indexOf(this.articleId) > -1 ? 'bookmark' : 'bookmark_border';
+      _calcBookmarkPosition(articleId, bookmarks) {
+        for (let i = 0; i < bookmarks.length; i++) {
+          if (bookmarks[i].id == articleId) { return i; }
+        }
+        return -1;
+      }
+
+      _updateBookmarksIcon(marked) {
+        this.bookmarksIcon = marked ? 'bookmark' : 'bookmark_border';
       }
 
       _isNull(arr = []) {

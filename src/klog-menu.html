@@ -18,13 +18,14 @@
       }
 
       .subtitle {
+        position: relative;
         display: flex;
         align-items: center;
         height: 24px;
         font-size: .9em;
         padding: 16px 16px 8px;
         overflow: hidden;
-        position: relative;
+        color: var(--secondary-text-color);
       }
 
       .subtitle.button {
@@ -71,7 +72,7 @@
 
       :host([round]) .item {
         padding: 4px 12px;
-        margin: 4px 8px 0px 0;
+        margin: 4px 8px 0 0;
         border-radius: 0 22px 22px 0;
       }
 
@@ -153,21 +154,20 @@
       </template>
 
     </iron-selector>
-    <iron-selector attr-for-selected="name" selected="{{collection}}" on-iron-select="updateCollection">
-      <template is="dom-if" if="{{login}}">
-        <template is="dom-if" if="{{!_isEmpty(collections)}}">
-
+    <iron-selector attr-for-selected="name" selected="{{customMenuSelected}}" on-iron-select="customMenuSelect">
+      <div name="idle" id="idle"></div>
+      <template is="dom-repeat" items="{{menu}}">
+        <template is="dom-if" if="{{item.subtitle}}">
           <div class="divider"></div>
-          <div class="subtitle"><span>分类</span></div>
+          <div class="subtitle"><span>{{item.text}}</span></div>
+        </template>
 
-          <template is="dom-repeat" items="{{collections}}">
-            <div class="item secondary" name$="{{item}}">
-              <iron-icon icon="label"></iron-icon>
-              <span>{{item}}</span>
-              <paper-ripple></paper-ripple>
-            </div>
-          </template>
-
+        <template is="dom-if" if="{{item.item}}">
+          <div class="item secondary" name$="{{item.name}}" category$="{{item.category}}">
+            <iron-icon icon="{{item.icon}}"></iron-icon>
+            <span>{{item.text}}</span>
+            <paper-ripple></paper-ripple>
+          </div>
         </template>
 
       </template>
@@ -187,8 +187,28 @@
           login: {
             type: Boolean,
             value: false
+          },
+          customMenu: {
+            type: Object,
+            observer: '_calcMenuItems'
+          },
+          menu: {
+            type: Array,
+            value: []
           }
         }
+      }
+
+      _calcMenuItems(customMenu) {
+        this._customMenu = customMenu;
+        const menu = [];
+        for (let category of customMenu) {
+          menu.push({ subtitle: true, name: category.name, text: category.text });
+          for (let item of category.items) {
+            menu.push({ item: true, name: item.name, text: item.text, icon: item.icon, category: category.name });
+          }
+        }
+        this.set('menu', menu);
       }
 
       updatePage(e) {
@@ -199,21 +219,23 @@
             composed: true,
             detail: { page: name }
           }));
-          this.dispatchEvent(new CustomEvent('menu-select', {
-            bubbles: true,
-            composed: true,
-          }));
+          this.dispatchEvent(new CustomEvent('menu-select', { bubbles: true, composed: true }));
         }
       }
 
-      updateCollection(e) {
-        const collection = e.detail.item.getAttribute('name');
-        if (collection) {
-          this.dispatchEvent(new CustomEvent('collection-select', {
+      customMenuSelect(e) {
+        const item = e.detail.item;
+        const name = item.getAttribute('name');
+        if (name == 'idle') { return; }
+        else this.$.idle.click();
+        const category = item.getAttribute('category');
+        if (category && name) {
+          this.dispatchEvent(new CustomEvent('custom-menu-select', {
             bubbles: true,
             composed: true,
-            detail: { collection: collection }
+            detail: { category: category, item: name }
           }));
+          this.dispatchEvent(new CustomEvent('menu-select', { bubbles: true, composed: true }));
         }
       }
 

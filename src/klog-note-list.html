@@ -187,7 +187,7 @@
     </style>
 
     <klog-data-list id="data" last-response="{{list}}" loading="{{loading}}" userinfo="{{userinfo}}"
-      keyword="{{keyword}}" collection="{{collection}}" stt="{{stt}}"></klog-data-list>
+      keyword="{{keyword}}" collection="{{collection}}" bookmarks="{{bookmarks}}"></klog-data-list>
 
     <div class="header-container" id="header">
       <!-- <div class="gesture-indicator"></div> -->
@@ -230,7 +230,8 @@
           },
           keyword: {
             type: String,
-            notify: true
+            notify: true,
+            observer: 'load'
           },
           list: {
             type: Array,
@@ -238,7 +239,8 @@
           },
           collection: {
             type: String,
-            notify: true
+            notify: true,
+            observer: 'load'
           },
           title: {
             type: String,
@@ -248,7 +250,6 @@
 
       static get observers() {
         return [
-          'load(keyword, collection)',
           'updateTitle(keyword,collection)'
         ]
       }
@@ -308,51 +309,20 @@
           this._waitingToFocus = false;
           this.$.search.focus();
         }
-        // blur
-        // if (this.userinfo.preference && this.userinfo.preference.backdropBlurEnabled) {
-        //   let isLight = this.theme == 'light';
-        //   let process = Math.min(y / threshold, 1);
-        //   this.updateStyles({ '--klog-header-opacity': process * (isLight ? 0.4 : 0.8) });
-        //   this.$.header.style.backdropFilter = `saturate(180%) blur(${y > threshold ? process * (isLight ? 10 : 15) : 0}px)`;
-        //   this.$.header.style.webkitBackdropFilter = `saturate(180%) blur(${y > threshold ? process * (isLight ? 10 : 15) : 0}px)`;
-        // } else {
-        this.updateStyles({ '--klog-header-opacity': 1 });
-        this.$.header.style.backdropFilter = 'initial';
-        this.$.header.style.webkitBackdropFilter = 'initial';
-        // }
       }
 
-      load() {
+      load(property, oldProperty) {
+        if (!property && !oldProperty) return;
         this.$.scrollTarget.scrollTop = 0;
         this.$.scrollTarget.addEventListener('scroll', this._pageScrollHandler);
         this.$.data.load().then(list => {
-          if (!list) return;
-          let isMobile = this.mobile;
-          let isOnly = list.length == 1;
-          let isSearching = this.keyword != '';
-          let hasPath = Boolean(this.path);
-          if (isMobile && isSearching && isOnly || !isMobile && isSearching) {
-            // 加载第一项：手机上搜索时只有一个结果；电脑上搜索时
-            this.dispatchEvent(new CustomEvent('app-load', {
-              detail: {
-                page: 'note/' + this.collection + '/' + list[0].path
-              }, bubbles: true, composed: true
-            }));
-          } else if (!isMobile && !isSearching && !hasPath) {
-            // 加载非置顶的第一项
-            let topArticleIndex = 0;
-            for (let i = 0; i < list.length; i++) {
-              if (!list[i].stt) {
-                topArticleIndex = i;
-                break;
-              }
-            }
-            this.dispatchEvent(new CustomEvent('app-load', {
-              detail: {
-                page: 'note/' + this.collection + '/' + list[topArticleIndex].path
-              }, bubbles: true, composed: true
-            }));
-          }
+          if (list.length == 0 || this.path) return;
+          // load the first result
+          this.dispatchEvent(new CustomEvent('app-load', {
+            detail: {
+              page: 'note/' + this.collection + '/' + list[0].path
+            }, bubbles: true, composed: true
+          }));
         });
       }
 
