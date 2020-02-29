@@ -190,7 +190,6 @@
       keyword="{{keyword}}" collection="{{collection}}" bookmarks="{{bookmarks}}"></klog-data-list>
 
     <div class="header-container" id="header">
-      <!-- <div class="gesture-indicator"></div> -->
       <div class="title">{{title}}</div>
       <klog-note-search id="search" keyword="{{keyword}}" userinfo="{{userinfo}}" on-click="search"></klog-note-search>
     </div>
@@ -317,10 +316,10 @@
         this.$.scrollTarget.addEventListener('scroll', this._pageScrollHandler);
         this.$.data.load().then(list => {
           if (list.length == 0 || this.path) return;
-          // load the first result
-          this.dispatchEvent(new CustomEvent('app-load', {
+          // load the first result in background
+          this.dispatchEvent(new CustomEvent('note-update-path', {
             detail: {
-              page: 'note/' + this.collection + '/' + list[0].path
+              path: list[0].path
             }, bubbles: true, composed: true
           }));
         });

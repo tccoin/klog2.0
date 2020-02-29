@@ -12,7 +12,7 @@
           },
           path: {
             type: String,
-            observer: '_onIdChanged'
+            observer: '_onPathChanged'
           },
           articleId: {
             type: String,
@@ -58,23 +58,27 @@
       }
 
       _onIdChanged(id, _id) {
-        if (id != _id) this.load();
+        if (id != _id && (!this.lastResponse || id != this.lastResponse.objectId)) this.load();
+      }
+
+      _onPathChanged(path, _path) {
+        if (path != _path && (!this.lastResponse || path != this.lastResponse.path)) this.load();
       }
 
       load() {
         if (!this.default && !this.path && !this.articleId) return;
         if (this.disabled) return;
-        this.loading = true;
         // ID
         if (this.articleId) {
           this.loadByArticleId();
         } else {
-          this.loadByPath();
+          this.loadByPath(this.path);
         }
       }
 
       loadByArticleId() {
         var article = AV.Object.createWithoutData('Article', this.articleId);
+        this.loading = true;
         return article.fetch()
           .then(data => {
             if (data.get('updatedAt')) {
@@ -85,13 +89,14 @@
           });
       }
 
-      loadByPath() {
+      loadByPath(path) {
+        this.loading = true;
         let query = new AV.Query('Article');
         let author;
         // 私有文章
         if (this.type == 'user') {
           if (!this.userinfo || !this.userinfo.publicinfo) {
-            setTimeout(() => this.load(this.path), 100);
+            setTimeout(() => this.loadByPath(path), 100);
             return;
           }
           author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
@@ -102,8 +107,8 @@
           query.equalTo('collection', this.collection);
         }
         // 路径
-        if (this.path) {
-          query.equalTo('path', this.path);
+        if (path) {
+          query.equalTo('path', path);
         }
         query.select(['title', 'markdown', 'comments', 'topic', 'author', 'immersive', 'collection', 'tags', 'path']);
         query.include(['author', 'topic']);

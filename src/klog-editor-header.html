@@ -102,19 +102,6 @@
             type: String,
             notify: true
           },
-          path: {
-            type: String,
-            notify: true,
-            observer: '_pathChanged'
-          },
-          randomPath: {
-            type: String,
-            notify: true,
-            observer: '_pathChanged'
-          },
-          backTo: {
-            type: String
-          },
           selected: {
             type: Number,
             notify: true
@@ -129,20 +116,14 @@
 
       ready() {
         super.ready();
-        this._pathChanged();
       }
 
       openKlogDrawer() {
         this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
       }
 
-      _pathChanged(path) {
-        if (path) this.backTo = (this.backTo.indexOf('#/article') > -1 ? 'article/' : 'note/all/') + path;
-        else path = '';
-      }
-
       back() {
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || '/', now: false } }));
+        this.dispatchEvent(new CustomEvent('back', { bubbles: true, composed: true }));
       }
 
       publish() {

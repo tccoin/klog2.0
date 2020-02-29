@@ -75,7 +75,10 @@
           error: {
             type: String,
             notify: true
-          }
+          },
+          wordCount: {
+            type: Number
+          },
         }
       }
 
@@ -264,14 +267,15 @@
           query.equalTo('path', path);
           query.select(['path']);
           query.find().then((results) => {
-            const pathIsDuplicate = results.length != 0;
-            if (pathIsDuplicate) {
+            this._pathUsed = false;
+            if (results.length != 0) {
               let articleIsEmpty = !this.path && !this.articleId;
               const thatIsThis = results[0].id == this.articleId;
               if (articleIsEmpty) {
                 this._generateRandomPath();
               } else if (!thatIsThis) {
-                this.error = '这个路径已经被使用啦，请换一个( ´ー`)';
+                this.error = new Error('path used');
+                this._pathUsed = true;
               }
             }
           }, (err) => console.log(err));
@@ -279,16 +283,14 @@
       }
 
       _verifyPath() {
-        let illegal = true;
         const illegalRe = /[^\d\w-]/g;
-        let _path = this.path || this.randomPath || '';
         if (this.path && illegalRe.test(this.path)) {
           this.path = this.path.replace(illegalRe, '-').replace(/-+/g, '-');
-          this.error = '这个路径不可以！( ´ー`)';
-          illegal = false;
+          this.error = new Error('path illegal');
+          return false;
+        } else {
+          return true;
         }
-        this._pathIllegal = illegal;
-        return illegal;
       }
 
       _updateFileinfo(fileinfo) {
@@ -345,7 +347,9 @@
       save() {
         // create or update
         let article;
-        if (this.markdown == '') return Promise.reject('球球李写点什么吧！');
+        if (this.wordCount == 0) {
+          return Promise.reject(new Error('empty'));
+        }
         if (this.articleId) {
           article = AV.Object.createWithoutData('Article', this.articleId);
         } else {
@@ -355,8 +359,17 @@
         let topic = AV.Object.createWithoutData('Topic', '59bcb4d3128fe158340be1b5');
         let author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
         // path
-        if (this._pathIllegal) {
-          this.path = '';
+        if (this._pathUsed) {
+          return Promise.reject(new Error('path used'));
+        }
+        if (this.path != '') {
+          if (!this._verifyPath()) {
+            return Promise.reject(new Error());
+          } else if (this.path.length < 6) {
+            return Promise.reject(new Error('path too short'));
+          } else if (this.path[0] == '-') {
+            return Promise.reject(new Error('path start with hyphen'));
+          }
         }
         // set attributes
         article.set('title', this.title);
@@ -372,8 +385,8 @@
         article.set('keywords', this.keywords);
         article.set('comments', []);
         article.set('topic', topic);
+        article.set('author', author);
         if (!this.quiet) {
-          article.set('author', author);
           article.set('updateTimeline', true);
         } else {
           console.log('Updated in quite mode.');
@@ -381,8 +394,6 @@
         }
         //save
         return article.save();
-        //require updates
-        this.dispatchEvent(new CustomEvent('update-note-collection', { bubbles: true, composed: true }));
       }
 
       delete() {

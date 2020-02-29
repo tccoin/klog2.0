@@ -17,6 +17,7 @@ module.exports = function (app, opts, next) {
       const b = ua.browser;
       const supportBrowser = {
         'Chrome': 49,
+        'Android Chrome': 49,
         'Opera': 36,
         'Safari': 10,
         'Edge': 15,

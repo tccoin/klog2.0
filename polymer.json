@@ -4,6 +4,8 @@
   "fragments": [
     "src/klog-timeline.html",
     "src/klog-article.html",
+    "src/klog-layout.html",
+    "src/klog-icons.html",
     "src/klog-editor.html",
     "src/klog-signup.html",
     "src/klog-login.html",

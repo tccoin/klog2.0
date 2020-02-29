@@ -274,7 +274,7 @@
           'handleError(error)',
           'loadArticle(routeData.path)',
           'updateTitle(article.title)',
-          'articleloaded(article.title)',
+          'articleloaded(article.objectId)',
           'updateImmersiveMode(article.immersive)',
           'updateScrollerQuery(shareData.share)'
         ]
@@ -321,7 +321,7 @@
       }
 
       articleloaded() {
-        if (this.article && this.article.title) {
+        if (this.article && this.article.objectId) {
           this.loading = false;
         }
       }

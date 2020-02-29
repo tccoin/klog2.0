@@ -27,7 +27,6 @@
         background: var(--klog-layout-background, var(--klog-page-background));
         color: var(--primary-text-color);
         position: relative;
-        -webkit-overflow-scrolling: touch;
         overscroll-behavior: none;
         --paper-toggle-button-unchecked-button-color: var(--accent-color);
         --klog-layout-margin-left: 240px;
@@ -56,7 +55,7 @@
 
       .page-container {
         width: 100vw;
-        /* transition: all .15s ease; */
+        -webkit-overflow-scrolling: touch;
       }
 
       .page-container>* {
@@ -149,7 +148,7 @@
         <klog-signup id="signup" name="signup"></klog-signup>
         <klog-userpanel name="userpanel"></klog-userpanel>
         <klog-apps name="apps"></klog-apps>
-        <klog-note name="note" theme="[[theme]]" mobile="{{mobile}}"> </klog-note>
+        <klog-note id="note" name="note" theme="[[theme]]" mobile="{{mobile}}"> </klog-note>
         <!--testing-->
         <klog-drive name="drive"></klog-drive>
         <klog-zone name="zone"></klog-zone>
@@ -160,7 +159,7 @@
     <!--about-->
     <paper-dialog id="about" with-backdrop>
       <h2>> klog -V</h2>
-      <p>v2.10.1<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.10.2<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column>
         <paper-button on-click="aboutHelp">> klog help</paper-button>
         <paper-button on-click="aboutLog">> klog log</paper-button>
@@ -237,7 +236,17 @@
         this.addEventListener('open-about', e => this.$.about.open());
         this.addEventListener('about-help', e => this.aboutHelp());
         this.addEventListener('about-log', e => this.aboutLog());
-        this.addEventListener('update-note-collection', e => this.$.note.initColletion = false);
+        this.addEventListener('require-update', e => {
+          this.$.page.addEventListener('iron-select', e => {
+            let pageElement = this.$.page.querySelector(`[name = '${e.target.selected}']`);;
+            if (pageElement.refresh) {
+              pageElement.refresh();
+            }
+          }, { once: true });
+        });
+        this.addEventListener('backdrop-opened-changed', e => {
+          this.$.page.style = `-webkit-overflow-scrolling:${!e.detail.value ? 'touch' : 'unset'}`;
+        });
       }
 
       async load(page, subroute, userLoadPromise) {
@@ -266,7 +275,7 @@
       }
 
       async _userinfoHandle(userLoadPromise) {
-        const result = await userLoadPromise
+        const result = await userLoadPromise;
         this.userinfo = result.userinfo;
         this.login = result.login;
       }

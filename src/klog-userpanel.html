@@ -283,6 +283,17 @@
         }
       }
 
+      ready() {
+        super.ready();
+        this.$.uploadAvatarDialog.addEventListener('opened-changed', e => {
+          this.dispatchEvent(new CustomEvent('backdrop-opened-changed', {
+            bubbles: true,
+            composed: true,
+            detail: { value: e.detail.value }
+          }));
+        });
+      }
+
       openDrawer() {
         this.dispatchEvent(new CustomEvent('drawer-toggle', {
           bubbles: true,

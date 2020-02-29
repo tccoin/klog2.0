@@ -223,7 +223,7 @@
             this.tags = cap[1] ? cap[1].toLowerCase().split(',') : [];
             if (this.breadcrumbs) {
               return `
-              <div class="breadcrumbs">
+              <div class="breadcrumbs" dont-count>
               <div class="collection">${cap[0] || '日常'}</div>
               ${cap[1]
                   ? `<div class="tags">${this.tags.map(t => `<span class="tag">${t}</span>`)}</div>`
@@ -307,16 +307,18 @@
       }
 
       _updateWordCount() {
-        if (!this.$.content.innerText) {
-          this.wordCount = 0;
-          return;
+        let sum = 0;
+        for (let element of this.$.content.children) {
+          if (!element.hasAttribute('dont-count')) {
+            sum += element.innerText
+              .replace(/(\r\n+|\s+|　+)+/g, "龘")
+              .replace(/[\x00-\xff]/g, "m")
+              .replace(/m+/g, "*")
+              .replace(/龘/g, "")
+              .length;
+          }
         }
-        this.wordCount = this.$.content.innerText
-          .replace(/(\r\n+|\s+|　+)+/g, "龘")
-          .replace(/[\x00-\xff]/g, "m")
-          .replace(/m+/g, "*")
-          .replace(/龘/g, "")
-          .length;
+        this.wordCount = sum;
       }
 
       _updateHeadings() {
@@ -363,8 +365,12 @@
         const numbered = this.preference.numberedHeading;
         for (let heading of headings) {
           const element = this.$.content.querySelector(`#${heading.id}`);
-          if (heading.isIndependentTitle && this.hideIndependentTitle) {
-            element.parentNode.removeChild(element);
+          if (heading.isIndependentTitle) {
+            if (this.hideIndependentTitle) {
+              element.parentNode.removeChild(element);
+            } else {
+              element.setAttribute('independent-title', '');
+            }
             continue;
           }
           if (numbered == 'true' || this._hasToc && numbered == 'auto') {

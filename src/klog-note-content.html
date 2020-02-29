@@ -121,7 +121,7 @@
       }
     </style>
 
-    <klog-data-article key="updatedAt" path="{{path}}" last-response="{{article}}" loading="{{loading}}"
+    <klog-data-article id="data" key="createdAt" last-response="{{article}}" loading="{{loading}}"
       last-error="{{error}}" userinfo="{{userinfo}}" type="user" default="{{!mobile}}">
     </klog-data-article>
 
@@ -235,13 +235,15 @@
       }
 
       back() {
+        this.dispatchEvent(new CustomEvent('note-select-page', { bubbles: true, composed: true, detail: { selected: 0 } }));
         this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' } }));
       }
 
-      load(path) {
+      load(path, force = false) {
         if (window.location.hash.indexOf('#/note') == -1) return;
-        this.path = path || '';
-        this.selected = path ? 1 : 0;
+        if (path == this._path && !force) return;
+        this.$.data.loadByPath(path);
+        this._path = path;
       }
 
       loaded(articleId) {

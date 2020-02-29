@@ -319,8 +319,10 @@
           toast.querySelector('a').addEventListener('click', e => link.onclick(e));
         }
         this.shadowRoot.append(toast);
-        toast.addEventListener('opened-changed', function () {
-
+        toast.addEventListener('opened-changed', function (e) {
+          if (!e.detail.value) {
+            this.parentNode.removeChild(this);
+          }
         });
         toast.open();
       }

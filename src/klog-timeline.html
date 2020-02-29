@@ -279,7 +279,8 @@
         } else {
           await this.$.data.load();
           const token = x => x.objectId + x.updatedAt + x.title + x.path + x.text;
-          if (token(this._calculateCards(this.list)[0]) != token(this._cards[0])) {
+          let newList = this._calculateCards(this.list);
+          if (this._cards.length > 0 && newList.length > 0 && token(newList[0]) != token(this._cards[0])) {
             this.updateButtonHidden = false;
           }
         }
@@ -520,7 +521,9 @@
 
       refresh() {
         this.dispatchEvent(new CustomEvent('vibrate-start', { bubbles: true, composed: true, detail: { duration: 50 } }));
-        this.$.scrollTarget.scrollTop = 0;
+        if (this.$.scrollTarget) {
+          this.$.scrollTarget.scrollTop = 0;
+        }
         return this.updateTimeline(false);
       }
 

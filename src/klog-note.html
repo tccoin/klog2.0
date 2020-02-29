@@ -18,31 +18,19 @@
     <style include="klog-style-note"></style>
     <klog-data-collection id="collection" disabled></klog-data-collection>
     <app-route route="{{route}}" pattern="/:collection" data="{{routeData}}" tail="{{subroute0}}"></app-route>
-    <app-route route="{{subroute0}}" pattern="/:path" data="{{subrouteData}}" tail="{{subroute1}}"></app-route>
-    <app-route route="{{subroute1}}" pattern="/:hash" data="{{shareData}}"></app-route>
-    <app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{_subroute}}"></app-route>
-    <app-route route="{{_subroute}}" pattern="/:share" data="{{shareData}}"></app-route>
-    <klog-backdrop id="backdrop" class="layout" gesture-disabled="{{!gesture}}" moving="{{moving}}"
-      front-switch-disabled>
-      <klog-pages class="backdrop-back" slot="back" selected="0">
-        <div>
-          <app-toolbar class="backdrop-back-toolbar" id="toolbar">
-            <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden$="{{!mobile}}"></paper-icon-button>
-            <div class="title">
-              <div main-title>Klog</div>
-            </div>
-            <div class="divider"></div>
-            <paper-button on-click="add">
-              <iron-icon icon="add"></iron-icon>新建笔记
-            </paper-button>
-          </app-toolbar>
+    <app-route route="{{subroute0}}" pattern="/:path" data="{{pathData}}" tail="{{subroute1}}"></app-route>
+    <app-route route="{{subroute1}}" pattern="/:share" data="{{shareData}}"></app-route>
+    <klog-backdrop id="backdrop" class="layout" gesture-disabled="true" moving="{{moving}}" front-switch-disabled>
+      <app-toolbar class="backdrop-back-toolbar" slot="back" id="toolbar">
+        <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden$="{{!mobile}}"></paper-icon-button>
+        <div class="title">
+          <div main-title>Klog</div>
         </div>
-        <div>
-          <app-toolbar class="backdrop-back-toolbar">
-            <paper-icon-button icon="close"></paper-icon-button>
-          </app-toolbar>
-        </div>
-      </klog-pages>
+        <div class="divider"></div>
+        <paper-button on-click="add">
+          <iron-icon icon="add"></iron-icon>新建笔记
+        </paper-button>
+      </app-toolbar>
       <klog-pages id="animation" class="backdrop-front" slot="front" selected="{{selected}}" disabled="{{!mobile}}">
         <klog-note-list id="list" keyword="{{keyword}}" theme="[[theme]]" collection="{{collection}}"
           gesture="{{gesture}}" moving="{{moving}}" mobile="{{mobile}}" path="{{path}}">
@@ -99,7 +87,7 @@
 
       static get observers() {
         return [
-          'routeChanged(routeData.collection, subrouteData.path)',
+          'routeChanged(routeData.collection, pathData.path)',
           'updateScrollerQuery(shareData.share)',
           'loadPreference(userinfo.preference)',
           'articleError(error)'
@@ -122,6 +110,19 @@
         this.addEventListener('update-bookmarks', (e) => {
           this.bookmarks = e.detail.bookmarks;
           this._updateCustomMenu();
+        });
+        this.addEventListener('note-select-page', (e) => {
+          this.selected = e.detail.selected;
+        });
+        this.addEventListener('note-update-path', (e) => {
+          this.path = e.detail.path;
+        });
+        this.$.shareDialog.addEventListener('opened-changed', e => {
+          this.dispatchEvent(new CustomEvent('backdrop-opened-changed', {
+            bubbles: true,
+            composed: true,
+            detail: { value: e.detail.value }
+          }));
         });
       }
 
@@ -154,10 +155,20 @@
         });
       }
 
+      update(route) {
+        this.route = route;
+      }
+
+      refresh() {
+        this._initCollection = false;
+        this.$.list.load(true);
+        this.loadArticle(this.path, true);
+      }
+
       async _loadCollection(result) {
         let collections;
-        if (!this.initColletion) {
-          this.initColletion = true;
+        if (!this._initCollection) {
+          this._initCollection = true;
           collections = await this.$.collection.list();
           this.collections = collections;
         }
@@ -203,6 +214,7 @@
             detail: { page: `note/${item}/` }
           }));
         } else if (category == 'bookmark') {
+          this.selected = 1;
           this.dispatchEvent(new CustomEvent('app-load', {
             bubbles: true,
             composed: true,
@@ -214,14 +226,6 @@
       loadPreference(preference) {
         this.bookmarks = preference ? preference.bookmarks : [];
         this._updateCustomMenu();
-      }
-
-      update(route) {
-        this.route = route;
-      }
-
-      async unload() {
-        this.path = '';
       }
 
       _timeout(promise, timeout) {
@@ -245,8 +249,7 @@
           if (!this.mobile) this.$.list.$.search.focus();
         }
         if (path == this.path) return;
-        if (path) {
-          this.selected = 1;
+        if (path || path == '') {
           this.path = path;
           this.loadArticle(path);
         } else {
@@ -254,8 +257,8 @@
         }
       }
 
-      loadArticle(path) {
-        this.$.content.load(path);
+      loadArticle(path, force = false) {
+        this.$.content.load(path, force);
       }
 
       articleError() {

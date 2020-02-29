@@ -154,7 +154,8 @@
       </template>
 
     </iron-selector>
-    <iron-selector attr-for-selected="name" selected="{{customMenuSelected}}" on-iron-select="customMenuSelect">
+    <iron-selector id="customMenuSelector" attr-for-selected="name" selected="{{customMenuSelected}}"
+      on-iron-select="customMenuSelect">
       <div name="idle" id="idle"></div>
       <template is="dom-repeat" items="{{menu}}">
         <template is="dom-if" if="{{item.subtitle}}">
@@ -227,7 +228,7 @@
         const item = e.detail.item;
         const name = item.getAttribute('name');
         if (name == 'idle') { return; }
-        else this.$.idle.click();
+        else this.$.customMenuSelector.selected = 'idle';
         const category = item.getAttribute('category');
         if (category && name) {
           this.dispatchEvent(new CustomEvent('custom-menu-select', {

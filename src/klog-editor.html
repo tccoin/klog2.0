@@ -123,6 +123,10 @@
         transition: opacity .2s ease, transform .1s ease;
       }
 
+      .klog-editor-back-pages {
+        transition: .2s all 0s ease;
+      }
+
       :host([exit]) .klog-editor-back-pages,
       :host([exit]) .klog-editor-main-pages {
         opacity: 0;
@@ -142,21 +146,20 @@
     <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}"
       random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}"
       private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}" error="{{err}}"
-      current-line="{{currentLine}}">
+      current-line="{{currentLine}}" word-count="{{wordCount}}">
     </klog-data-editor>
     <div class="layout">
       <klog-backdrop id="backdrop">
         <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}"
-          path="{{path}}" random-path="{{randomPath}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}"
-          selected="{{selected}}">
+          mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
         </klog-editor-header>
         <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
           <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}"
             title="{{title}}" path="{{path}}" random-path="{{randomPath}}" private="{{private}}"
             immersive="{{immersive}}"></klog-editor-info-form>
           <klog-upload-zone class="klog-editor-back-pages" name="uploadzone" id="uploadzone"></klog-upload-zone>
-          <klog-editor-browser class="klog-editor-back-pages" name="browser" disabled="{{loading}}"
-            article-id="{{articleId}}" collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser>
+          <!-- <klog-editor-browser class="klog-editor-back-pages" name="browser" disabled="{{loading}}"
+            article-id="{{articleId}}" collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser> -->
         </iron-pages>
         <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
           <klog-editor-textarea id="textarea" loading="{{loading}}" value="{{markdown}}" preview="{{preview}}"
@@ -208,7 +211,8 @@
             value: {}
           },
           path: {
-            type: String
+            type: String,
+            observer: '_pathChanged'
           },
           layout: {
             type: Object,
@@ -254,6 +258,7 @@
           this._loadPreset();
         }, 1);
       }
+
       _updateArticleId() {
         this.articleId = this.routeData.id;
       }
@@ -325,11 +330,12 @@
           this.$.data.save().then((updatedArticle) => {
             //data
             this.$.data.articleId = updatedArticle.id;
+            //event
+            this.dispatchEvent(new CustomEvent('require-update', { bubbles: true, composed: true, detail: { page: 'note' } }));
             //ui
             this.loading = false;
-            this.showToast('已保存', { title: '查看', onclick: () => this.back() });
-            //browser
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '#/editor/' + this.articleId } }));
+            this._pathChanged();
+            this.showToast('已保存', { title: '查看', href: this.backTo });
           }, err => {
             this.set('err', err);
             this.loading = false;
@@ -342,13 +348,15 @@
           this.$.data.delete().then((success) => {
             //data
             this.$.data.reset();
+            //event
+            this.dispatchEvent(new CustomEvent('require-update', { bubbles: true, composed: true, detail: { page: 'note' } }));
             //ui
             this.loading = false;
-            this.showToast('已删除', undefined, { noCancelOnOutsideClick: false });
+            this.showToast('已删除', undefined, { duration: 500, noCancelOnOutsideClick: false });
             //route
-            this.continue = '#/note/all/';
+            this.backTo = /#\/(article|timeline)/.test(this.backTo) ? '#/timeline' : '#/note/all/';
             setTimeout(() => {
-              this.$.header.back();
+              this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo } }));
             }, 500);
           }, (err) => {
             this.set('err', err);
@@ -359,9 +367,12 @@
           if (e.ctrlKey == true && e.keyCode == 83) {
             //ctrl s
             e.preventDefault();
-            if (!this.loading) this.$.header.$.saveButton.click();
+            if (!this.loading) {
+              this.dispatchEvent(new CustomEvent('save', { bubbles: true, composed: true, detail: { quiet: true } }));
+            }
           }
         });
+        this.addEventListener('back', (e) => this.back());
         this.addEventListener('dragover', e => this.dragover(e), false);
         this.addEventListener('dragleave', e => this.dragleave(e), false);
         this.addEventListener('drop', e => this.drop(e), false);
@@ -373,7 +384,13 @@
       }
 
       back() {
-        this.$.header.back();
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || '/' } }));
+      }
+
+      _pathChanged(path) {
+        if (path) {
+          this.backTo = (/#\/(article|timeline)/.test(this.backTo) ? '#/article/' : '#/note/all/') + path;
+        }
       }
 
       dragover() {
@@ -430,10 +447,21 @@
         if (!err) return;
         if (err.code == -1 && err.message.indexOf('offline') > -1) {
           this.showToast('无法保存, 请检查网络连接');
+        } else if (err.message == 'empty') {
+          this.showToast('球球李写点什么吧！');
+        } else if (err.message == 'path illegal') {
+          this.showToast('路径里不可以有奇怪的符号 ( ´ー`)');
+        } else if (err.message == 'path used') {
+          this.showToast('这个路径已经被使用啦，请换一个 ( ´ー`)');
+        } else if (err.message == 'path start with hyphen') {
+          this.showToast('路径不能以短横线开头 ( ´ー`)');
+        } else if (err.message == 'path too short') {
+          this.showToast('你设置的路径太短啦 ( ´ー`)');
         } else if (err.code == 403) {
           this.showToast('没有权限, 你只能编辑自己的文章哦');
         } else if (err.code == 404) {
           this.showToast('无法保存, 请备份后新建文章');
+        } else if (err.message == '' && !err.code) {
         } else {
           this.showToast('保存失败, 请备份文章后再试一次');
           console.log(this.err);

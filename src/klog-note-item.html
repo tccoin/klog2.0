@@ -62,10 +62,20 @@
 
       static get is() { return 'klog-note-item'; }
 
+      static get properties() {
+        return {
+          selected: {
+            type: Boolean,
+            notify: true
+          },
+        }
+      }
+
       ready() {
         super.ready();
         setTimeout(() => $clamp(this.$.text, { clamp: 2 }), 1);
         this.addEventListener('click', () => {
+          this.dispatchEvent(new CustomEvent('note-select-page', { bubbles: true, composed: true, detail: { selected: 1 } }));
           this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' + this.data.path } }));
         });
       }
