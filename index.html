@@ -50,30 +50,6 @@
       display: none;
     }
 
-    body:not([unresolved])>.splash-container {
-      display: none;
-    }
-
-    body>.splash-container {
-      display: flex;
-      width: 100vw;
-      height: var(--klog-layout-page-height);
-      overflow: hidden;
-      align-items: center;
-      justify-content: center;
-    }
-
-    body>.splash-container h1 {
-      font-size: 20vw;
-      font-weight: lighter;
-      color: rgba(0, 0, 0, .87);
-    }
-
-    body>.splash-container sup {
-      font-size: .5em;
-      color: rgba(0, 0, 0, .54);
-    }
-
     #statusbarFix,
     #statusbarFixBackground {
       display: block;
@@ -93,13 +69,6 @@
       z-index: 1000000;
       background-color: var(--klog-statusbar-color, #000);
       opacity: var(--klog-statusbar-opacity, 1);
-    }
-
-    @media(max-width: 767px) {
-      body>.splash-container h1 {
-        font-size: 20vh;
-        transform: rotate(90deg);
-      }
     }
   </style>
 </head>
