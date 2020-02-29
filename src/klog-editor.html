@@ -59,6 +59,7 @@
       }
 
       .klog-editor-back-pages {
+        width: 100vw;
         margin: 64px auto 16px;
         padding: 16px;
         max-height: calc(var(--klog-layout-page-height) - 224px);
@@ -157,7 +158,7 @@
           <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}"
             title="{{title}}" path="{{path}}" random-path="{{randomPath}}" private="{{private}}"
             immersive="{{immersive}}"></klog-editor-info-form>
-          <klog-upload-zone class="klog-editor-back-pages" name="uploadzone" id="uploadzone"></klog-upload-zone>
+          <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
           <!-- <klog-editor-browser class="klog-editor-back-pages" name="browser" disabled="{{loading}}"
             article-id="{{articleId}}" collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser> -->
         </iron-pages>
