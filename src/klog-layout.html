@@ -30,6 +30,7 @@
         overscroll-behavior: none;
         --paper-toggle-button-unchecked-button-color: var(--accent-color);
         --klog-layout-margin-left: 240px;
+        --klog-layout-page-height: 100vh;
         transition: all .3s ease, background .5s ease-out;
       }
 
@@ -40,7 +41,7 @@
 
       .menu-container,
       .page-container {
-        height: 100vh;
+        height: var(--klog-layout-page-height);
         box-sizing: border-box;
         overflow-y: auto;
       }
@@ -59,8 +60,9 @@
       }
 
       .page-container>* {
-        min-height: 100vh;
+        min-height: var(--klog-layout-page-height);
         padding-left: var(--klog-layout-margin-left);
+        box-sizing: border-box;
       }
 
       .spinner-container {
@@ -247,6 +249,11 @@
         this.addEventListener('backdrop-opened-changed', e => {
           this.$.page.style = `-webkit-overflow-scrolling:${!e.detail.value ? 'touch' : 'unset'}`;
         });
+        const setPageHeight = () => {
+          this.style.setProperty('--klog-layout-page-height', this.mobile ? `${window.innerHeight}px` : '100vh');
+        }
+        setPageHeight();
+        window.addEventListener('resize', setPageHeight);
       }
 
       async load(page, subroute, userLoadPromise) {

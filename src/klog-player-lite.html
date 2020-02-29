@@ -3,7 +3,7 @@
 <dom-module id="klog-player-lite">
   <template>
     <style>
-       :host {
+      :host {
         display: block;
         position: relative;
         overflow: hidden;
@@ -13,7 +13,7 @@
 
       video {
         width: 100%;
-        max-height: 100vh;
+        max-height: var(--klog-layout-page-height);
         display: block;
         object-fit: contain;
       }
@@ -29,7 +29,7 @@
         transition: opacity .15s ease;
       }
 
-       :host([paused]) .actions {
+      :host([paused]) .actions {
         opacity: 1;
       }
 

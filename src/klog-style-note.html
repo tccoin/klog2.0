@@ -8,18 +8,18 @@
         overflow: hidden;
         padding-left: var(--klog-layout-margin-left);
         width: 100vw;
-        min-height: calc(100vh - 64px) !important;
+        min-height: calc(var(--klog-layout-page-height) - 64px) !important;
         box-sizing: border-box;
         --klog-note-list-width: 300px;
         --klog-pages-width: 100%;
-        --klog-pages-height: 100vh;
+        --klog-pages-height: var(--klog-layout-page-height);
         --klog-note-padding: 24px;
         --klog-markdown-padding: var(--klog-note-padding);
       }
 
       .layout {
         width: 100%;
-        height: 100vh;
+        height: var(--klog-layout-page-height);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -53,7 +53,7 @@
       klog-pages.backdrop-front {
         width: 100%;
         max-width: 1280px;
-        height: calc(100vh - 64px);
+        height: calc(var(--klog-layout-page-height) - 64px);
         margin: auto;
         border-radius: 12px 12px 0 0;
         overflow: hidden;
@@ -97,7 +97,7 @@
         }
 
         klog-pages.backdrop-front[selected="1"] {
-          height: 100vh;
+          height: var(--klog-layout-page-height);
           transform: translateY(-64px);
           border-radius: 0;
         }

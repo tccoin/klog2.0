@@ -14,7 +14,7 @@
     <style>
       :host {
         flex: 1;
-        height: calc(100vh - 64px);
+        height: calc(var(--klog-layout-page-height) - 64px);
         outline: none;
       }
 
@@ -111,12 +111,12 @@
 
       @media (max-width: 767px) {
         :host {
-          height: 100vh;
+          height: var(--klog-layout-page-height);
         }
 
         .main-container {
           padding-top: 64px;
-          height: calc(100vh - 64px);
+          height: calc(var(--klog-layout-page-height) - 64px);
         }
       }
     </style>
