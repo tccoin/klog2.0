@@ -50,7 +50,7 @@
         "inlineScripts": false
       },
       "addServiceWorker": true,
-      "basePath": false
+      "basePath": true
     },
     {
       "preset": "es6-unbundled",
