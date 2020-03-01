@@ -436,6 +436,7 @@
         }
         this._setAttribute(this.$.header, 'fixed', !header.fixed);
         this._setAttribute(this.$.header, 'short', !header.short);
+        this._setAttribute(this.$.header, 'collapsed', true);
         this._bindEvent(this.$.scrollTarget, 'scroll', this._shortScrollHandle, !header.short);
         this._bindEvent(this.$.scrollTarget, 'scroll', this._shadowScrollHandle, header.shadow != 'scroll');
         if (header.shadow == 'scroll') {

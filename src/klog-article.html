@@ -265,7 +265,7 @@
                 <app-toolbar>
                   <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
                   <div class="title">
-                    <div page-title></div>
+                    <div main-title></div>
                   </div>
                 </app-toolbar>`
             }
@@ -383,7 +383,7 @@
             documentTitle: title + ' - Klog'
           }
         }));
-        this.$.header.querySelector('[page-title]').innerText = title;
+        this.$.header.querySelector('[main-title]').innerText = title;
       }
 
       updateImmersiveMode(immersive) {
