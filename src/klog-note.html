@@ -24,7 +24,9 @@
       <app-toolbar class="backdrop-back-toolbar" slot="back" id="toolbar">
         <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden$="{{!mobile}}"></paper-icon-button>
         <div class="title">
-          <div main-title>Klog</div>
+          <div main-title>
+            <iron-icon icon="klog"></iron-icon>
+          </div>
         </div>
         <div class="divider"></div>
         <paper-button on-click="add">
@@ -76,7 +78,7 @@
                 shadow: 'off',
               },
               styles: {
-                '--klog-header-background-color': 'transparent',
+                '--klog-header-background-color': 'var(--klog-page-background)',
                 '--klog-header-text-color': 'var(--primary-text-color)',
               },
               toolbar: Polymer.html``

@@ -113,12 +113,12 @@
         opacity: 0;
       }
 
-      klog-backdrop klog-pages.backdrop-back>app-toolbar {
-        transition: transform .1s ease-out;
+      klog-backdrop .layout .backdrop-back-toolbar {
+        transition: opacity .2s ease;
       }
 
-      :host([exit]) klog-pages.backdrop-back>app-toolbar {
-        transform: translateY(-64px);
+      :host([exit]) .layout .backdrop-back-toolbar {
+        opacity: 0;
       }
 
       .backdrop-back {

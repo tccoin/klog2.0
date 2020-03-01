@@ -125,6 +125,10 @@
         transform: translateY(25vh);
         opacity: 0;
       }
+
+      :host([exit]) klog-fab {
+        transform: scale(0);
+      }
     </style>
     <klog-data-timeline id="data" last-response="{{list}}"></klog-data-timeline>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}"
@@ -206,12 +210,13 @@
               }],
               styles: {
                 '--klog-header-background-color': 'var(--primary-background-color)',
+                '--klog-header-text-color': 'var(--primary-text-color)',
               },
               toolbar: Polymer.html`
                   <app-toolbar>
                     <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                     <div class="title" on-click="refresh">
-                      <div main-title>Klog</div>
+                      <div main-title><iron-icon icon="klog"></iron-icon></div>
                       <div class="divider"></div>
                       <div page-title>时间轴</div>
                       <paper-ripple></paper-ripple>

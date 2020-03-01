@@ -8,21 +8,10 @@
         right: 0;
         width: 100%;
         z-index: 100;
+        height: var(--klog-header-height, 64px);
         color: var(--klog-header-text-color, var(--secondary-text-color));
         overflow: hidden;
-        transition: box-shadow .2s ease, opacity .2s ease, width .25s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      app-header::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        background-color: var(--klog-header-background-color, var(--primary-background-color));
-        opacity: var(--klog-header-opacity, 1);
-        transition: all .2s ease;
+        transition: box-shadow .3s ease, opacity .25s ease, width .25s cubic-bezier(0.4, 0, 0.2, 1) !important;
       }
 
       app-toolbar {
@@ -31,6 +20,20 @@
         z-index: 100;
         box-sizing: border-box;
         background-color: transparent;
+        transition: opacity .25s ease;
+      }
+
+      app-toolbar::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: -1;
+        background-color: var(--klog-header-background-color, var(--primary-background-color));
+        opacity: var(--klog-header-opacity, 1);
+        transition: all .25s ease;
       }
 
       app-toolbar>.divider {
@@ -44,6 +47,7 @@
         align-items: center;
         flex: 1;
         line-height: 26px;
+        margin-left: 8px;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -51,7 +55,11 @@
         user-select: none;
         -webkit-user-select: none;
         cursor: default;
-        margin-left: 16px;
+      }
+
+      app-toolbar .title [main-title] iron-icon {
+        width: 51.14px;
+        height: 51.14px;
       }
 
       app-toolbar .title[on-click] {
@@ -65,7 +73,8 @@
         width: 1px;
         height: 20px;
         margin: 0 16px;
-        background: var(--klog-header-divider-color, var(--divider-color));
+        background: currentColor;
+        opacity: var(--secondary-overlay-opacity);
       }
 
       app-toolbar .actions {
@@ -155,11 +164,11 @@
 
         app-header[short][collapsed],
         app-toolbar[short][collapsed] {
-          width: calc(var(--klog-header-short-width, 128px) - 24px);
+          width: calc(var(--klog-header-short-width, 128px) - 16px);
         }
 
         app-toolbar {
-          padding: 0 4px;
+          padding: 0 8px;
         }
 
         app-toolbar[vertical] {
@@ -171,28 +180,33 @@
           margin-bottom: 4px;
         }
 
-        :host([entry]) .title [main-title],
-        :host([entry]) .title .divider {
-          display: none;
+        app-toolbar .title .divider {
+          opacity: 0;
+          transform: scale(1, 0);
+        }
+
+        app-toolbar .title [page-title] {
+          opacity: 0;
+          transform: translate(-20%, 0);
         }
       }
 
       /*animation*/
 
-      :host .title .divider {
-        transition: all .3s ease-out;
+      :host app-toolbar .title .divider {
+        transition: all .2s ease-out;
       }
 
-      :host([exit]) .title .divider {
+      app-toolbar[exit] .title .divider {
         opacity: 0;
         transform: scale(1, 0);
       }
 
-      :host .title [page-title] {
+      :host app-toolbar .title [page-title] {
         transition: opacity .15s ease, transform .2s ease;
       }
 
-      :host([exit]) .title [page-title] {
+      app-toolbar[exit] .title [page-title] {
         opacity: 0;
         transform: translate(-20%, 0);
       }

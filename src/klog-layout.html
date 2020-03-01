@@ -161,7 +161,7 @@
     <!--about-->
     <paper-dialog id="about" with-backdrop>
       <h2>> klog -V</h2>
-      <p>v2.10.2<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.10.3<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column>
         <paper-button on-click="aboutHelp">> klog help</paper-button>
         <paper-button on-click="aboutLog">> klog log</paper-button>
@@ -291,7 +291,7 @@
         let pageElement = this.$.page.querySelector(`[name='${page}']`);
         this._setAttribute(pageElement, 'exit');
         if (pageElement.$.animation) {
-          await this._timeout(new Promise(resolve => { pageElement.$.animation.addEventListener('transitionend', resolve) }), 1000);
+          await this._timeout(new Promise(resolve => { pageElement.$.animation.addEventListener('transitionend', resolve) }), 500);
         }
         if (pageElement.unload) {
           await pageElement.unload();
@@ -363,6 +363,7 @@
               '--klog-header-background-color': 'var(--primary-background-color)',
               '--klog-header-text-color': 'var(--secondary-text-color)',
               '--klog-header-short-width': '80px',
+              '--klog-header-height': '64px',
               '--klog-header-opacity': 1,
             },
             toolbar: Polymer.html``
@@ -393,20 +394,21 @@
         }
       }
 
-      _updateMenu(menu) {
-        if (menu == 'auto') menu = this.tablet ? 'off' : 'on';
+      _updateMenu(menu, tablet) {
+        if (menu == 'auto') menu = tablet ? 'off' : 'on';
         this._setAttribute(this, 'menu-off', menu == 'on');
       }
 
-      async _updateDrawer(drawer) {
+      async _updateDrawer(drawer, tablet, header = undefined) {
+        if (!header) { header = this.$.header; }
         await new Promise(resolve => setTimeout(resolve, 1));
-        if (this.$.header.hasAttribute('lock')) { return; }
-        if (drawer == 'auto') drawer = this.tablet ? 'on' : 'off';
+        if (drawer == 'auto') drawer = tablet ? 'on' : 'off';
         this.$.drawer.disabled = drawer == 'off';
         // drawer-button
-        const drawerButton = this.$.header.querySelector('[name=drawer-button]');
+        const drawerButton = header.querySelector('[name=drawer-button]');
         if (drawerButton) {
           this._setAttribute(drawerButton, 'hidden', drawer == 'on');
+          await new Promise(resolve => setTimeout(resolve, 1));
         }
       }
 
@@ -444,38 +446,51 @@
 
       async _updateToolbar(toolbar) {
         if (!toolbar || !toolbar.content) { return; }
-        this._setAttribute(this.$.header, 'lock', false);
         let oldChildren = Array.from(this.$.header.children);
         let emptyNewToolbar = toolbar.content.children.length == 0;
         let clone, children, newToolbar;
         if (!emptyNewToolbar) {
-          toolbar.content.children[0].style.display = 'none';
+          this.$.header.style.setProperty('visibility', '');
+          // remove name of old drawer-button
+          for (let drawerButton of this.$.header.querySelectorAll('[name=drawer-button]')) {
+            this._setAttribute(drawerButton, 'name', true);
+          }
+          // add new toolbar
+          toolbar.content.children[0].style.setProperty('position', 'absolute');
+          toolbar.content.children[0].style.setProperty('left', '0');
+          toolbar.content.children[0].style.setProperty('top', '0');
+          toolbar.content.children[0].style.setProperty('z-index', 99);
+          this._setAttribute(toolbar.content.children[0], 'exit');
+          await this._updateDrawer(this.drawer, this.tablet, toolbar.content);
           clone = document.importNode(toolbar.content, true);
           this.$.header.append(clone);
           await new Promise(resolve => setTimeout(resolve, 1));
           children = Array.from(this.$.header.children);
           newToolbar = children.pop();
+          // update new toolbar
+          await new Promise(resolve => setTimeout(resolve, 1));
         }
-        // fade out
+        // fade out and remove
         if (oldChildren.length > 0) {
-          this.$.header.style.opacity = 0;
-          await this._timeout(new Promise(resolve => { this.$.header.addEventListener('transitionend', resolve) }), 1000);
-
-          // remove
-          for (let child of oldChildren) {
-            if (child.parentElement == this.$.header) {
-              this.$.header.removeChild(child);
-            }
+          let promises = [];
+          for (let oldToolbar of oldChildren) {
+            this._setAttribute(oldToolbar, 'exit');
+            oldToolbar.style.setProperty('opacity', 0);
+            promises.push(this._timeout(new Promise(resolve => { oldToolbar.addEventListener('transitionend', resolve) }), 500));
           }
+          await Promise.all(promises);
+          for (let oldToolbar of oldChildren) {
+            this.$.header.removeChild(oldToolbar);
+          }
+          await new Promise(resolve => setTimeout(resolve, 1));
         }
-        if (emptyNewToolbar) { return; }
-        // update drawer-button style
-        this._setAttribute(this.$.header, 'lock', true);
-        this._updateDrawer(this.drawer, this.mobile);
-        await new Promise(resolve => setTimeout(resolve, 1));
-        // fade in
-        newToolbar.style.display = '';
-        this.$.header.style.opacity = 1;
+        if (emptyNewToolbar) {
+          this.$.header.style.setProperty('visibility', 'hidden');
+          return;
+        }
+        // new toolbar enter
+        newToolbar.style.setProperty('z-index', 100);
+        this._setAttribute(newToolbar, 'exit', true);
         // event
         const pageElement = this.$.page.querySelector(`[name = '${this.page}']`);
         if (pageElement) {

@@ -239,14 +239,14 @@
                 shadow: 'off',
               },
               styles: {
-                '--klog-header-background-color': 'transparent',
+                '--klog-header-background-color': 'translate',
                 '--klog-header-text-color': 'var(--primary-text-color)',
               },
               toolbar: Polymer.html`
                 <app-toolbar>
                   <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                     <div class="title">
-                      <div main-title>Klog</div>
+                      <div main-title><iron-icon icon="klog"></iron-icon></div>
                     </div>
                   <div class="divider"></div>
                   <paper-button on-click="logout">

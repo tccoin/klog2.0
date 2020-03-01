@@ -182,6 +182,10 @@
           background-color: var(--scrollbar-thumb-active-color) !important;
         }
       }
+
+      :host([exit]) klog-fab {
+        transform: scale(0);
+      }
     </style>
     <app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{_subroute}}"></app-route>
     <app-route route="{{_subroute}}" pattern="/:share" data="{{shareData}}"></app-route>
@@ -261,7 +265,7 @@
                 <app-toolbar>
                   <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
                   <div class="title">
-                    <div name="page-title"></div>
+                    <div page-title></div>
                   </div>
                 </app-toolbar>`
             }
@@ -379,7 +383,7 @@
             documentTitle: title + ' - Klog'
           }
         }));
-        this.$.header.querySelector('[name=page-title]').innerText = title;
+        this.$.header.querySelector('[page-title]').innerText = title;
       }
 
       updateImmersiveMode(immersive) {
