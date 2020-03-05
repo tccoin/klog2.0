@@ -80,7 +80,11 @@
           headingActions: {
             type: Boolean,
             value: false
-          }
+          },
+          tokens: {
+            type: Array,
+            notify: true
+          },
         }
       }
 
@@ -138,7 +142,7 @@
 
         renderer.heading = (text, depth) => {
           this._headingIndex += 1;
-          let id = 'heading-' + this.BKDRHash(text);
+          let id = 'heading-' + this.BKDRHash(this._headingIndex + '-' + depth + '-' + text);
           let classList = '';
           classList += this.preference.centeredHeading == 'true' ? 'centered-heading ' : '';
           classList += this.preference.numberedHeading == 'true' ? 'numbered-heading ' : '';
@@ -505,8 +509,9 @@
           return;
         }
         // translate markdown
-        marked(this.markdown, this.options, (err, out) => {
+        marked(this.markdown, this.options, (err, out, tokens) => {
           if (err) throw err;
+          this.tokens = tokens;
           //render
           this.$.content.innerHTML = out;
           //post-update

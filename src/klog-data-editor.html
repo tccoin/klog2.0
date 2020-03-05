@@ -20,8 +20,11 @@
           },
           markdown: {
             type: String,
-            observer: '_markdownChanged',
             notify: true,
+          },
+          tokens: {
+            type: Array,
+            observer: '_tokensChanged'
           },
           title: {
             type: String,
@@ -89,9 +92,7 @@
         }
       }
 
-      _markdownChanged() {
-        let lexer = new marked.Lexer();
-        let tokens = lexer.lex(this.markdown);
+      _tokensChanged(tokens) {
         this._updateTitle(tokens);
         this._updateMeta(tokens);
         this._updateAttachments(tokens);
@@ -118,15 +119,13 @@
         for (let token of tokens) {
           if (token.type == 'blockquote_start') text += '"';
           else if (token.type == 'blockquote_end') text = text.substr(0, text.length - 1) + '" ';
-          else if (token.type == 'paragraph' || token.type == 'text') {
-            //at
-            let cap = token.text.match(/^@\(([\s\S]+?)\)(\[([\s\S]+?)\])?/);
-            if (cap) {
-              collection = cap[1] ? cap[1] : '';
-              tags = cap[3] ? cap[3].split(',') : [];
-              for (let i = 0; i < tags.length; i++) tags[i] = tags[i].trim().toLowerCase();
+          else if (token.type == 'at') {
+            collection = token.text[0];
+            if (token.text[1]) {
+              tags = token.text[1].split(',');
             }
-            //summary
+          }
+          else if (token.type == 'paragraph' || token.type == 'text') {
             if (text.length > 300) continue
             let out = this._caculateSummary(token.text);
             text += out ? out + ' ' : '';
@@ -162,49 +161,27 @@
         let renderer = new marked.Renderer();
         this.image = {};
         this.attachments = [];
-        renderer.image = (href, title, text) => {
-          const isVideo = Boolean(href.match(/\.mp4$/));
-          let attachment = {
-            url: href,
-            text: this.unescape(text),
-          }
-          if (isVideo) {
-            attachment.video = true;
-          } else {
-            attachment.image = true;
-          }
-          if (title) {
-            attachment.title = title;
-          }
-          this.push('attachments', attachment);
-          if (!this.image['url'] && !isVideo) {
-            this.image = attachment;
-          }
-          return '';
-        };
+        for (let _token of tokens.filter(t => 'inline' in t)) {
+          for (let token of _token.inline) {
 
-        renderer.link = (href, title, text = '') => {
-          let attachment;
-          if (/^https:\/\/storage\.krrr\.party\/.*/.test(href)) {
-            attachment = {
-              file: true,
-              url: href,
-              text: this.unescape(text),
+            let attachment = {
+              url: token.href,
+              text: this.unescape(token.text)
             };
-          } else {
-            attachment = {
-              link: true,
-              url: href,
-              text: this.unescape(text),
-            };
-          }
-          this.push('attachments', attachment);
-          return '';
-        };
-        let Inlinelexer = new marked.InlineLexer(tokens.links, { gfw: true, renderer: renderer });
-        for (let token of tokens) {
-          if (token.type == 'paragraph' || token.type == 'heading' || token.type == 'text' || token.type == 'blockquote_start') {
-            Inlinelexer.output(token.text);
+            if (token.type == 'image') {
+              if (/\.mp4$/.test(token.href)) {
+                attachment.video = true;
+              } else {
+                attachment.image = true;
+              }
+            } else {
+              if (/^https:\/\/storage\.krrr\.party\/.*/.test(token.href)) {
+                attachment.file = true;
+              } else {
+                attachment.link = true;
+              }
+            }
+            this.attachments.push(attachment);
           }
         }
       }

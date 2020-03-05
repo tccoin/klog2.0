@@ -234,7 +234,11 @@
           this.dispatchEvent(new CustomEvent('custom-menu-select', {
             bubbles: true,
             composed: true,
-            detail: { category: category, item: name }
+            detail: {
+              category: category,
+              item: name,
+              target: item
+            }
           }));
           this.dispatchEvent(new CustomEvent('menu-select', { bubbles: true, composed: true }));
         }

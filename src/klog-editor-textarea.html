@@ -19,7 +19,7 @@
         --iron-autogrow-textarea: {
           padding: var(--textarea-padding, 24px);
           font-size: var(--textarea-font-size, 14px);
-          word-break: break-word;
+          word-break: break-all;
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -49,6 +49,10 @@
           preview: {
             type: String,
             notify: true
+          },
+          tokens: {
+            type: Array,
+            observer: '_tokensChanged'
           },
           placeholder: {
             type: String
@@ -160,7 +164,7 @@
 
       load() {
         if (this._interval) clearInterval(this._interval);
-        this._interval = setInterval(() => this._updateCurrentStatus(), 500);
+        // this._interval = setInterval(() => this._updateCurrentStatus(), 500);
       }
 
       unload() {
@@ -306,6 +310,10 @@
         this._fireInput();
       }
 
+      _tokensChanged(tokens) {
+        this._tokens = tokens.filter(t => 'start' in t);
+      }
+
       _updateCurrentStatus() {
         let input = this.$.input.$.textarea;
         let lines = this.value.split("\n");
@@ -317,19 +325,62 @@
           lengthSum += lines[i].length + 1;
           if (lengthSum > this.cursorPosition) {
             this.currentLine = lines[i];
+            this.currentLineNumber = i;
             this.currentLineStart = lengthSum - lines[i].length - 1;
             this.currentLineEnd = lengthSum;
+            this.cursorLinePosition = this.cursorPosition - (lengthSum - lines[i].length - 1);
             break;
           }
         };
-        if (this._currentLine != this.currentLine) {
-          this.dispatchEvent(new CustomEvent('klog-editor-input', { bubbles: true, composed: true, detail: { currentLine: this.currentLine } }));
-          this._currentLine = this.currentLine;
+        // get current token
+        let currentToken;
+        for (let token of this._tokens) {
+          if (this.currentLineNumber >= token.start) {
+            currentToken = token;
+          } else {
+            break;
+          }
         }
+        this.currentToken = currentToken;
+        // get caret position
+        const mirror = this.$.input.$.mirror;
+        let _lineNumber = this.currentLineNumber;
+        let mirrorLine;
+        if (_lineNumber == 0) {
+          mirrorLine = mirror.length == 0 ? null : mirror.childNodes[0];
+        } else {
+          for (mirrorLine of Array.from(mirror.childNodes).filter(x => x.tagName == 'BR')) {
+            _lineNumber -= 1;
+            if (_lineNumber == 0) {
+              break;
+            }
+          }
+        }
+        let anchor = document.createElement('span');
+        anchor.innerHTML = this.currentLine.slice(0, this.cursorLinePosition) + '<span class="pin">.</span>';
+        if (mirrorLine) {
+          mirror.insertBefore(anchor, mirrorLine.nextSibling);
+        } else {
+          mirror.append(anchor);
+        }
+        let anchorPosition = anchor.querySelector('.pin').getBoundingClientRect();
+        anchor.parentNode.removeChild(anchor);
+        // kick
+        this.dispatchEvent(new CustomEvent('klog-editor-input', {
+          bubbles: true, composed: true, detail: {
+            currentLine: this.currentLine,
+            currentLineNumber: this.currentLineNumber,
+            currentToken: this.currentToken,
+            selection: [input.selectionStart, input.selectionEnd],
+            lineHeight: parseInt(window.getComputedStyle(input).lineHeight),
+            caretPosition: { x: anchorPosition.x, y: anchorPosition.y }
+          }
+        }));
 
       }
 
       _fireInput() {
+        this._input.focus();
         this._input.dispatchEvent(new CustomEvent('input', { bubbles: true, composed: true }));
       }
 

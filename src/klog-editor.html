@@ -106,10 +106,16 @@
         color: var(--secondary-text-color);
       }
 
-      paper-toast a {
-        color: var(--paper-yellow-500);
-        float: right;
-        cursor: pointer;
+      /* floating toolbar */
+      .floating-toolbar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 100;
+        border-radius: 4px;
+        background: var(--primary-background-color);
+        color: var(--primary-text-color);
+        @apply --shadow-elevation-4dp;
       }
 
       @media (max-width: 767px) {
@@ -144,9 +150,9 @@
       }
     </style>
     <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
-    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}"
-      random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}"
-      private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}" error="{{err}}"
+    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" tokens="{{tokens}}" title="{{title}}"
+      path="{{path}}" random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}"
+      markdown="{{markdown}}" private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}" error="{{err}}"
       current-line="{{currentLine}}" word-count="{{wordCount}}">
     </klog-data-editor>
     <div class="layout">
@@ -163,15 +169,17 @@
             article-id="{{articleId}}" collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser> -->
         </iron-pages>
         <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
-          <klog-editor-textarea id="textarea" loading="{{loading}}" value="{{markdown}}" preview="{{preview}}"
-            placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
-          <klog-markdown id="markdown" markdown="{{preview}}" theme="[[theme]]" word-count="{{wordCount}}"
-            collection="{{collection}}" preference="{{userinfo.preference.markdown}}" breadcrumbs>
+          <klog-editor-textarea id="textarea" loading="{{loading}}" tokens="{{tokens}}" value="{{markdown}}"
+            preview="{{preview}}" placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
+          <klog-markdown id="markdown" tokens="{{tokens}}" markdown="{{preview}}" theme="[[theme]]"
+            word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}"
+            breadcrumbs>
             <span slot="after" class="info">字数统计: {{wordCount}}</span>
           </klog-markdown>
         </klog-pages>
       </klog-backdrop>
     </div>
+    <div class="floating-toolbar"></div>
   </template>
   <script src="../static/lib/marked/marked.min.js"></script>
   <script>
@@ -191,6 +199,9 @@
           loading: {
             type: Boolean,
             value: false
+          },
+          tokens: {
+            type: Array
           },
           err: {
             observer: '_errChanged'
@@ -239,6 +250,7 @@
       }
 
       load(userLoadPromise) {
+        this.mainMenu();
         return userLoadPromise.then(result => {
           if (!result.login) {
             this.dispatchEvent(new CustomEvent('user-login-page-open', {
@@ -276,8 +288,132 @@
         });
       }
 
+      _initFloatingToolbar() {
+        const container = this.shadowRoot.querySelector('.floating-toolbar');
+        container.style.setProperty('visibility', 'hidden');
+        const buttons = [
+          { name: 'strong', text: '加粗', icon: 'format_bold' },
+          { name: 'highlight', text: '高亮', icon: 'highlight' },
+          { name: 'strikethrough', text: '删除线', icon: 'format_strikethrough' },
+          { name: 'inlinecode', text: '术语', icon: 'code' },
+          { name: 'inlineformula', text: '行内公式', icon: 'functions' }
+        ];
+        for (let button of buttons) {
+          let element = document.createElement('paper-icon-button');
+          element.icon = button.icon;
+          element.label = button.text;
+          element.name = button.name;
+          element.addEventListener('click', e => { this.menuSelect('format', e.target.name) });
+          container.append(element);
+        }
+      }
+
+      updateFloatingToolbar(visibility, position) {
+        const container = this.shadowRoot.querySelector('.floating-toolbar');
+        container.style.setProperty('visibility', visibility ? '' : 'hidden');
+        if (position) {
+          container.style.setProperty('left', position[0] + 'px');
+          container.style.setProperty('top', position[1] - container.offsetHeight + 'px');
+        }
+      }
+
+
+      mainMenu() {
+        this.dispatchEvent(new CustomEvent('layout-update', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            customMenu: [{
+              name: 'action',
+              text: '插入',
+              items: [
+                { name: 'collection', text: '分类和标签', icon: 'category' },
+                { name: 'table', text: '表格', icon: 'border_all' },
+                { name: 'code', text: '代码', icon: 'code' },
+                { name: 'heading', text: '标题', icon: 'title' },
+                { name: 'formula', text: '公式', icon: 'functions' },
+                { name: 'toc', text: '目录', icon: 'menu_book' },
+                { name: 'quote', text: '引用', icon: 'format_quote' },
+                { name: 'ul', text: '无序列表', icon: 'format_list_bulleted' },
+                { name: 'ol', text: '有序列表', icon: 'format_list_numbered' },
+              ]
+            }]
+          }
+        }));
+      }
+
+      headingMenu() {
+        this.dispatchEvent(new CustomEvent('layout-update', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            customMenu: [{
+              name: 'action',
+              text: '插入',
+              items: [
+                { name: 'heading-1', text: '一级标题', icon: 'title' },
+                { name: 'heading-2', text: '二级标题', icon: 'title' },
+                { name: 'heading-3', text: '三级标题', icon: 'title' },
+                { name: 'heading-4', text: '四级标题', icon: 'title' },
+                { name: 'heading-5', text: '五级标题', icon: 'title' },
+                { name: 'heading-6', text: '六级标题', icon: 'title' },
+              ]
+            }]
+          }
+        }));
+      }
+
+      menuSelect(category, item) {
+        if (category == 'action') {
+          if (item == 'collection') {
+            if (this.markdown.match(/@\(.*\)\[.*\]/)) {
+              this.showToast('已经有分类啦！');
+            } else {
+              this.markdown = '@(笔记)[]\n' + this.markdown;
+            }
+          } else if (item == 'table') {
+            this.$.textarea.insertLine('', `\n|  header   | header  |
+|  :----:  | : ----:  |
+| cell1  | cell2 |
+| cell3  | cell4 |\n`);
+          } else if (item == 'code') {
+            this.$.textarea.insertLine('', '\n```c\nhelloworld();\n```\n');
+          } else if (item == 'formula') {
+            this.$.textarea.insertLine('', '\n$$E=mc^2$$\n');
+          } else if (item == 'toc') {
+            this.$.textarea.insertLine('', '\n[toc]\n');
+          } else if (item == 'quote') {
+            this.$.textarea.insertLine('', "\n> I thought what I'd do was, I'd pretend I was one of those deaf-mutes.\n");
+          } else if (item == 'ul') {
+            this.$.textarea.insertLine('', '\n- item1\n- item2\n- item3\n');
+          } else if (item == 'ol') {
+            this.$.textarea.insertLine('', '\n1. item1\n2. item2\n3. item3\n');
+          } else if (item == 'heading') {
+            this.headingMenu();
+          } else if (item.indexOf('heading-') > -1) {
+            this.$.textarea.insertLine('',
+              `\n${'#'.repeat(item.replace('heading-', ''))} 标题\n`
+            );
+            this.mainMenu();
+          }
+        } else if (category == 'format') {
+          if (item == 'strong') {
+            this.$.textarea.autoPack('**');
+          } else if (item == 'highlight') {
+            this.$.textarea.autoPack('*');
+          } else if (item == 'strikethrough') {
+            this.$.textarea.autoPack('~~');
+          } else if (item == 'inlinecode') {
+            this.$.textarea.autoPack('`');
+          } else if (item == 'inlineformula') {
+            this.$.textarea.autoPack('$');
+          }
+        }
+      }
       ready() {
         super.ready();
+        // init floating toolbar
+        this._initFloatingToolbar();
         // preset
         this._defaultPreset = {
           markdown: '@(笔记)[]',
@@ -294,6 +430,18 @@
           console.log(data);
         });
         //event
+        this.$.textarea.addEventListener('klog-editor-input', (e) => {
+          const selection = e.detail.selection;
+          const position = e.detail.caretPosition;
+          const lineHeight = e.detail.lineHeight;
+          this.updateFloatingToolbar(
+            selection[0] != selection[1] && !this.mobile,
+            [position.x, position.y - lineHeight]
+          );
+        });
+        this.$.textarea.addEventListener('scroll', (e) => {
+          this.updateFloatingToolbar(false);
+        });
         this.addEventListener('active-backdrop-front', (e) => {
           let newSelected = e.detail.selected;
           if (this.$.backdrop.active && this.backSelected != newSelected) this.$.backdrop.toggle();
@@ -321,9 +469,6 @@
           //browser
           this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
         });
-        // this.$.textarea.addEventListener('klog-editor-input', (e) => {
-        //   this.$.helper.load(e.detail.currentLine);
-        // });
         this.addEventListener('save', (e) => {
           e.stopPropagation();
           if (this.loading) return

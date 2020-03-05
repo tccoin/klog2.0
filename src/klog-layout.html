@@ -50,7 +50,7 @@
         position: absolute;
         width: var(--klog-layout-margin-left);
         box-sizing: border-box;
-        padding: 80px 16px 0 0;
+        padding: 80px 16px 16px 0;
         transition: all .2s ease .1s;
       }
 
@@ -161,7 +161,7 @@
     <!--about-->
     <paper-dialog id="about" with-backdrop>
       <h2>> klog -V</h2>
-      <p>v2.10.3<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.10.4<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column>
         <paper-button on-click="aboutHelp">> klog help</paper-button>
         <paper-button on-click="aboutLog">> klog log</paper-button>
@@ -481,10 +481,13 @@
           }
           await Promise.all(promises);
           for (let oldToolbar of oldChildren) {
-            this.$.header.removeChild(oldToolbar);
+            if (oldToolbar.parentNode) {
+              oldToolbar.parentNode.removeChild(oldToolbar);
+            }
           }
           await new Promise(resolve => setTimeout(resolve, 1));
         }
+        if (toolbar != this.toolbar) { return; }
         if (emptyNewToolbar) {
           this.$.header.style.setProperty('visibility', 'hidden');
           return;
