@@ -349,21 +349,26 @@
         if (_lineNumber == 0) {
           mirrorLine = mirror.length == 0 ? null : mirror.childNodes[0];
         } else {
-          for (mirrorLine of Array.from(mirror.childNodes).filter(x => x.tagName == 'BR')) {
+          for (mirrorLine of mirror.querySelectorAll('br')) {
             _lineNumber -= 1;
             if (_lineNumber == 0) {
               break;
             }
           }
         }
+        // let _anchor = mirror.querySelector('span.anchor');
+        // if (_anchor) _anchor.parentNode.removeChild(_anchor);
         let anchor = document.createElement('span');
+        anchor.classList.add('anchor');
         anchor.innerHTML = this.currentLine.slice(0, this.cursorLinePosition) + '<span class="pin">.</span>';
         if (mirrorLine) {
-          mirror.insertBefore(anchor, mirrorLine.nextSibling);
+          mirrorLine.parentNode.insertBefore(anchor, mirrorLine.nextSibling);
         } else {
           mirror.append(anchor);
         }
         let anchorPosition = anchor.querySelector('.pin').getBoundingClientRect();
+        // anchor.style.background = '#333';
+        // mirror.style.visibility = 'initial';
         anchor.parentNode.removeChild(anchor);
         // kick
         this.dispatchEvent(new CustomEvent('klog-editor-input', {

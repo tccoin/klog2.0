@@ -435,11 +435,14 @@
           const position = e.detail.caretPosition;
           const lineHeight = e.detail.lineHeight;
           this.updateFloatingToolbar(
-            selection[0] != selection[1] && !this.mobile,
-            [position.x, position.y - lineHeight]
+            (selection[0] != selection[1]) && !this.mobile,
+            [position.x, position.y - lineHeight * 0.5]
           );
         });
         this.$.textarea.addEventListener('scroll', (e) => {
+          this.updateFloatingToolbar(false);
+        });
+        this.$.textarea.addEventListener('mousedown', (e) => {
           this.updateFloatingToolbar(false);
         });
         this.addEventListener('active-backdrop-front', (e) => {
