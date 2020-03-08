@@ -241,7 +241,7 @@
         this.addEventListener('require-update', e => {
           this.$.page.addEventListener('iron-select', e => {
             let pageElement = this.$.page.querySelector(`[name = '${e.target.selected}']`);;
-            if (pageElement.refresh) {
+            if (pageElement && pageElement.refresh) {
               pageElement.refresh();
             }
           }, { once: true });

@@ -102,7 +102,16 @@
             this.loading = false;
             let response = [];
             for (let _item of list) {
-              let item = _item.toJSON();
+              let item = Object.assign({
+                attachments: [],
+                type: 'article',
+                collection: '日常',
+                image: {},
+                keywords: [],
+                tags: [],
+                text: '',
+                title: ''
+              }, _item.toJSON());;
               //trim
               item.text = item.text.trim();
               response.push(item);
