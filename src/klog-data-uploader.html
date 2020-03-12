@@ -109,7 +109,7 @@
           this.progress = progresses.reduce((x, y) => x + y) / progresses.length;
         });
         request.responseType = 'json';
-        request.open('POST', `${this.host}/upload?bucketname=${this.bucketname}&rename=off&name=${name}&total=${total}&index=${index}`);
+        request.open('POST', `${this.host}/upload?bucketname=${this.bucketname}&name=${name}&total=${total}&index=${index}`);
         request.send(data);
       }
 

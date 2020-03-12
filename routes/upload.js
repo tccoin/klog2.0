@@ -92,7 +92,7 @@ module.exports = function (app, opts, next) {
       _uploadedPart++;
       if (_uploadedPart == request.query.total) {
         _uploadedPart = 0;
-        let result = await merge(request.query.bucketname, request.query.name, request.query.total, request.query.addhash);
+        let result = await merge(request.query.bucketname, request.query.name, request.query.total, request.query.rename);
         reply.send(JSON.stringify([result]));
       } else {
         reply.send('[]');
