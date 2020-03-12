@@ -301,12 +301,11 @@
         }
         await this._loadNewPage(this.list)
         await new Promise(resolve => Polymer.RenderStatus.afterNextRender(this, resolve));
-        // await new Promise(resolve => setTimeout(resolve, 1));
-        await this._scrollHandler()
         await this._refreshAllItems()
         await this._clearLazyState()
         this.loading = false;
-        await new Promise(resolve => setTimeout(resolve, 1));
+        await this._timeout(new Promise(resolve => { this.$.timelineContainer.addEventListener('transitionend', resolve) }), 500);
+        await this._scrollHandler()
       }
 
       ready() {

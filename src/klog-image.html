@@ -236,6 +236,10 @@
           let maxWidth = parseInt(mediaWidth);
           let w, h;
           if (!mediaWidth) {
+            if (!this.offsetWidth) {
+              setTimeout(() => this.updatePlaceholder(), 10);
+              return;
+            }
             w = Math.min(this.offsetWidth, data.w);
           } else {
             w = Math.min(maxWidth, data.w);
