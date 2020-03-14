@@ -14,11 +14,12 @@
     "src/klog-drive.html",
     "src/klog-zone.html",
     "src/klog-apps.html",
-    "src/klog-apps-money.html",
-    "src/klog-apps-kdoc.html",
     "src/klog-404.html",
     "src/klog-lab.html",
-    "src/klog-render-katex.html"
+    "src/klog-render-katex.html",
+    "src/klog-apps-money.html",
+    "src/klog-apps-kdoc.html",
+    "src/klog-apps-lib.html"
   ],
   "npm": true,
   "moduleResolution": "node",

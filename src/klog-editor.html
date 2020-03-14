@@ -148,6 +148,16 @@
       :host([exit]) klog-editor-header {
         opacity: 0;
       }
+
+      /*media*/
+      @media (min-width: 768px) {
+        :host {
+          --klog-markdown-media: {
+            width: fit-content;
+            @apply(--shadow-elevation-8dp);
+          }
+        }
+      }
     </style>
     <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
     <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" tokens="{{tokens}}" title="{{title}}"
@@ -334,6 +344,7 @@
                 { name: 'formula', text: '公式', icon: 'functions' },
                 { name: 'toc', text: '目录', icon: 'menu_book' },
                 { name: 'quote', text: '引用', icon: 'format_quote' },
+                { name: 'ref', text: '注释', icon: 'comment' },
                 { name: 'ul', text: '无序列表', icon: 'format_list_bulleted' },
                 { name: 'ol', text: '有序列表', icon: 'format_list_numbered' },
               ]
@@ -384,6 +395,9 @@
             this.$.textarea.insertLine('', '\n[toc]\n');
           } else if (item == 'quote') {
             this.$.textarea.insertLine('', "\n> I thought what I'd do was, I'd pretend I was one of those deaf-mutes.\n");
+          } else if (item == 'ref') {
+            this.$.textarea.insert('', '[^1]');
+            this.$.textarea.insertLine('', "\n\n[^1]: Blablabla... \n");
           } else if (item == 'ul') {
             this.$.textarea.insertLine('', '\n- item1\n- item2\n- item3\n');
           } else if (item == 'ol') {

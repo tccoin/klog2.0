@@ -140,11 +140,11 @@
       /*list*/
 
       .items {
-        position: relative;
-        padding-top: 118px;
-        overflow-x: hidden;
-        overflow-y: auto;
+        padding-top: 62px;
         -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+        scroll-padding-top: 62px;
       }
 
       .items .divider {
@@ -153,8 +153,16 @@
         margin: 0 16px;
       }
 
+      .search-placeholder {
+        height: 56px;
+      }
+
       .items .divider:first-child {
         display: none;
+      }
+
+      .items .item {
+        scroll-snap-align: start;
       }
 
       @media (max-width: 767px) {
@@ -177,7 +185,8 @@
         }
 
         .items {
-          padding-top: 100px;
+          padding-top: 54px;
+          scroll-padding-top: 54px;
         }
 
         .spinner-container {
@@ -198,13 +207,12 @@
       <paper-spinner-lite active></paper-spinner-lite>
     </div>
 
-    <div class="main-container" id="scrollTarget">
-      <div class="items" id="items">
-        <template is="dom-repeat" items="{{items}}">
-          <div class="divider"></div>
-          <klog-note-item class="item" data="{{item}}" collection="{{collection}}"></klog-note-item>
-        </template>
-      </div>
+    <div class="main-container items" id="items">
+      <div class="search-placeholder item"></div>
+      <template is="dom-repeat" items="{{items}}">
+        <klog-note-item class="item" data="{{item}}" collection="{{collection}}"></klog-note-item>
+        <div class="divider"></div>
+      </template>
     </div>
 
   </template>
@@ -260,11 +268,12 @@
       ready() {
         super.ready();
         //events
+        this.$.scrollTarget = this.$.items;
         this.$.scrollTarget.addEventListener('scroll', () => {
           if (this._scrollingTimeout) { window.clearTimeout(this._scrollingTimeout) }
           this._scrollingTimeout = setTimeout(() => {
             this.scroll(false);
-          }, 150);
+          }, 1000);
           this.scroll(true);
         });
         this.addEventListener('touchstart', e => {
@@ -292,6 +301,9 @@
         if (!this._searchHeight) this.updateContainer();
         let threshold = this._searchHeight;
         isScrolling = !!(isScrolling || this._isMoving);
+        // searchbar animation
+        this.$.search.setWidth(this.offsetWidth);
+        this.$.search.setAnimation(1 - y / threshold);
         // scroll according to the threshold
         if (!isScrolling) {
           if (y < threshold * 0.7) this.$.scrollTarget.scrollTop = 0;
@@ -300,9 +312,6 @@
         // raise the header
         if (y >= threshold) this.$.header.classList.add('raised');
         else this.$.header.classList.remove('raised');
-        // searchbar animation
-        this.$.search.setWidth(this.offsetWidth - 40);
-        this.$.search.setAnimation(1 - y / threshold);
         // focus event
         if (y == 0 && this._waitingToFocus) {
           this._waitingToFocus = false;
@@ -330,7 +339,7 @@
       }
 
       updateContainer() {
-        if (!this._searchHeight) this._searchHeight = this.$.search.getBoundingClientRect().height;
+        if (!this._searchHeight) this._searchHeight = parseInt(this.$.search.getBoundingClientRect().height);
         let scrollTargetHeight = this.$.scrollTarget.getBoundingClientRect().height;
         let itemsComputedStyle = getComputedStyle(this.$.items);
         let itemsHeight = parseFloat(itemsComputedStyle.height) + parseFloat(itemsComputedStyle.paddingTop);

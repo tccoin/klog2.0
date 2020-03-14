@@ -93,7 +93,6 @@
       }
 
       _tokensChanged(tokens) {
-        console.log(tokens);
         this._updateTitle(tokens);
         this._updateMeta(tokens);
         this._updateAttachments(tokens);
@@ -195,7 +194,7 @@
         let tokens = lexer.lex(currentLine);
         let renderer = new marked.Renderer();
         this.previews = [];
-        renderer.image = (href, title, text) => {
+        renderer.image = (href, title, text = '') => {
           let preview = {
             image: true,
             url: href,
@@ -328,7 +327,7 @@
       save() {
         // create or update
         let article;
-        if (this.wordCount == 0) {
+        if (this.wordCount == 0 && this.attachments.length == 0) {
           return Promise.reject(new Error('empty'));
         }
         if (this.articleId) {

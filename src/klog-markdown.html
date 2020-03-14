@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-fit-behavior/iron-fit-behavior.html">
 <link rel="import" href="klog-style-scrollbar.html">
 <link rel="import" href="klog-image.html">
 <link rel="import" href="klog-video.html">
@@ -21,7 +22,7 @@
     </article>
   </template>
   <script src="../static/lib/Han/han.min.js"></script>
-  <script src="../static/lib/marked/marked.min.js"></script>
+  <script src="klog-marked.js"></script>
   <script>
     class KlogMarkdown extends Polymer.Element {
 
@@ -158,7 +159,7 @@
         };
 
 
-        renderer.image = (href, title, text) => {
+        renderer.image = (href, text) => {
           let mediaType = 'image';
           if (href.match(/\.mp4$/)) {
             mediaType = 'video';
@@ -167,7 +168,6 @@
           let out = `<klog-${mediaType}  content
           src="${href}"
           alt="${text}"
-          ${title ? ` title="${title}"` : ''}
           ${this.lazy ? ` lazy theme="${this.theme}"` : ''}
           ></klog-${mediaType}>`;
           if (text || tip) {
@@ -188,13 +188,13 @@
           return out
         };
 
-        renderer.link = function (href, title, text = '') {
-          var out = '<a href="' + href + '"';
-          if (title) {
-            out += ' title="' + title + '"';
-          }
-          out += '>' + text + '</a>';
-          return out;
+        renderer.link = function (href, text, link = {}) {
+          let isSup = /^<span>\^/.test(text);
+          text = isSup ? `${text.replace('^', '')}` : text || href;
+          href = isSup ? '' : `href="${href}"`;
+          let className = isSup ? ' class="sup"' : '';
+          let out = `<a ${href}${className}>${text}</a>`;
+          return link.ref ? `<span class="link">${out}<span class="ref-popup">${this.output(link.ref)}</span></span>` : out;
         };
 
         renderer.text = function (text) {
@@ -216,7 +216,7 @@
         };
 
         block.at = {
-          reg: /^@\(([\s\S]*?)\)(\[([\s\S]*?)\])?/,
+          reg: /^@\(([\s\S]*?)\)(\[([\s\S]*?)\])?(?:\n+|$)/,
           lex: function (src, cap) {
             src = src.substring(cap[0].length);
             cap = [cap[1] ? marked.escape(cap[1]) : false, cap[3] ? marked.escape(cap[3]) : false];
@@ -237,6 +237,21 @@
             } else {
               return `<!--collection:${cap[0]};tags:${this.tags}-->`;
             }
+          }
+        };
+
+        block.reflink = {
+          reg: /^\[(\^?.*?)\]:\s*([\s\S]*?)(?:\n+|$)/,
+          lex: (src, cap, links = {}) => {
+            src = src.substring(cap[0].length);
+            links[cap[1].toLowerCase()] = {
+              href: cap[1],
+              ref: cap[2]
+            };
+            return { src: src, text: '' }
+          },
+          parse: (cap) => {
+            return cap
           }
         };
 
@@ -392,7 +407,7 @@
           for (let heading of headings) {
             let newli = '';
             if (!heading.isIndependentTitle && heading.depth - bottom < 3) {
-              if (heading.text) newli = `<li name="${heading.id}" depth="${depth}"><span>${heading.number}  ${heading.text}</span>`;
+              if (heading.text) newli = `<li target="id-${heading.id}" depth="${depth}"><span>${heading.number}  ${heading.text}</span>`;
               if (heading.depth == depth) {
                 tocHTML += `</li>${newli}`;
               }
@@ -421,12 +436,16 @@
             if (_selected) _selected.classList.remove('selected');
             e.currentTarget.classList.add('selected');
           });
+        }
+
+        // add scroll event
+        let scrollLinks = this.$.content.querySelectorAll('[target]');
+        for (let link of scrollLinks) {
+          let target = link.getAttribute('target');
           link.addEventListener('click', (e) => {
             e.stopPropagation();
-            let i = 0;
-            while (e.currentTarget.tagName != 'LI') i++;
-            let name = e.currentTarget.getAttribute('name');
-            this.$.scroller.updateQuery('#' + name);
+            e.preventDefault();
+            this.$.scroller.updateQueryByHash(e.currentTarget.getAttribute('target'));
             this.$.scroller.scroll();
           });
         }
@@ -512,6 +531,7 @@
         marked(this.markdown, this.options, (err, out, tokens) => {
           if (err) throw err;
           this.tokens = tokens;
+          this._reflinks = tokens.links;
           //render
           this.$.content.innerHTML = out;
           //post-update

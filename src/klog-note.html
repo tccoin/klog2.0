@@ -34,11 +34,11 @@
         </paper-button>
       </app-toolbar>
       <klog-pages id="animation" class="backdrop-front" slot="front" selected="{{selected}}" disabled="{{!mobile}}">
-        <klog-note-list id="list" keyword="{{keyword}}" theme="[[theme]]" collection="{{collection}}"
+        <klog-note-list id="list" keyword="{{keyword}}" theme="{{theme}}" collection="{{collection}}"
           gesture="{{gesture}}" moving="{{moving}}" mobile="{{mobile}}" path="{{path}}">
         </klog-note-list>
-        <klog-note-content id="content" bookmarks="{{bookmarks}}" keyword="{{keyword}}" collection="{{collection}}"
-          mobile="{{mobile}}" selected="{{selected}}" path="{{path}}">
+        <klog-note-content id="content" bookmarks="{{bookmarks}}" theme="{{theme}}" keyword="{{keyword}}"
+          collection="{{collection}}" mobile="{{mobile}}" selected="{{selected}}" path="{{path}}">
         </klog-note-content>
       </klog-pages>
     </klog-backdrop>

@@ -9,6 +9,7 @@
         position: absolute;
         display: inline-block;
         overflow: hidden;
+        transition-property: width border-radius;
       }
 
       :host,
@@ -117,7 +118,7 @@
         this.$.input.addEventListener('input', () => {
           this.countdown();
         });
-        this._width = this.offsetWidth - 40;
+        this._width = this.offsetWidth;
       }
 
       _updateInput(value) {
@@ -157,13 +158,18 @@
       }
 
       setAnimation(p) {
+        requestAnimationFrame(() => this._setAnimation(p));
+      }
+
+      _setAnimation(p) {
         p = Math.min(Math.max(p, 0), 1);
-        let opacityInput = Math.max(1 - (1 - p) * 2, 0),
+        let opacityInput = p == 1 ? 1 : 0,
           opacityBg = Math.max(1 - (1 - p) * 1.5, 0),
-          padding = 16 * p,
-          x = (this._width - 20) * (1 - p),
+          width = p * (this._width - 72) + 72,
+          radius = 24 - p * 19,
+          x = (this._width - width) * (1 - p),
           y = -48 * (1 - p);
-        this.style = `padding: 0 ${padding}px ${padding}px!important;transform: translate(${x}px, ${y}px);` + (p == 0 ? 'width: 40px; border-radius: 24px;' : 'border-radius: 5px;');
+        this.style = `transform: translate(${x}px, ${y}px);width: ${width}px; border-radius: ${radius}px;`;
         this.$.input.style = `opacity:${opacityInput};`;
         this.$.bg.style = `opacity:calc(${opacityBg} * var(--overlay-style_-_opacity));transform:scaleX(${p});`;
         this.$.container.style = (p == 0 ? 'border-radius: 24px;' : '');

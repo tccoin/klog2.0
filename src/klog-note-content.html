@@ -25,7 +25,6 @@
         max-height: 100%;
         z-index: 2;
         overflow: auto;
-        background: var(--primary-background-color);
         opacity: 1;
         transition: opacity .2s ease;
         scroll-behavior: smooth;
@@ -103,6 +102,13 @@
       }
 
       @media (min-width: 768px) {
+        :host {
+          --klog-markdown-media: {
+            width: fit-content;
+            @apply(--shadow-elevation-8dp);
+          }
+        }
+
         [mobile] {
           display: none !important;
         }

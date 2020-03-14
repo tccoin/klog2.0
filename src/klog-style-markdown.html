@@ -61,16 +61,6 @@
         text-align: center;
       }
 
-      .klog-article-content a {
-        color: var(--primary-color);
-        text-decoration: none;
-        border-bottom: 1px solid var(--light-primary-color);
-      }
-
-      .klog-article-content a:visited {
-        color: var(--primary-color);
-      }
-
       .klog-article-content code {
         font-family: "Biaodian Pro Sans GB", Menlo, Consolas, Courier, "Han Heiti GB", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", monospace !important;
       }
@@ -110,6 +100,86 @@
         background: var(--divider-color);
         border-radius: 2px;
       }
+
+      /* link */
+
+      .klog-article-content a {
+        position: relative;
+        color: var(--primary-color);
+        text-decoration: none;
+        border-bottom: 1px solid var(--light-primary-color);
+      }
+
+      .klog-article-content a:visited {
+        color: var(--primary-color);
+      }
+
+      .klog-article-content .sup {
+        top: -.5em;
+        font-size: 0.8em;
+        margin-left: 2px;
+        padding: 2px 4px;
+        border-radius: 4px;
+        vertical-align: baseline;
+        cursor: pointer;
+        background: var(--secondary-background-color);
+        border-bottom: 0;
+      }
+
+      .klog-article-content .link {
+        position: relative;
+      }
+
+      .klog-article-content .link>.ref-popup {
+        position: absolute;
+        left: 0;
+        top: 2em;
+        width: max-content;
+        max-width: 320px;
+        font-size: var(--klog-markdown-font-size, 14px);
+        font-weight: normal;
+        padding: 16px;
+        word-break: break-all;
+        line-height: 1.7;
+        border-radius: 4px;
+        z-index: 10;
+        cursor: default;
+        color: var(--primary-text-color);
+        background: var(--primary-background-color);
+        visibility: hidden;
+        transform: translateY(0.5em);
+        opacity: 0;
+        transition: .1s all .5s ease-out;
+        box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.3), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+      }
+
+      .klog-article-content .link>.ref-popup::before {
+        content: '';
+        position: absolute;
+        border: 5px solid transparent;
+        border-top: 0;
+        border-bottom: 8px solid rgba(0, 0, 0, 0.07);
+        top: -9px;
+        left: 3px;
+      }
+
+      .klog-article-content .link>.ref-popup::after {
+        content: '';
+        position: absolute;
+        border: 8px solid transparent;
+        border-top: 0;
+        border-bottom: 11px solid var(--primary-background-color);
+        top: -7px;
+        left: 0px;
+      }
+
+      .klog-article-content .link:hover>.ref-popup {
+        visibility: visible;
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /*media*/
 
       .klog-article-content klog-player-lite {
         width: 100%;
