@@ -655,12 +655,12 @@
           text = escape(cap[1]);
           href = text;
         }
-        out += this.renderer.link(href, null, text);
+        out += this.renderer.link.call(this, href, text, {});
         continue;
       }
 
       // url (gfm)
-      if (!this.inLink && (cap = this.rules.url.exec(src))) {
+      if (cap = this.rules.url.exec(src)) {
         cap[0] = this.rules._backpedal.exec(cap[0])[0];
         src = src.substring(cap[0].length);
         if (cap[2] === '@') {
@@ -674,7 +674,7 @@
             href = text;
           }
         }
-        out += this.renderer.link(href, null, text);
+        out += this.renderer.link.call(this, href, text, {});
         continue;
       }
 
@@ -715,7 +715,7 @@
         src = src.substring(cap[0].length);
         link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
         link = this.links[link.toLowerCase()];
-        if (!link || !link.href) {
+        if (!link || !link.ref) {
           out += cap[0].charAt(0);
           src = cap[0].substring(1) + src;
           continue;

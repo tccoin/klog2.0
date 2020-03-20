@@ -163,7 +163,7 @@
         this.attachments = [];
         for (let _token of tokens.filter(t => 'inline' in t)) {
           for (let token of _token.inline) {
-
+            if (!token.href) continue;
             let attachment = {
               url: token.href,
               text: this.unescape(token.text)

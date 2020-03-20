@@ -245,7 +245,7 @@
           lex: (src, cap, links = {}) => {
             src = src.substring(cap[0].length);
             links[cap[1].toLowerCase()] = {
-              href: cap[1],
+              href: '',
               ref: cap[2]
             };
             return { src: src, text: '' }
