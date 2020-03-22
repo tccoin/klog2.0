@@ -189,7 +189,6 @@
         };
 
         renderer.link = function (href, text, link = {}) {
-          console.log(link);
           let isSup = /^<span>\^/.test(text);
           text = isSup ? `${text.replace('^', '')}` : text || href;
           href = isSup ? '' : `href="${href}"`;
@@ -522,6 +521,7 @@
         this.tags = [];
         this._headingIndex = 0;
         this._headings = [];
+        this._hasToc = false;
         // no markdown
         if (!this.markdown) {
           this.$.scroller.reset();

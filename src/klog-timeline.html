@@ -343,7 +343,7 @@
           if (this._keywordInputTimeout) {
             clearTimeout(this._keywordInputTimeout);
           }
-          setTimeout(cb, 1000);
+          this._keywordInputTimeout = setTimeout(cb, 1000);
         });
       }
 
