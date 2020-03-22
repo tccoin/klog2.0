@@ -19,7 +19,7 @@
     "@webcomponents/webcomponentsjs": "2.4.0",
     "body-parser": "^1.18.2",
     "crypto": "^1.0.1",
-    "fastify": "^2.3.0",
+    "fastify": "^2.13.0",
     "fastify-compress": "^0.10.0",
     "fastify-multipart": "^0.8.1",
     "fastify-static": "^2.4.0",
@@ -51,7 +51,7 @@
     "gulp-replace": "^1.0.0",
     "gulp-run": "^1.7.1",
     "merge-stream": "^1.0.1",
-    "polymer-cli": "^1.6.0",
-    "vinyl": "^2.2.0"
+    "vinyl": "^2.2.0",
+    "polymer-cli": "^1.6.0"
   }
 }

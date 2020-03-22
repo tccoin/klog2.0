@@ -7,11 +7,11 @@ module.exports = {
     args: '',
     instances: 1,
     autorestart: true,
-    watch: [],
+    watch: ['build', 'routes'],
     watch_options: {
       "followSymlinks": true
     },
-    max_memory_restart: '1024M',
+    max_memory_restart: '4096M',
     env: {
     },
     env_production: {
