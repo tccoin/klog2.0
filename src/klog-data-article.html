@@ -84,7 +84,7 @@
             if (data.get('updatedAt')) {
               return this._onLoad(data);
             } else {
-              return this._onFailed();
+              return this._onNotFound();
             }
           });
       }
@@ -119,7 +119,7 @@
           if (articles.length != 0) {
             return this._onLoad(articles[0]);
           } else {
-            return this._onFailed();
+            return this._onNotFound();
           }
         }).catch(err => {
           if (err)
@@ -137,10 +137,10 @@
         return Promise.resolve(articleToJson);
       }
 
-      _onFailed() {
+      _onNotFound() {
         this.loading = false;
         this.lastError = 404;
-        this.dispatchEvent(new CustomEvent('error', { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent('notfound', { bubbles: true, composed: true }));
         return Promise.reject();
       }
 

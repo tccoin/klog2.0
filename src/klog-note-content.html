@@ -224,6 +224,7 @@
             element.addEventListener('click', e => this._setFilter(e));
           }
         });
+        this.$.data.addEventListener('notfound', () => this._notfoundHandle());
       }
 
       share() {
@@ -254,9 +255,42 @@
       loaded(articleId) {
         this.articleId = articleId;
         //bookmarks
+        this._updateBookmark();
         this._updateBookmarksIcon(this._calcBookmarkPosition(this.articleId, this.bookmarks) > -1);
         //clean state
         this.$.scrollTarget.scrollTop = 0;
+      }
+
+      _notfoundHandle() {
+        let bookmarks = this.bookmarks;
+        let bookmarkPosition = this._calcBookmarkPositionByPath(this.path, this.bookmarks);
+        if (bookmarkPosition == -1) return;
+        bookmarks.splice(bookmarkPosition, 1);
+        this._updateBookmarks(bookmarks);
+        this.back();
+      }
+
+      _updateBookmark() {
+        let bookmarks = this.bookmarks;
+        let bookmarkPosition = this._calcBookmarkPosition(this.articleId, this.bookmarks);
+        if (bookmarkPosition == -1) return;
+        let oldBookMark = Object.assign({}, bookmarks[bookmarkPosition]);
+        let newBookMark = this._generateBookmark();
+        delete oldBookMark['addedAt'];
+        delete newBookMark['addedAt'];
+        if (JSON.stringify(oldBookMark) != JSON.stringify(newBookMark)) {
+          bookmarks.splice(bookmarkPosition, 1, this._generateBookmark());
+          this._updateBookmarks(bookmarks);
+        }
+      }
+
+      _generateBookmark() {
+        return {
+          id: this.articleId,
+          title: this.article.title,
+          path: this.article.path,
+          addedAt: new Date().toUTCString()
+        };
       }
 
       toggleBookmark() {
@@ -266,24 +300,31 @@
         if (bookmarkPosition > -1) {
           bookmarks.splice(bookmarkPosition, 1);
         } else {
-          bookmarks.push({
-            id: this.articleId,
-            title: this.article.title,
-            path: this.article.path,
-            addedAt: new Date().toUTCString()
-          });
+          bookmarks.push(this._generateBookmark());
         }
+        this._updateBookmarksIcon(bookmarkPosition == -1);
+        this._updateBookmarks(bookmarks);
+      }
+
+      _updateBookmarks(bookmarks) {
         let klogUser = this.userinfo.klogUser;
         let newPreference = Object.assign({}, this.userinfo.preference, { bookmarks: bookmarks });
         klogUser.update({ preference: { value: newPreference } });
         this.bookmarks = bookmarks;
         this.dispatchEvent(new CustomEvent('update-bookmarks', { bubbles: true, composed: true, detail: { bookmarks: bookmarks } }));
-        this._updateBookmarksIcon(bookmarkPosition == -1);
       }
 
       _calcBookmarkPosition(articleId, bookmarks) {
         for (let i = 0; i < bookmarks.length; i++) {
           if (bookmarks[i].id == articleId) { return i; }
+          if (bookmarks[i].id == articleId) { return i; }
+        }
+        return -1;
+      }
+
+      _calcBookmarkPositionByPath(path, bookmarks) {
+        for (let i = 0; i < bookmarks.length; i++) {
+          if (bookmarks[i].path == path) { return i; }
         }
         return -1;
       }

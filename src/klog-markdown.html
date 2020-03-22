@@ -189,6 +189,7 @@
         };
 
         renderer.link = function (href, text, link = {}) {
+          console.log(link);
           let isSup = /^<span>\^/.test(text);
           text = isSup ? `${text.replace('^', '')}` : text || href;
           href = isSup ? '' : `href="${href}"`;
