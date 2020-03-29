@@ -23,22 +23,66 @@
       }
 
       .section,
-      .footer {
+      .article-footer {
         margin: auto;
         box-sizing: border-box;
       }
 
       .content,
-      .footer {
+      .article-footer {
         transition: opacity .3s ease, transform .2s ease-out;
       }
 
       :host([loading]) .content,
-      :host([loading]) .footer {
+      :host([loading]) .article-footer {
         opacity: 0;
       }
 
-      .author {
+      /*Article*/
+
+      .article-category {
+        font-size: calc(1.1 * var(--klog-markdown-font-size));
+        padding: 0 16px;
+        color: var(--secondary-text-color);
+      }
+
+      .article-collection {
+        font-weight: bold;
+        padding-right: 8px;
+      }
+
+      .article-tag {
+        padding-left: 8px;
+      }
+
+      .article-title {
+        padding: 0 16px;
+      }
+
+      .article-title h1 {
+        font-size: calc(2 * var(--klog-markdown-font-size));
+        font-weight: 400;
+        line-height: 1.3;
+        margin: 0 0 1em;
+      }
+
+      .dot-divider {
+        display: inline-block;
+        margin: 0 6px;
+        width: 5px;
+        height: 5px;
+        background: var(--divider-color);
+        border-radius: 50%;
+      }
+
+      .article-meta {
+        display: flex;
+        padding: 0 16px;
+        flex-direction: row;
+        color: var(--secondary-text-color)
+      }
+
+      .article-author {
         display: flex;
         margin: 16px auto 32px;
         padding: 16px;
@@ -47,7 +91,11 @@
         -webkit-user-select: none;
       }
 
-      .author .avatar {
+      .article-author .divider {
+        flex: 1;
+      }
+
+      .article-author .author-avatar {
         width: 50px;
         height: 50px;
         margin-right: 16px;
@@ -56,22 +104,24 @@
         @apply(--shadow-elevation-8dp);
       }
 
-      .author .meta {
-        color: var(--secondary-text-color);
+      .article-author .text {
+        display: flex;
+        flex-direction: column;
         width: calc(100% - 64px);
+        color: var(--secondary-text-color);
       }
 
-      .meta-user {
+      .article-author .author-info {
         display: flex;
         flex-direction: row;
       }
 
-      .meta-name {
+      .article-author .author-name {
         color: var(--primary-text-color);
         font-weight: bold;
       }
 
-      .meta-intro {
+      .article-author .author-intro {
         display: block;
         flex: 1;
         white-space: nowrap;
@@ -79,7 +129,7 @@
         text-overflow: ellipsis;
       }
 
-      .footer {
+      .article-footer {
         padding: 16px;
         font-size: 20px;
         color: var(--primary-text-color);
@@ -88,13 +138,13 @@
         cursor: default;
       }
 
-      .footer .logo {
+      .article-footer .logo {
         position: relative;
         user-select: none;
         -webkit-user-select: none;
       }
 
-      .footer .logo a {
+      .article-footer .logo a {
         @apply --fit-layout;
         z-index: 1;
       }
@@ -111,28 +161,6 @@
 
       :host([immersive]) .non-immersive {
         display: none !important;
-      }
-
-      /*Article header*/
-
-      .article-title {
-        padding: 0 16px;
-      }
-
-      .article-title h1 {
-        font-size: 2em;
-        font-weight: 400;
-        line-height: 1.3;
-        margin: 1em 0 1em;
-      }
-
-      .dot-divider {
-        display: inline-block;
-        margin: 0 6px;
-        width: 5px;
-        height: 5px;
-        background: var(--divider-color);
-        border-radius: 50%;
       }
 
       /*media block*/
@@ -182,10 +210,16 @@
       .content {
         width: 100%;
         margin: auto;
+        padding-top: 5vh;
         max-width: calc(42 * var(--klog-markdown-font-size) + 32px);
       }
 
       @media (max-width: 767px) {
+
+        .content {
+          padding-top: 0;
+        }
+
         :host {
           --klog-markdown-font-size: 15px;
           --klog-markdown-line-height: 1.7;
@@ -231,30 +265,35 @@
     <klog-fab icon="edit" id="fab" class="edit-fab" label="编辑" on-click="edit" hidden="{{!isOwner}}"
       extended="{{fabExtended}}"></klog-fab>
     <div class="content" id="content">
-      <!--article title-->
+      <!--article header-->
+      <div class="section article-category" hidden={{!article.title}}>
+        <span class="article-collection">{{article.collection}}</span>
+        <template is="dom-repeat" items="{{article.tags}}">
+          <span class="article-tag">#{{item}}</span>
+        </template>
+      </div>
       <div class="section article-title" hidden={{!article.title}}>
         <h1>{{article.title}}</h1>
       </div>
-      <!--author-->
-      <div class="section author" theme$="{{theme}}">
-        <klog-image class="avatar" src="{{article.author.avatarUrl}}" avatar></klog-image>
-        <div class="meta">
-          <div class="meta-user">
-            <span class="meta-name">{{article.author.displayName}}<template is="dom-if"
-                if="{{article.author.introduction}}">,&nbsp;
-              </template></span>
-            <span class="meta-intro">{{article.author.introduction}}</span>
+      <div class="section article-author" theme$="{{theme}}">
+        <klog-image class="author-avatar" src="{{article.author.avatarUrl}}" avatar></klog-image>
+        <div class="text">
+          <div class="author-info">
+            <span class="author-name">{{article.author.displayName}}</span>
+            <template is="dom-if" if="{{article.author.introduction}}">,&nbsp;
+              <span class="author-intro">{{article.author.introduction}}</span>
+            </template>
           </div>
-          <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发布于 </klog-render-timestamp>
+          <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发表于&nbsp;</klog-render-timestamp>
         </div>
       </div>
       <!--article-->
-      <klog-markdown class="section article" id="markdown" markdown="{{article.markdown}}"
+      <klog-markdown class="section article-main" id="markdown" markdown="{{article.markdown}}"
         link-prefix="article/{{path}}" hide-independent-title="true" theme="{{theme}}"
         preference="{{userinfo.preference.markdown}}" lazy heading-actions>
       </klog-markdown>
     </div>
-    <div class="footer">
+    <div class="article-footer">
       <span class="logo">
         Klog.
         <a href="#/timeline/" class="immersive"></a>
