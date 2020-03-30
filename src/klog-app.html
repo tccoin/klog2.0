@@ -133,7 +133,7 @@
           const subroute = this._calcSubroute(this.subroute);
           await ui.load(page, subroute, userLoadPromise);
         } catch (err) {
-          console.log(err);
+          console.log(err.message);
           if (err.message == '404') {
             window.location.hash = `#/404/`;
           }
