@@ -1376,7 +1376,7 @@
       var i = 0;
       tokens.splice(0, tokens.length);
       for (let token of _tokens) {
-        if (!token.type in ['space', 'text']) {
+        if (['space', 'text', 'list_item_end', 'list_end', 'blockquote_end'].indexOf(token.type) == -1) {
           tokens.push({ type: 'anchor', index: i });
           token.index = i;
           i++;

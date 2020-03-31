@@ -49,7 +49,8 @@
       .klog-article-content h5,
       .klog-article-content h6 {
         color: var(--klog-markdown-title-color);
-        margin: 1em 0 0.5em;
+        line-height: 1;
+        margin: 1.7em 0 1.2em;
       }
 
       .klog-article-content h1.centered-heading,
@@ -253,19 +254,24 @@
       }
 
       .klog-article-content .toc {
-        overflow-y: auto;
-        max-height: 33vh;
-        padding: 16px 8px 16px 16px;
+        position: relative;
         border-radius: 5px;
         margin-bottom: 2em;
         background: var(--klog-markdown-block-color);
       }
 
       .klog-article-content .toc-icon-container {
-        margin-top: 2em;
-        position: relative;
+        position: absolute;
+        left: 0px;
+        top: -12px;
         height: 16px;
         z-index: 10;
+      }
+
+      .klog-article-content .toc-container {
+        padding: 16px 8px 16px 16px;
+        max-height: 33vh;
+        overflow-y: auto;
       }
 
       .klog-article-content .toc-icon {
@@ -310,11 +316,6 @@
       .klog-article-content ol>li,
       .klog-article-content ul>li {
         position: relative;
-      }
-
-      .klog-article-content [depth]+ul,
-      .klog-article-content [depth]+ol {
-        margin-top: 1em;
       }
 
       .klog-article-content ol>li,
