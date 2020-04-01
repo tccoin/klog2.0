@@ -165,6 +165,34 @@
 
       /*media block*/
 
+      @media (max-width: 662px) {
+        klog-markdown {
+
+          --klog-markdown-media-container: {
+            width: calc(100% + 32px);
+            margin: 0 0 16px 50%;
+            transform: translateX(-50%);
+          }
+
+          --klog-markdown-media: {
+            width: 100%;
+            --klog-media-border-radius: 0px;
+          }
+
+          --klog-markdown-media-description: {
+            padding: 12px 16px 0;
+          }
+        }
+      }
+
+      @media (min-width: 663px) {
+        klog-markdown {
+          --klog-markdown-media: {
+            @apply(--shadow-elevation-8dp);
+          }
+        }
+      }
+
       @media (min-width: 768px) {
         klog-markdown {
           --klog-media-width: 739px;
@@ -174,10 +202,6 @@
             margin: 0 0 16px 50%;
             width: max-content;
             transform: translateX(-50%);
-          }
-
-          --klog-markdown-media: {
-            @apply(--shadow-elevation-8dp);
           }
         }
       }
@@ -215,10 +239,6 @@
       }
 
       @media (max-width: 767px) {
-
-        .content {
-          padding-top: 0;
-        }
 
         :host {
           --klog-markdown-font-size: 15px;

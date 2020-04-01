@@ -271,7 +271,7 @@
       }
 
       calculateIsGallery(images) {
-        return images.filter(x => x.entropy >= 6).length >= 3;
+        return images.filter(x => x.entropy >= 5).length >= 3;
       }
 
       _calculateGallery(images) {
@@ -281,7 +281,9 @@
         this.imageNumber = images.length;
         this.isGallery = this.calculateIsGallery(images);
         if (!this.isGallery) return [];
-        images.sort((a, b) => Math.floor(b.entropy) - Math.floor(a.entropy));
+        // images[0].entropy += 2;
+        // images.sort((a, b) => Math.floor(b.entropy) - Math.floor(a.entropy));
+        images = [images[0]].concat(images.slice(1).sort((a, b) => Math.floor(b.entropy) - Math.floor(a.entropy)));
         /*generate gallery*/
         let layout;
         if (this.data.view == 'gallery') {

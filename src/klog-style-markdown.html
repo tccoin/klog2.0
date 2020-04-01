@@ -205,10 +205,18 @@
 
       .klog-article-content klog-video,
       .klog-article-content klog-image {
-        max-width: 100%;
-        border-radius: 5px;
         --klog-media-border-radius: 5px;
+        max-width: 100%;
+        border-radius: var(--klog-media-border-radius);
         @apply(--klog-markdown-media);
+      }
+
+      .klog-article-content [media] .description {
+        color: var(--klog-markdown-secondary-text-color);
+        padding: 12px 0 0;
+        box-sizing: border-box;
+        max-width: var(--klog-media-width, 100%);
+        @apply(--klog-markdown-media-description);
       }
 
       .klog-article-content [media] .description::before {
@@ -225,11 +233,6 @@
 
       .klog-article-content [media]:hover .description::before {
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-      }
-
-      .klog-article-content [media] .description {
-        color: var(--klog-markdown-secondary-text-color);
-        padding: 12px 0 0;
       }
 
       .klog-article-content [media] .description .media-tip {
