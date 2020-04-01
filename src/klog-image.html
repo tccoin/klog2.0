@@ -91,6 +91,10 @@
             type: Boolean,
             reflectToAttribute: true
           },
+          galleryCover: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
           theme: {
             type: String
           },
@@ -111,6 +115,15 @@
         ]
       }
 
+      encode(url) {
+        let result = url.replace(/(\?.*)?$/, '').match(/(.*\/)(.*)$/);
+        return result[1] + encodeURIComponent(result[2]);
+      }
+
+      _isKlogStorage(src) {
+        return src.indexOf('storage.krrr.party') > -1;
+      }
+
       srcChanged(src) {
         if (!src) return;
         this._initQueue();
@@ -120,9 +133,8 @@
           src = 'https://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg';
         } else if (this.content && src.indexOf('clouddn.com') > -1 && !src.indexOf(/\.svg$/)) {
           src += '?imageView2/2/w/1440/q/85/interlace/1';
-        } else if (src.indexOf('storage.krrr.party') > -1 && src.indexOf('gif') == -1) {
-          let result = src.replace(/(\?.*)?$/, '').match(/(.*\/)(.*)$/);
-          src = result[1] + encodeURIComponent(result[2]);
+        } else if (this._isKlogStorage(src)) {
+          src = this.encode(src);
           oriSrc = src;
           if (this.avatar) {
             src += '?Magic/1/w/100/h/100/q/90';
@@ -130,13 +142,19 @@
             src += '?Magic/1/w/320/h/180/q/75';
           } else if (this.content) {
             src += '?Magic/2/w/1440/q/90';
+          } else if (this.galleryCover) {
+            // src += '?Magic/1/w/584/h/584/q/75';
+            src += '?Magic/1/w/412/h/412/q/80';
           } else if (this.gallery) {
             // src += '?Magic/1/w/584/h/584/q/75';
             src += '?Magic/1/w/274/h/274/q/75';
           }
           if (this.lazy) {
-            this.loadPlaceholder(oriSrc + '?Magic/6');
+            this.loadPlaceholder(oriSrc);
           }
+        } else {
+          this._lazySrc = src;
+          return this.lazyload();
         }
         this._lazySrc = src;
         if (this.lazy) {
@@ -213,21 +231,38 @@
         });
       }
 
-      loadPlaceholder(url) {
-        if (!this.fixed) {
+      loadPlaceholder(url, headless = false) {
+        if (!this._isKlogStorage(url)) return { w: 1600, h: 900, stats: { entropy: 0 } };
+        url += '?Magic/6';
+        if (!this.fixed && !headless) {
           this.$.bg.style.height = '300px';
           this.$.bg.style.width = "1000px";
         }
         let req = new XMLHttpRequest();
         this.placeHolderPromise = new Promise(resolve => {
           req.addEventListener('load', () => {
-            this._placeholderData = JSON.parse(req.response);
-            this.updatePlaceholder();
-            setTimeout(resolve, 1);
+            try {
+              this._placeholderData = JSON.parse(req.response);
+            } catch{
+              console.log('placeholder error: ', url);
+            }
+            this.savePlaceholderData(url, this._placeholderData);
+            if (!headless) {
+              this.updatePlaceholder();
+            }
+            setTimeout(() => resolve(this._placeholderData), 1);
           });
+          req.open('get', url, true);
+          req.send();
         });
-        req.open('get', url, true);
-        req.send();
+        return this.placeHolderPromise;
+      }
+
+      savePlaceholderData(url, data) {
+        // disabled
+        return;
+        window.placeholders = window.placeholders || {};
+        window.placeholders[url.replace(/[^0-9a-zA-Z_$]/g, '')] = data;
       }
 
       updatePlaceholder() {

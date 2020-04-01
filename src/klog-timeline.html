@@ -314,6 +314,8 @@
         this._initScroller();
         this._initPageloader();
 
+        this._item = document.createElement('klog-timeline-item');
+
         this.filterPreset = {
           default: { view: 'default', keyword: '' },
           search: { view: 'default', keyword: '' },
@@ -324,12 +326,11 @@
 
         this.viewPreset = {
           default: {
-            pageSize: 15,
-            requiredAttachments: []
+            pageSize: 15
           },
           gallery: {
             pageSize: 7,
-            requiredAttachments: [['image', 3]]
+            requiredAttachments: x => this._item.calculateIsGallery(x.filter(y => y.image))
           }
         };
 
@@ -499,8 +500,8 @@
           });
         }
         // view
-        for (let [attr, len] of this.viewPreset[this.view].requiredAttachments) {
-          cards = cards.filter(x => x.attachments.filter(x => x[attr]).length >= len);
+        if (this.viewPreset[this.view].requiredAttachments) {
+          cards = cards.filter(x => this.viewPreset[this.view].requiredAttachments(x.attachments));
         }
         for (let card of cards) {
           card.view = this.view;

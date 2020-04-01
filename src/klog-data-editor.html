@@ -1,4 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="klog-image.html">
+<link rel="import" href="klog-markdown.html">
 <dom-module id="klog-data-editor">
   <template>
     <style>
@@ -95,7 +97,7 @@
       _tokensChanged(tokens) {
         this._updateTitle(tokens);
         this._updateMeta(tokens);
-        this._updateAttachments(tokens);
+        return this._updateAttachments(tokens);
       }
 
       _updateTitle(tokens) {
@@ -157,6 +159,19 @@
           .replace(/\n/g, '')
       }
 
+      _generateMarkdownParser() {
+        const parser = document.createElement('klog-markdown');
+        parser.ready();
+        return parser;
+      }
+
+      async _generateTokens(markdown) {
+        let parser = this._generateMarkdownParser();
+        this._parser = parser;
+        let tokens = await parser.render(markdown, true);
+        await this._tokensChanged(tokens);
+      }
+
       _updateAttachments(tokens) {
         let renderer = new marked.Renderer();
         this.image = {};
@@ -186,6 +201,15 @@
             }
             this.attachments.push(attachment);
           }
+        }
+        return this._updatePlaceholders(this.attachments);
+      }
+
+      async _updatePlaceholders(attachments) {
+        this._image = this._image || document.createElement('klog-image');
+        for (let image of attachments.filter(x => x.image)) {
+          let placeholder = await this._image.loadPlaceholder(this._image.encode(image.url), true);
+          image.entropy = placeholder.stats ? placeholder.stats.entropy : 0;
         }
       }
 
@@ -310,9 +334,11 @@
               return
             }
             data = Object.assign({ private: true, immersive: false }, data.toJSON());
-            if (data.author.objectId != this.userinfo.publicinfo.id && !AV._config.useMasterKey) {
-              this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
-              return;
+            if (!AV._config.useMasterKey) {
+              if (this.userinfo == undefined || data.author.objectId != this.userinfo.publicinfo.id) {
+                this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
+                return;
+              }
             }
             this.markdown = data.markdown;
             this.path = data.path;
@@ -324,7 +350,7 @@
           });
       }
 
-      save() {
+      async save() {
         // create or update
         let article;
         if (this.wordCount == 0 && this.attachments.length == 0) {
@@ -337,7 +363,6 @@
         }
         // pointer
         let topic = AV.Object.createWithoutData('Topic', '59bcb4d3128fe158340be1b5');
-        let author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
         // path
         if (this._pathUsed) {
           return Promise.reject(new Error('path used'));
@@ -350,6 +375,10 @@
           } else if (this.path[0] == '-') {
             return Promise.reject(new Error('path start with hyphen'));
           }
+        }
+        // attachments
+        if (this.tokens == undefined) {
+          await this._generateTokens(this.markdown);
         }
         // set attributes
         article.set('title', this.title);
@@ -365,14 +394,15 @@
         article.set('keywords', this.keywords);
         article.set('comments', []);
         article.set('topic', topic);
-        article.set('author', author);
         if (!this.quiet) {
+          let author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
+          article.set('author', author);
           article.set('updateTimeline', true);
         } else {
           console.log('Updated in quite mode.');
           article.set('updateTimeline', false);
         }
-        //save
+        // save
         return article.save();
       }
 

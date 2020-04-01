@@ -120,14 +120,21 @@ const sendImage = async (request, reply, filePath, query) => {
   if (mode == 6) {
     params['q'] = params['q'] || 64;
     let samplePath = filePath.replace(/\\/g, '/').replace(/pan\/(.*)\/(.*)\.([^\.]*)$/, `pan\/cache\/$1.$2.vibrantsample${params['q']}.jpg`);
-    await image.resize(params['q']).toFile(samplePath);
+    let sample = image.resize(params['q']);
+    await sample.toFile(samplePath);
+    let stats = await sample.stats();
     console.log('LOG Generating palette...');
     let vibrant = new Vibrant(samplePath, { maxDimension: 64 });
     let palette = await vibrant.getPalette();
     let result = JSON.stringify({
       w: _w,
       h: _h,
-      palette: palette
+      palette: palette,
+      stats: {
+        stdev: stats.channels.map(x => x.stdev).reduce((a, b) => a + b),
+        entropy: stats.entropy,
+        isOpaque: stats.isOpaque
+      }
     });
     reply.header('content-type', 'text/plain');
     reply.header('Access-Control-Allow-Origin', '*');

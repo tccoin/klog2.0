@@ -38,167 +38,15 @@
 
       .card {
         width: calc(100% - 16px);
-        margin: auto;
         cursor: pointer;
-        background: var(--klog-theme-surface);
-        /* background: transparent;
-        border: 1px solid var(--border-color, --divider-color);
-        @apply --shadow-none; */
-        overflow: hidden;
-        -webkit-tap-highlight-color: transparent;
-        transition: box-shadow .3s ease;
       }
 
       .card:hover {
         @apply --shadow-elevation-8dp;
       }
 
-      /*card-meta*/
-
-      .card-meta {
-        display: flex;
-        align-items: center;
-        font-size: 0.9em;
-        line-height: 1;
-        margin: calc(var(--klog-card-padding) * 2);
-        color: var(--secondary-text-color);
-      }
-
-      .card-meta .meta-avatar {
-        width: 32px;
-        height: 32px;
-      }
-
-      .card-meta .meta-content {
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .meta-title {
-        font-weight: bold;
-        color: var(--primary-text-color);
-        font-size: var(--primary-font-size);
-      }
-
-      .meta-subtitle {
-        display: flex;
-        flex-flow: row;
-        align-items: center;
-        white-space: nowrap;
-        font-size: var(--primary-font-size);
-        margin-top: 4px;
-      }
-
-      .meta-collection {
-        color: var(--dark-primary-color);
-      }
-
-      .meta-subtitle .divider {
-        display: inline-block;
-        height: 4px;
-        width: 4px;
-        margin: 0 6px;
-        border-radius: 2px;
-        background: var(--border-color);
-      }
-
-
-      /*card-body*/
-
-      .card-media {
-        max-height: 328px;
-        margin: 0;
-        --klog-media-override-width: 100%;
-        width: 100%;
-      }
-
-      .card-subtitle {
-        margin: calc(var(--klog-card-padding) * 3) calc(var(--klog-card-padding) * 2) 0;
-        line-height: 1;
-        color: var(--secondary-text-color);
-        font-weight: bold;
-      }
-
-      .card-media:not([hidden])+.card-subtitle {
-        margin: calc(var(--klog-card-padding) * 2) calc(var(--klog-card-padding) * 2) 0;
-      }
-
-      .card-title {
-        color: var(--primary-text-color);
-        margin-top: var(--klog-card-padding) !important;
-      }
-
-      .card-subtitle+.card-title {
-        margin-top: calc(var(--klog-card-padding) * 0.5) !important;
-      }
-
-      .card-content {
-        display: flex;
-        flex-direction: row;
-      }
-
-      .content-text {
-        max-height: 6.8em;
-        overflow: hidden;
-        flex: 1;
-        margin: 0;
-        font-size: var(--primary-font-size);
-        color: var(--klog-card-content-color, var(--primary-text-color));
-      }
-
-      .content-thumbnail {
-        width: 160px;
-        height: 90px;
-        border-radius: 3px;
-        margin-left: calc(var(--klog-card-padding) * 2);
-      }
-
-      /*card-gallery*/
-
-      .card-gallery {
-        @apply --layout-horizontal;
-        @apply --layout-start-center;
-        flex-wrap: wrap;
-        overflow: auto;
-        flex: 1;
-        margin: calc(var(--klog-card-padding) * 2);
-        font-size: var(--secondary-font-size);
-        color: var(--klog-card-content-color, var(--primary-text-color));
-      }
-
-      .card-gallery-item {
-        margin-right: 1px;
-        margin-top: 1px;
-        flex-grow: 0;
-        flex-shrink: 0;
-        flex-basis: calc(25% - 1px);
-      }
-
-      :host([mobile]) .card-gallery-item {
+      :host() .gallery-item {
         flex-basis: calc(33.33% - 1px);
-      }
-
-      .card-gallery-item[large] {
-        flex-basis: calc(50% - 1px);
-      }
-
-      .attachments {
-        position: relative;
-        margin-top: 0;
-        margin-bottom: 0;
-        overflow: hidden;
-      }
-
-      /*card-actions*/
-
-      .card-actions {
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: calc(var(--klog-card-padding) * 2 - 4px) !important;
-        color: var(--secondary-text-color);
-        overflow: hidden;
-        transition: height .2s ease;
       }
 
       .card-actions>paper-chip {
@@ -208,7 +56,7 @@
         --paper-chip-icon-size: 20px;
 
         --paper-chip-style: {
-          font-size: var(--secondary-font-size);
+          font-size: var(--secondary-font-size, 14px);
           padding: 3px 10px;
         }
       }
@@ -230,10 +78,6 @@
         width: 0;
       }
 
-      [hidden] {
-        display: none !important;
-      }
-
       @media (max-width: 632px) {
         .card-actions>paper-chip {
           max-width: calc(50vw - 32px);
@@ -242,13 +86,13 @@
     </style>
     <!--header-->
     <a href="/#/article/{{data.path}}" id="card">
-      <div class="card klog-card" raised$="{{expended}}" on-click="read">
+      <div class="card klog-card" raised$="{{expended}}" on-click="read" mobile$="{{mobile}}">
 
         <!--meta-->
         <div class="card-meta">
           <klog-image class="meta-avatar" src="{{data.author.avatarUrl}}" theme="{{theme}}" lazy fixed avatar>
           </klog-image>
-          <div class="meta-content">
+          <div class="meta-container">
             <div class="meta-title">{{data.author.displayName}}</div>
           </div>
           <div class="meta-date">
@@ -279,9 +123,13 @@
         <template is="dom-if" if="{{view.gallery}}">
           <div class="card-gallery">
             <template is="dom-repeat" items="{{gallery}}">
-              <klog-image class="card-gallery-item" src="{{item.url}}" theme="{{theme}}" lazy fixed gallery
-                large$="{{item.large}}">
-              </klog-image>
+              <div class="gallery-container" cover$="{{item.cover}}">
+                <template is="dom-repeat" items="{{item}}">
+                  <klog-image class="gallery-item" src="{{item.url}}" theme="{{theme}}" lazy fixed gallery
+                    gallery-cover="{{item.cover}}">
+                  </klog-image>
+                </template>
+              </div>
             </template>
           </div>
         </template>
@@ -368,7 +216,7 @@
             // clamp
             let text = this.$.card.querySelector('#text');
             if (text) {
-              promises.push(Promise.resolve($clamp(text, { clamp: 4 })));
+              promises.push(Promise.resolve($clamp(text, { clamp: this.clamp })));
             }
             Promise.all(promises).then(resolve);
           }, 1);
@@ -383,7 +231,7 @@
           const data = this.data;
           const text = this.data.text || '';
           const shortenText = text.replace(/\[图片\]/g, '').trim();
-          const gallery = this.gallery;
+          const imageNumber = this.imageNumber;
           const actions = this.actions;
           /*避免修改原数据*/
           data._text = data.text;
@@ -391,8 +239,11 @@
           view.thumbnail = Boolean(data.image.url);
           view.fullWidthMedia = Boolean(data.image.url);
           view.actions = actions.length != 0;
+          /* 文字裁剪 */
+          this.clamp = 4;
           /* 显示相册 */
-          if (gallery.length >= 3) {
+          if (this.isGallery) {
+            this.clamp = 2;
             view.gallery = true;
             view.fullWidthMedia = false;
             view.thumbnail = false;
@@ -404,6 +255,7 @@
             if (shortenText.length > 40) {
               view.fullWidthMedia = false;
             } else {
+              this.clamp = 2;
               data._text = shortenText;
               view.thumbnail = false;
             }
@@ -418,17 +270,57 @@
         });
       }
 
+      calculateIsGallery(images) {
+        return images.filter(x => x.entropy >= 7).length >= 3;
+      }
+
+      _calculateGallery(images) {
+        /*determine whether to show gallery*/
+        let cover = true;
+        let mobile = this.mobile;
+        this.imageNumber = images.length;
+        this.isGallery = this.calculateIsGallery(images);
+        if (!this.isGallery) return [];
+        images.sort((a, b) => Math.floor(b.entropy) - Math.floor(a.entropy));
+        /*generate gallery*/
+        let layout;
+        if (this.data.view == 'gallery') {
+          layout = mobile ?
+            cover ? [4, 2, 3] : [3, 3] :
+            cover ? [4, 4, 4] : [4, 4];
+        } else {
+          layout = mobile ?
+            cover ? [4, 2] : [3, 3] :
+            cover ? [4, 4] : [4, 4];
+        }
+        images[0].cover = cover;
+        let gallery = [[]];
+        let number = 0;
+        for (let image of images) {
+          if (layout[0] == 0) {
+            layout.shift();
+            if (layout.length == 0) break;
+            else gallery.push([]);
+          }
+          if (image.cover) {
+            gallery[gallery.length - 1].cover = true;
+            layout[0] -= 4;
+          } else {
+            layout[0] -= 1;
+          }
+          number += 1;
+          gallery[gallery.length - 1].push(image);
+        }
+        /*count*/
+        this.hiddenImageNumber = this.imageNumber - number;
+        return gallery;
+      }
+
       _calculateAttachments() {
         return new Promise((resolve) => {
           // gallery
-          let gallery = this.data.attachments.filter(x => x.image);
-          this.imageCount = gallery.length;
-          gallery.splice(this.mobile ? 6 : 8);
-          // if (gallery.length >= 1 && gallery.length <= 3) {
-          //   gallery[0].large = true;
-          // }
-          this.hiddenImageCount = this.imageCount - gallery.length;
-          this.gallery = gallery;
+          let images = this.data.attachments.filter(x => x.image);
+          this.gallery = this._calculateGallery(images);
           // links
           let links = this.data.attachments.filter(x => x.link);
           this.links = links;

@@ -510,46 +510,64 @@
         }));
       }
 
-      render() {
+      getDefaultPreference() {
+        return {
+          numberedHeading: 'auto',
+          centeredHeading: 'false',
+          overflowCode: 'true'
+        };
+      }
+
+      render(markdown, headless = false) {
+        markdown = markdown || this.markdown;
         //load preference
         if (!this.preference) {
-          this.preference = this.$.user.defaultMarkdownPreference;
+          this.preference = this.getDefaultPreference();
         }
         // reset attributes
-        this.$.content.innerHTML = '';
+        if (!headless) this.$.content.innerHTML = '';
         this.collection = 'Daily';
         this.tags = [];
         this._headingIndex = 0;
         this._headings = [];
         this._hasToc = false;
         // no markdown
-        if (!this.markdown) {
+        if (!markdown) {
           this.$.scroller.reset();
           this._updateWordCount();
           return;
         }
         // translate markdown
-        marked(this.markdown, this.options, (err, out, tokens) => {
-          if (err) throw err;
-          this.tokens = tokens;
-          this._reflinks = tokens.links;
-          //render
-          this.$.content.innerHTML = out;
-          //post-update
-          this._updateHeadings();
-          this._updateLists();
-          this._updateEvents();
-          // word count
-          this._updateWordCount();
-          //Han
-          Han(this.$.article, this.$.article).render();
-          setTimeout(() => this.dispatchEvent(new CustomEvent('markdown-rendered', { bubbles: true, composed: true })), 1);
-          // scroller
-          if (this.$.scroller.query) {
-            this.waitPlaceholders().then(() => this.$.scroller.scroll());
-          }
-          // lazy load image
-          if (this.lazy) setTimeout(() => this.lazyObserve(), 1);
+        return new Promise(resolve => {
+          marked(markdown, this.options, (err, out, tokens) => {
+            if (err) throw err;
+            this.tokens = tokens;
+            resolve(tokens);
+            if (headless) {
+              resolve(tokens);
+              return;
+            }
+            this._reflinks = tokens.links;
+            //render
+            this.$.content.innerHTML = out;
+            //post-update
+            this._updateHeadings();
+            this._updateLists();
+            this._updateEvents();
+            // word count
+            this._updateWordCount();
+            //Han
+            Han(this.$.article, this.$.article).render();
+            setTimeout(() => this.dispatchEvent(new CustomEvent('markdown-rendered', { bubbles: true, composed: true })), 1);
+            // scroller
+            if (this.$.scroller.query) {
+              this.waitPlaceholders().then(() => this.$.scroller.scroll());
+            }
+            // lazy load image
+            if (this.lazy) setTimeout(() => this.lazyObserve(), 1);
+            // resolve
+            resolve(tokens);
+          });
         });
       }
 

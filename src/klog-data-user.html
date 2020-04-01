@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="klog-style-card.html">
+<link rel="import" href="klog-markdown.html">
 <dom-module id="klog-data-user">
   <script>
     'user strict';
@@ -42,11 +43,8 @@
 
       ready() {
         super.ready();
-        this.defaultMarkdownPreference = {
-          numberedHeading: 'auto',
-          centeredHeading: 'false',
-          overflowCode: 'true'
-        };
+        const markdown = document.createElement('klog-markdown');
+        this.defaultMarkdownPreference = markdown.getDefaultPreference();
         this.defaultPreference = {
           theme: 'time',
           darkThemeDisabled: false,
