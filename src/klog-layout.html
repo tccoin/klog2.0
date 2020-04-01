@@ -148,7 +148,7 @@
         <klog-editor id="editor" name="editor" mobile="{{mobile}}" theme="{{theme}}"></klog-editor>
         <klog-login id="login" name="login"></klog-login>
         <klog-signup id="signup" name="signup"></klog-signup>
-        <klog-userpanel name="userpanel"></klog-userpanel>
+        <klog-userpanel name="userpanel" mobile="[[mobile]]"></klog-userpanel>
         <klog-apps name="apps"></klog-apps>
         <klog-note id="note" name="note" theme="[[theme]]" mobile="{{mobile}}"> </klog-note>
         <!--testing-->
@@ -161,7 +161,7 @@
     <!--about-->
     <paper-dialog id="about" with-backdrop>
       <h2>> klog -V</h2>
-      <p>v2.11.0<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.11.1<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column>
         <paper-button on-click="aboutHelp">> klog help</paper-button>
         <paper-button on-click="aboutLog">> klog log</paper-button>

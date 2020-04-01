@@ -243,7 +243,7 @@
           req.addEventListener('load', () => {
             try {
               this._placeholderData = JSON.parse(req.response);
-            } catch{
+            } catch (error) {
               console.log('placeholder error: ', url);
             }
             this.savePlaceholderData(url, this._placeholderData);

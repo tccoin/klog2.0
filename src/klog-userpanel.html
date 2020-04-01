@@ -32,7 +32,12 @@
       :host {
         display: block;
         background: var(--klog-page-background);
-        padding: 64px 0 32px 0 !important;
+        padding: 80px 0 32px var(--klog-layout-margin-left) !important;
+        --klog-card-padding: 12px;
+      }
+
+      :host([mobile]) {
+        --klog-card-padding: 8px;
       }
 
       app-toolbar {
@@ -45,7 +50,7 @@
         flex: 1;
       }
 
-      .userpanel-card {
+      .klog-card {
         max-width: 400px;
         width: calc(100% - 16px);
         margin: 0 auto 32px;
@@ -56,34 +61,27 @@
         @apply --shadow-elevation-2dp;
       }
 
-      .userpanel-card:last-child {
+      .klog-card .card-meta {
+        font-weight: bold;
+        margin-bottom: calc(var(--klog-card-padding) * 3);
+        font-size: 1.1em;
+      }
+
+      .klog-card:last-child {
         margin-bottom: 0;
       }
 
-      .userpanel-card .card-meta.header {
-        padding: 8px 16px 8px 24px;
-        display: flex;
-        align-items: center;
-        min-height: 56px;
-        box-sizing: border-box;
-      }
-
-      .userpanel-card .card-meta.header .title {
-        color: var(--secondary-text-color);
-        font-weight: bold;
-      }
-
-      .userpanel-card .card-meta.header paper-icon-button {
+      .klog-card .card-meta.header paper-icon-button {
         color: var(--primary-color);
       }
 
       .form>* {
-        margin: 0 24px;
-        padding-bottom: 16px;
+        margin: 0 calc(var(--klog-card-padding) * 2);
+        padding-bottom: calc(var(--klog-card-padding) * 2);
       }
 
-      .form>.fit {
-        margin: 0 8px;
+      .form>*:last-child {
+        padding-bottom: 0;
       }
 
       klog-upload-zone {
@@ -99,10 +97,8 @@
     </style>
     <klog-data-user id="user" disabled></klog-data-user>
 
-    <div class="userpanel-card klog-card">
-      <div class="card-meta header">
-        <div class="title">公开信息</div>
-      </div>
+    <div class="klog-card" mobile="[[mobile]]">
+      <div class="card-meta">公开信息</div>
       <div class="form">
         <klog-input label="头像路径" value="{{userinfo.avatarUrl}}" outlined hidden>
         </klog-input>
@@ -117,15 +113,11 @@
             <iron-icon icon="cloud_upload"></iron-icon>
           </paper-button>
         </div>
-        <div class="fit">
-        </div>
       </div>
     </div>
 
-    <div class="userpanel-card klog-card">
-      <div class="card-meta header">
-        <div class="title">外观</div>
-      </div>
+    <div class="klog-card" mobile="[[mobile]]">
+      <div class="card-meta">外观</div>
       <div class="form">
         <klog-dropdown-menu label="主题" outlined vertical-align="top" horizontal-align="left" vertical-offset="62"
           horizontal-offset="-16">
@@ -145,8 +137,6 @@
           </div>
           <paper-toggle-button checked="{{preference.backdropBlurEnabled}}"></paper-toggle-button>
         </div>
-        <div class="fit">
-        </div>
       </div>
 
 
@@ -156,10 +146,8 @@
     <div class="fit"></div>
     </div>
 
-    <div class="userpanel-card klog-card" id="animation">
-      <div class="card-meta header">
-        <div class="title">阅读偏好</div>
-      </div>
+    <div class="klog-card" mobile="[[mobile]]" id="animation">
+      <div class="card-meta">阅读偏好</div>
       <div class="form">
         <klog-dropdown-menu label="标题序号" outlined vertical-align="top" horizontal-align="left" vertical-offset="62"
           horizontal-offset="-16">
@@ -196,26 +184,21 @@
             <iron-icon icon="settings_backup_restore"></iron-icon>
           </paper-button>
         </div>
-        <div class="fit"></div>
       </div>
-    </div>
 
-    <!-- <div class="userpanel-card klog-card">
-      <div class="card-meta header">
-        <div class="title">启动时打开</div>
-      </div>
+      <!-- <div class="klog-card" mobile="[[mobile]]">
+      <div class="card-meta">启动时打开</div>
       <div class="form">
         <paper-radio-group selected="{{preference.defaultPage}}">
           <paper-radio-button name="timeline">时间轴</paper-radio-button>
           <paper-radio-button name="note">笔记</paper-radio-button>
         </paper-radio-group>
       </div>
-      <div class="fit"></div>
     </div> -->
 
-    <paper-dialog id="uploadAvatarDialog" with-backdrop>
-      <klog-upload-zone bucketname="klog-avatar" fileinfo="{{avatarinfo}}"></klog-upload-zone>
-    </paper-dialog>
+      <paper-dialog id="uploadAvatarDialog" with-backdrop>
+        <klog-upload-zone bucketname="klog-avatar" fileinfo="{{avatarinfo}}"></klog-upload-zone>
+      </paper-dialog>
   </template>
   <script>
     class KlogUserpanel extends Polymer.Element {
@@ -226,6 +209,10 @@
 
       static get properties() {
         return {
+          mobile: {
+            type: Boolean,
+            reflectToAttribute: true
+          },
           layout: {
             type: Object,
             value: {
