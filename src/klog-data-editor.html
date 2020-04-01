@@ -360,6 +360,7 @@
           article = AV.Object.createWithoutData('Article', this.articleId);
         } else {
           article = new AV.Object('Article');
+          this.quiet = false;
         }
         // pointer
         let topic = AV.Object.createWithoutData('Topic', '59bcb4d3128fe158340be1b5');
