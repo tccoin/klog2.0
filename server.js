@@ -10,7 +10,7 @@ const tls = require('tls');
 const isDev = process.env.NODE_ENV == 'development';
 
 if (isDev) {
-  const httpserver = app(fastify());
+  const httpserver = app(fastify({ maxParamLength: 200 }));
   httpserver.listen(3000, '0.0.0.0', (err, address) => {
     if (err) {
       console.log(err)
@@ -22,6 +22,7 @@ if (isDev) {
   const opt = {
     logger: false,
     http2: true,
+    maxParamLength: 200,
     https: {
       allowHTTP1: true,
       key: fs.readFileSync('certs/krrr.party/krrr.party.key'),
