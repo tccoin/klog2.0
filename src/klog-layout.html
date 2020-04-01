@@ -161,7 +161,7 @@
     <!--about-->
     <paper-dialog id="about" with-backdrop>
       <h2>> klog -V</h2>
-      <p>v2.11.1<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.11.2<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column>
         <paper-button on-click="aboutHelp">> klog help</paper-button>
         <paper-button on-click="aboutLog">> klog log</paper-button>
@@ -543,9 +543,9 @@
 
       _setAttribute(target, attribute, remove = false, value = '') {
         if (!remove) {
-          target.setAttribute(attribute, value);
+          target && target.setAttribute(attribute, value);
         } else {
-          target.removeAttribute(attribute, value);
+          target && target.removeAttribute(attribute, value);
         }
       }
 

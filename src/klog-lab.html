@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="klog-style-layout.html">
 <link rel="import" href="klog-style-card.html">
@@ -10,6 +11,7 @@
 <link rel="import" href="klog-input.html">
 <link rel="import" href="klog-data-list.html">
 <link rel="import" href="klog-image.html">
+<link rel="import" href="klog-icons.html">
 
 <dom-module id="klog-lab">
   <template>
@@ -73,6 +75,32 @@
 
       static get is() { return 'klog-lab'; }
 
+      static get properties() {
+        return {
+          layout: {
+            type: Object,
+            value: {
+              documentTitle: '实验室 - Klog',
+              drawer: 'off',
+              menu: 'off',
+              styles: {
+                '--klog-header-background-color': 'translate',
+                '--klog-header-text-color': 'var(--primary-text-color)',
+              },
+              header: {
+                fixed: false,
+                short: false,
+                shadow: 'off'
+              },
+              toolbar: Polymer.html`
+          <app-toolbar>
+            <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
+          </app-toolbar>`
+            }
+          }
+        }
+      }
+
       ready() {
         super.ready();
         this.addEventListener('app-load', (e) => {
@@ -99,6 +127,21 @@
 
       saveArticle() {
         return this._editor.save();
+      }
+
+      load(userLoadPromise) {
+        return userLoadPromise.then(result => {
+          if (!result.login) {
+            this.dispatchEvent(new CustomEvent('user-login-page-open', {
+              bubbles: true,
+              composed: true
+            }));
+          }
+        });
+      }
+
+      back() {
+        this.parentElement.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
       }
 
       loadList() {

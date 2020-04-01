@@ -91,7 +91,6 @@
 
       ready() {
         super.ready();
-
         //lazy-init
         if (this.lazy) this.lazyInit();
 
@@ -164,14 +163,14 @@
           if (href.match(/\.mp4$/)) {
             mediaType = 'video';
           }
-          let tip = (mediaType == 'video') ? `<span class="media-tip${text ? ' with-text' : ''}">单击以暂停，双击切换静音</span>` : '';
           let out = `<klog-${mediaType}  content
+          ${(this.mobile || false) ? 'mobile' : ''}
           src="${href}"
           alt="${text}"
           ${this.lazy ? ` lazy theme="${this.theme}"` : ''}
           ></klog-${mediaType}>`;
-          if (text || tip) {
-            out = `<div media description>${out}<div class="description">${text}${tip}</div></div>`;
+          if (text) {
+            out = `<div media description>${out}<div class="description">${text}</div></div>`;
           } else {
             out = `<div media>${out}</div>`;
           }
