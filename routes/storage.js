@@ -4,7 +4,6 @@
 const path = require('path');
 const fs = require('fs');
 const mime = require('mime-types');
-const pump = require('pump-promise');
 const sharp = require('sharp');
 const OptiPng = require('optipng');
 const stream = require('stream');
