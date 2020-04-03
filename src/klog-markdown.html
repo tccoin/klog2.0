@@ -210,7 +210,7 @@
           },
           parse: () => {
             this._hasToc = true;
-            return '<div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><div class="toc"></div>'
+            return '<div class="toc"><div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><div class="toc-container"></div></div>'
           }
         };
 
@@ -399,7 +399,7 @@
         }
 
         // update toc elements
-        let tocs = this.$.content.querySelectorAll('.toc');
+        let tocs = this.$.content.querySelectorAll('.toc-container');
         let tocHTML = '';
         if (tocs.length > 0) {
           let depth = bottom, lastDepth = 0, outDepth = 0;
