@@ -5,16 +5,19 @@
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="klog-style-layout.html">
 <link rel="import" href="klog-style-card.html">
+<link rel="import" href="klog-style-author.html">
 <link rel="import" href="klog-markdown.html">
 <link rel="import" href="klog-icons.html">
 <link rel="import" href="klog-data-article.html">
 <link rel="import" href="klog-image.html">
 <link rel="import" href="klog-fab.html">
 <link rel="import" href="klog-render-timestamp.html">
+<!-- <link rel="import" href="klog-comment.html"> -->
 <dom-module id="klog-article">
   <template>
     <style include="klog-style-layout"></style>
     <style include="klog-style-card"></style>
+    <style include="klog-style-author"></style>
     <style>
       :host {
         display: block;
@@ -83,50 +86,8 @@
       }
 
       .article-author {
-        display: flex;
         margin: 16px auto 32px;
         padding: 16px;
-        border-radius: 8px;
-        user-select: none;
-        -webkit-user-select: none;
-      }
-
-      .article-author .divider {
-        flex: 1;
-      }
-
-      .article-author .author-avatar {
-        width: 50px;
-        height: 50px;
-        margin-right: 16px;
-        border-radius: 5px;
-        --klog-media-border-radius: 5px;
-        @apply(--shadow-elevation-8dp);
-      }
-
-      .article-author .text {
-        display: flex;
-        flex-direction: column;
-        width: calc(100% - 64px);
-        color: var(--secondary-text-color);
-      }
-
-      .article-author .author-info {
-        display: flex;
-        flex-direction: row;
-      }
-
-      .article-author .author-name {
-        color: var(--primary-text-color);
-        font-weight: bold;
-      }
-
-      .article-author .author-intro {
-        display: block;
-        flex: 1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
       }
 
       .article-footer {
@@ -295,13 +256,13 @@
       <div class="section article-title" hidden={{!article.title}}>
         <h1>{{article.title}}</h1>
       </div>
-      <div class="section article-author" theme$="{{theme}}">
-        <klog-image class="author-avatar" src="{{article.author.avatarUrl}}" avatar></klog-image>
+      <div class="section article-author klog-author" theme$="{{theme}}">
+        <klog-image id="avatar" class="author-avatar" src="{{article.author.avatarUrl}}" avatar lazy></klog-image>
         <div class="text">
           <div class="author-info">
             <span class="author-name">{{article.author.displayName}}</span>
             <template is="dom-if" if="{{article.author.introduction}}">,&nbsp;
-              <span class="author-intro">{{article.author.introduction}}</span>
+              <span class="author-intro divider">{{article.author.introduction}}</span>
             </template>
           </div>
           <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发表于&nbsp;</klog-render-timestamp>
@@ -312,6 +273,11 @@
         link-prefix="article/{{path}}" hide-independent-title="true" theme="{{theme}}"
         preference="{{userinfo.preference.markdown}}" mobile="{{mobile}}" lazy heading-actions>
       </klog-markdown>
+      <!--comment-->
+      <!-- <div class="section">
+        <klog-comment id="comment" article-id="{{article.objectId}}" userinfo="{{userinfo}}"></klog-comment>
+      </div> -->
+      <!--footer-->
       <div class="article-footer">
         <span class="logo">
           Klog.
@@ -407,6 +373,7 @@
           let y = this.$.scrollTarget.scrollTop;
           this.fabExtended = y < 48 && !this.mobile;
         };
+
       }
 
       async load(userLoadPromise) {
@@ -422,6 +389,7 @@
       articleloaded() {
         if (this.article && this.article.objectId) {
           this.loading = false;
+          this.$.avatar.lazyload();
         }
       }
 

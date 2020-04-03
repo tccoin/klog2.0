@@ -1,0 +1,36 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="klog-data-comment">
+  <script>
+    class KlogDataComment extends Polymer.Element {
+
+      static get is() { return 'klog-data-comment'; }
+
+      load(articleId) {
+        let query = new AV.Query('Comment');
+        query.select(['author', 'replyTo', 'replyToAuthor', 'markdown']);
+        query.include('author');
+        query.descending('createdAt');
+        query.equalTo('article', AV.Object.createWithoutData('Article', articleId));
+        return query.find().then((data) => {
+          let result = [];
+          console.log(data);
+          for (let comment of data) {
+            result.push(comment.toJSON());
+          }
+          return result;
+        }).catch(err => {
+          if (err) console.log(err);
+        });
+      }
+
+      create(articleId, authorId, ) {
+
+      }
+
+    }
+
+    window.customElements.define(KlogDataComment.is, KlogDataComment);
+  </script>
+
+</dom-module>
