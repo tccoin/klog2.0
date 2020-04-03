@@ -21,7 +21,7 @@
 <link rel="import" href="klog-markdown.html">
 <link rel="import" href="klog-upload-zone.html">
 <link rel="import" href="klog-editor-helper.html">
-<link rel="import" href="klog-imarkdown.html">
+<!-- <link rel="import" href="klog-imarkdown.html"> -->
 <dom-module id="klog-editor">
   <template>
     <style include="klog-style-scrollbar"></style>
@@ -180,7 +180,7 @@
           <!-- <klog-editor-browser class="klog-editor-back-pages" name="browser" disabled="{{loading}}"
             article-id="{{articleId}}" collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser> -->
         </iron-pages>
-        <klog-pages slot="front" class="klog-editor-main-pages" selected="2">
+        <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
           <!-- <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}"> -->
           <klog-editor-textarea id="textarea" loading="{{loading}}" tokens="{{tokens}}" value="{{markdown}}"
             preview="{{preview}}" placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
@@ -189,11 +189,11 @@
             breadcrumbs>
             <span slot="after" class="info">字数统计: {{wordCount}}</span>
           </klog-markdown>
-          <klog-imarkdown id="imarkdown" tokens="{{tokens}}" markdown="{{preview}}" theme="[[theme]]"
+          <!-- <klog-imarkdown id="imarkdown" tokens="{{tokens}}" markdown="{{preview}}" theme="[[theme]]"
             word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}"
             breadcrumbs>
             <span slot="after" class="info">字数统计: {{wordCount}}</span>
-          </klog-imarkdown>
+          </klog-imarkdown> -->
         </klog-pages>
       </klog-backdrop>
     </div>
@@ -443,7 +443,7 @@
         // bond
         this.$.textarea.$.preview = this.$.markdown;
         this.$.markdown.updateScrollTarget(this.$.markdown);
-        this.$.imarkdown.updateScrollTarget(this.$.imarkdown);
+        // this.$.imarkdown.updateScrollTarget(this.$.imarkdown);
         this.$.header.$.uploadzone = this.$.uploadzone;
         this.$.header.$.backdrop = this.$.backdrop;
         this.$.infoform.$.header = this.$.header;
