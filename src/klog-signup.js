@@ -78,7 +78,8 @@ class KlogSignup extends PolymerElement {
         value: {
           documentTitle: '注册 - Klog',
           drawer: 'auto',
-          menu: 'auto',
+          mainMenu: true,
+          sidebar: 'auto',
           scrollToTop: false,
           header: {
             fixed: true,

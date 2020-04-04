@@ -9,6 +9,11 @@ server-worker.js
 
 #build
 build/
+sw.js
+sw.js.map
+workbox-*.js
+workbox-*.js.map
+!workbox-config.js
 
 # Logs
 logs

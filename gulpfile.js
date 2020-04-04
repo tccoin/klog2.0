@@ -8,6 +8,8 @@ const run = require('gulp-run');
 const replace = require('gulp-replace');
 const rename = require('gulp-rename');
 const settings = require('./settings');
+const { workboxConfig } = require('./workbox-config');
+const { generateSW } = require('workbox-build');
 
 // promise that waits for stream to end
 function waitFor(stream) {
@@ -59,30 +61,39 @@ function byeGoogleFont() {
     .pipe(gulp.dest(settings.buildDirectory));
 };
 
-function fixServiceWorkerPath() {
-  const insert = (filepath, base) => {
-    console.log(base + 'src/');
-    return gulp.src(filepath + '/service-worker.js')
-      .pipe(replace('src/', base + 'src/'))
-      .pipe(replace('[["index.html"', '[["' + base + 'index.html"'))
-      .pipe(gulp.dest(filepath));
-  };
-  let promises = [];
-  let builds = fs.readdirSync(settings.buildDirectory);
-  for (let name of builds) {
-    let stat = fs.statSync(path.join(settings.buildDirectory, name));
-    if (stat.isDirectory()) {
-      let promise = insert(path.join(settings.buildDirectory, name), `${name}/`);
-      promises.push(promise);
-    }
+async function workerBuild() {
+  const configs = [
+    Object.assign({}, workboxConfig, {
+      disableDevLogs: false
+    }),
+    Object.assign({}, workboxConfig, {
+      globDirectory: './build/',
+      globPatterns: [],
+      swDest: "./build/es5-bundled/sw.js",
+      disableDevLogs: true
+    }),
+    Object.assign({}, workboxConfig, {
+      globDirectory: './build/',
+      globPatterns: [
+        "es6-unbundled/src/*.js",
+        "es6-unbundled/src/lib/*.js"
+      ],
+      swDest: "./build/es6-unbundled/sw.js",
+      disableDevLogs: true
+    })
+  ];
+  for (let config of configs) {
+    await generateSW(config).then(({ count, size }) => {
+      console.log(`Generated ${config.swDest}, which will precache ${count} files, totaling ${size} bytes.`);
+    });
   }
-  return Promise.all(promises);
+
 };
 
 
 exports.build = build;
 exports.insert = insertVariable;
 exports.google = byeGoogleFont;
-exports.sw = fixServiceWorkerPath;
+exports.sw = workerBuild;
 exports.push = pushOTA;
 exports.default = gulp.series(build, insertVariable, byeGoogleFont);

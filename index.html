@@ -85,11 +85,6 @@
         serverURLs: 'https://us.leancloud.cn'
       });
 
-      //serviceWorker
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js', { scope: '/' });
-      }
-
       await import('./src/klog-app.js');
     })();
   </script>

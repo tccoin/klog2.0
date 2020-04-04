@@ -3,16 +3,14 @@ import '@polymer/iron-fit-behavior/iron-fit-behavior.js';
 import './klog-style-scrollbar.js';
 import './klog-image.js';
 import './klog-video.js';
-import './klog-player-lite.js';
 import './klog-style-markdown.js';
 import './klog-data-user.js';
 import './klog-popup.js';
 import './klog-markdown-scroller.js';
-import '../static/lib/Clamp.js/clamp.js';
-import '../static/lib/Han/han.js';
-import '../static/lib/Han/han-style.js';
-import '../static/lib/prism/prism-style.js';
-import '../static/js/marked.js';
+import './lib/han.js';
+import './lib/han-style.js';
+import './lib/marked.js';
+import './lib/clamp.js';
 import { getDefaultMarkdownPreference } from './klog-data-preference.js';
 class KlogMarkdown extends PolymerElement {
   static get template() {

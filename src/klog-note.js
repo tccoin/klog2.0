@@ -69,7 +69,8 @@ class KlogNote extends PolymerElement {
         value: {
           documentTitle: '笔记 - Klog',
           drawer: 'auto',
-          menu: 'auto',
+          mainMenu: true,
+          sidebar: 'auto',
           scrollToTop: true,
           header: {
             fixed: true,

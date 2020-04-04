@@ -1,5 +1,4 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
-import './klog-data-gql.js';
 class klogDataCollection extends PolymerElement {
   static get is() { return 'klog-data-collection'; }
 

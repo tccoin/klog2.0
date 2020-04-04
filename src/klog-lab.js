@@ -81,7 +81,8 @@ class KlogLab extends PolymerElement {
         value: {
           documentTitle: '实验室 - Klog',
           drawer: 'off',
-          menu: 'off',
+          mainMenu: false,
+          sidebar: 'off',
           styles: {
             '--klog-header-background-color': 'translate',
             '--klog-header-text-color': 'var(--primary-text-color)',

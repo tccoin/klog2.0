@@ -1,9 +1,3 @@
-/* <link rel="import" href="klog-imarkdown.html"> */
-/*
-  FIXME(polymer-modulizer): the above comments were extracted
-  from HTML and may be out of place here. Review them and
-  then delete this comment!
-*/
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -18,7 +12,6 @@ import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/app-route/app-route.js';
 import './klog-icons.js';
 import './klog-editor-info-form.js';
-import './klog-editor-browser.js';
 import './klog-editor-header.js';
 import './klog-editor-textarea.js';
 import './klog-data-editor.js';
@@ -27,7 +20,6 @@ import './klog-backdrop.js';
 import './klog-pages.js';
 import './klog-markdown.js';
 import './klog-upload-zone.js';
-import './klog-editor-helper.js';
 
 class KlogEditor extends PolymerElement {
   static get template() {
@@ -179,8 +171,6 @@ class KlogEditor extends PolymerElement {
         <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
           <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" random-path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}"></klog-editor-info-form>
           <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
-          <!-- <klog-editor-browser class="klog-editor-back-pages" name="browser" disabled="{{loading}}"
-            article-id="{{articleId}}" collection="{{collection}}" userinfo="{{userinfo}}"></klog-editor-browser> -->
         </iron-pages>
         <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
           <!-- <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}"> -->
@@ -246,7 +236,8 @@ class KlogEditor extends PolymerElement {
         value: {
           documentTitle: '写作 - Klog',
           drawer: 'auto',
-          menu: 'auto',
+          mainMenu: false,
+          sidebar: 'auto',
           scrollToTop: false,
           header: {
             fixed: true,

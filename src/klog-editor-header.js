@@ -5,7 +5,6 @@ import '@polymer/paper-progress/paper-progress.js';
 import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/paper-toggle-button/paper-toggle-button.js';
-import './klog-editor-browser.js';
 import './klog-style-toolbar.js';
 import './klog-style-dialog.js';
 

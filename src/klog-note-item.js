@@ -2,7 +2,7 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-ripple/paper-ripple.js';
 import './klog-render-timestamp.js';
 
-import '../static/lib/Clamp.js/clamp.js';
+import './lib/clamp.js';
 class KlogNoteItem extends PolymerElement {
   static get template() {
     return html`

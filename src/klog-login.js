@@ -60,7 +60,8 @@ class KlogLogin extends PolymerElement {
         value: {
           documentTitle: '登录 - Klog',
           drawer: 'auto',
-          menu: 'auto',
+          mainMenu: true,
+          sidebar: 'auto',
           scrollToTop: false,
           header: {
             fixed: true,

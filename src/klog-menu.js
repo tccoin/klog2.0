@@ -111,61 +111,19 @@ class KlogMenu extends PolymerElement {
         opacity: 0.6;
       }
     </style>
-    <iron-selector attr-for-selected="name" id="selector" selected="{{page}}" on-iron-select="updatePage">
-
-      <div class="item" name="timeline">
-        <iron-icon icon="timeline"></iron-icon>
-        <span>时间轴</span>
-        <paper-ripple></paper-ripple>
-      </div>
-
-      <div class="item" name="note/all/">
-        <iron-icon icon="book"></iron-icon>
-        <span>笔记本</span>
-        <paper-ripple></paper-ripple>
-      </div>
-
-      <template is="dom-if" if="{{login}}">
-
-        <div class="item" name="userpanel">
-          <iron-icon icon="account_circle"></iron-icon>
-          <span>个人设置</span>
-          <paper-ripple></paper-ripple>
-        </div>
-      </template>
-
-      <div class="item" on-click="about">
-        <iron-icon icon="console"></iron-icon>
-        <span>控制台</span>
-        <paper-ripple></paper-ripple>
-      </div>
-
-      <template is="dom-if" if="{{!login}}">
-        <div class="divider"></div>
-        <div class="subtitle"><span>账户</span></div>
-        <div class="item" name="login">
-          <iron-icon icon="account_circle"></iron-icon>
-          <span>登录</span>
-          <paper-ripple></paper-ripple>
-        </div>
-        <div class="item" name="signup">
-          <iron-icon icon="account_box"></iron-icon>
-          <span>注册</span>
-          <paper-ripple></paper-ripple>
-        </div>
-      </template>
-
-    </iron-selector>
-    <iron-selector id="customMenuSelector" attr-for-selected="name" selected="{{customMenuSelected}}" on-iron-select="customMenuSelect">
+    <iron-selector id="itemsSelector" attr-for-selected="name" selected="{{itemsSelected}}" on-iron-select="itemsSelect">
       <div name="idle" id="idle"></div>
       <template is="dom-repeat" items="{{menu}}">
-        <template is="dom-if" if="{{item.subtitle}}">
+        <template is="dom-if" if="{{item.divider}}">
           <div class="divider"></div>
+        </template>
+
+        <template is="dom-if" if="{{item.subtitle}}">
           <div class="subtitle"><span>{{item.text}}</span></div>
         </template>
 
         <template is="dom-if" if="{{item.item}}">
-          <div class="item secondary" name\$="{{item.name}}" category\$="{{item.category}}">
+          <div class="item secondary" name\$="{{item.name}}" category\$="{{item.category}}" path\$="{{item.path}}">
             <iron-icon icon="{{item.icon}}"></iron-icon>
             <span>{{item.text}}</span>
             <paper-ripple></paper-ripple>
@@ -188,9 +146,9 @@ class KlogMenu extends PolymerElement {
         type: Boolean,
         value: false
       },
-      customMenu: {
+      items: {
         type: Object,
-        observer: '_calcMenuItems'
+        observer: '_calcMenu'
       },
       menu: {
         type: Array,
@@ -199,13 +157,18 @@ class KlogMenu extends PolymerElement {
     }
   }
 
-  _calcMenuItems(customMenu) {
-    this._customMenu = customMenu;
+  _calcMenu(items) {
+    this._items = items;
     const menu = [];
-    for (let category of customMenu) {
-      menu.push({ subtitle: true, name: category.name, text: category.text });
+    for (let category of items) {
+      if (category.text) {
+        if (menu.length != 0) {
+          menu.push({ divider: true });
+        }
+        menu.push({ subtitle: true, name: category.name, text: category.text });
+      }
       for (let item of category.items) {
-        menu.push({ item: true, name: item.name, text: item.text, icon: item.icon, category: category.name });
+        menu.push({ item: true, name: item.name, text: item.text, icon: item.icon, category: category.name, path: item.path || '' });
       }
     }
     this.set('menu', menu);
@@ -223,14 +186,23 @@ class KlogMenu extends PolymerElement {
     }
   }
 
-  customMenuSelect(e) {
+  itemsSelect(e) {
     const item = e.detail.item;
     const name = item.getAttribute('name');
+    const path = item.getAttribute('path');
+    const selectable = item.getAttribute('selectable');
     if (name == 'idle') { return; }
-    else this.$.customMenuSelector.selected = 'idle';
+    else { this.$.itemsSelector.selected = 'idle'; }
     const category = item.getAttribute('category');
     if (category && name) {
-      this.dispatchEvent(new CustomEvent('custom-menu-select', {
+      if (path) {
+        this.dispatchEvent(new CustomEvent('app-load', {
+          bubbles: true,
+          composed: true,
+          detail: { page: path }
+        }));
+      }
+      this.dispatchEvent(new CustomEvent('menu-select', {
         bubbles: true,
         composed: true,
         detail: {
@@ -239,23 +211,7 @@ class KlogMenu extends PolymerElement {
           target: item
         }
       }));
-      this.dispatchEvent(new CustomEvent('menu-select', { bubbles: true, composed: true }));
     }
-  }
-
-  _isEmpty(array) {
-    return array ? array.length == 0 : true;
-  }
-
-  about() {
-    this.dispatchEvent(new CustomEvent('menu-select', {
-      bubbles: true,
-      composed: true,
-    }));
-    this.dispatchEvent(new CustomEvent('open-about', {
-      bubbles: true,
-      composed: true,
-    }));
   }
 }
 

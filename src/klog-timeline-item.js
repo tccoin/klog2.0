@@ -7,7 +7,6 @@ import './klog-icons.js';
 import './klog-data-timeline.js';
 import './klog-image.js';
 import './klog-style-card.js';
-import './klog-timeline-attachments.js';
 import './klog-render-timestamp.js';
 
 class KlogTimelineItem extends PolymerElement {
@@ -51,29 +50,29 @@ class KlogTimelineItem extends PolymerElement {
         flex-basis: calc(33.33% - 1px);
       }
 
-      .card-actions>paper-chip {
+      .card-actions>klog-chip {
         max-width: 268px;
         min-width: 80px;
         margin: 0 8px 4px 0;
-        --paper-chip-icon-size: 20px;
+        --klog-chip-icon-size: 20px;
 
-        --paper-chip-style: {
+        --klog-chip-style: {
           font-size: var(--secondary-font-size, 14px);
           padding: 3px 10px;
         }
       }
 
-      .card-actions>paper-chip[animated] {
+      .card-actions>klog-chip[animated] {
         transition: all .2s ease;
       }
 
-      .card-actions>paper-chip[more] {
+      .card-actions>klog-chip[more] {
         margin-right: 0;
         min-width: 0;
         width: 52px;
       }
 
-      .card-actions>paper-chip[more][hidden] {
+      .card-actions>klog-chip[more][hidden] {
         display: initial !important;
         transform: scale(0);
         opacity: 0;
@@ -81,7 +80,7 @@ class KlogTimelineItem extends PolymerElement {
       }
 
       @media (max-width: 632px) {
-        .card-actions>paper-chip {
+        .card-actions>klog-chip {
           max-width: calc(50vw - 32px);
         }
       }
@@ -138,13 +137,13 @@ class KlogTimelineItem extends PolymerElement {
         <div class="card-actions" hidden\$="{{!view.actions}}">
           <template is="dom-repeat" items="{{actions}}">
             <template is="dom-if" if="{{item.file}}">
-              <paper-chip outlined="" icon="inbox" href="{{item.url}}" label="{{item.text}}"></paper-chip>
+              <klog-chip outlined="" icon="inbox" href="{{item.url}}" label="{{item.text}}"></klog-chip>
             </template>
             <template is="dom-if" if="{{item.link}}">
-              <paper-chip outlined="" icon="link" href="{{item.url}}" label="{{item.text}}"></paper-chip>
+              <klog-chip outlined="" icon="link" href="{{item.url}}" label="{{item.text}}"></klog-chip>
             </template>
             <template is="dom-if" if="{{item.more}}">
-              <paper-chip outlined="" icon="more_horiz" more="" animated="" on-click="expand"></paper-chip>
+              <klog-chip outlined="" icon="more_horiz" more="" animated="" on-click="expand"></klog-chip>
             </template>
           </template>
         </div>
@@ -345,7 +344,7 @@ class KlogTimelineItem extends PolymerElement {
     return new Promise((resolve) => {
       setTimeout(() => {
         const actionsContainer = this.$.card.querySelector('.card-actions');
-        let chips = Array.from(actionsContainer.querySelectorAll('paper-chip:not([style^=display])'));
+        let chips = Array.from(actionsContainer.querySelectorAll('klog-chip:not([style^=display])'));
         let remainWidth = actionsContainer.offsetWidth;
         for (let i = 0; i < chips.length; i++) {
           let chip = chips[i];
@@ -385,7 +384,7 @@ class KlogTimelineItem extends PolymerElement {
     e.preventDefault();
     const actionsContainer = this.$.card.querySelector('.card-actions');
     const more = e.target;
-    const last = Array.from(actionsContainer.querySelectorAll('paper-chip')).pop();
+    const last = Array.from(actionsContainer.querySelectorAll('klog-chip')).pop();
     let height = last.offsetTop + last.offsetHeight - actionsContainer.offsetTop + 8;
     actionsContainer.style.height = `${height}px`;
     this._shrinkedChip.setAttribute('animated', true);

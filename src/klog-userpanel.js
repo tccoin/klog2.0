@@ -210,7 +210,8 @@ class KlogUserpanel extends PolymerElement {
         value: {
           documentTitle: '个人设置 - Klog',
           drawer: 'auto',
-          menu: 'auto',
+          mainMenu: true,
+          sidebar: 'auto',
           scrollToTop: false,
           header: {
             fixed: true,

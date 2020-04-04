@@ -1,5 +1,4 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
-import '@polymer/iron-ajax/iron-ajax.js';
 class KlogUploader extends PolymerElement {
 
   static get is() { return 'klog-data-uploader'; }

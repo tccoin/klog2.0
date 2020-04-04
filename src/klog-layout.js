@@ -41,14 +41,14 @@ class KlogLayout extends PolymerElement {
         flex-direction: row;
       }
 
-      .menu-container,
+      .sidebar-container,
       .page-container {
         height: var(--klog-layout-page-height);
         box-sizing: border-box;
         overflow-y: auto;
       }
 
-      .menu-container {
+      .sidebar-container {
         position: absolute;
         width: var(--klog-layout-margin-left);
         box-sizing: border-box;
@@ -98,18 +98,18 @@ class KlogLayout extends PolymerElement {
         color: var(--klog-theme-primary);
       }
 
-      /* menu-off */
+      /* sidebar-off */
 
-      :host([menu-off]) {
+      :host([sidebar-off]) {
         --klog-layout-margin-left: 0px;
       }
 
-      :host([menu-off]) .menu-container {
+      :host([sidebar-off]) .sidebar-container {
         transform: translate(-20vw);
         opacity: 0;
       }
 
-      :host([menu-off]) .page-container {
+      :host([sidebar-off]) .page-container {
         padding-left: 0;
       }
 
@@ -121,8 +121,7 @@ class KlogLayout extends PolymerElement {
     </style>
     <!-- Drawer -->
     <klog-drawer id="drawer" heading="记录未来">
-      <klog-menu login="{{login}}" page="{{page}}" custom-menu="{{customMenu}}">
-      </klog-menu>
+      <klog-menu login="{{login}}" page="{{page}}" items="{{menu}}"></klog-menu>
     </klog-drawer>
     <!-- Layout -->
     <div id="main" class="main-container">
@@ -132,9 +131,9 @@ class KlogLayout extends PolymerElement {
       <iron-media-query query="max-width: 1440px" query-matches="{{laptop}}"></iron-media-query>
       <!-- Header -->
       <app-header id="header"></app-header>
-      <!-- Menu -->
-      <div id="menu" class="menu-container">
-        <klog-menu login="{{login}}" page="{{page}}" custom-menu="{{customMenu}}"></klog-menu>
+      <!-- Sidebar -->
+      <div id="sidebar" class="sidebar-container">
+        <klog-menu login="{{login}}" page="{{page}}" items="{{menu}}"></klog-menu>
       </div>
       <!-- Pages -->
       <iron-pages id="page" class="page-container" role="main" selected="{{page}}" attr-for-selected="name" selected-attribute="visible">
@@ -184,6 +183,10 @@ class KlogLayout extends PolymerElement {
         type: Boolean,
         value: true
       },
+      menu: {
+        type: Array,
+        value: []
+      },
       customMenu: {
         type: Array,
         value: []
@@ -201,8 +204,12 @@ class KlogLayout extends PolymerElement {
       drawer: {
         type: String
       },
-      menu: {
+      sidebar: {
         type: String
+      },
+      mainMenu: {
+        type: Boolean,
+        value: false
       },
       header: {
         type: Object
@@ -218,12 +225,13 @@ class KlogLayout extends PolymerElement {
 
   static get observers() {
     return [
-      '_updateMenu(menu,tablet)',
+      '_updateSidebar(sidebar,tablet)',
       '_updateDrawer(drawer,tablet)',
       '_updateDocumentTitle(documentTitle)',
       '_updateStyles(styles)',
       '_updateHeader(header)',
       '_updateToolbar(toolbar)',
+      '_updateMenu(login)'
     ]
   }
 
@@ -232,9 +240,8 @@ class KlogLayout extends PolymerElement {
     this.$.scrollTarget = this.$.page;
     this.$.scrollTarget.style.scrollBehavior = 'smooth';
     this.addEventListener('layout-update', e => this.updateLayout(e.detail, false));
-    this.addEventListener('custom-menu-select', e => this._pageMenuSelect(e.detail.category, e.detail.item));
+    this.addEventListener('menu-select', e => this._menuSelectHandle(e.detail.category, e.detail.item));
     this.addEventListener('drawer-toggle', e => this.$.drawer.open());
-    this.addEventListener('open-about', e => this.$.about.open());
     this.addEventListener('about-help', e => this.aboutHelp());
     this.addEventListener('about-log', e => this.aboutLog());
     this.addEventListener('require-update', e => {
@@ -339,7 +346,7 @@ class KlogLayout extends PolymerElement {
         collections: [],
         scrollToTop: true,
         drawer: 'on', // on off auto
-        menu: 'off', // on off auto
+        sidebar: 'off', // on off auto
         header: {
           fixed: true,
           short: false,
@@ -348,6 +355,7 @@ class KlogLayout extends PolymerElement {
           color: 'var(--secondary-text-color)',
         },
         customMenu: [],
+        mainMenu: false,
         styles: {
           '--klog-layout-background': 'var(--klog-page-background)',
           '--klog-header-background-color': 'var(--primary-background-color)',
@@ -382,11 +390,14 @@ class KlogLayout extends PolymerElement {
     if (layout.scrollToTop) {
       this.scrollTo(0, 0);
     }
+
+    // update menu
+    this._updateMenu();
   }
 
-  _updateMenu(menu, tablet) {
-    if (menu == 'auto') menu = tablet ? 'off' : 'on';
-    this._setAttribute(this, 'menu-off', menu == 'on');
+  _updateSidebar(sidebar, tablet) {
+    if (sidebar == 'auto') sidebar = tablet ? 'off' : 'on';
+    this._setAttribute(this, 'sidebar-off', sidebar == 'on');
   }
 
   async _updateDrawer(drawer, tablet, header = undefined) {
@@ -505,7 +516,44 @@ class KlogLayout extends PolymerElement {
     }
   }
 
-  _pageMenuSelect(category, item) {
+  _getMainMenu() {
+    let mainMenu = [{
+      name: 'main',
+      text: '',
+      items: [
+        { name: 'timeline', text: '时间轴', icon: 'timeline', path: 'timeline' },
+        { name: 'note', text: '笔记本', icon: 'book', path: 'note/all/' },
+        { name: 'console', text: '控制台', icon: 'console' }
+      ]
+    }];
+    if (this.login) {
+      let item = { name: 'userpanel', text: '个人设置', icon: 'account_circle', path: 'userpanel' };
+      mainMenu[0].items.splice(2, 0, item);
+    } else {
+      let category = {
+        name: 'user',
+        text: '账户',
+        items: [
+          { name: 'login', text: '登录', icon: 'account_circle', path: 'login' },
+          { name: 'signup', text: '注册', icon: 'account_box', path: 'signup' }
+        ]
+      };
+      mainMenu.push(category);
+    }
+    return mainMenu;
+  }
+
+  _updateMenu() {
+    let menu = [];
+    if (this.mainMenu) {
+      menu = menu.concat(this._getMainMenu());
+    }
+    menu = menu.concat(this.customMenu);
+    this.menu = menu;
+  }
+
+  _menuSelectHandle(category, item) {
+    if (category == 'main' && item == 'console') this.$.about.open();
     let pageElement = this.$.page.querySelector(`[name='${this.page}']`);
     if (pageElement && pageElement.menuSelect) {
       return pageElement.menuSelect(category, item);
@@ -556,13 +604,14 @@ class KlogLayout extends PolymerElement {
   }
 
   aboutUpdate() {
-    const noUpdateFound = swreg => {
-      if (!swreg.installing) {
-        this.showToast('Klog 已是最新版本');
-      }
-    };
     this.dispatchEvent(new CustomEvent('update-service-worker', {
-      bubbles: true, composed: true, detail: { callback: noUpdateFound }
+      bubbles: true, composed: true, detail: {
+        callback: updateFound => {
+          if (!updateFound) {
+            this.showToast('Klog 已是最新版本');
+          }
+        }
+      }
     }));
   }
 

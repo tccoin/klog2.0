@@ -1,6 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-input/iron-input.js';
-import './klog-data-tag.js';
 
 class KlogNoteSearch extends PolymerElement {
   static get template() {
@@ -77,8 +76,6 @@ class KlogNoteSearch extends PolymerElement {
       }
     </style>
 
-    <klog-data-tag id="tag" userinfo="{{userinfo}}"></klog-data-tag>
-
     <div class="container" id="container">
       <iron-icon id="icon" icon="search">
       </iron-icon>
@@ -135,11 +132,6 @@ class KlogNoteSearch extends PolymerElement {
 
   setWidth(width) {
     this._width = width;
-  }
-
-  loadTags() {
-    this.$.tag.list()
-      .then(tags => this.tags = tags);
   }
 
   focus() {

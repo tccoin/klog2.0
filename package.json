@@ -59,7 +59,6 @@
     "web-animations-js": "^2.3.2"
   },
   "devDependencies": {
-    "@webcomponents/webcomponentsjs": "^2.0.0",
     "gulp": "^4.0.2",
     "gulp-add": "^0.1.0",
     "gulp-if": "^2.0.0",
@@ -69,7 +68,7 @@
     "polymer-cli": "^1.9.11",
     "vinyl": "^2.2.0",
     "wct-browser-legacy": "^1.0.1",
-    "workbox-cli": "^5.1.2"
+    "workbox-build": "^5.1.2"
   },
   "resolutions": {
     "inherits": "2.0.3",

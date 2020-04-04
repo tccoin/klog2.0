@@ -8,7 +8,7 @@ import './klog-style-layout.js';
 import './klog-style-scrollbar.js';
 import './klog-style-card.js';
 import './klog-timeline-item.js';
-import './paper-chip.js';
+import './klog-chip.js';
 import './klog-fab.js';
 
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
@@ -53,23 +53,23 @@ class KlogTimeline extends PolymerElement {
         transition: all .15s ease;
       }
 
-      paper-chip {
+      klog-chip {
         margin: 0 4px;
-        --paper-chip-text-color: var(--secondary-text-color);
+        --klog-chip-text-color: var(--secondary-text-color);
         --divider-color: var(--secondary-text-color);
 
-        --paper-chip-style: {
+        --klog-chip-style: {
           font-weight: bold;
           padding: 8px 18px;
         }
       }
 
-      paper-chip[name=search] {
+      klog-chip[name=search] {
         --primary-color: var(--paper-cyan-700);
-        --paper-chip-expand-width: 64px;
+        --klog-chip-expand-width: 64px;
       }
 
-      paper-chip[name=search] input {
+      klog-chip[name=search] input {
         width: 100%;
         height: 19px;
         color: var(--primary-color);
@@ -81,15 +81,15 @@ class KlogTimeline extends PolymerElement {
         outline: none;
       }
 
-      paper-chip[name=daily] {
+      klog-chip[name=daily] {
         --primary-color: var(--paper-amber-900);
       }
 
-      paper-chip[name=note] {
+      klog-chip[name=note] {
         --primary-color: var(--paper-green-700);
       }
 
-      paper-chip[name=gallery] {
+      klog-chip[name=gallery] {
         --primary-color: var(--paper-blue-grey-500);
       }
 
@@ -142,14 +142,13 @@ class KlogTimeline extends PolymerElement {
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
       <div class="filter-container item" id="filter" on-click="setFilter">
-        <paper-chip name="search" icon="search" checkmark-animation-disabled="">
+        <klog-chip name="search" icon="search" checkmark-animation-disabled="">
           <input slot="expand-content" id="keywordInput">
-
-        </paper-chip>
-        <paper-chip name="default" label="全部文章"></paper-chip>
-        <paper-chip name="daily" label="日常"></paper-chip>
-        <paper-chip name="note" label="笔记"></paper-chip>
-        <paper-chip name="gallery" label="相册"></paper-chip>
+        </klog-chip>
+        <klog-chip name="default" label="全部文章"></klog-chip>
+        <klog-chip name="daily" label="日常"></klog-chip>
+        <klog-chip name="note" label="笔记"></klog-chip>
+        <klog-chip name="gallery" label="相册"></klog-chip>
       </div>
       <div class="timeline-container" id="timelineContainer">
         <template is="dom-repeat" items="{{cards}}">
@@ -195,7 +194,8 @@ class KlogTimeline extends PolymerElement {
         value: {
           documentTitle: '时间轴 - Klog',
           drawer: 'auto',
-          menu: 'auto',
+          mainMenu: true,
+          sidebar: 'auto',
           scrollToTop: false,
           header: {
             fixed: true,
@@ -411,7 +411,7 @@ class KlogTimeline extends PolymerElement {
   }
 
   setFilter(e) {
-    if (e.target.tagName == 'PAPER-CHIP') {
+    if (e.target.tagName == 'KLOG-CHIP') {
       const filterName = e.target.getAttribute('name');
       this.view = this.filterPreset[filterName].view || 'default';
       if (filterName == 'search') {
@@ -529,7 +529,6 @@ class KlogTimeline extends PolymerElement {
   }
 
   refresh() {
-    this.dispatchEvent(new CustomEvent('vibrate-start', { bubbles: true, composed: true, detail: { duration: 50 } }));
     if (this.$.scrollTarget) {
       this.$.scrollTarget.scrollTop = 0;
     }

@@ -123,7 +123,6 @@ class KlogEditorInfoForm extends PolymerElement {
   }
 
   delete() {
-    this.dispatchEvent(new CustomEvent('vibrate-start', { bubbles: true, composed: true, detail: { duration: (4 - this.deleteCountdown) * 50 } }));
     if (this.deleteCountdown > 0) {
       if (this.deleteLock) return
       this.deleteLock = true;

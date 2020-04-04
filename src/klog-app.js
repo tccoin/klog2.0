@@ -139,12 +139,15 @@ class KlogApp extends PolymerElement {
         console.error(err);
       }
     }
+    if (!this._serviceWorkerInit) {
+      this._serviceWorkerInit = true;
+      this._installServiceWorker();
+    }
   }
 
   ready() {
     super.ready();
     this._loadLayout();
-    this._initServiceWorker();
     // event
     this.addEventListener('app-load', (e) => {
       if (e.detail.page) window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
@@ -173,50 +176,59 @@ class KlogApp extends PolymerElement {
     window.addEventListener('online', (e) => this._notifyNetworkStatus(e));
     window.addEventListener('offline', (e) => this._notifyNetworkStatus(e));
     this._notifyNetworkStatus();
-    this.addEventListener('vibrate-start', (e) => {
-      if ("vibrate" in navigator) {
-        navigator.vibrate(e.detail.duration);
-      }
-    });
     this.addEventListener('show-toast', e => this.showToast(e.detail.text, e.detail.link, e.detail.option));
     this.addEventListener('update-service-worker', (e) => {
-      if (this._swUpdateFound) {
-        this._updateFound();
-      } else if (this.swReg) {
-        const promise = this.swReg.update();
-        if (e.detail && e.detail.callback) {
-          promise.then(e.detail.callback);
-        }
-      }
+      let callback = e.detail && e.detail.callback ? e.detail.callback : function () { };
+      this._updateServiceWorker(callback);
     });
   }
 
-  _initServiceWorker() {
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.getRegistration().then(reg => {
-        if (!reg) return;
-        this.swReg = reg;
-        // reload if update required
-        reg.onupdatefound = () => {
-          let sw = reg.installing;
-          sw.onstatechange = () => {
-            if (sw.state == 'installed') {
-              this._updateFound();
-              this._swUpdateFound = true;
-            }
-          };
-        };
-        // check now
-        reg.update();
-      });
+  _installServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js', { scope: '/' });
+      this._updateServiceWorker();
     }
   }
 
-  _updateFound() {
+  _updateServiceWorker(callback) {
+    callback = callback || function () { };
+    if ('serviceWorker' in navigator) {
+      if (this._swUpdateFound) {
+        this._updateFound();
+        callback(true);
+      } else {
+        navigator.serviceWorker.getRegistration().then((reg) => {
+          reg.update().then(reg => {
+            if (reg.installing) {
+              reg.installing.onstatechange = e => {
+                if (e.target.state == 'installed') {
+                  reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                  console.log('SKIP_WAITING');
+                }
+              }
+              this._swUpdateFound = true;
+              this._updateFound();
+              callback(true);
+            } else if (reg.waiting) {
+              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+              console.log('SKIP_WAITING');
+              this._swUpdateFound = true;
+              this._updateFound();
+              callback(true);
+            } else {
+              callback(false);
+            }
+          });
+        });
+      }
+    }
+  }
+
+  _updateFound(sw) {
     console.log('Update for Klog found.');
     this.showToast('Klog 更新已就绪', {
       title: 'Link Start!',
-      onclick: this.reload
+      onclick: () => this.reload()
     }, { duration: 10000 });
   }
 
