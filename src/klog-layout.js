@@ -134,7 +134,7 @@ class KlogLayout extends PolymerElement {
       <app-header id="header"></app-header>
       <!-- Menu -->
       <div id="menu" class="menu-container">
-        <klog-menu login="{{login}}" page="{{page}}" custom-menu="{{customMenu}}" round=""></klog-menu>
+        <klog-menu login="{{login}}" page="{{page}}" custom-menu="{{customMenu}}"></klog-menu>
       </div>
       <!-- Pages -->
       <iron-pages id="page" class="page-container" role="main" selected="{{page}}" attr-for-selected="name" selected-attribute="visible">
@@ -328,7 +328,7 @@ class KlogLayout extends PolymerElement {
 
   _checkInterrupt(page) {
     if (this.page != page) {
-      return Promise.reject(new Error('Loading interrupt.'))
+      return Promise.reject(new Error('Loading interrupted'))
     }
   }
 

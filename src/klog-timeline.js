@@ -239,6 +239,7 @@ class KlogTimeline extends PolymerElement {
   }
 
   async load(userLoadPromise) {
+    this.$.scrollTarget.style.setProperty('scroll-behavior', '');
     this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
     this.$.scrollTarget.addEventListener('scroll', this._pageScrollHandler);
   }
@@ -250,16 +251,17 @@ class KlogTimeline extends PolymerElement {
       await this._scrollHandler();
       this.$.scrollTarget.scrollTop = 0;
     } else {
-      await this.checkUpdate();
+      this.loading = false;
       const y = this._lastScrollY || 0;
       this.$.scrollTarget.scrollTop = y;
       await this._scrollHandler();
       await this._refreshAllItems()
-      this.loading = false;
+      await this.checkUpdate();
     }
   }
 
   async unload() {
+    this.$.scrollTarget.style.setProperty('scroll-behavior', 'smooth');
     this.$.scrollTarget.removeEventListener('scroll', this._scrollHandler);
     this.$.scrollTarget.removeEventListener('scroll', this._pageScrollHandler);
     this._lastScrollY = this.$.scrollTarget.scrollTop;
