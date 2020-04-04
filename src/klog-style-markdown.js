@@ -133,63 +133,6 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         position: relative;
       }
 
-      .klog-article-content .link>.ref-popup {
-        position: absolute;
-        left: 0;
-        top: 2em;
-        width: max-content;
-        max-width: 320px;
-        font-size: calc(var(--klog-markdown-font-size, 14px) * 0.8);
-        font-weight: normal;
-        padding: 8px;
-        word-break: break-all;
-        line-height: 1.7;
-        border-radius: 4px;
-        z-index: 10;
-        cursor: default;
-        color: var(--primary-text-color);
-        background: var(--primary-background-color);
-        visibility: hidden;
-        transform: translateY(0.5em);
-        opacity: 0;
-        transition: .1s all .5s ease-out;
-        box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.3), 0 0 1px 1px rgba(0, 0, 0, 0.05);
-      }
-
-      .klog-article-content .link>.ref-popup::before {
-        content: '';
-        position: absolute;
-        border: 6px solid transparent;
-        border-top: 0;
-        border-bottom: 7px solid rgba(0, 0, 0, 0.05);
-        top: -7px;
-        left: 4px;
-      }
-
-      .klog-article-content .link>.ref-popup::after {
-        content: '';
-        position: absolute;
-        border: 6px solid transparent;
-        border-top: 0;
-        border-bottom: 8px solid var(--primary-background-color);
-        top: -6px;
-        left: 4px;
-      }
-
-      .klog-article-content .link:hover>.ref-popup {
-        visibility: visible;
-        transform: translateY(0);
-        opacity: 1;
-      }
-
-      .klog-article-content[theme~=dark] .link>.ref-popup {
-        background: var(--secondary-background-color);
-      }
-
-      .klog-article-content[theme~=dark] .link>.ref-popup::after {
-        border-bottom: 8px solid var(--secondary-background-color);
-      }
-
       /*media*/
 
       .klog-article-content klog-player-lite {

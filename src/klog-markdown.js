@@ -6,6 +6,7 @@ import './klog-video.js';
 import './klog-player-lite.js';
 import './klog-style-markdown.js';
 import './klog-data-user.js';
+import './klog-popup.js';
 import './klog-markdown-scroller.js';
 import '../static/lib/Clamp.js/clamp.js';
 import '../static/lib/Han/han.js';
@@ -197,8 +198,8 @@ class KlogMarkdown extends PolymerElement {
       text = isSup ? `${text.replace('^', '')}` : text || href;
       href = isSup ? '' : `href="${href}"`;
       let className = isSup ? ' class="sup"' : '';
-      let out = `<a ${href}${className}>${text}</a>`;
-      return link.ref ? `<span class="link">${out}<span class="ref-popup">${this.output(link.ref)}</span></span>` : out;
+      let out = `<a id="link" ${href}${className}>${text}</a>`;
+      return link.ref ? `<span class="link">${out}<klog-popup for="link" theme="${this.theme}">${this.output(link.ref)}</klog-popup></span>` : out;
     };
 
     renderer.text = function (text) {
