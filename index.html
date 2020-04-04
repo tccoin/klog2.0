@@ -71,22 +71,11 @@
       opacity: var(--klog-statusbar-opacity, 1);
     }
   </style>
-</head>
-
-<body unresolved>
-  <div id="statusbarFix"></div>
-  <div id="statusbarFixBackground"></div>
-  <!-- Main View -->
-  <klog-app></klog-app>
-
-  <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-  <script src="node_modules/@webcomponents/html-imports/html-imports.min.js"></script>
+  <script src="./node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js" async></script>
+  <script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" async></script>
   <script src="https://c.lcfile.com/static/js/3.11.1/av-min.js"></script>
   <script type="module">
-    window.WebComponents = window.WebComponents || {
-      waitFor(cb) { addEventListener('WebComponentsReady', cb) }
-    }
-    WebComponents.waitFor(async () => {
+    (async () => {
       // LeanClouds
       // appId and appKey will be replaced by app.js
       const appId = '{{GLOBAL_APPID}}';
@@ -100,13 +89,17 @@
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js', { scope: '/' });
       }
-      HTMLImports.loadImports(document.body);
 
-      //resolve
-      document.body.removeAttribute('unresolved');
-    });
+      await import('./src/klog-app.js');
+    })();
   </script>
-  <link rel="import" href="src/klog-app.html" />
+</head>
+
+<body>
+  <div id="statusbarFix"></div>
+  <div id="statusbarFixBackground"></div>
+  <!-- Main View -->
+  <klog-app></klog-app>
 </body>
 
 </html>

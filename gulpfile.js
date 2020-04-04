@@ -85,4 +85,4 @@ exports.insert = insertVariable;
 exports.google = byeGoogleFont;
 exports.sw = fixServiceWorkerPath;
 exports.push = pushOTA;
-exports.default = gulp.series(build, insertVariable, byeGoogleFont, pushOTA);
+exports.default = gulp.series(build, insertVariable, byeGoogleFont);

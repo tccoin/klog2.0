@@ -3,7 +3,6 @@
  */
 const path = require('path');
 const fs = require('fs');
-const pump = require('pump-promise');
 const md5File = require('md5-file');
 var mime = require('mime-types');
 

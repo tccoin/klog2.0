@@ -34,6 +34,7 @@ module.exports = {
       handler: 'networkFirst',
       options: {
         cache: {
+          maxEntries: 20,
           name: 'data-storage-avatar'
         }
       }
@@ -43,6 +44,7 @@ module.exports = {
       handler: 'cacheFirst',
       options: {
         cache: {
+          maxEntries: 20,
           name: 'data-storage-thumbnail'
         }
       }
@@ -52,6 +54,7 @@ module.exports = {
       handler: 'cacheFirst',
       options: {
         cache: {
+          maxEntries: 100,
           name: 'data-storage-placeholder'
         }
       }

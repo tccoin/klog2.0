@@ -1,6 +1,11 @@
 {
   "name": "Klog",
   "short_name": "Klog",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#212121",
+  "theme_color": "#212121",
+  "start_url": "/",
   "icons": [
     {
       "src": "static/img/klog/klog48.png",
@@ -47,10 +52,5 @@
       "sizes": "1024x1024",
       "type": "image/png"
     }
-  ],
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#212121",
-  "theme_color": "#212121",
-  "start_url": "https://klog.app"
+  ]
 }

@@ -1,13 +1,9 @@
-const path = require('path');
 const routes = require('./routes/router');
 const fs = require('fs');
+const settings = require('./settings');
 
 // environment
-let isDev = process.env.NODE_ENV == 'development';
-let buildDir = path.join(__dirname, 'build');
-let staticDir = isDev ? __dirname : buildDir;
-
-console.log('isDev:', isDev);
+console.log('static directory: ', settings.staticDir);
 
 // set response header
 swHeader = (request, reply, done) => {
@@ -19,7 +15,7 @@ swHeader = (request, reply, done) => {
 module.exports = (app) => {
   // app
   app.register(require('fastify-multipart'));
-  app.register(require('fastify-static'), { root: staticDir });
+  app.register(require('fastify-static'), { root: settings.staticDir });
   app.register(require('fastify-compress'));
   app.addHook('preHandler', swHeader)
   routes(app);

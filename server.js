@@ -5,11 +5,9 @@ const app = require('./app');
 const http2 = require('http2');
 const fs = require("fs");
 const tls = require('tls');
+const settings = require('./settings');
 
-//environment
-const isDev = process.env.NODE_ENV == 'development';
-
-if (isDev) {
+if (!settings.tls) {
   const httpserver = app(fastify({ maxParamLength: 200 }));
   httpserver.listen(3000, '0.0.0.0', (err, address) => {
     if (err) {

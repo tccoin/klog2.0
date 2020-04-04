@@ -3,12 +3,12 @@
  */
 const UA = require('ua-device');
 const fs = require("fs");
-
-const isDev = process.env.NODE_ENV == 'development';
+const settings = require('../settings');
 
 module.exports = function (app, opts, next) {
   app.get('/', (request, reply, next) => {
-    if (isDev) {
+    if (!settings.serveBuild) {
+      console.log('load Source');
       let stream = fs.createReadStream('index-debug.html')
       reply.type('text/html').send(stream);
     } else {

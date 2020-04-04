@@ -1,25 +1,25 @@
 {
-  "shell": "src/klog-app.html",
   "entrypoint": "index.html",
+  "shell": "src/klog-app.js",
   "fragments": [
-    "src/klog-timeline.html",
-    "src/klog-article.html",
-    "src/klog-layout.html",
-    "src/klog-icons.html",
-    "src/klog-editor.html",
-    "src/klog-signup.html",
-    "src/klog-login.html",
-    "src/klog-userpanel.html",
-    "src/klog-note.html",
-    "src/klog-drive.html",
-    "src/klog-zone.html",
-    "src/klog-apps.html",
-    "src/klog-404.html",
-    "src/klog-lab.html",
-    "src/klog-render-katex.html",
-    "src/klog-apps-money.html",
-    "src/klog-apps-kdoc.html",
-    "src/klog-apps-lib.html"
+    "src/klog-timeline.js",
+    "src/klog-article.js",
+    "src/klog-layout.js",
+    "src/klog-icons.js",
+    "src/klog-editor.js",
+    "src/klog-signup.js",
+    "src/klog-login.js",
+    "src/klog-userpanel.js",
+    "src/klog-note.js",
+    "src/klog-drive.js",
+    "src/klog-zone.js",
+    "src/klog-apps.js",
+    "src/klog-404.js",
+    "src/klog-lab.js",
+    "src/klog-render-katex.js",
+    "src/klog-apps-money.js",
+    "src/klog-apps-kdoc.js",
+    "src/klog-apps-lib.js"
   ],
   "npm": true,
   "moduleResolution": "node",
@@ -27,10 +27,7 @@
     "src/**"
   ],
   "extraDependencies": [
-    "bower_components/webcomponentsjs/webcomponents-loader.js",
-    "node_modules/@webcomponents/webcomponentsjs/**/*",
-    "node_modules/@webcomponents/html-imports/**/*",
-    "bower_components/Han/dist/font/*",
+    "node_modules/@webcomponents/webcomponentsjs/**",
     "static/**/*",
     "manifest.json",
     "static/favicon.ico"
@@ -43,23 +40,17 @@
   "builds": [
     {
       "preset": "es5-bundled",
-      "js": {
-        "minify": true,
-        "compile": "es5"
-      },
       "bundle": {
         "inlineScripts": false
       },
       "addServiceWorker": true,
-      "basePath": true
+      "insertPrefetchLinks": false
     },
     {
       "preset": "es6-unbundled",
-      "js": {
-        "minify": true
-      },
       "addServiceWorker": true,
-      "basePath": true
+      "insertPrefetchLinks": false,
+      "addPushManifest": true
     }
   ]
 }
