@@ -67,16 +67,16 @@ async function workerBuild() {
       disableDevLogs: false
     }),
     Object.assign({}, workboxConfig, {
-      globDirectory: './build/',
+      globDirectory: './build/es5-bundled/',
       globPatterns: [],
       swDest: "./build/es5-bundled/sw.js",
       disableDevLogs: true
     }),
     Object.assign({}, workboxConfig, {
-      globDirectory: './build/',
+      globDirectory: './build/es6-unbundled/',
       globPatterns: [
-        "es6-unbundled/src/*.js",
-        "es6-unbundled/src/lib/*.js"
+        "src/*.js",
+        "src/lib/*.js"
       ],
       swDest: "./build/es6-unbundled/sw.js",
       disableDevLogs: true
@@ -96,4 +96,4 @@ exports.insert = insertVariable;
 exports.google = byeGoogleFont;
 exports.sw = workerBuild;
 exports.push = pushOTA;
-exports.default = gulp.series(build, insertVariable, byeGoogleFont);
+exports.default = gulp.series(build, insertVariable, byeGoogleFont, workerBuild);

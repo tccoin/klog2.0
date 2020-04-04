@@ -9,7 +9,6 @@
     "src/klog-login.js",
     "src/klog-userpanel.js",
     "src/klog-note.js",
-    "src/klog-zone.js",
     "src/klog-apps.js",
     "src/klog-lab.js",
     "src/klog-404.js",

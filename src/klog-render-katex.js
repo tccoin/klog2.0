@@ -1,5 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
-import katex from './lib/katex.mjs';
+import katex from './lib/katex.js';
 import './lib/katex-style.js';
 
 class KlogRenderKatex extends PolymerElement {
