@@ -308,7 +308,7 @@ class KlogArticle extends PolymerElement {
         type: Object,
         value: {
           documentTitle: '文章 - Klog',
-          drawer: 'on',
+          drawer: 'off',
           mainMenu: false,
           sidebar: 'off',
           header: {

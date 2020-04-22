@@ -411,6 +411,8 @@ class KlogLayout extends PolymerElement {
       this._setAttribute(drawerButton, 'hidden', drawer == 'on');
       await new Promise(resolve => setTimeout(resolve, 1));
     }
+    // drawer disabled
+    this.$.drawer.$.drawer.disableSwipe = drawer == 'off';
   }
 
   _updateDocumentTitle(documentTitle) {
@@ -520,6 +522,7 @@ class KlogLayout extends PolymerElement {
     let mainMenu = [{
       name: 'main',
       text: '',
+      style: 'color:var(--primary-text-color)',
       items: [
         { name: 'timeline', text: '时间轴', icon: 'timeline', path: 'timeline' },
         { name: 'note', text: '笔记本', icon: 'book', path: 'note/all/' },

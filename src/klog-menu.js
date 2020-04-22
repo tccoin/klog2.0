@@ -123,7 +123,13 @@ class KlogMenu extends PolymerElement {
         </template>
 
         <template is="dom-if" if="{{item.item}}">
-          <div class="item secondary" name\$="{{item.name}}" category\$="{{item.category}}" path\$="{{item.path}}">
+          <div
+            class="item"
+            name\$="{{item.name}}"
+            category\$="{{item.category}}"
+            path\$="{{item.path}}"
+            style\$="{{item.style}}"
+          >
             <iron-icon icon="{{item.icon}}"></iron-icon>
             <span>{{item.text}}</span>
             <paper-ripple></paper-ripple>
@@ -163,12 +169,26 @@ class KlogMenu extends PolymerElement {
     for (let category of items) {
       if (category.text) {
         if (menu.length != 0) {
-          menu.push({ divider: true });
+          menu.push({
+            divider: true
+          });
         }
-        menu.push({ subtitle: true, name: category.name, text: category.text });
+        menu.push({
+          subtitle: true,
+          name: category.name,
+          text: category.text
+        });
       }
       for (let item of category.items) {
-        menu.push({ item: true, name: item.name, text: item.text, icon: item.icon, category: category.name, path: item.path || '' });
+        menu.push({
+          item: true,
+          name: item.name,
+          text: item.text,
+          icon: item.icon,
+          category: category.name,
+          style: category.style || '',
+          path: item.path || ''
+        });
       }
     }
     this.set('menu', menu);

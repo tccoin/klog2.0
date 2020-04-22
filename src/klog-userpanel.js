@@ -36,10 +36,6 @@ class KlogUserpanel extends PolymerElement {
         --klog-card-padding: 12px;
       }
 
-      :host([mobile]) {
-        --klog-card-padding: 8px;
-      }
-
       app-toolbar {
         position: fixed;
         top: 0;
