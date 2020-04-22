@@ -101,6 +101,7 @@ class KlogEditor extends PolymerElement {
       }
 
       klog-markdown .info {
+        margin-top:16px;
         font-size: 12px;
         cursor: default;
         user-select: none;
