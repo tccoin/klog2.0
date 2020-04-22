@@ -38,12 +38,13 @@ class KlogMarkdown extends PolymerElement {
       },
       theme: {
         type: String,
-        value: '',
+        value: 'dark',
         reflectToAttribute: true,
         observer: 'updateTheme'
       },
       linkPrefix: {
-        type: String
+        type: String,
+        value: '/'
       },
       hideIndependentTitle: {
         type: Boolean,
@@ -93,9 +94,6 @@ class KlogMarkdown extends PolymerElement {
 
   ready() {
     super.ready();
-
-    //renderer
-    this.initRanderer();
 
     //scroller
     this.$.scroller.$.markdown = this;
@@ -515,6 +513,10 @@ class KlogMarkdown extends PolymerElement {
 
   render(markdown, headless = false) {
     markdown = markdown || this.markdown;
+    // load renderer
+    if (!this.option) {
+      this.initRanderer();
+    }
     //load preference
     if (!this.preference) {
       this.preference = getDefaultMarkdownPreference();

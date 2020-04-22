@@ -45,7 +45,8 @@ class KlogEditorTextarea extends PolymerElement {
       value: {
         type: String,
         notify: true,
-        observer: '_changed'
+        observer: '_changed',
+        value: ''
       },
       preview: {
         type: String,
@@ -53,7 +54,8 @@ class KlogEditorTextarea extends PolymerElement {
       },
       tokens: {
         type: Array,
-        observer: '_tokensChanged'
+        observer: '_tokensChanged',
+        value: []
       },
       placeholder: {
         type: String
@@ -88,7 +90,9 @@ class KlogEditorTextarea extends PolymerElement {
     this._input.addEventListener('paste', (e) => this.paste(e));
 
     setTimeout(() => {
-      this.$.preview.addEventListener('markdown-rendered', () => this._updatePointers());
+      if (this.$.preview) {
+        this.$.preview.addEventListener('markdown-rendered', () => this._updatePointers());
+      }
       this.addEventListener('scroll', (e) => this.scroll(e));
     }, 1);
     this._currentLine = "";
@@ -312,7 +316,11 @@ class KlogEditorTextarea extends PolymerElement {
   }
 
   _tokensChanged(tokens) {
-    this._tokens = tokens.filter(t => 'start' in t);
+    if (tokens) {
+      this._tokens = tokens.filter(t => 'start' in t);
+    } else {
+      this._tokens = [];
+    }
   }
 
   _updateCurrentStatus() {

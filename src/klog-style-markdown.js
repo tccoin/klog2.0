@@ -14,8 +14,11 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         padding: var(--klog-markdown-padding, 0 16px);
         font-size: var(--klog-markdown-font-size, 14px);
         word-break: break-word;
-        min-height: calc(100% - 2 * var(--klog-markdown-padding));
         line-height: var(--klog-markdown-line-height, 1.7);
+      }
+
+      .klog-article-content #content>*:last-child {
+        margin-bottom:0!important;
       }
 
       .klog-article-content hr {
