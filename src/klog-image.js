@@ -132,7 +132,7 @@ class KlogImage extends PolymerElement {
     // process url
     let oriSrc = src;
     if (this.avatar && !src) {
-      src = 'https://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg';
+      src = 'https://storage.krrr.party/storage/klog-avatar/default_avatar.jpg';
     } else if (this.content && src.indexOf('clouddn.com') > -1 && !src.indexOf(/\.svg$/)) {
       src += '?imageView2/2/w/1440/q/85/interlace/1';
     } else if (this._isKlogStorage(src)) {

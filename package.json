@@ -33,7 +33,7 @@
     "@polymer/paper-input": "^3.0.0",
     "@polymer/paper-item": "^3.0.0",
     "@polymer/paper-listbox": "^3.0.0",
-    "@polymer/paper-menu-button": "^3.0.0",
+    "@polymer/paper-menu-button": "^3.0.1",
     "@polymer/paper-progress": "^3.0.0",
     "@polymer/paper-radio-group": "^3.0.0",
     "@polymer/paper-slider": "^3.0.0",
@@ -56,7 +56,7 @@
     "optipng": "^2.0.0",
     "sharp": "0.22.1",
     "ua-device": "^0.1.10",
-    "web-animations-js": "^2.3.2"
+    "web-animations-js": "2.3.2"
   },
   "devDependencies": {
     "gulp": "^4.0.2",

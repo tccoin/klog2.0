@@ -154,9 +154,8 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
 
       .klog-article-content klog-video,
       .klog-article-content klog-image {
-        --klog-media-border-radius: 5px;
         max-width: 100%;
-        border-radius: var(--klog-media-border-radius);
+        border-radius: var(--klog-media-border-radius, 5px);
         @apply(--klog-markdown-media);
       }
 

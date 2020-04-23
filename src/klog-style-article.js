@@ -13,25 +13,85 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       display: block;
       min-height: var(--klog-layout-page-height);
       outline: none;
+      padding: 0;
     }
 
-    .section,
-    .article-footer {
+    .section {
+      position: relative;
       margin: auto;
       box-sizing: border-box;
+      max-width: calc(42 * var(--klog-markdown-font-size) + 32px);
     }
 
-    .content,
-    .article-footer {
+    .fab-section{
+      max-width: calc(70 * var(--klog-markdown-font-size) + 32px);
+    }
+
+    .article-container {
+      width: 100%;
+      margin: auto;
+      padding: 64px 0 0;
+      background: var(--primary-background-color);
+      min-height: calc(100vh - 280px);
+      @apply(--shadow-elevation-2dp);
+    }
+
+    .article-container,
+    .comment-container {
       transition: opacity .3s ease, transform .2s ease-out;
     }
 
-    :host([loading]) .content,
-    :host([loading]) .article-footer {
+    :host([loading]) .article-container,
+    :host([loading]) .comment-container {
       opacity: 0;
     }
 
+    .fab-container{
+      position: absolute;
+      padding: 0 16px;
+      right: 0;
+    }
+
+    klog-fab{
+      position: fixed;
+      bottom: 10vh;
+      right: auto;
+      width: 96px;
+      background-color: var(--primary-color);
+      color: #FFF;
+      transform: translateX(-100%);
+      transition: transform 0.2s ease 0s, box-shadow 0.2s ease 0s, opacity 0.2s ease 0s;
+    }
+
+    .article-footer {
+      padding: 0 16px 32px;
+      font-size: 20px;
+      color: var(--primary-text-color);
+      opacity: 0.15;
+      text-align: right;
+      cursor: default;
+    }
+
+    .article-footer .logo {
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .article-footer .logo iron-icon{
+      width: 51.14px;
+      height: 51.14px;
+    }
+
+    .article-footer .logo a {
+      @apply --fit-layout;
+      z-index: 1;
+    }
+
     /*Article*/
+    klog-markdown {
+      padding-bottom: 24px;
+    }
 
     .article-category {
       font-size: calc(1.1 * var(--klog-markdown-font-size));
@@ -80,26 +140,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       padding: 16px;
     }
 
-    .article-footer {
-      padding: 16px;
-      font-size: 20px;
-      color: var(--primary-text-color);
-      opacity: 0.15;
-      text-align: right;
-      cursor: default;
-    }
-
-    .article-footer .logo {
-      position: relative;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .article-footer .logo a {
-      @apply --fit-layout;
-      z-index: 1;
-    }
-
     [hidden] {
       display: none;
     }
@@ -119,6 +159,8 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     @media (max-width: 662px) {
       klog-markdown {
 
+        --klog-media-border-radius: 0px;
+
         --klog-markdown-media-container: {
           width: calc(100% + 32px);
           margin: 0 0 16px 50%;
@@ -127,7 +169,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
         --klog-markdown-media: {
           width: 100%;
-          --klog-media-border-radius: 0px;
         }
 
         --klog-markdown-media-description: {
@@ -140,6 +181,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       klog-markdown {
         --klog-markdown-media: {
           @apply(--shadow-elevation-8dp);
+          width: fit-content;
         }
       }
     }
@@ -181,13 +223,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     /*font size*/
-
-    .content {
-      width: 100%;
-      margin: auto;
-      padding-top: 5vh;
-      max-width: calc(42 * var(--klog-markdown-font-size) + 32px);
-    }
 
     @media (max-width: 767px) {
 

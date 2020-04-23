@@ -177,12 +177,12 @@ class KlogEditor extends PolymerElement {
           <!-- <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}"> -->
           <klog-editor-textarea id="textarea" loading="{{loading}}" tokens="{{tokens}}" value="{{markdown}}" preview="{{preview}}" placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
           <klog-markdown id="markdown" tokens="{{tokens}}" mobile="{{mobile}}" markdown="{{preview}}" theme="[[theme]]" word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}" breadcrumbs="">
-            <span slot="after" class="info">字数统计: {{wordCount}}</span>
+            <div slot="after" class="info">字数统计: {{wordCount}}</div>
           </klog-markdown>
           <!-- <klog-imarkdown id="imarkdown" tokens="{{tokens}}" markdown="{{preview}}" theme="[[theme]]"
             word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}"
             breadcrumbs>
-            <span slot="after" class="info">字数统计: {{wordCount}}</span>
+            <div slot="after" class="info">字数统计: {{wordCount}}</div>
           </klog-imarkdown> -->
         </klog-pages>
       </klog-backdrop>

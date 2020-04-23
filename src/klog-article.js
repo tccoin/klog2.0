@@ -16,51 +16,61 @@ import './klog-comment.js';
 class KlogArticle extends PolymerElement {
   static get template() {
     return html`
-    <style include="klog-style-article"></style>
-    <app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{_subroute}}"></app-route>
-    <app-route route="{{_subroute}}" pattern="/:share" data="{{shareData}}"></app-route>
-    <klog-data-article id="data" path="{{path}}" last-response="{{article}}" last-error="{{error}}" is-owner="{{isOwner}}">
-    </klog-data-article>
-    <klog-fab icon="edit" id="fab" class="edit-fab" label="编辑" on-click="edit" hidden="{{!isOwner}}" extended="{{fabExtended}}"></klog-fab>
-    <div class="content" id="content">
-      <!--article header-->
-      <div class="section article-category" hidden="{{!article.title}}">
-        <span class="article-collection">{{article.collection}}</span>
-        <template is="dom-repeat" items="{{article.tags}}">
-          <span class="article-tag">#{{item}}</span>
-        </template>
-      </div>
-      <div class="section article-title" hidden="{{!article.title}}">
-        <h1>{{article.title}}</h1>
-      </div>
-      <div class="section article-author klog-author" theme\$="{{theme}}">
-        <klog-image id="avatar" class="author-avatar" src="{{article.author.avatarUrl}}" avatar="" lazy=""></klog-image>
-        <div class="text">
-          <div class="author-info">
-            <span class="author-name">{{article.author.displayName}}</span>
-            <template is="dom-if" if="{{article.author.introduction}}">,&nbsp;
-              <span class="author-intro divider">{{article.author.introduction}}</span>
-            </template>
-          </div>
-          <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发表于&nbsp;</klog-render-timestamp>
+<style include="klog-style-article"></style>
+<app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{_subroute}}"></app-route>
+<app-route route="{{_subroute}}" pattern="/:share" data="{{shareData}}"></app-route>
+<klog-data-article id="data" path="{{path}}" last-response="{{article}}" last-error="{{error}}" is-owner="{{isOwner}}">
+</klog-data-article>
+<!--article-->
+<div class="article-container" id="content">
+  <div class="section">
+    <!--article header-->
+    <div class="article-category" hidden="{{!article.title}}">
+      <span class="article-collection">{{article.collection}}</span>
+      <template is="dom-repeat" items="{{article.tags}}">
+        <span class="article-tag">#{{item}}</span>
+      </template>
+    </div>
+    <div class="article-title" hidden="{{!article.title}}">
+      <h1>{{article.title}}</h1>
+    </div>
+    <div class="article-author klog-author" theme\$="{{theme}}">
+      <klog-image id="avatar" class="author-avatar" src="{{article.author.avatarUrl}}" avatar="" lazy=""></klog-image>
+      <div class="text">
+        <div class="author-info">
+          <span class="author-name">{{article.author.displayName}}</span>
+          <template is="dom-if" if="{{article.author.introduction}}">,&nbsp;
+            <span class="author-intro divider">{{article.author.introduction}}</span>
+          </template>
         </div>
-      </div>
-      <!--article-->
-      <klog-markdown class="section article-main" id="markdown" markdown="{{article.markdown}}" link-prefix="article/{{path}}" hide-independent-title="true" theme="{{theme}}" preference="{{userinfo.preference.markdown}}" mobile="{{mobile}}" lazy heading-actions>
-      </klog-markdown>
-      <!--comment-->
-      <div class="section">
-        <klog-comment id="comment" article-id="{{article.objectId}}" userinfo="{{userinfo}}"></klog-comment>
-      </div>
-      <!--footer-->
-      <div class="article-footer">
-        <span class="logo">
-          Klog.
-          <a href="#/timeline/" class="immersive"></a>
-        </span>
+        <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发表于&nbsp;</klog-render-timestamp>
       </div>
     </div>
-    <div id="toastContainer"></div>
+    <!--article content-->
+    <klog-markdown class="article-main" id="markdown" markdown="{{article.markdown}}" link-prefix="article/{{path}}" hide-independent-title="true" theme="{{theme}}" preference="{{userinfo.preference.markdown}}" mobile="{{mobile}}" lazy heading-actions>
+    </klog-markdown>
+  </div>
+</div>
+<!--fab-->
+<div class="section fab-section">
+  <div class="fab-container">
+    <klog-fab icon="edit" id="fab" class="edit-fab" label="编辑" on-click="edit" hidden="{{!isOwner}}" extended="{{fabExtended}}"></klog-fab>
+  </div>
+</div>
+<!--comment-->
+<div class="comment-container">
+  <div class="section">
+    <klog-comment id="comment" article-id="{{article.objectId}}" userinfo="{{userinfo}}" theme="{{theme}}" mobile="{{mobile}}" login="{{login}}"></klog-comment>
+  </div>
+</div>
+<!--footer-->
+<div class="section article-footer">
+  <span class="logo">
+    <iron-icon icon="klog"></iron-icon>
+    <a href="#/timeline/" class="immersive"></a>
+  </span>
+</div>
+<div id="toastContainer"></div>
 `;
   }
 
@@ -94,7 +104,6 @@ class KlogArticle extends PolymerElement {
             shadow: 'scroll'
           },
           styles: {
-            '--klog-layout-background': 'var(--klog-article-theme-color)',
             '--klog-header-background-color': 'var(--klog-article-theme-color)',
           },
           toolbar: html`
@@ -146,7 +155,14 @@ class KlogArticle extends PolymerElement {
 
     this._scrollHandler = () => {
       let y = this.$.scrollTarget.scrollTop;
-      this.fabExtended = y < 48 && !this.mobile;
+      this.fabExtended = !this.mobile;
+      if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 <= window.innerHeight * 0.9) {
+        this.$.fab.style.position = 'absolute';
+        this.$.fab.style.bottom = '-24px';
+      } else {
+        this.$.fab.style.position = 'fixed';
+        this.$.fab.style.bottom = '10vh';
+      }
     };
     setTimeout(() => {
       this.$.comment.updateScrollTarget(this.$.scrollTarget);
@@ -160,6 +176,7 @@ class KlogArticle extends PolymerElement {
     userLoadPromise.then(result => {
       this.$.data.userinfo = result.userinfo;
       this.userinfo = result.userinfo;
+      this.login = result.login;
     });
   }
 
@@ -167,11 +184,11 @@ class KlogArticle extends PolymerElement {
     if (this.article && this.article.objectId) {
       this.loading = false;
       this.$.avatar.lazyload();
+      this._scrollHandler();
     }
   }
 
-  async update(subroute) {
-    this._scrollHandler();
+  update(subroute) {
     this.route = subroute;
   }
 
@@ -184,6 +201,7 @@ class KlogArticle extends PolymerElement {
     this.article = {
       markdown: ''
     };
+    this.$.comment.resetInput();
   }
 
   _timeout(promise, timeout) {
