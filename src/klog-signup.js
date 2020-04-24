@@ -36,7 +36,8 @@ class KlogSignup extends PolymerElement {
         <h1 name="loading">登记中……</h1>
         <h1 name="success">拿好，<br>你的新人卡来了。</h1>
         <h1 name="error_email_format">这个邮箱地址…<br>好像哪里不对？</h1>
-        <h1 name="error_info">大哥！<br>两个框你都填不好？</h1>
+        <h1 name="error_info">信息有误…<br>检查一下？</h1>
+        <h1 name="error_short_password">密码太短了欸</h1>
         <h1 name="error_email_taken">这个邮箱已经注册过了<br>直接<a href="#/login">登录</a>试试？</h1>
       </div>
       <div class="form">
@@ -134,6 +135,10 @@ class KlogSignup extends PolymerElement {
 
   signup() {
     this.title = 'loading';
+    if (this.password.length <= 6) {
+      this.title = 'error_short_password';
+      return;
+    }
     this.user.signup(this.email, this.password).then(() => {
       this.title = 'success';
       setTimeout(() => {
@@ -141,6 +146,7 @@ class KlogSignup extends PolymerElement {
       }, 1500);
     }, err => {
       window.err = err;
+      console.log(err, err.code);
       if (err) {
         if (err.code == 125) {
           this.title = 'error_email_format';

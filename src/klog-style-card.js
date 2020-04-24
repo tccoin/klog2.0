@@ -30,6 +30,28 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         margin-bottom: calc(var(--klog-card-padding) * 2);
       }
 
+      .klog-card>paper-ripple {
+        margin: 0;
+      }
+
+      /*list*/
+
+      .klog-card.list{
+        border-radius: 0px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .klog-card.list:first-of-type {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+
+      .klog-card.list:last-of-type {
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+        border-bottom: none;
+      }
+
       /*card-meta*/
 
       .klog-card .card-meta {

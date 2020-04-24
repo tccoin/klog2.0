@@ -1,11 +1,12 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { KlogDataCommentMixin } from './klog-data-comment-mixin.js';
+import { KlogDataMessageMixin } from './klog-data-message-mixin.js';
 import '@polymer/paper-button/paper-button.js';
 import './klog-icons.js';
 import './klog-style-author.js';
 import './klog-editor-textarea.js';
 
-class KlogComment extends KlogDataCommentMixin(PolymerElement) {
+class KlogComment extends KlogDataCommentMixin(KlogDataMessageMixin(PolymerElement)) {
   static get template() {
     return html`
     <style include="klog-style-author"></style>
@@ -29,6 +30,10 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
 
       iron-icon{
         margin-right:8px;
+      }
+
+      .input-container{
+        cursor: text;
       }
 
       klog-editor-textarea{
@@ -100,7 +105,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
 
   static get inputTemplate() {
     return html`
-    <div class="klog-author">
+    <div class="klog-author input-container">
       <klog-image class="author-avatar" src="{{_userAvatarUrl}}" avatar></klog-image>
       <div class="text">
         <div class="author-info">
@@ -109,8 +114,8 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
           <a on-click="resetInput" hidden="{{_calcCancelButtonDisabled(_inputMethod)}}">取消</a>
           </div>
         </div>
-        <div class="comment-content">
-          <klog-editor-textarea id="input" placeholder="聊天鬼才你来啦！"></klog-editor-textarea>
+        <div class="comment-content" on-click="focus">
+          <klog-editor-textarea id="input" placeholder="聊天鬼才你来啦！(＾o＾)ﾉ"></klog-editor-textarea>
           <paper-button on-click="_submitComment" id="replyButton"><iron-icon icon="save_alt"></iron-icon>评论</paper-button>
         </div>
       </div>
@@ -153,7 +158,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
       articleId: {
         type: String
       },
-      authorId: {
+      articleAuthorId: {
         type: String
       },
       data: {
@@ -189,7 +194,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
   }
 
   async refresh() {
-    this.data = await this.loadComment(this.articleId);
+    this.data = await this.loadComments(this.articleId);
     setTimeout(() => {
       this._updateMarkdownScroller();
     }, 1);
@@ -204,7 +209,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
     this._inputMethod = method;
     this._inputData = data;
     if (method == 'create') {
-      this._inputIndicator = '新版评论区绝赞好评测试中 (＾o＾)ﾉ';
+      this._inputIndicator = '评论文章';
     } else {
       if (method == 'edit') {
         this._inputIndicator = '修改评论';
@@ -222,6 +227,10 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
     this.updateInput('create');
   }
 
+  focus() {
+    this.$.input.$.input.$.textarea.focus();
+  }
+
   _isAuthor(data) {
     if (this.login) {
       const userId = this.userinfo.publicinfo.id;
@@ -235,14 +244,27 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
   async _submitComment() {
     const method = this._inputMethod;
     const data = this._inputData;
-    if (method == 'create') {
-      await this.createComment(this.articleId, this.userinfo.publicinfo.id, this.$.input.value);
+    if (this.$.input.value.length == 0) {
+      this.showToast('什么话都不说，这是坠好的！');
+      return;
+    } else if (method == 'create') {
+      const comment = await this.createComment(this.articleId, this.userinfo.publicinfo.id, this.$.input.value);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      await this.createMessage('article-comment', this.userinfo.publicinfo.id, [
+        'author-' + this.articleAuthorId,
+        'comment-' + this.articleId
+      ], this.articleId, comment.objectId);
       this.showToast('评论已发送');
     } else if (method == 'edit') {
       await this.updateComment(data.objectId, this.$.input.value);
       this.showToast('评论已修改');
     } else if (method == 'reply') {
-      await this.createComment(this.articleId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
+      const comment = await this.createComment(this.articleId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
+      await this.createMessage('article-comment', this.userinfo.publicinfo.id, [
+        'author-' + this.articleAuthorId,
+        'comment-' + this.articleId,
+        'reply-' + data.author.objectId
+      ], this.articleId, comment.objectId);
       this.showToast('回复已发送');
     }
     await this.refresh();
@@ -251,7 +273,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
 
   _editComment(e) {
     this.updateInput('edit', this._getCommentData(e.target));
-    this.$.input.$.input.$.textarea.focus();
+    this.focus();
   }
 
   _replyComment(e) {
@@ -261,7 +283,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
       author: currentComment.author,
       objectId: primaryComment.objectId
     });
-    this.$.input.$.input.$.textarea.focus();
+    this.focus();
   }
 
   _tapHandle(e) {

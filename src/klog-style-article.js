@@ -68,7 +68,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       font-size: 20px;
       color: var(--primary-text-color);
       opacity: 0.15;
-      text-align: right;
+      text-align: center;
       cursor: default;
     }
 

@@ -67,7 +67,8 @@ class KlogEditorTextarea extends PolymerElement {
       },
       currentLine: {
         type: String,
-        notify: true
+        notify: true,
+        value: ''
       },
       currentLineStart: {
         type: Number,

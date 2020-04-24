@@ -99,7 +99,7 @@ class KlogUserpanel extends PolymerElement {
         <klog-input label="头像路径" value="{{userinfo.avatarUrl}}" outlined="" hidden="">
         </klog-input>
         <klog-input label="昵称" on-change="updatePublicinfo" value="{{userinfo.displayName}}" outlined=""></klog-input>
-        <klog-input label="个人介绍" value="{{userinfo.introduction}}" outlined=""></klog-input>
+        <klog-input label="个人介绍" on-change="updatePublicinfo" value="{{userinfo.introduction}}" outlined=""></klog-input>
 
         <div class="form-item">
           <div class="text-container">

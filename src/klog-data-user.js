@@ -125,8 +125,8 @@ class KlogDataUser extends PolymerElement {
     user.setPassword(password);
     user = await user.signUp()
     this.user = user;
-    await this._initUser(password);
     await this.login(email, password);
+    await this._initUser(password);
   }
 
   // User init
@@ -140,7 +140,7 @@ class KlogDataUser extends PolymerElement {
         publicRead: true
       },
       avatarUrl: {
-        value: 'https://klog2.oss-cn-hangzhou.aliyuncs.com/img/default_avatar.jpg',
+        value: 'https://storage.krrr.party/storage/klog-avatar/default_avatar.jpg',
         publicRead: true
       }
     })

@@ -60,7 +60,7 @@ class KlogArticle extends PolymerElement {
 <!--comment-->
 <div class="comment-container">
   <div class="section">
-    <klog-comment id="comment" article-id="{{article.objectId}}" userinfo="{{userinfo}}" theme="{{theme}}" mobile="{{mobile}}" login="{{login}}"></klog-comment>
+    <klog-comment id="comment" article-id="{{article.objectId}}" userinfo="{{userinfo}}" article-author-id="{{article.author.objectId}}" theme="{{theme}}" mobile="{{mobile}}" login="{{login}}"></klog-comment>
   </div>
 </div>
 <!--footer-->
@@ -70,7 +70,6 @@ class KlogArticle extends PolymerElement {
     <a href="#/timeline/" class="immersive"></a>
   </span>
 </div>
-<div id="toastContainer"></div>
 `;
   }
 
@@ -86,6 +85,10 @@ class KlogArticle extends PolymerElement {
         type: Boolean,
         value: true,
         reflectToAttribute: true,
+      },
+      backTo: {
+        type: String,
+        value: 'timeline'
       },
       immersive: {
         type: Boolean,
@@ -130,9 +133,6 @@ class KlogArticle extends PolymerElement {
   }
 
   back() {
-    if (!this.backTo) {
-      this.backTo = 'timeline';
-    }
     this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo, now: false } }));
   }
 

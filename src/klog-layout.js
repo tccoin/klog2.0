@@ -151,6 +151,7 @@ class KlogLayout extends PolymerElement {
         <klog-userpanel name="userpanel" mobile="[[mobile]]"></klog-userpanel>
         <klog-apps name="apps"></klog-apps>
         <klog-note id="note" name="note" theme="[[theme]]" mobile="{{mobile}}"> </klog-note>
+        <klog-message id="message" name="message" theme="[[theme]]" mobile="{{mobile}}"> </klog-message>
         <!--testing-->
         <klog-drive name="drive"></klog-drive>
         <klog-zone name="zone"></klog-zone>
@@ -161,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.13.1<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.14.0<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -282,6 +283,7 @@ class KlogLayout extends PolymerElement {
       }
       await this._updatePage(page, subroute);
       await this._checkInterrupt(page);
+      return this._getPage(page);
     } catch (err) {
       return Promise.reject(err);
     }
@@ -294,7 +296,7 @@ class KlogLayout extends PolymerElement {
   }
 
   async _unloadPage(page) {
-    let pageElement = this.$.page.querySelector(`[name='${page}']`);
+    let pageElement = this._getPage(page);
     this._setAttribute(pageElement, 'exit');
     if (pageElement.$.animation) {
       await this._timeout(new Promise(resolve => { pageElement.$.animation.addEventListener('transitionend', resolve) }), 500);
@@ -304,8 +306,12 @@ class KlogLayout extends PolymerElement {
     }
   }
 
+  _getPage(page) {
+    return this.$.page.querySelector(`[name='${page}']`);
+  }
+
   async _loadPage(page, userLoadPromise) {
-    let pageElement = this.$.page.querySelector(`[name='${page}']`);
+    let pageElement = this._getPage(page);
     if (!pageElement) {
       return Promise.reject(new Error('404'));
     }
@@ -320,14 +326,14 @@ class KlogLayout extends PolymerElement {
   }
 
   _updatePage(page, subroute) {
-    let pageElement = this.$.page.querySelector(`[name='${page}']`);
+    let pageElement = this._getPage(page);
     if (pageElement && pageElement.update) {
       return pageElement.update(subroute);
     }
   }
 
   _getPageLayout(page) {
-    let pageElement = this.$.page.querySelector(`[name='${page}']`);
+    let pageElement = this._getPage(page);
     if (pageElement && pageElement.layout) {
       return this.updateLayout(pageElement.layout, true);
     }
@@ -530,8 +536,10 @@ class KlogLayout extends PolymerElement {
       ]
     }];
     if (this.login) {
-      let item = { name: 'userpanel', text: '个人设置', icon: 'account_circle', path: 'userpanel' };
-      mainMenu[0].items.splice(2, 0, item);
+      mainMenu[0].items.splice(2, 0,
+        { name: 'message', text: '消息中心', icon: 'notifications', path: 'message' },
+        { name: 'userpanel', text: '个人设置', icon: 'account_circle', path: 'userpanel' },
+      );
     } else {
       let category = {
         name: 'user',

@@ -128,9 +128,10 @@ class KlogApp extends PolymerElement {
     const ui = this.$.layout;
     const userLoadPromise = this.$.user.loadPromise;
     try {
-      const page = await this._calcPage(this.routeData.page);
+      const pageName = await this._calcPage(this.routeData.page);
       const subroute = this._calcSubroute(this.subroute);
-      await ui.load(page, subroute, userLoadPromise);
+      const page = await ui.load(pageName, subroute, userLoadPromise);
+      this._setPageBackTo(page);
     } catch (err) {
       if (err.message == '404') {
         window.location.hash = `#/404/`;
@@ -150,6 +151,7 @@ class KlogApp extends PolymerElement {
     this._loadLayout();
     // event
     this.addEventListener('app-load', (e) => {
+      if (e.detail.backTo != undefined) this._backTo = e.detail.backTo;
       if (e.detail.page) window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
     });
     this.addEventListener('app-reload', (e) => this.reload());
@@ -181,6 +183,13 @@ class KlogApp extends PolymerElement {
       let callback = e.detail && e.detail.callback ? e.detail.callback : function () { };
       this._updateServiceWorker(callback);
     });
+  }
+
+  _setPageBackTo(page) {
+    if (this._backTo != undefined) {
+      page.backTo = this._backTo;
+      this._backTo = null;
+    }
   }
 
   _installServiceWorker() {
@@ -238,6 +247,22 @@ class KlogApp extends PolymerElement {
 
   back() {
     window.history.back();
+  }
+
+  showToast(text, link, option = {}) {
+    const toast = document.createElement('paper-toast');
+    Object.assign(toast, { text: text, duration: 2000, withBackdrop: false }, option);
+    if (link) {
+      toast.innerHTML = `<a ${link.href ? `href="${link.href}"` : ''}>${link.title}</a>`;
+      toast.querySelector('a').addEventListener('click', e => link.onclick(e));
+    }
+    this.shadowRoot.append(toast);
+    toast.addEventListener('opened-changed', function (e) {
+      if (!e.detail.value) {
+        this.parentNode.removeChild(this);
+      }
+    });
+    toast.open();
   }
 
   _calcPage(page) {
@@ -323,22 +348,6 @@ class KlogApp extends PolymerElement {
     if (this._waitingToLoadDefaultPage) {
       this._loadDefaultPage();
     }
-  }
-
-  showToast(text, link, option = {}) {
-    const toast = document.createElement('paper-toast');
-    Object.assign(toast, { text: text, duration: 2000, withBackdrop: false }, option);
-    if (link) {
-      toast.innerHTML = `<a href="${link.href}">${link.title}</a>`;
-      toast.querySelector('a').addEventListener('click', e => link.onclick(e));
-    }
-    this.shadowRoot.append(toast);
-    toast.addEventListener('opened-changed', function (e) {
-      if (!e.detail.value) {
-        this.parentNode.removeChild(this);
-      }
-    });
-    toast.open();
   }
 }
 

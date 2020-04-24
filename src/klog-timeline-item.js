@@ -86,7 +86,7 @@ class KlogTimelineItem extends PolymerElement {
       }
     </style>
     <!--header-->
-    <a href="/#/article/{{data.path}}" id="card">
+    <a href="{{server}}#/article/{{data.path}}" id="card">
       <div class="card klog-card" raised\$="{{expended}}" on-click="read" mobile\$="{{mobile}}">
 
         <!--meta-->
@@ -184,6 +184,7 @@ class KlogTimelineItem extends PolymerElement {
       }
       this._resizeTimeout = setTimeout(() => this.refresh(), 100);
     });
+    this.server = window.location.origin + window.location.pathname;
   }
 
   has(sth) {

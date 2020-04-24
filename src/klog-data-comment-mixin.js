@@ -2,7 +2,7 @@ import { KlogDataMixin } from './klog-data-mixin.js';
 
 const KlogDataCommentMixin = (superClass) => class extends KlogDataMixin(superClass) {
 
-  loadComment(articleId) {
+  loadComments(articleId) {
     let query = new AV.Query('Comment');
     query.select(['author', 'replyTo', 'replyToAuthor', 'markdown']);
     query.include('author', 'replyToAuthor');
@@ -76,7 +76,7 @@ const KlogDataCommentMixin = (superClass) => class extends KlogDataMixin(superCl
     if (replyToAuthorId) {
       comment.set('replyToAuthor', AV.Object.createWithoutData('UserPublic', replyToAuthorId));
     }
-    return comment.save().catch(err => {
+    return comment.save().then(data => data.toJSON()).catch(err => {
       this.errorCode = '403';
     });
   }
