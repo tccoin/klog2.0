@@ -37,13 +37,12 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         margin-bottom: 0;
       }
 
-      .klog-article-content>p:first-child,
-      .klog-article-content>h1:first-child,
-      .klog-article-content>h2:first-child,
-      .klog-article-content>h3:first-child,
-      .klog-article-content>h4:first-child,
-      .klog-article-content>h5:first-child,
-      .klog-article-content>h6:first-child {
+      .klog-article-content>#content>anchor:first-child+.breadcrumbs+anchor+[depth],
+      .klog-article-content>#content>anchor:first-child+.breadcrumbs+anchor+p,
+      .klog-article-content>#content>anchor:first-child+[depth],
+      .klog-article-content>#content>anchor:first-child+p,
+      .klog-article-content>#content>[depth]:first-child,
+      .klog-article-content>#content>p:first-child {
         margin-top: 0;
       }
 

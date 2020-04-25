@@ -1,16 +1,10 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import './klog-image.js';
 import './klog-markdown.js';
-import { html as html$0 } from '@polymer/polymer/lib/utils/html-tag.js';
-class KlogDataEditor extends PolymerElement {
+import { KlogDataMessageMixin } from './klog-data-message-mixin.js';
+class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
   static get template() {
-    return html$0`
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-`;
+    return html``;
   }
 
   static get is() { return 'klog-data-editor'; }
@@ -235,9 +229,9 @@ class KlogDataEditor extends PolymerElement {
     Inlinelexer.output(currentLine);
   }
 
-  unescape(html) {
+  unescape(str) {
     // explicitly match decimal, hex, and named HTML entities
-    return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function (_, n) {
+    return str.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function (_, n) {
       n = n.toLowerCase();
       if (n === 'colon') return ':';
       if (n.charAt(0) === '#') {
@@ -394,18 +388,39 @@ class KlogDataEditor extends PolymerElement {
     article.set('collection', this.collection);
     article.set('tags', this.tags);
     article.set('keywords', this.keywords);
-    article.set('comments', []);
     article.set('topic', topic);
-    if (!this.quiet) {
+    if (this.quiet) {
+      console.log('Updated in quite mode.');
+      article.set('updateTimeline', false);
+    } else {
       let author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
       article.set('author', author);
       article.set('updateTimeline', true);
-    } else {
-      console.log('Updated in quite mode.');
-      article.set('updateTimeline', false);
     }
-    // save
-    return article.save();
+    // save article
+    article = await article.save();
+    // send message
+    console.log(article);
+    if (!this.quiet) {
+      const create = () => this.createMessage('article-create', this.userinfo.publicinfo.id, [
+        `article-user-${this.userinfo.publicinfo.id}`,
+        `article-article-${article.id}`,
+        `article-all`
+      ], {}, article.id);
+      const update = (messageId) => this.updateMessage(messageId, 'article-update');
+      try {
+        const message = await this.loadMessageByChannel(`article-article-${article.id}`, this.userinfo.publicinfo.id);
+        if ((Date.now() - Date.parse(message.updatedAt)) > 6 * 1000) update(message.objectId);
+        console.log('update message');
+      } catch (err) {
+        if (err.message == 'message not found') {
+          console.log('create message');
+          create();
+        }
+      }
+    }
+
+    return article;
   }
 
   delete() {

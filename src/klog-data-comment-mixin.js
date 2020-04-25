@@ -1,6 +1,7 @@
 import { KlogDataMixin } from './klog-data-mixin.js';
+import { KlogDataMessageMixin } from './klog-data-message-mixin.js';
 
-const KlogDataCommentMixin = (superClass) => class extends KlogDataMixin(superClass) {
+const KlogDataCommentMixin = (superClass) => class extends KlogDataMessageMixin(KlogDataMixin(superClass)) {
 
   loadComments(articleId) {
     let query = new AV.Query('Comment');
@@ -58,27 +59,32 @@ const KlogDataCommentMixin = (superClass) => class extends KlogDataMixin(superCl
     const result1 = keys.map(x => result[x]).sort(compareLatestAhead);
     for (let comment of result1) {
       comment.secondary.sort(compareOldestAhead);
-      // for (let secondaryComment of comment.secondary) {
-      //   secondaryComment.objectId = comment.objectId;
-      // }
     }
     return result1;
   }
 
-  createComment(articleId, authorId, markdown, replyToId = null, replyToAuthorId = null) {
+  async createComment(articleId, articleAuthorId, commentAuthorId, markdown, replyToId = null, replyToAuthorId = null) {
     let comment = new AV.Object('Comment');
     comment.set('article', AV.Object.createWithoutData('Article', articleId));
-    comment.set('author', AV.Object.createWithoutData('UserPublic', authorId));
+    comment.set('author', AV.Object.createWithoutData('UserPublic', commentAuthorId));
     comment.set('markdown', markdown);
-    if (replyToId) {
-      comment.set('replyTo', AV.Object.createWithoutData('Comment', replyToId));
-    }
+    if (replyToId) comment.set('replyTo', AV.Object.createWithoutData('Comment', replyToId));
+    if (replyToAuthorId) comment.set('replyToAuthor', AV.Object.createWithoutData('UserPublic', replyToAuthorId));
+    await comment.save();
+    comment = comment.toJSON();
+    const channels = [
+      `comment-all`,
+      `author-user-${articleAuthorId}`,
+      `comment-article-${articleId}`,
+      `comment-user-${commentAuthorId}`
+    ];
     if (replyToAuthorId) {
-      comment.set('replyToAuthor', AV.Object.createWithoutData('UserPublic', replyToAuthorId));
+      channels.push(`reply-user-${replyToAuthorId}`);
+      await this.createMessage('comment-reply', commentAuthorId, channels, {}, articleId, comment.objectId);
+    } else {
+      await this.createMessage('comment-new', commentAuthorId, channels, {}, articleId, comment.objectId);
     }
-    return comment.save().then(data => data.toJSON()).catch(err => {
-      this.errorCode = '403';
-    });
+    return comment;
   }
 
   updateComment(commentId, markdown) {

@@ -537,7 +537,7 @@ class KlogLayout extends PolymerElement {
     }];
     if (this.login) {
       mainMenu[0].items.splice(2, 0,
-        { name: 'message', text: '消息中心', icon: 'notifications', path: 'message' },
+        { name: 'message', text: '通知中心', icon: 'notifications', path: 'message' },
         { name: 'userpanel', text: '个人设置', icon: 'account_circle', path: 'userpanel' },
       );
     } else {

@@ -87,6 +87,7 @@ class KlogDataUser extends PolymerElement {
           updatedAt: userJson.updatedAt,
           emailVerified: userJson.emailVerified,
           preference: preference,
+          follow: userJson.follow,
           publicinfo: publicinfo,
           displayName: publicinfoJson.displayName,
           introduction: publicinfoJson.introduction,
@@ -134,6 +135,9 @@ class KlogDataUser extends PolymerElement {
     await this.update({
       p: {
         value: p
+      },
+      follow: {
+        value: ['channel-default', 'author-user-self', 'reply-user-self', 'mention-user-self']
       },
       displayName: {
         value: ['Wind', 'Wood', 'Water', 'Fire', 'Earth'][Math.floor(Math.random() * 4 + 1)] + Math.floor(Math.random() * 8999 + 1000),

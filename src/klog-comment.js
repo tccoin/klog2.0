@@ -1,12 +1,11 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { KlogDataCommentMixin } from './klog-data-comment-mixin.js';
-import { KlogDataMessageMixin } from './klog-data-message-mixin.js';
 import '@polymer/paper-button/paper-button.js';
 import './klog-icons.js';
 import './klog-style-author.js';
 import './klog-editor-textarea.js';
 
-class KlogComment extends KlogDataCommentMixin(KlogDataMessageMixin(PolymerElement)) {
+class KlogComment extends KlogDataCommentMixin(PolymerElement) {
   static get template() {
     return html`
     <style include="klog-style-author"></style>
@@ -248,23 +247,14 @@ class KlogComment extends KlogDataCommentMixin(KlogDataMessageMixin(PolymerEleme
       this.showToast('什么话都不说，这是坠好的！');
       return;
     } else if (method == 'create') {
-      const comment = await this.createComment(this.articleId, this.userinfo.publicinfo.id, this.$.input.value);
+      const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      await this.createMessage('article-comment', this.userinfo.publicinfo.id, [
-        'author-' + this.articleAuthorId,
-        'comment-' + this.articleId
-      ], this.articleId, comment.objectId);
       this.showToast('评论已发送');
     } else if (method == 'edit') {
       await this.updateComment(data.objectId, this.$.input.value);
       this.showToast('评论已修改');
     } else if (method == 'reply') {
-      const comment = await this.createComment(this.articleId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
-      await this.createMessage('article-comment', this.userinfo.publicinfo.id, [
-        'author-' + this.articleAuthorId,
-        'comment-' + this.articleId,
-        'reply-' + data.author.objectId
-      ], this.articleId, comment.objectId);
+      const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
       this.showToast('回复已发送');
     }
     await this.refresh();

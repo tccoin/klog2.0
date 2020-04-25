@@ -28,7 +28,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
       layout: {
         type: Object,
         value: {
-          documentTitle: '消息中心 - Klog',
+          documentTitle: '通知中心 - Klog',
           drawer: 'auto',
           mainMenu: true,
           sidebar: 'auto',
@@ -47,7 +47,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
             <div class="title">
               <div main-title><iron-icon icon="klog"></iron-icon></div>
               <div class="divider"></div>
-              <div page-title>消息中心</div>
+              <div page-title>通知中心</div>
             </div>
             <div class="divider"></div>
             <paper-button on-click="refresh">
@@ -67,7 +67,11 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
     <style>
       :host {
         display: block;
-        padding: 64px 16px 0;
+        padding: 64px 0 0;
+      }
+
+      .main-container{
+        padding:16px;
       }
 
       .message-card{
@@ -83,7 +87,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
   static get template() {
     return html`
       ${this.styleTemplate}
-      ${this.messageTemplate}
+      <div class="main-container">${this.messageTemplate}</div>
       `;
   }
 
@@ -150,10 +154,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
   }
 
   refresh() {
-    this.loadMessages([
-      'author-' + this.userinfo.publicinfo.id,
-      'reply-' + this.userinfo.publicinfo.id
-    ], this.userinfo.publicinfo.id).then(messages => {
+    this.loadMessages(this.userinfo.follow, this.userinfo.publicinfo.id).then(messages => {
       this.messages = messages;
     });
   }

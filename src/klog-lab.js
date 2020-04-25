@@ -4,6 +4,7 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-progress/paper-progress.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-toggle-button/paper-toggle-button.js';
+import { KlogDataMessageMixin } from './klog-data-message-mixin.js';
 import './klog-style-layout.js';
 import './klog-style-card.js';
 import './klog-markdown.js';
@@ -13,7 +14,7 @@ import './klog-data-list.js';
 import './klog-image.js';
 import './klog-icons.js';
 
-class KlogLab extends PolymerElement {
+class KlogLab extends KlogDataMessageMixin(PolymerElement) {
   static get template() {
     return html`
     <style include="klog-style-layout"></style>
@@ -24,10 +25,14 @@ class KlogLab extends PolymerElement {
         background-color: var(--klog-page-background);
       }
 
-      .main-container {
+      .card-container {
+        margin: 32px;
+      }
+
+      .lab-card {
         max-height: 500px;
         max-width: 720px;
-        margin: 32px auto;
+        margin: 0 auto;
         padding: 16px;
         overflow: auto;
       }
@@ -43,31 +48,41 @@ class KlogLab extends PolymerElement {
     <app-localstorage-document key="articleId" data="{{articleId}}"></app-localstorage-document>
     <!-- <klog-data-editor id="data" markdown="{{markdown}}" quiet data="{{article}}"></klog-data-editor> -->
     <klog-data-list id="list" last-response="{{list}}" limit="1000"></klog-data-list>
-    <div class="klog-card main-container">
-      <klog-input outlined="" value="{{masterKey}}" label="Master Key"></klog-input>
-      <klog-input outlined="" value="{{articleId}}" label="Article Id"></klog-input>
-      <klog-input outlined="" value="{{article.title}}" label="Title"></klog-input>
-      <paper-button on-click="login">登录</paper-button>
-      <paper-button on-click="loadList">加载列表</paper-button>
-      <paper-button on-click="loadArticle">打开文章</paper-button>
-      <paper-button on-click="saveArticle">保存文章</paper-button>
-      <br>
-      <paper-button on-click="loadNext">打开下一篇文章</paper-button>
-      <paper-button on-click="saveNext">更新下一篇文章</paper-button>
-      <paper-button on-click="saveList">更新所有文章</paper-button>
-      <paper-button on-click="updateImageInfo">更新所有图片信息</paper-button>
-      <paper-toggle-button checked="{{stop}}">急停</paper-toggle-button>
+    <div class="card-container">
+      <div class="klog-card lab-card list">
+        <klog-input outlined value="{{masterKey}}" label="Master Key"></klog-input>
+        <klog-input outlined value="{{articleId}}" label="Article Id"></klog-input>
+        <klog-input outlined value="{{article.title}}" label="Title"></klog-input>
+        </div>
+        <div class="klog-card lab-card list">
+        <paper-button on-click="login">登录</paper-button>
+        <paper-button on-click="loadList">加载列表</paper-button>
+        <paper-button on-click="loadArticle">打开文章</paper-button>
+        <paper-button on-click="saveArticle">保存文章</paper-button>
+        <br>
+        <paper-button on-click="loadNext">打开下一篇文章</paper-button>
+        <paper-button on-click="saveNext">更新下一篇文章</paper-button>
+        <paper-button on-click="saveList">更新所有文章</paper-button>
+        <paper-button on-click="updateImageInfo">更新所有图片信息</paper-button>
+      </div>
+      <div class="klog-card lab-card list">
+        <paper-progress value="[[listProgress]]"></paper-progress>
+        等待处理：{{list.length}}
+        <paper-toggle-button checked="{{stop}}">急停</paper-toggle-button>
+      </div>
+      <div class="klog-card lab-card list">
+        {{article.updatedAt}}:{{listProgressDelta}}
+        <klog-markdown id="markdown" markdown="{{markdown}}"></klog-markdown>
+      </div>
+      <div class="klog-card lab-card list">
+        <textarea value="{{markdown::input}}"></textarea>
+      </div>
     </div>
-    <div class="klog-card main-container">
-      <paper-progress value="[[listProgress]]"></paper-progress>
-      等待处理：{{list.length}}
-    </div>
-    <div class="klog-card main-container">
-      {{article.updatedAt}}:{{listProgressDelta}}
-      <klog-markdown id="markdown" markdown="{{markdown}}"></klog-markdown>
-    </div>
-    <div class="klog-card main-container">
-      <textarea value="{{markdown::input}}"></textarea>
+    <div class="card-container">
+      <div class="klog-card lab-card list">
+        <klog-input outlined value="{{globalMessage}}" label="全站通知"></klog-input>
+        <paper-button on-click="sendGlobalMessage">发送</paper-button>
+      </div>
     </div>
 `;
   }
@@ -208,6 +223,22 @@ class KlogLab extends PolymerElement {
       this.loadArticle().then(() => this.saveArticle()).then(() => this.saveList());
     }
     this.listProgress += this.listProgressDelta;
+  }
+
+  async sendGlobalMessage() {
+    await this.createMessage('text', '5ea323e42f040b00087e42ae', ['channel-default'], { 'text': this.globalMessage });
+    this.showToast('发送成功');
+  }
+
+  showToast(text, link) {
+    this.dispatchEvent(new CustomEvent('show-toast', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        text: text,
+        link: link
+      }
+    }));
   }
 }
 
