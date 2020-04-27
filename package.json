@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "engines": {
-    "node": "^12.16.0"
+    "node": ">=12.16.0"
   },
   "scripts": {
     "serve": "npx es-dev-server --node-resolve --open --port 3000 --app-index index-debug.html --hostname 0.0.0.0",
