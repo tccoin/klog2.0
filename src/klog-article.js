@@ -158,12 +158,13 @@ class KlogArticle extends PolymerElement {
       this.fabExtended = !this.mobile;
       if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 <= window.innerHeight * 0.9) {
         this.$.fab.style.position = 'absolute';
-        this.$.fab.style.bottom = '-24px';
+        this.$.fab.style.bottom = `-${this.fabExtended ? 24 : 28}px`;
       } else {
         this.$.fab.style.position = 'fixed';
         this.$.fab.style.bottom = '10vh';
       }
     };
+    window.addEventListener('resize', this._scrollHandler);
     setTimeout(() => {
       this.$.comment.updateScrollTarget(this.$.scrollTarget);
     }, 1);

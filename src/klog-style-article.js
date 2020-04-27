@@ -90,7 +90,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
     /*Article*/
     klog-markdown {
-      padding-bottom: 24px;
+      padding-bottom: 28px;
     }
 
     .article-category {

@@ -104,7 +104,10 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
     // preprocess strings
     let commentAuthorName, commentReplyToName;
     if (this._contains(message.type, ['comment-'])) {
-      if (!message.comment) throw new Error('comment not found');
+      if (!message.comment) {
+        this.deleteMessage(message.objectId);
+        throw new Error('comment not found');
+      }
       commentAuthorName = this._processName(message.comment.author, userPublicId);
       if (message.comment.replyToAuthor) {
         commentReplyToName = this._processName(message.comment.replyToAuthor, userPublicId);
@@ -112,7 +115,10 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
     }
     let articleTitle, articleAuthorName, articleWithAuthorName;
     if (this._contains(message.type, ['article-', 'comment-'])) {
-      if (!message.article) throw new Error('article not found');
+      if (!message.article) {
+        this.deleteMessage(message.objectId);
+        throw new Error('article not found');
+      }
       articleTitle = this._processArticleTitle(message.article);
       articleAuthorName = this._processName(message.article.author, userPublicId);
       articleWithAuthorName = `${articleAuthorName}的文章${articleTitle}`;

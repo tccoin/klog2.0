@@ -33,6 +33,19 @@ containerKlogStyleAuthor.innerHTML = `<dom-module id="klog-style-author">
       .klog-author .author-info {
         display: flex;
         flex-direction: row;
+        align-items: center;
+        line-height: 1.5;
+        font-size: 13px;
+      }
+
+      .klog-author .author-info .dot-divider {
+        display: inline-block;
+        margin: 0 5px;
+        width: 4px;
+        height: 4px;
+        background: var(--secondary-overlay-color);
+        border-radius: 50%;
+        vertical-align: middle;
       }
 
       .klog-author .author-name {

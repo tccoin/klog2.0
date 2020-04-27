@@ -19,6 +19,7 @@ class KlogEditorTextarea extends PolymerElement {
         width: 100%;
 
         --iron-autogrow-textarea: {
+          color: var(--primary-text-color);
           padding: var(--textarea-padding, 24px);
           font-size: var(--textarea-font-size, 14px);
           word-break: break-all;

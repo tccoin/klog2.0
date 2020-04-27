@@ -31,8 +31,25 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
         margin-right:8px;
       }
 
-      .input-container{
+      .klog-author .comment-content {
+        padding: 16px;
+        margin: 0 0 20px;
+        background: var(--primary-background-color);
+        border-radius: 5px;
+        width: fit-content;
+        max-width: 100%;
+        box-sizing: border-box;
+        @apply(--shadow-elevation-2dp);
+      }
+
+      .input-container .comment-content{
         cursor: text;
+        width: 100%;
+      }
+
+      .input-container,
+      .klog-author-primary{
+        margin-bottom: 20px;
       }
 
       klog-editor-textarea{
@@ -44,12 +61,22 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
       }
 
       .klog-author .author-info{
-        margin-bottom: 8px;
+        margin-bottom: 4px;
+        white-space: nowrap;
+      }
+
+      .klog-author .author-action{
+        overflow: hidden;
+        flex-shrink: 0;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-left: 2px;
       }
 
       .klog-author .author-avatar{
         width: 40px;
         height: 40px;
+        @apply(--shadow-elevation-4dp);
       }
 
       .klog-author .text{
@@ -57,35 +84,27 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
       }
 
       .klog-author .actions{
-        flex: 1;
         text-align: right;
         opacity: 0;
         transition: opacity .2s ease;
       }
 
       .klog-author .actions a{
-        margin-left: 8px;
+        margin-right: 8px;
         cursor: pointer;
       }
 
       .klog-author .actions a:hover{
-        color: var(--primary-color);
+        color: var(--primary-text-color);
       }
 
+      .klog-author.input-container .actions,
       .klog-author:hover>.text>.author-info> .actions{
         opacity: 1;
       }
 
-      .klog-author .comment-content {
-        padding: 16px;
-        margin: 0 0 32px;
-        background: var(--primary-background-color);
-        border-radius: 5px;
-        @apply(--shadow-elevation-2dp);
-      }
-
       [hidden]{
-        display: none;
+        display: none!important;
       }
 
       @media (min-width: 768px) {
@@ -98,6 +117,12 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
         .klog-author .actions{
           display: none;
         }
+        .klog-author.input-container .actions{
+          display: block;
+        }
+        .klog-author .author-avatar{
+          margin-right: 12px;
+        }
       }
     </style>`
   }
@@ -108,9 +133,13 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
       <klog-image class="author-avatar" src="{{_userAvatarUrl}}" avatar></klog-image>
       <div class="text">
         <div class="author-info">
-          {{_inputIndicator}}
-          <div class="actions">&nbsp;
-          <a on-click="resetInput" hidden="{{_calcCancelButtonDisabled(_inputMethod)}}">取消</a>
+          <!--<span class="author-name">{{userinfo.displayName}}</span>-->
+          <span class="author-action">
+            {{_inputIndicator}}
+          </span>
+          <div class="actions" hidden="{{_calcCancelButtonDisabled(_inputMethod)}}">
+            <div class="dot-divider"></div>
+            <a on-click="resetInput">取消</a>
           </div>
         </div>
         <div class="comment-content" on-click="focus">
@@ -127,13 +156,17 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
       return `
         <template is="dom-repeat" items="{{${isPrimary ? 'data' : 'primary.secondary'}}}" as="${item}">
           <div class="klog-author klog-author-${item}" comment-data="{{${item}}}" on-click="_tapHandle">
-            <klog-image class="author-avatar" src="{{${item}.author.avatarUrl}}" avatar></klog-image>
+            <klog-image class="author-avatar" src="{{${item}.author.avatarUrl}}" ${!isPrimary ? 'hidden' : ''} avatar></klog-image>
             <div class="text">
               <div class="author-info">
-                <span class="author-name">{{${item}.author.displayName}}&nbsp;</span>
-                <klog-render-timestamp time-stamp="{{_parseDate(${item}.createdAt)}}" hidden="{{${item}.deleted}}">在</klog-render-timestamp>
-                ${isPrimary ? '评论了文章' : '回复了{{' + item + '.replyToAuthor.displayName}}'}
+                <span class="author-name">{{${item}.author.displayName}}</span>
+                <span class="author-action">
+                  ${isPrimary ? '评论了文章' : '回复了{{' + item + '.replyToAuthor.displayName}}'}
+                </span>
+                <div class="dot-divider"></div>
+                <klog-render-timestamp time-stamp="{{_parseDate(${item}.createdAt)}}" hidden="{{${item}.deleted}}"></klog-render-timestamp>
                 <div class="actions">
+                  <div class="dot-divider"></div>
                   <a on-click="_replyComment">回复</a>
                   <a on-click="_editComment" hidden="{{!_isAuthor(${item})}}">编辑</a>
                   <a on-click="_deleteComment" hidden="{{!_isAuthor(${item})}}">删除</a>
