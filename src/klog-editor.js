@@ -7,7 +7,7 @@ import '@polymer/iron-media-query/iron-media-query.js';
 import '@polymer/iron-image/iron-image.js';
 import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/paper-toast/paper-toast.js';
-import 'web-animations-js/web-animations-next.min.js';
+import './lib/web-animations-next-lite.min.js';
 import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/app-route/app-route.js';
 import './klog-icons.js';

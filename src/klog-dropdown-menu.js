@@ -1,5 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
-import 'web-animations-js/web-animations-next-lite.min.js';
+import './lib/web-animations-next-lite.min.js';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
 
 class KlogDropdownMenu extends PolymerElement {
