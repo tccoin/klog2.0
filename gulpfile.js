@@ -96,4 +96,4 @@ exports.insert = insertVariable;
 exports.google = byeGoogleFont;
 exports.sw = workerBuild;
 exports.push = pushOTA;
-exports.default = gulp.series(build, insertVariable, byeGoogleFont, workerBuild);
+exports.default = gulp.series(build, insertVariable, byeGoogleFont, workerBuild, pushOTA);

@@ -1,14 +1,3 @@
-cd /home/klog2.0/build/es5-bundled/
-put build/es5-bundled/index.html
-put build/es5-bundled/manifest.json
-put build/es5-bundled/service-worker.js
-cd src
-put -r build/es5-bundled/src
-cd /home/klog2.0/build/es6-unbundled
-put build/es6-unbundled/index.html
-put build/es6-unbundled/manifest.json
-put build/es6-unbundled/service-worker.js
-put build/es6-unbundled/push-manifest.json
-cd src
-put -r build/es6-unbundled/src
+cd /home/klog2.0/build/
+put build/build.zip
 bye
