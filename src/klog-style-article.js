@@ -207,7 +207,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
     @media (min-width: 1440px) {
       klog-markdown {
-        --klog-media-width: 1024px;
+        --klog-media-width: 810px;
 
         --klog-markdown-media-container: {
           min-width: 100%;
@@ -218,6 +218,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
         --klog-markdown-media: {
           @apply(--shadow-elevation-16dp);
+          width: fit-content;
         }
       }
     }

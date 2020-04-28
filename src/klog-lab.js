@@ -209,8 +209,6 @@ class KlogLab extends KlogDataMessageMixin(PolymerElement) {
       this.article = editor.data;
       this.markdown = editor.markdown;
       await editor.save();
-      // window.e = editor;
-      // console.log(window.e);
     }
   }
 

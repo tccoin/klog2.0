@@ -545,7 +545,7 @@ class KlogMarkdown extends PolymerElement {
         }
         this._reflinks = tokens.links;
         //render
-        this.$.content.innerHTML = out;
+        this.$.content.innerHTML = out.replace(/<p>(<div media description>[\s\S\n]*?)<\/p>/g, '$1');
         //post-update
         this._updateHeadings();
         this._updateLists();

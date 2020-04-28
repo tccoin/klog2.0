@@ -53,7 +53,7 @@
     "md5-file": "^4.0.0",
     "mime-types": "^2.1.18",
     "node-vibrant": "^3.2.0-alpha",
-    "optipng": "^2.0.0",
+    "optipng": "^2.1.0",
     "sharp": "0.22.1",
     "ua-device": "^0.1.10"
   },
