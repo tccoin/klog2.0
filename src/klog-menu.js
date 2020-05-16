@@ -72,6 +72,12 @@ class KlogMenu extends PolymerElement {
         -webkit-tap-highlight-color: transparent;
       }
 
+      .item.raised {
+        background: var(--primary-color);
+        color: #FFF;
+        @apply(--shadow-elevation-4dp);
+      }
+
       :host([round]) .item {
         padding: 4px 12px;
         margin: 4px 8px 0 0;
@@ -124,7 +130,7 @@ class KlogMenu extends PolymerElement {
 
         <template is="dom-if" if="{{item.item}}">
           <div
-            class="item"
+            class\$="{{item.className}}"
             name\$="{{item.name}}"
             category\$="{{item.category}}"
             path\$="{{item.path}}"
@@ -166,13 +172,14 @@ class KlogMenu extends PolymerElement {
   _calcMenu(items) {
     this._items = items;
     const menu = [];
+    let hasRaised = false;
     for (let category of items) {
+      if (menu.length != 0) {
+        menu.push({
+          divider: true
+        });
+      }
       if (category.text) {
-        if (menu.length != 0) {
-          menu.push({
-            divider: true
-          });
-        }
         menu.push({
           subtitle: true,
           name: category.name,
@@ -180,12 +187,18 @@ class KlogMenu extends PolymerElement {
         });
       }
       for (let item of category.items) {
+        let className = 'item';
+        if (item.raised && !hasRaised) {
+          hasRaised = true;
+          className += ' raised';
+        }
         menu.push({
           item: true,
           name: item.name,
           text: item.text,
           icon: item.icon,
           category: category.name,
+          className: className,
           style: category.style || '',
           path: item.path || ''
         });
