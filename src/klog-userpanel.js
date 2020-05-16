@@ -215,9 +215,16 @@ class KlogUserpanel extends PolymerElement {
             shadow: 'off',
           },
           styles: {
-            '--klog-header-background-color': 'translate',
+            '--klog-header-background': 'translate',
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
+          customMenu: [{
+            name: 'account',
+            text: '账户',
+            items: [
+              { name: 'logout', text: '注销', icon: 'power_settings_new' }
+            ]
+          }],
           toolbar: html`
             <app-toolbar>
               <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
@@ -225,7 +232,7 @@ class KlogUserpanel extends PolymerElement {
                   <div main-title><iron-icon icon="klog"></iron-icon></div>
                 </div>
               <div class="divider"></div>
-              <paper-button on-click="logout">
+              <paper-button on-click="logout" mobile>
                 <iron-icon icon="power_settings_new"></iron-icon>注销
               </paper-button>
             </app-toolbar>`
@@ -268,6 +275,12 @@ class KlogUserpanel extends PolymerElement {
         detail: { value: e.detail.value }
       }));
     });
+  }
+
+  menuSelect(category, item) {
+    if (category == 'account' && item == 'logout') {
+      this.logout();
+    }
   }
 
   openDrawer() {

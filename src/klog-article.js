@@ -103,11 +103,11 @@ class KlogArticle extends PolymerElement {
           sidebar: 'off',
           header: {
             fixed: true,
-            short: true,
-            shadow: 'scroll'
+            short: { mobile: true, desktop: false },
+            shadow: { mobile: 'scroll', desktop: 'off' }
           },
           styles: {
-            '--klog-header-background-color': 'var(--klog-article-theme-color)',
+            '--klog-header-background': { mobile: 'var(--klog-article-theme-color)', desktop: 'transparent' },
           },
           toolbar: html`
             <app-toolbar>

@@ -99,7 +99,7 @@ class KlogLab extends KlogDataMessageMixin(PolymerElement) {
           mainMenu: false,
           sidebar: 'off',
           styles: {
-            '--klog-header-background-color': 'translate',
+            '--klog-header-background': 'translate',
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
           header: {

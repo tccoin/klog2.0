@@ -61,7 +61,7 @@ class KlogAppsLib extends PolymerElement {
           shadow: 'scroll'
         },
         styles: {
-          '--klog-header-background-color': 'var(--primary-background-color)',
+          '--klog-header-background': 'var(--primary-background-color)',
           '--klog-header-text-color': 'var(--primary-text-color)',
         },
         toolbar: html`

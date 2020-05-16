@@ -31,7 +31,7 @@ class KlogNote extends PolymerElement {
           </div>
         </div>
         <div class="divider"></div>
-        <paper-button on-click="add">
+        <paper-button on-click="add" hidden\$="{{!mobile}}">
           <iron-icon icon="note_add"></iron-icon>新建笔记
         </paper-button>
       </app-toolbar>
@@ -78,7 +78,7 @@ class KlogNote extends PolymerElement {
             shadow: 'off',
           },
           styles: {
-            '--klog-header-background-color': 'var(--klog-page-background)',
+            '--klog-header-background': 'var(--klog-page-background)',
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
           toolbar: html``
@@ -182,8 +182,8 @@ class KlogNote extends PolymerElement {
     if (this.collections && this.collections.length > 0) {
       let items = {
         name: 'collection',
-        text: '分类',
-        items: []
+        text: '笔记本',
+        items: [{ name: 'add', text: '新建笔记', icon: 'note_add', raised: true }]
       };
       for (let item of this.collections) {
         items.items.push({ name: item, text: item, icon: 'label' });
@@ -209,7 +209,9 @@ class KlogNote extends PolymerElement {
   }
 
   menuSelect(category, item) {
-    if (category == 'collection') {
+    if (category == 'collection' && item == 'add') {
+      this.add();
+    } else if (category == 'collection') {
       this.dispatchEvent(new CustomEvent('app-load', {
         bubbles: true,
         composed: true,

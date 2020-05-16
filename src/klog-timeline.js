@@ -30,7 +30,7 @@ class KlogTimeline extends PolymerElement {
       }
 
       .main-container {
-        padding: 96px 0;
+        padding: 64px 0;
         min-height: var(--klog-layout-page-height);
         box-sizing: border-box;
         overflow: hidden;
@@ -38,23 +38,25 @@ class KlogTimeline extends PolymerElement {
         transition: all .15s ease;
       }
 
+      :host([mobile]) .main-container{
+        padding: 96px 0 64px;
+      }
+
       .filter-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        width: 100vw !important;
-        overflow: auto;
-        padding: 0 8px;
+        width: calc(100vw + 92px) !important;
+        padding: 0 50px;
+        position: relative;
+        left: -46px;
         box-sizing: border-box;
         overflow: auto;
         white-space: nowrap;
-        width: fit-content;
         font-size: 0;
-        transition: all .15s ease;
       }
 
       klog-chip {
+        height: 40px;
         margin: 0 4px;
+        vertical-align: middle;
         --klog-chip-text-color: var(--secondary-text-color);
         --divider-color: var(--secondary-text-color);
 
@@ -189,6 +191,10 @@ class KlogTimeline extends PolymerElement {
         type: Boolean,
         value: true
       },
+      mobile: {
+        type: Boolean,
+        reflectToAttribute: true
+      },
       layout: {
         type: Object,
         value: {
@@ -200,18 +206,19 @@ class KlogTimeline extends PolymerElement {
           header: {
             fixed: true,
             short: false,
-            shadow: 'on',
+            shadow: { mobile: 'on', desktop: 'off' },
           },
           customMenu: [{
-            name: 'article',
-            text: '关于 Klog',
+            name: 'timeline',
+            text: '时间轴',
             items: [
+              { name: 'add', text: '优里卡！', icon: 'post_add', raised: true },
               { name: 'help', text: '写作入门', icon: 'bookmark' },
               { name: 'log', text: '最近更新', icon: 'bookmark' },
             ]
           }],
           styles: {
-            '--klog-header-background-color': 'var(--primary-background-color)',
+            '--klog-header-background': { mobile: 'var(--primary-background-color)', desktop: 'transparent' },
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
           toolbar: html`
@@ -224,7 +231,7 @@ class KlogTimeline extends PolymerElement {
                   <paper-ripple></paper-ripple>
                 </div>
                 <div class="divider"></div>
-                <paper-button on-click="add">
+                <paper-button on-click="add" mobile>
                   <iron-icon icon="post_add"></iron-icon>
                   <span>优里卡！</span>
                 </paper-button>
@@ -352,7 +359,9 @@ class KlogTimeline extends PolymerElement {
   }
 
   menuSelect(category, item) {
-    if (category == 'article') {
+    if (category == 'timeline' && item == 'add') {
+      this.add();
+    } else {
       this.dispatchEvent(new CustomEvent('about-' + item, { bubbles: true, composed: true }));
     }
   }

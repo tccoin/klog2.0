@@ -122,8 +122,8 @@ containerKlogStyle.innerHTML = `<custom-style>
       --border-color: rgba(255, 255, 255, .12);
 
       --primary-color: var(--paper-indigo-500);
-      --dark-primary-color: var(--paper-indigo-200);
-      --light-primary-color: var(--paper-indigo-800);
+      --light-primary-color: var(--paper-indigo-500);
+      --dark-primary-color: var(--paper-indigo-800);
       --on-primary-color: #FFF;
 
       --accent-color: var(--paper-grey-800);

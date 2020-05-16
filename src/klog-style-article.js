@@ -113,10 +113,10 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     .article-title h1 {
-      font-size: calc(2 * var(--klog-markdown-font-size));
+      font-size: calc(1.6 * var(--klog-markdown-font-size));
       font-weight: 400;
       line-height: 1.3;
-      margin: 0 0 1em;
+      margin: 0 0 2em;
     }
 
     .dot-divider {

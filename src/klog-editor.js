@@ -247,7 +247,7 @@ class KlogEditor extends PolymerElement {
           },
           collections: [],
           styles: {
-            '--klog-header-background-color': 'var(--klog-page-background)',
+            '--klog-header-background': 'var(--klog-page-background)',
             '--klog-header-height': '0px',
           },
           toolbar: html``

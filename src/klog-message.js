@@ -38,7 +38,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
             shadow: 'off',
           },
           styles: {
-            '--klog-header-background-color': 'var(--klog-page-background)',
+            '--klog-header-background': 'var(--klog-page-background)',
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
           toolbar: html`

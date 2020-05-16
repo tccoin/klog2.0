@@ -130,7 +130,7 @@ class KlogLayout extends PolymerElement {
       <iron-media-query query="max-width: 1024px" query-matches="{{tablet}}"></iron-media-query>
       <iron-media-query query="max-width: 1440px" query-matches="{{laptop}}"></iron-media-query>
       <!-- Header -->
-      <app-header id="header"></app-header>
+      <app-header id="header" mobile$="{{mobile}}"></app-header>
       <!-- Sidebar -->
       <div id="sidebar" class="sidebar-container">
         <klog-menu login="{{login}}" page="{{page}}" items="{{menu}}"></klog-menu>
@@ -162,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.14.2<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.14.3<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -232,7 +232,8 @@ class KlogLayout extends PolymerElement {
       '_updateStyles(styles)',
       '_updateHeader(header)',
       '_updateToolbar(toolbar)',
-      '_updateMenu(login)'
+      '_updateMenu(login)',
+      '_updateLayout(mobile)'
     ]
   }
 
@@ -345,40 +346,21 @@ class KlogLayout extends PolymerElement {
     }
   }
 
-  updateLayout(layout, useDefault = true) {
-    if (useDefault) {
-      const defaultLayout = {
-        documentTitle: 'Klog',
-        collections: [],
-        scrollToTop: true,
-        drawer: 'on', // on off auto
-        sidebar: 'off', // on off auto
-        header: {
-          fixed: true,
-          short: false,
-          shadow: 'on', // on off scroll
-          background: 'var(--primary-background-color)',
-          color: 'var(--secondary-text-color)',
-        },
-        customMenu: [],
-        mainMenu: false,
-        styles: {
-          '--klog-layout-background': 'var(--klog-page-background)',
-          '--klog-header-background-color': 'var(--primary-background-color)',
-          '--klog-header-text-color': 'var(--secondary-text-color)',
-          '--klog-header-short-width': '80px',
-          '--klog-header-height': '64px',
-          '--klog-header-opacity': 1,
-        },
-        toolbar: html``
-      };
-      layout = Object.assign({}, defaultLayout, layout);
-      layout.header = Object.assign({}, defaultLayout.header, layout.header);
-      layout.styles = Object.assign({}, defaultLayout.styles, layout.styles);
-    }
+
+  _updateLayout() {
+    setTimeout(() => this.updateLayout({}, false), 1);
+  }
+
+  updateLayout(layout = {}, useDefault = true) {
+    // resolve
+    layout = this._updateCompleteLayout(layout, useDefault);
+    layout = this._updateDynamicLayout(layout);
+    layout.header = this._updateDynamicLayout(layout.header);
+    layout.styles = this._updateDynamicLayout(layout.styles);
+    console.log(layout);
     // update valid properties
     for (let key of Object.keys(layout)) {
-      if (key in this) {
+      if (key in this && layout[key] != undefined) {
         this.set(key, layout[key]);
       }
     }
@@ -399,6 +381,59 @@ class KlogLayout extends PolymerElement {
 
     // update menu
     this._updateMenu();
+  }
+
+  _updateCompleteLayout(layout, useDefault) {
+    let parent;
+    if (useDefault) {
+      const defaultLayout = {
+        documentTitle: 'Klog',
+        collections: [],
+        scrollToTop: true,
+        drawer: 'on', // on off auto
+        sidebar: 'off', // on off auto
+        header: {
+          fixed: true,
+          short: false,
+          shadow: 'on', // on off scroll
+          background: 'var(--primary-background-color)',
+          color: 'var(--secondary-text-color)',
+        },
+        customMenu: [],
+        mainMenu: false,
+        styles: {
+          '--klog-layout-background': 'var(--klog-page-background)',
+          '--klog-header-background': 'var(--primary-background-color)',
+          '--klog-header-text-color': 'var(--secondary-text-color)',
+          '--klog-header-short-width': '80px',
+          '--klog-header-height': '64px',
+          '--klog-header-opacity': 1,
+        },
+        toolbar: html``
+      };
+      parent = defaultLayout;
+    } else {
+      parent = this._layout;
+      parent.toolbar = undefined;
+    }
+    layout = Object.assign({}, parent, layout);
+    layout.header = Object.assign({}, parent.header, layout.header);
+    layout.styles = Object.assign({}, parent.styles, layout.styles);
+    this._layout = layout;
+    return layout;
+  }
+
+  _updateDynamicLayout(layout) {
+    if (!layout) return {};
+    console.log(layout);
+    layout = Object.assign({}, layout);
+    for (let key in layout) {
+      if (typeof (layout[key]) == 'object' && 'mobile' in layout[key] && 'desktop' in layout[key]) {
+        layout[key] = this.mobile ? layout[key].mobile : layout[key].desktop;
+        console.log(key, layout[key]);
+      }
+    }
+    return layout;
   }
 
   _updateSidebar(sidebar, tablet) {
@@ -543,9 +578,9 @@ class KlogLayout extends PolymerElement {
     } else {
       let category = {
         name: 'user',
-        text: '账户',
+        text: '',
         items: [
-          { name: 'login', text: '登录', icon: 'account_circle', path: 'login' },
+          { name: 'login', text: '登录', icon: 'account_circle', path: 'login', raised: true },
           { name: 'signup', text: '注册', icon: 'account_box', path: 'signup' }
         ]
       };

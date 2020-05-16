@@ -33,9 +33,13 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         top: 0;
         bottom: 0;
         z-index: -1;
-        background-color: var(--klog-header-background-color, var(--primary-background-color));
+        background: var(--klog-header-background, var(--primary-background-color));
         opacity: var(--klog-header-opacity, 1);
         transition: all .25s ease;
+      }
+
+       app-header:not([mobile]) app-toolbar:not([mobile]) [mobile]{
+        display: none !important;
       }
 
       app-toolbar>.divider {

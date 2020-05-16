@@ -58,7 +58,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         display: flex;
         align-items: center;
         font-size: 0.9em;
-        line-height: 1;
+        line-height: 1.3;
         margin: calc(var(--klog-card-padding) * 2);
         color: var(--secondary-text-color);
       }
