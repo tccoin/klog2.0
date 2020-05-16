@@ -189,6 +189,8 @@ class KlogApp extends PolymerElement {
     if (this._backTo != undefined) {
       page.backTo = this._backTo;
       this._backTo = null;
+    } else {
+      page.backTo = undefined;
     }
   }
 

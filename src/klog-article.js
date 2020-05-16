@@ -133,7 +133,7 @@ class KlogArticle extends PolymerElement {
   }
 
   back() {
-    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo, now: false } }));
+    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || 'timeline', now: false } }));
   }
 
   loadArticle(path) {
