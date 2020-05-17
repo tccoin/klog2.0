@@ -72,6 +72,11 @@ class KlogDataList extends PolymerElement {
       author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
       query.equalTo('author', author);
     }
+    // 作者
+    if (this.userPublicId) {
+      author = AV.Object.createWithoutData('UserPublic', this.userPublicId);
+      query.equalTo('author', author);
+    }
     // 关键词
     if (this.keyword) {
       let attributes = ['title', 'collection', 'tags', 'keywords'];

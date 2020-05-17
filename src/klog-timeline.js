@@ -12,12 +12,16 @@ import './klog-chip.js';
 import './klog-fab.js';
 
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
-/**
- * @customElement
- * @polymer
- */
+
 class KlogTimeline extends PolymerElement {
   static get template() {
+    return html`
+      ${this.styleTemplate}
+      ${this.contentTemplate}
+    `;
+  }
+
+  static get styleTemplate() {
     return html`
     <style include="klog-style-layout"></style>
     <style include="klog-style-scrollbar"></style>
@@ -48,7 +52,7 @@ class KlogTimeline extends PolymerElement {
         position: relative;
         left: -46px;
         box-sizing: border-box;
-        overflow: auto;
+        overflow-x: auto;
         white-space: nowrap;
         font-size: 0;
       }
@@ -59,7 +63,6 @@ class KlogTimeline extends PolymerElement {
         vertical-align: middle;
         --klog-chip-text-color: var(--secondary-text-color);
         --divider-color: var(--secondary-text-color);
-
         --klog-chip-style: {
           font-weight: bold;
           padding: 8px 18px;
@@ -140,6 +143,11 @@ class KlogTimeline extends PolymerElement {
         transform: scale(0);
       }
     </style>
+    `;
+  }
+
+  static get contentTemplate() {
+    return html`
     <klog-data-timeline id="data" last-response="{{list}}"></klog-data-timeline>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
@@ -159,7 +167,7 @@ class KlogTimeline extends PolymerElement {
         <div class="eof" hidden="{{!_eof}}">Klog 奇点</div>
       </div>
     </div>
-`;
+    `;
   }
 
   static get is() { return 'klog-timeline'; }
@@ -576,3 +584,5 @@ class KlogTimeline extends PolymerElement {
 }
 
 window.customElements.define(KlogTimeline.is, KlogTimeline);
+
+export { KlogTimeline };

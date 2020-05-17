@@ -35,7 +35,7 @@ class KlogArticle extends PolymerElement {
       <h1>{{article.title}}</h1>
     </div>
     <div class="article-author klog-author" theme\$="{{theme}}">
-      <klog-image id="avatar" class="author-avatar" src="{{article.author.avatarUrl}}" avatar="" lazy=""></klog-image>
+      <klog-image id="avatar" class="author-avatar" on-click="openZone" src="{{article.author.avatarUrl}}" avatar="" lazy=""></klog-image>
       <div class="text">
         <div class="author-info">
           <span class="author-name">{{article.author.displayName}}</span>
@@ -134,6 +134,10 @@ class KlogArticle extends PolymerElement {
 
   back() {
     this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || 'timeline', now: false } }));
+  }
+
+  openZone() {
+    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'zone/' + this.article.author.objectId } }));
   }
 
   loadArticle(path) {

@@ -156,10 +156,10 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
       return `
         <template is="dom-repeat" items="{{${isPrimary ? 'data' : 'primary.secondary'}}}" as="${item}">
           <div class="klog-author klog-author-${item}" comment-data="{{${item}}}" on-click="_tapHandle">
-            <klog-image class="author-avatar" src="{{${item}.author.avatarUrl}}" ${!isPrimary ? 'hidden' : ''} avatar></klog-image>
+            <klog-image class="author-avatar" on-click="openZone" src="{{${item}.author.avatarUrl}}" ${!isPrimary ? 'hidden' : ''} avatar></klog-image>
             <div class="text">
               <div class="author-info">
-                <span class="author-name">{{${item}.author.displayName}}</span>
+                <span class="author-name" on-click="openZone">{{${item}.author.displayName}}</span>
                 <span class="author-action">
                   ${isPrimary ? '评论了文章' : '回复了{{' + item + '.replyToAuthor.displayName}}'}
                 </span>
@@ -271,6 +271,13 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
     } else {
       return false;
     }
+  }
+
+  openZone(e) {
+    e.stopPropagation();
+    const commentData = this._getCommentData(e.target);
+    const page = 'zone/' + commentData.author.objectId;
+    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
   }
 
   async _submitComment() {

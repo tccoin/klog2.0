@@ -95,6 +95,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         width: 4px;
         margin: 0 6px;
         border-radius: 2px;
+        vertical-align: middle;
         background: var(--border-color);
       }
 

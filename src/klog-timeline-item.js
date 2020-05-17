@@ -90,8 +90,8 @@ class KlogTimelineItem extends PolymerElement {
       <div class="card klog-card" raised\$="{{expended}}" on-click="read" mobile\$="{{mobile}}">
 
         <!--meta-->
-        <div class="card-meta">
-          <klog-image class="meta-avatar" src="{{data.author.avatarUrl}}" theme="{{theme}}" lazy="" fixed="" avatar="">
+        <div class="card-meta" hidden$="{{authorHidden}}">
+          <klog-image class="meta-avatar" src="{{data.author.avatarUrl}}" theme="{{theme}}" lazy fixed avatar>
           </klog-image>
           <div class="meta-container">
             <div class="meta-title">{{data.author.displayName}}</div>
@@ -106,7 +106,11 @@ class KlogTimelineItem extends PolymerElement {
         </klog-image>
 
         <!--title-->
-        <div class="card-subtitle" hidden\$="{{!data.title}}">{{data.collection}}</div>
+        <div class="card-subtitle" hidden\$="{{!data.title}}">
+          {{data.collection}}
+          <div class="dot-divider" hidden$="{{!authorHidden}}"></div>
+          <klog-render-timestamp time-stamp="{{data.date}}" hidden$="{{!authorHidden}}"></klog-render-timestamp>
+        </div>
         <h1 class="card-title" hidden\$="{{!data.title}}">{{data.title}}</h1>
 
         <!--content-->
@@ -167,6 +171,15 @@ class KlogTimelineItem extends PolymerElement {
         type: Boolean,
         reflectToAttribute: true
       },
+      authorHidden: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+      backTo: {
+        type: String,
+        value: ''
+      },
     }
   }
 
@@ -185,14 +198,28 @@ class KlogTimelineItem extends PolymerElement {
       this._resizeTimeout = setTimeout(() => this.refresh(), 100);
     });
     this.server = window.location.origin + window.location.pathname;
+    this.$.card.addEventListener('click', e => {
+      e.preventDefault();
+      const page = 'article/' + this.data.path;
+      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page, backTo } }));
+    });
   }
 
   has(sth) {
     return !(sth == false)
   }
 
-  read() {
-    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'article/' + this.data.path, now: false } }));
+  read(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (e.target.tagName == 'KLOG-IMAGE') {
+      const page = 'zone/' + this.data.author.objectId;
+      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
+    } else {
+      const page = 'article/' + this.data.path;
+      const backTo = this.backTo || 'timeline';
+      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page, backTo } }));
+    }
   }
 
   refresh() {

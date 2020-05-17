@@ -162,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.14.3<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.14.4<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -252,6 +252,12 @@ class KlogLayout extends PolymerElement {
         if (pageElement && pageElement.refresh) {
           pageElement.refresh();
         }
+      }, { once: true });
+    });
+    this.addEventListener('after-selected', e => {
+      this.$.page.addEventListener('iron-select', () => {
+        let pageElement = this.$.page.querySelector(`[name = '${e.detail.selected}']`);;
+        e.detail.callback(pageElement);
       }, { once: true });
     });
     this.addEventListener('backdrop-opened-changed', e => {
@@ -348,7 +354,9 @@ class KlogLayout extends PolymerElement {
 
 
   _updateLayout() {
-    setTimeout(() => this.updateLayout({}, false), 1);
+    if (this._layout) {
+      setTimeout(() => this.updateLayout({}, false), 1);
+    }
   }
 
   updateLayout(layout = {}, useDefault = true) {
@@ -357,7 +365,6 @@ class KlogLayout extends PolymerElement {
     layout = this._updateDynamicLayout(layout);
     layout.header = this._updateDynamicLayout(layout.header);
     layout.styles = this._updateDynamicLayout(layout.styles);
-    console.log(layout);
     // update valid properties
     for (let key of Object.keys(layout)) {
       if (key in this && layout[key] != undefined) {
@@ -425,12 +432,10 @@ class KlogLayout extends PolymerElement {
 
   _updateDynamicLayout(layout) {
     if (!layout) return {};
-    console.log(layout);
     layout = Object.assign({}, layout);
     for (let key in layout) {
       if (typeof (layout[key]) == 'object' && 'mobile' in layout[key] && 'desktop' in layout[key]) {
         layout[key] = this.mobile ? layout[key].mobile : layout[key].desktop;
-        console.log(key, layout[key]);
       }
     }
     return layout;

@@ -12,18 +12,10 @@ class KlogDataTimeline extends PolymerElement {
 
   static get properties() {
     return {
-      pageSize: {
-        type: Number,
-        value: 10
-      },
       loading: {
         type: Boolean,
         value: true,
         notify: true,
-      },
-      pageNumber: {
-        type: Number,
-        observer: 'load'
       },
       lastResponse: {
         type: Array,
@@ -31,12 +23,6 @@ class KlogDataTimeline extends PolymerElement {
       },
       keyword: {
         type: String
-      },
-      hasMore: {
-        type: Boolean
-      },
-      lastResponseTimestamp: {
-        type: Number
       }
     }
   }
