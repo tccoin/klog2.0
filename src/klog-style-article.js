@@ -27,6 +27,10 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       max-width: calc(70 * var(--klog-markdown-font-size) + 32px);
     }
 
+    .klog-author .author-avatar {
+      cursor: pointer;
+    }
+
     .article-container {
       width: 100%;
       margin: auto;

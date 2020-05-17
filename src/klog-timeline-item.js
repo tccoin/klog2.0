@@ -129,7 +129,7 @@ class KlogTimelineItem extends PolymerElement {
             <template is="dom-repeat" items="{{gallery}}">
               <div class="gallery-container" cover\$="{{item.cover}}">
                 <template is="dom-repeat" items="{{item}}">
-                  <klog-image class="gallery-item" src="{{item.url}}" theme="{{theme}}" lazy="" fixed="" gallery="" gallery-cover="{{item.cover}}">
+                  <klog-image class="gallery-item" src="{{item.url}}" theme="{{theme}}" lazy fixed gallery gallery-cover="{{item.cover}}">
                   </klog-image>
                 </template>
               </div>
@@ -212,7 +212,7 @@ class KlogTimelineItem extends PolymerElement {
   read(e) {
     e.stopPropagation();
     e.preventDefault();
-    if (e.target.tagName == 'KLOG-IMAGE') {
+    if (e.target.classList.contains('meta-avatar')) {
       const page = 'zone/' + this.data.author.objectId;
       this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
     } else {
