@@ -152,9 +152,9 @@ class KlogLayout extends PolymerElement {
         <klog-apps name="apps"></klog-apps>
         <klog-note id="note" name="note" theme="[[theme]]" mobile="{{mobile}}"> </klog-note>
         <klog-message id="message" name="message" theme="[[theme]]" mobile="{{mobile}}"> </klog-message>
+        <klog-zone name="zone" theme="[[theme]]" mobile="{{mobile}}"></klog-zone>
         <!--testing-->
         <klog-drive name="drive"></klog-drive>
-        <klog-zone name="zone"></klog-zone>
         <klog-lab name="lab"></klog-lab>
       </iron-pages>
     </div>
@@ -162,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.14.4<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.14.5<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>

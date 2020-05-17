@@ -46,7 +46,7 @@ class KlogTimelineItem extends PolymerElement {
         @apply --shadow-elevation-8dp;
       }
 
-      :host() .gallery-item {
+      .gallery-item {
         flex-basis: calc(33.33% - 1px);
       }
 

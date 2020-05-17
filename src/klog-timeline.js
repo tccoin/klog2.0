@@ -381,13 +381,9 @@ class KlogTimeline extends PolymerElement {
       this.updateButtonExtended = y == 0 || !this.mobile;
       // filter animation
       if (y > 16) {
-        let progress = Math.max(0, Math.min(1, (y - 16) / 30));
-        this.$.filter.style.transform = `scale(${1 - progress * 0.05})`;
-        if (this.preference && this.preference.backdropBlurEnabled) {
-          this.$.filter.style.opacity = 1;
-        } else {
-          this.$.filter.style.opacity = 1 - progress;
-        }
+        let progress = Math.max(0, Math.min(1, (this.$.filter.offsetTop + this.$.filter.offsetHeight - y - 32) / 32));
+        this.$.filter.style.transform = `scale(${0.95 + progress * 0.05})`;
+        this.$.filter.style.opacity = progress;
       }
       else {
         this.$.filter.style.transform = `scale(1)`;

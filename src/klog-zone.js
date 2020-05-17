@@ -25,8 +25,18 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       top: 0;
       bottom: 0;
     }
+    :host([mobile]) .info-container{
+      width: 100vw;
+      height: auto;
+      position: relative;
+      bottom: auto;
+    }
     .main-container{
       padding-left:300px;
+    }
+    :host([mobile]) .main-container{
+      padding-left: 0;
+      padding-top: 24px;
     }
     .info-container paper-button{
       width: 100%;
