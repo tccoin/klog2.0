@@ -21,6 +21,7 @@ class KlogChip extends PolymerElement {
         text-overflow: ellipsis;
         white-space: nowrap;
         max-width: 100%;
+        height: 24px;
       }
 
       iron-icon {

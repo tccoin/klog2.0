@@ -53,6 +53,7 @@ class KlogTimeline extends PolymerElement {
         left: -46px;
         box-sizing: border-box;
         overflow-x: auto;
+        overflow-y: hidden;
         white-space: nowrap;
         font-size: 0;
       }
@@ -221,7 +222,7 @@ class KlogTimeline extends PolymerElement {
             text: '时间轴',
             items: [
               { name: 'add', text: '优里卡！', icon: 'post_add', raised: true },
-              { name: 'help', text: '写作入门', icon: 'bookmark' },
+              { name: 'help', text: 'Klog入门', icon: 'bookmark' },
               { name: 'log', text: '最近更新', icon: 'bookmark' },
             ]
           }],
