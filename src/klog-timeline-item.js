@@ -212,7 +212,7 @@ class KlogTimelineItem extends PolymerElement {
   read(e) {
     e.stopPropagation();
     e.preventDefault();
-    if (e.target.classList.contains('meta-avatar')) {
+    if (e.target.classList.contains('meta-avatar') || e.target.classList.contains('meta-title')) {
       const page = 'zone/' + this.data.author.objectId;
       this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
     } else {

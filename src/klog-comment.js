@@ -76,8 +76,16 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
       .klog-author .author-avatar{
         width: 40px;
         height: 40px;
-        cursor: pointer;
         @apply(--shadow-elevation-4dp);
+      }
+
+      .klog-author .author-avatar,
+      .klog-author .author-name{
+        cursor: pointer;
+      }
+
+      .input-container .author-avatar{
+        cursor: default;
       }
 
       .klog-author .text{

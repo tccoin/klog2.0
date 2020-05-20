@@ -38,7 +38,7 @@ class KlogArticle extends PolymerElement {
       <klog-image id="avatar" class="author-avatar" on-click="openZone" src="{{article.author.avatarUrl}}" avatar="" lazy=""></klog-image>
       <div class="text">
         <div class="author-info">
-          <span class="author-name">{{article.author.displayName}}</span>
+          <span class="author-name" on-click="openZone">{{article.author.displayName}}</span>
           <template is="dom-if" if="{{article.author.introduction}}">,&nbsp;
             <span class="author-intro divider">{{article.author.introduction}}</span>
           </template>
