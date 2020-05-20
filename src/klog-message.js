@@ -38,9 +38,16 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
             shadow: 'off',
           },
           styles: {
-            '--klog-header-background': 'var(--klog-page-background)',
+            '--klog-header-background': 'transparent',
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
+          customMenu: [{
+            name: 'message',
+            text: '通知',
+            items: [
+              { name: 'refresh', text: '刷新', icon: 'refresh' },
+            ]
+          }],
           toolbar: html`
           <app-toolbar>
             <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
@@ -50,7 +57,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
               <div page-title>通知中心</div>
             </div>
             <div class="divider"></div>
-            <paper-button on-click="refresh">
+            <paper-button on-click="refresh" mobile>
               <iron-icon icon="refresh"></iron-icon>
               <span>刷新</span>
             </paper-button>
@@ -58,6 +65,12 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
         }
       }
     };
+  }
+
+  menuSelect(category, item) {
+    if (category == 'message' && item == 'refresh') {
+      this.refresh();
+    }
   }
 
 
@@ -74,9 +87,17 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
         padding:16px;
       }
 
+      .group-container{
+        margin-bottom: 32px;
+      }
+
+      .klog-card-label,
       .message-card{
         max-width: 500px;
         width: 100%;
+      }
+
+      .message-card{
         cursor: pointer;
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         -webkit-tap-highlight-color: transparent;
@@ -93,25 +114,27 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
 
   static get messageTemplate() {
     return html`
-      <template is="dom-repeat" items="{{messages}}">
-        <div class="klog-card message-card list" on-click="view" link="{{item.link}}">
-
-            <!--meta-->
-            <div class="card-meta">
-              <div class="meta-container">
-                <div class="meta-title">{{item.info}}</div>
-              </div>
-              <div class="meta-date">
-                <klog-render-timestamp time-stamp="{{item.createdAt}}"></klog-render-timestamp>
-              </div>
+      <template is="dom-repeat" items="{{messageGroups}}" as="group">
+        <div class="group-container">
+          <div class="klog-card-label">{{group.name}}</div>
+          <template is="dom-repeat" items="{{group.items}}" as="item">
+            <div class="klog-card message-card list" on-click="view" link="{{item.link}}">
+                <!--meta-->
+                <div class="card-meta">
+                  <div class="meta-container">
+                    <div class="meta-title">{{item.info}}</div>
+                  </div>
+                  <div class="meta-date">
+                    <klog-render-timestamp time-stamp="{{item.createdAt}}"></klog-render-timestamp>
+                  </div>
+                </div>
+                <!--content-->
+                <div class="card-content" hidden\$="{{!item.text}}">
+                  <p class="content-text" id="text">{{item.text}}</p>
+                </div>
+              <paper-ripple></paper-ripple>
             </div>
-
-            <!--content-->
-            <div class="card-content" hidden\$="{{!item.text}}">
-              <p class="content-text" id="text">{{item.text}}</p>
-            </div>
-
-          <paper-ripple></paper-ripple>
+          </template>
         </div>
       </template>`;
   }
@@ -137,7 +160,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
       } else {
         this.userinfo = result.userinfo;
         this.login = result.login;
-        this.refresh();
+        this.refresh(false);
       }
     });
   }
@@ -153,10 +176,24 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
     }
   }
 
-  refresh() {
+  refresh(toast = true) {
     this.loadMessages(this.userinfo.follow, this.userinfo.publicinfo.id).then(messages => {
       this.messages = messages;
+      this.messageGroups = this.groupByDate(messages);
+    }).then(() => {
+      if (toast) this.showToast('通知已更新');
     });
+  }
+
+  showToast(text, link) {
+    this.dispatchEvent(new CustomEvent('show-toast', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        text: text,
+        link: link
+      }
+    }));
   }
 
   _getLink(container) {

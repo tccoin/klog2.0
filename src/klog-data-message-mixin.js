@@ -64,6 +64,7 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
   }
 
   _processChannels(channels, userPublicId) {
+    /* replace "self" to userPublicId */
     let results = [];
     for (let channel of channels) {
       results.push(channel.replace(/-self$/, `-${userPublicId}`));
@@ -72,24 +73,22 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
   }
 
   _processMessages(data, userPublicId, accessPrivate) {
+    /* process messages; hide the message if error happened*/
     let result = [];
     for (let message of data) {
       try {
         message = message.toJSON();
-        message = this._processMessage(message, userPublicId, accessPrivate);
+        message = this._processMessageAccess(message, accessPrivate ? userPublicId : '');
+        message = this._processMessageDisplay(message, userPublicId);
         result.push(message);
       } catch (err) { }
     }
     return result;
   }
 
-  _processMessage(message, userPublicId, accessPrivate) {
-    message = this._processMessageAccess(message, accessPrivate ? userPublicId : '');
-    message = this._processMessageDisplay(message, userPublicId);
-    return message;
-  }
 
   _processMessageAccess(message, userPublicId) {
+    /* acl */
     const article = message.article || message.comment;
     const useMasterKey = false;
     const isCoworker = false;
@@ -101,8 +100,9 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
   }
 
   _processMessageDisplay(message, userPublicId) {
-    // preprocess strings
+    /* generate brief description for the message */
     let commentAuthorName, commentReplyToName;
+    // preprocess strings
     if (this._contains(message.type, ['comment-'])) {
       if (!message.comment) {
         this.deleteMessage(message.objectId);
@@ -123,13 +123,18 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
       articleAuthorName = this._processName(message.article.author, userPublicId);
       articleWithAuthorName = `${articleAuthorName}的文章${articleTitle}`;
     }
+    // skip message from oneself
+    if ((message.type == 'comment-new' || message.type == 'comment-reply') && commentAuthorName == '你') {
+      throw new Error(`user is author`);
+    }
     // concat info
     let info, title, text;
     if (message.type == 'comment-new') {
       info = `${commentAuthorName}评论了${articleWithAuthorName}`;
       text = message.comment.markdown;
     } else if (message.type == 'comment-reply') {
-      info = `${commentAuthorName}在${articleWithAuthorName}下回复了${commentReplyToName}`;
+      if (articleTitle) info = `${commentAuthorName}在${articleTitle}下回复了${commentReplyToName}`;
+      else info = `${commentAuthorName}回复了${commentReplyToName}`;
       text = message.comment.markdown;
     } else if (message.type == 'article-create') {
       info = `${articleAuthorName}发布了`;

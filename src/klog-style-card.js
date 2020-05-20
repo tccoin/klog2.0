@@ -9,6 +9,15 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         --klog-card-secondary-font-size: var(--secondary-font-size, 12px);
       }
 
+      .klog-card-label {
+        position: relative;
+        margin: auto;
+        padding: 0 0 8px;
+        font-size: 0.9em;
+        box-sizing: border-box;
+        color: var(--secondary-text-color);
+      }
+
       .klog-card {
         position: relative;
         margin: auto;
@@ -41,6 +50,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         border-bottom: 1px solid var(--border-color);
       }
 
+      .klog-card-label+.klog-card.list,
       .klog-card.list:first-of-type {
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
@@ -75,6 +85,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
       }
 
       .klog-card .card-meta .meta-title {
+        display: inline;
         font-weight: bold;
         color: var(--primary-text-color);
         font-size: var(--klog-card-primary-font-size);
