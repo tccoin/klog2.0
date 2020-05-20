@@ -124,13 +124,14 @@ class KlogUserpanel extends PolymerElement {
           </paper-tabs>
         </klog-dropdown-menu>
 
-        <div class="form-item">
+        <!-- <div class="form-item">
           <div class="text-container">
             <span class="title">毛玻璃效果</span><br>
             <span class="description">实验性</span>
           </div>
           <paper-toggle-button checked="{{preference.backdropBlurEnabled}}"></paper-toggle-button>
         </div>
+        -->
       </div>
 
 
