@@ -162,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.14.7<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.14.8<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -571,14 +571,14 @@ class KlogLayout extends PolymerElement {
       style: 'color:var(--primary-text-color)',
       items: [
         { name: 'timeline', text: '时间轴', icon: 'timeline', path: 'timeline' },
-        { name: 'note', text: '笔记本', icon: 'book', path: 'note/all/' },
+        { name: 'note', text: '笔记', icon: 'book', path: 'note/all/' },
         { name: 'console', text: '控制台', icon: 'console' }
       ]
     }];
     if (this.login) {
       mainMenu[0].items.splice(2, 0,
-        { name: 'message', text: '通知中心', icon: 'notifications', path: 'message' },
-        { name: 'userpanel', text: '个人设置', icon: 'account_circle', path: 'userpanel' },
+        { name: 'message', text: '通知', icon: 'notifications', path: 'message' },
+        { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' },
       );
     } else {
       let category = {
