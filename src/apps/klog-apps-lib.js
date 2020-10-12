@@ -2,8 +2,8 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-button/paper-button.js';
-import './klog-style-layout.js';
-import './klog-style-card.js';
+import '../style/klog-style-layout.js';
+import '../style/klog-style-card.js';
 
 class KlogAppsLib extends PolymerElement {
   static get template() {

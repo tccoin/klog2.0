@@ -8,6 +8,7 @@
   },
   "scripts": {
     "serve": "npx es-dev-server --node-resolve --open --port 3000 --app-index index-debug.html --hostname 0.0.0.0",
+    "test": "npx es-dev-server -r build",
     "build": "gulp",
     "version": "polymer --pversion"
   },

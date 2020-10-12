@@ -6,9 +6,9 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@polymer/paper-dialog/paper-dialog.js';
-import './klog-style-layout.js';
-import './klog-style-card.js';
-import './klog-icons.js';
+import '../style/klog-style-layout.js';
+import '../style/klog-style-card.js';
+import '../ui/klog-icons.js';
 
 class KlogAppsMoney extends PolymerElement {
   static get template() {

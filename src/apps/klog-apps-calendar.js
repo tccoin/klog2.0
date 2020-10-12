@@ -1,9 +1,9 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-toggle-button/paper-toggle-button.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
-import './klog-style-layout.js';
-import './klog-style-card.js';
-import './klog-icons.js';
+import '../style/klog-style-layout.js';
+import '../style/klog-style-card.js';
+import '../ui/klog-icons.js';
 
 class KlogAppsCalendar extends PolymerElement {
   static get template() {
