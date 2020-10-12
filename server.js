@@ -17,9 +17,10 @@ if (!settings.tls) {
     console.log(`server listening on ${address}`)
   });
 } else {
+  const logger = require('pino')();
   const opt = {
     logger: false,
-    http2: true,
+    http2: false,
     maxParamLength: 200,
     https: {
       allowHTTP1: true,

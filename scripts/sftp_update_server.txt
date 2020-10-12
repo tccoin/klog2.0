@@ -1,0 +1,3 @@
+cd /home/klog2.0/
+put server.js
+bye
