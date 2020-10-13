@@ -218,7 +218,6 @@ class KlogTimelineItem extends PolymerElement {
     e.stopPropagation();
     e.preventDefault();
     if (e.target.classList.contains('card-collection')) {
-      console.log(e.target.innerText);
       this.searchTimeline(e.target.innerText);
     } else if (e.target.classList.contains('meta-avatar') || e.target.classList.contains('meta-title')) {
       const page = 'zone/' + this.data.author.objectId;

@@ -6,7 +6,7 @@ import '../style/klog-style-card.js';
 
 class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
   static get template() {
-    return html`
+    return html `
     ${this.styleTemplate}
     ${this.zoneStyletemplate}
       ${this.contentTemplate}
@@ -14,7 +14,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
   }
 
   static get zoneStyletemplate() {
-    return html`
+    return html `
     <style include="klog-style-card"></style>
     <style>
     .info-container{
@@ -65,6 +65,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     }
     .author-introduction{
       word-break: break-word;
+      color: var(--secondary-text-color);
     }
     :host([exit]) .info-container {
       transform: translateX(-5vh);
@@ -75,7 +76,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
   }
 
   static get contentTemplate() {
-    return html`
+    return html `
     <klog-data-list id="data" type="timeline" last-response="{{list}}" keyword="{{keyword}}" key="date"></klog-data-list>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="info-container klog-card" id="info">
@@ -166,10 +167,19 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
             '--klog-header-background': { mobile: 'var(--primary-background-color)', desktop: 'transparent' },
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
-          toolbar: html``
+          toolbar: html ``
         }
       },
     };
+  }
+
+  ready() {
+    super.ready();
+    this.addEventListener('timeline-set-filter', (e) => {
+      e.stopPropagation();
+      this.$.keywordInput.value = e.detail.keyword;
+      this.setFilter(e);
+    });
   }
 
   async update(subroute) {
@@ -202,7 +212,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
   async loadAuthorPublic(authorPublicId) {
     let authorPublic = await this.loadUserPublic(authorPublicId);
-    if(!authorPublic.introduction){
+    if (!authorPublic.introduction) {
       authorPublic.introduction = 'PLACEHOLDER_FOR_THOSE_LAZY_PEOPLE_WHO_DO_NOT_WRITE_ANYTHING_DESCRIBING_THEMSELVES';
     }
     this.authorPublic = authorPublic;

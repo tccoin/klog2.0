@@ -162,7 +162,6 @@ class KlogApp extends PolymerElement {
       this._updateUserinfo(e.detail.result);
     });
     this.addEventListener('timeline-set-filter', (e) => {
-      console.log(e);
       const callback = (pages) => {
         pages.timeline.$.keywordInput.value = e.detail.keyword;
         pages.timeline.setFilter(e);

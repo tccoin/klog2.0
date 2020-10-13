@@ -4,7 +4,7 @@ import '../ui/klog-markdown.js';
 import { KlogDataMessageMixin } from './klog-data-message-mixin.js';
 class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
   static get template() {
-    return html``;
+    return html ``;
   }
 
   static get is() { return 'klog-data-editor'; }
@@ -121,13 +121,11 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
         if (token.text[1]) {
           tags = token.text[1].split(',');
         }
-      }
-      else if (token.type == 'paragraph' || token.type == 'text') {
+      } else if (token.type == 'paragraph' || token.type == 'text') {
         if (text.length > 300) continue
         let out = this._caculateSummary(token.text);
         text += out ? out + ' ' : '';
-      }
-      else if (token.type == 'heading') {
+      } else if (token.type == 'heading') {
         keywords.push(this.unescape(token.text));
       }
     }
@@ -140,15 +138,15 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
 
   _caculateSummary(text) {
     return [].concat(text
-      .replace(/@\(([\s\S]*?)\)(\[([\s\S]*?)\])?/g, '') // at
-      .replace(/\[toc\]/ig, '') // toc
-      .replace(/^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\n? *\1 *(?:\n+|$)/ig, '\\[代码\\]') // toc
-      .replace(/\${1,2}([\s\S]+?)\${1,2}/g, '\\[公式\\]') // katex
-      .replace(/~{1,2}[\s\S]+~{1,2}/g, '\\[Biii\\]') // del
-      .replace(/!\[(.*)\]\(.*\)/g, '\\[图片\\]') // image
-      .replace(/\[<V>.*\]\(.*\)/g, '\\[视频\\]') // video
-      .replace(/\[(.*)\]\(.*\)/g, '$1') // link
-      .match(/\\[<!\[\]_~\*`\$]|[^<!\[\]_~\*`\$]/g))
+        .replace(/@\(([\s\S]*?)\)(\[([\s\S]*?)\])?/g, '') // at
+        .replace(/\[toc\]/ig, '') // toc
+        .replace(/^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\n? *\1 *(?:\n+|$)/ig, '\\[代码\\]') // toc
+        .replace(/\${1,2}([\s\S]+?)\${1,2}/g, '\\[公式\\]') // katex
+        .replace(/~{1,2}[\s\S]+~{1,2}/g, '\\[Biii\\]') // del
+        .replace(/!\[(.*)\]\(.*\)/g, '\\[图片\\]') // image
+        .replace(/\[<V>.*\]\(.*\)/g, '\\[视频\\]') // video
+        .replace(/\[(.*)\]\(.*\)/g, '$1') // link
+        .match(/\\[<!\[\]_~\*`\$]|[^<!\[\]_~\*`\$]/g))
       .join('')
       .replace(/\\([\\`*{}\[\]\$()#+\-.!_>~|])/g, '$1')
       .replace(/\n/g, '')
@@ -231,7 +229,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
 
   unescape(str) {
     // explicitly match decimal, hex, and named HTML entities
-    return str.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function (_, n) {
+    return str.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function(_, n) {
       n = n.toLowerCase();
       if (n === 'colon') return ':';
       if (n.charAt(0) === '#') {
@@ -402,20 +400,23 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
     // send message
     console.log(article);
     if (!this.quiet) {
-      const create = () => this.createMessage('article-create', this.userinfo.publicinfo.id, [
-        `article-user-${this.userinfo.publicinfo.id}`,
-        `article-article-${article.id}`,
-        `article-all`
-      ], {}, article.id);
       const update = (messageId) => this.updateMessage(messageId, 'article-update');
       try {
         const message = await this.loadMessageByChannel(`article-article-${article.id}`, this.userinfo.publicinfo.id);
-        if ((Date.now() - Date.parse(message.updatedAt)) > 6 * 1000) update(message.objectId);
-        console.log('update message');
+        if ((Date.now() - Date.parse(message.updatedAt)) > 6 * 1000) {
+          /* create a article-create message */
+          update(message.objectId);
+          console.log('update message');
+        }
       } catch (err) {
         if (err.message == 'message not found') {
           console.log('create message');
-          create();
+          /* create a article-create message */
+          this.createMessage('article-create', this.userinfo.publicinfo.id, [
+            `article-user-${this.userinfo.publicinfo.id}`,
+            `article-article-${article.id}`,
+            `article-all`
+          ], {}, article.id);
         }
       }
     }
