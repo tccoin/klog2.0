@@ -84,6 +84,10 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
         cursor: pointer;
       }
 
+      .klog-author .author-name:hover{
+        text-decoration: underline;
+      }
+
       .input-container .author-avatar{
         cursor: default;
       }

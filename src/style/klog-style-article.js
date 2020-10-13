@@ -32,6 +32,10 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       cursor: pointer;
     }
 
+    .klog-author .author-name:hover{
+      text-decoration: underline;
+    }
+
     .article-container {
       width: 100%;
       margin: auto;

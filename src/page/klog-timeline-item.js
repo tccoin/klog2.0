@@ -46,6 +46,10 @@ class KlogTimelineItem extends PolymerElement {
         @apply --shadow-elevation-8dp;
       }
 
+      .card-meta .meta-title:hover {
+        text-decoration: underline;
+      }
+
       .gallery-item {
         flex-basis: calc(33.33% - 1px);
       }
