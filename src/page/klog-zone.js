@@ -63,6 +63,9 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       white-space: nowrap;
       max-width: 100%;
     }
+    .author-introduction{
+      word-break: break-word;
+    }
     :host([exit]) .info-container {
       transform: translateX(-5vh);
       opacity: 0;
@@ -86,7 +89,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         <klog-chip name="search" icon="search" checkmark-animation-disabled>
           <input slot="expand-content" id="keywordInput">
         </klog-chip>
-        <klog-chip name="default" label="全部文章"></klog-chip>
+        <klog-chip name="default" label="全部"></klog-chip>
         <klog-chip name="daily" label="日常"></klog-chip>
         <klog-chip name="note" label="笔记"></klog-chip>
         <klog-chip name="gallery" label="相册"></klog-chip>
@@ -170,6 +173,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
   }
 
   async update(subroute) {
+    this.loading = true;
     this.authorPublicId = subroute.path.replace(/[\/\\]/, '');
     this.cardBackTo = 'zone/' + this.authorPublicId;
     // author publicinfo
@@ -197,7 +201,11 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
   }
 
   async loadAuthorPublic(authorPublicId) {
-    this.authorPublic = await this.loadUserPublic(authorPublicId);
+    let authorPublic = await this.loadUserPublic(authorPublicId);
+    if(!authorPublic.introduction){
+      authorPublic.introduction = 'PLACEHOLDER_FOR_THOSE_LAZY_PEOPLE_WHO_DO_NOT_WRITE_ANYTHING_DESCRIBING_THEMSELVES';
+    }
+    this.authorPublic = authorPublic;
   }
 }
 
