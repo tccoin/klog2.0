@@ -23,7 +23,7 @@ import '../ui/klog-upload-zone.js';
 
 class KlogEditor extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-scrollbar"></style>
     <style>
       :host {
@@ -61,7 +61,7 @@ class KlogEditor extends PolymerElement {
       }
 
       .klog-editor-back-pages {
-        width: 100vw;
+        width: calc(100vw - var(--klog-layout-margin-left));
         margin: 64px auto 16px;
         padding: 16px;
         max-height: calc(var(--klog-layout-page-height) - 224px);
@@ -83,7 +83,7 @@ class KlogEditor extends PolymerElement {
       .klog-editor-main-pages {
         width: 100%;
         max-width: 1280px;
-        height: calc(var(--klog-layout-page-height) - 64px);
+        height: calc(var(--klog-layout-page-height) - var(--klog-backdrop-default-front-top));
         margin: auto;
         border-radius: 12px 12px 0 0;
         overflow: hidden;
@@ -153,6 +153,16 @@ class KlogEditor extends PolymerElement {
       }
 
       /*media*/
+      :host,
+      klog-backdrop {
+        --klog-backdrop-default-front-top: 64px;
+      }
+      @media (min-width: 1025px) {
+        :host,
+        klog-backdrop {
+          --klog-backdrop-default-front-top: 16px;
+        }
+      }
       @media (min-width: 768px) {
         :host {
           --klog-markdown-media: {
@@ -250,7 +260,7 @@ class KlogEditor extends PolymerElement {
             '--klog-header-background': 'var(--klog-page-background)',
             '--klog-header-height': '0px',
           },
-          toolbar: html``
+          toolbar: html ``
         }
       },
     };
@@ -331,17 +341,27 @@ class KlogEditor extends PolymerElement {
       composed: true,
       detail: {
         customMenu: [{
+          name: 'edit',
+          text: '',
+          items: [
+            { name: 'save', text: '保存', icon: 'publish', desktop: true, raised: true },
+            { name: 'upload', text: '上传文件', icon: 'insert_drive_file', desktop: true },
+            { name: 'collection', text: '分类和标签', icon: 'category' },
+            { name: 'settings', text: '其它设置', icon: 'settings', desktop: true },
+          ]
+        }, {
           name: 'action',
           text: '插入',
           items: [
-            { name: 'collection', text: '分类和标签', icon: 'category' },
             { name: 'table', text: '表格', icon: 'border_all' },
             { name: 'code', text: '代码', icon: 'code' },
-            { name: 'heading', text: '标题', icon: 'title' },
             { name: 'formula', text: '公式', icon: 'functions' },
             { name: 'toc', text: '目录', icon: 'menu_book' },
             { name: 'quote', text: '引用', icon: 'format_quote' },
             { name: 'ref', text: '来源', icon: 'comment' },
+            { name: 'heading-1', text: '一级标题', icon: 'title' },
+            { name: 'heading-2', text: '二级标题', icon: 'title' },
+            { name: 'heading-3', text: '三级标题', icon: 'title' },
             { name: 'ul', text: '无序列表', icon: 'format_list_bulleted' },
             { name: 'ol', text: '有序列表', icon: 'format_list_numbered' },
           ]
@@ -350,62 +370,37 @@ class KlogEditor extends PolymerElement {
     }));
   }
 
-  headingMenu() {
-    this.dispatchEvent(new CustomEvent('layout-update', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        customMenu: [{
-          name: 'action',
-          text: '插入',
-          items: [
-            { name: 'heading-1', text: '一级标题', icon: 'title' },
-            { name: 'heading-2', text: '二级标题', icon: 'title' },
-            { name: 'heading-3', text: '三级标题', icon: 'title' },
-            { name: 'heading-4', text: '四级标题', icon: 'title' },
-            { name: 'heading-5', text: '五级标题', icon: 'title' },
-            { name: 'heading-6', text: '六级标题', icon: 'title' },
-          ]
-        }]
-      }
-    }));
-  }
-
   menuSelect(category, item) {
     if (category == 'action') {
-      if (item == 'collection') {
-        if (this.markdown.match(/@\(.*\)\[.*\]/)) {
-          this.showToast('已经有分类啦！');
-        } else {
-          this.markdown = '@(笔记)[]\n' + this.markdown;
-        }
-      } else if (item == 'table') {
-        this.$.textarea.insertLine('', `\n|  header   | header  |
+      // if (item == 'collection') {
+      //   if (this.markdown.match(/@\(.*\)\[.*\]/)) {
+      //     this.showToast('已经有分类啦！');
+      //   } else {
+      //     this.markdown = '@(笔记)[]\n' + this.markdown;
+      //   }
+      // } else
+      if (item == 'table') {
+        this.$.textarea.insert('\n|  header', `  |  header  |
 |  :----:  | : ----:  |
 | cell1  | cell2 |
-| cell3  | cell4 |\n`);
+| cell3  | cell4 |`);
       } else if (item == 'code') {
-        this.$.textarea.insertLine('', '\n```c\nhelloworld();\n```\n');
+        this.$.textarea.insert('\n```c\nhelloworld();', '\n```');
       } else if (item == 'formula') {
-        this.$.textarea.insertLine('', '\n$$E=mc^2$$\n');
+        this.$.textarea.insert('\n$$E=mc^2', '$$');
       } else if (item == 'toc') {
-        this.$.textarea.insertLine('', '\n[toc]\n');
+        this.$.textarea.insert('\n[toc]', '');
       } else if (item == 'quote') {
-        this.$.textarea.insertLine('', "\n> I thought what I'd do was, I'd pretend I was one of those deaf-mutes.\n");
+        this.$.textarea.insert('\n> I thought what I\'d do was, I\'d pretend I was one of those deaf-mutes.', "");
       } else if (item == 'ref') {
         this.$.textarea.insert('', '[^1]');
-        this.$.textarea.insertLine('', "\n\n[^1]: Blablabla... \n");
+        this.$.textarea.insertLine('', "\n[^1]: Blablabla...");
       } else if (item == 'ul') {
-        this.$.textarea.insertLine('', '\n- item1\n- item2\n- item3\n');
+        this.$.textarea.insert('\n- item1\n- item2\n- item3');
       } else if (item == 'ol') {
-        this.$.textarea.insertLine('', '\n1. item1\n2. item2\n3. item3\n');
-      } else if (item == 'heading') {
-        this.headingMenu();
+        this.$.textarea.insert('\n1. item1\n2. item2\n3. item3');
       } else if (item.indexOf('heading-') > -1) {
-        this.$.textarea.insertLine('',
-          `\n${'#'.repeat(item.replace('heading-', ''))} 标题\n`
-        );
-        this.mainMenu();
+        this.$.textarea.insert(`\n${'#'.repeat(item.replace('heading-', ''))} 标题`);
       }
     } else if (category == 'format') {
       if (item == 'strong') {
@@ -419,8 +414,19 @@ class KlogEditor extends PolymerElement {
       } else if (item == 'inlineformula') {
         this.$.textarea.autoPack('$');
       }
+    } else if (category == 'edit') {
+      if (item == 'save') {
+        this.$.header.publish();
+      } else if (item == 'upload') {
+        this.$.header.upload();
+      } else if (item == 'collection') {
+        this.$.header.publish();
+      } else if (item == 'settings') {
+        this.$.header.$.infoformButton.click();
+      }
     }
   }
+
   ready() {
     super.ready();
     // init floating toolbar
@@ -438,7 +444,7 @@ class KlogEditor extends PolymerElement {
     this.$.header.$.backdrop = this.$.backdrop;
     this.$.infoform.$.header = this.$.header;
     // activate the leancloud server
-    AV.Cloud.run('warmup').then(function (data) {
+    AV.Cloud.run('warmup').then(function(data) {
       console.log(data);
     });
     //event
@@ -447,8 +453,7 @@ class KlogEditor extends PolymerElement {
       const position = e.detail.caretPosition;
       const lineHeight = e.detail.lineHeight;
       this.updateFloatingToolbar(
-        (selection[0] != selection[1]) && !this.mobile,
-        [position.x, position.y - lineHeight * 0.5]
+        (selection[0] != selection[1]) && !this.mobile, [position.x, position.y - lineHeight * 0.5]
       );
     });
     this.$.textarea.addEventListener('scroll', (e) => {
@@ -623,8 +628,7 @@ class KlogEditor extends PolymerElement {
       this.showToast('没有权限, 你只能编辑自己的文章哦');
     } else if (err.code == 404) {
       this.showToast('无法保存, 请备份后新建文章');
-    } else if (err.message == '' && !err.code) {
-    } else {
+    } else if (err.message == '' && !err.code) {} else {
       this.showToast('保存失败, 请备份文章后再试一次');
       console.log(this.err);
     }

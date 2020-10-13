@@ -2,7 +2,7 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 
 class KlogBackdrop extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;

@@ -6,7 +6,7 @@ import './klog-icons.js';
 
 class KlogMenu extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-scrollbar"></style>
     <style>
       :host {
@@ -116,6 +116,18 @@ class KlogMenu extends PolymerElement {
       .item.secondary iron-icon {
         opacity: 0.6;
       }
+
+
+      @media (min-width: 1025px) {
+        .item.mobile {
+          display: none!important;
+        }
+      }
+      @media (max-width: 1024px) {
+        .item.desktop {
+          display: none!important;
+        }
+      }
     </style>
     <iron-selector id="itemsSelector" attr-for-selected="name" selected="{{itemsSelected}}" on-iron-select="itemsSelect">
       <div name="idle" id="idle"></div>
@@ -192,6 +204,12 @@ class KlogMenu extends PolymerElement {
           hasRaised = true;
           className += ' raised';
         }
+        if (item.desktop) {
+          className += ' desktop';
+        }
+        if (item.mobile) {
+          className += ' mobile';
+        }
         menu.push({
           item: true,
           name: item.name,
@@ -224,8 +242,7 @@ class KlogMenu extends PolymerElement {
     const name = item.getAttribute('name');
     const path = item.getAttribute('path');
     const selectable = item.getAttribute('selectable');
-    if (name == 'idle') { return; }
-    else { this.$.itemsSelector.selected = 'idle'; }
+    if (name == 'idle') { return; } else { this.$.itemsSelector.selected = 'idle'; }
     const category = item.getAttribute('category');
     if (category && name) {
       if (path) {

@@ -4,7 +4,7 @@ import '../data/klog-data-uploader.js';
 
 class KlogEditorTextarea extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;
@@ -175,9 +175,9 @@ class KlogEditorTextarea extends PolymerElement {
   }
 
   unload() {
-    clearInterval(this._interval);
-  }
-  //editor function
+      clearInterval(this._interval);
+    }
+    //editor function
 
   keydown(e) {
     //console.log(e, e.keyCode);
@@ -310,9 +310,9 @@ class KlogEditorTextarea extends PolymerElement {
     let [value, input, currentLineStart, currentLineEnd] = [this.value, this._input, this.currentLineStart, this.currentLineEnd];
     this.value = value.substr(0, currentLineStart) + before + value.substr(currentLineStart, currentLineEnd - currentLineStart) + after + value.substr(currentLineEnd);
     if (before) {
-      this._setSelection(currentLineStart + (before.split('\n').length - 1));
+      this._setSelection(currentLineStart + (before.split('\n').length - 2));
     } else {
-      this._setSelection(currentLineEnd + (after.split('\n').length - 1));
+      this._setSelection(currentLineEnd + (after.split('\n').length - 2));
     }
     this._fireInput();
   }
@@ -383,7 +383,9 @@ class KlogEditorTextarea extends PolymerElement {
     anchor.parentNode.removeChild(anchor);
     // kick
     this.dispatchEvent(new CustomEvent('klog-editor-input', {
-      bubbles: true, composed: true, detail: {
+      bubbles: true,
+      composed: true,
+      detail: {
         currentLine: this.currentLine,
         currentLineNumber: this.currentLineNumber,
         currentToken: this.currentToken,

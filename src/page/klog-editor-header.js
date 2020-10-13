@@ -10,7 +10,7 @@ import '../style/klog-style-dialog.js';
 
 class KlogEditorHeader extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-dialog"></style>
     <style>
@@ -65,24 +65,34 @@ class KlogEditorHeader extends PolymerElement {
         flex: 1;
       }
 
-      @media (min-width: 768px) {
-        [mobile] {
-          display: none;
+      @media (min-width: 1025px) {
+        [hidden-on-desktop] {
+          display: none!important;
+        }
+      }
+      @media (min-width: 769px) and (max-width: 1023px) {
+        [hidden-on-tablet] {
+          display: none!important;
+        }
+      }
+      @media (max-width: 768px) {
+        [hidden-on-hidden-on-desktop hidden-on-tablet] {
+          display: none!important;
         }
       }
     </style>
     <app-toolbar>
-      <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden\$="{{!mobile}}"></paper-icon-button>
       <paper-icon-button icon="arrow_back" on-click="back"></paper-icon-button>
       <div class="divider"></div>
-      <paper-toggle-button checked="{{preview}}" mobile=""></paper-toggle-button>
-      <paper-icon-button for="infoform" icon="highlight" on-click="activeFront" hidden=""></paper-icon-button>
-      <paper-icon-button for="infoform" icon="settings" on-click="activeFront">
+      <paper-toggle-button checked="{{preview}}" hidden-on-desktop hidden-on-tablet></paper-toggle-button>
+      <paper-icon-button icon="more_vert" on-click="openKlogDrawer" hidden-on-desktop></paper-icon-button>
+      <paper-icon-button for="infoform" icon="highlight" on-click="activeFront" hidden="" id="infoformButton"></paper-icon-button>
+      <paper-icon-button for="infoform" icon="settings" on-click="activeFront" hidden-on-desktop>
       </paper-icon-button>
-      <paper-icon-button for="uploadzone" icon="insert_drive_file" on-click="upload"></paper-icon-button>
+      <paper-icon-button for="uploadzone" icon="insert_drive_file" on-click="upload" hidden-on-desktop></paper-icon-button>
       <paper-icon-button for="browser" icon="book" on-click="activeFront" disabled="{{loading}}" hidden="">
       </paper-icon-button>
-      <paper-button raised="" id="saveButton" on-click="publish" disabled="{{loading}}">
+      <paper-button raised="" id="saveButton" on-click="publish" disabled="{{loading}}" hidden-on-desktop>
         <iron-icon icon="publish"></iron-icon>保存
       </paper-button>
       <paper-progress indeterminate="" disabled="{{!loading}}"></paper-progress>

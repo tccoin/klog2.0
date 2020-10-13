@@ -340,7 +340,8 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
       .klog-article-content .breadcrumbs {
         white-space: nowrap;
         overflow: hidden;
-        font-size: 12px;
+        font-size: 14px;
+        margin-bottom: 14px;
         text-overflow: ellipsis;
         cursor: default;
         user-select: none;

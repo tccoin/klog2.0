@@ -55,7 +55,7 @@ containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
       klog-pages.backdrop-front {
         width: 100%;
         max-width: 1280px;
-        height: calc(var(--klog-layout-page-height) - 64px);
+        height: calc(var(--klog-layout-page-height) - var(--klog-backdrop-default-front-top));
         margin: auto;
         border-radius: 12px 12px 0 0;
         overflow: hidden;
@@ -138,6 +138,33 @@ containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
       :host([exit]) .backdrop-front {
         opacity: 0;
         transform: translateY(5vh);
+      }
+
+      :host,
+      klog-backdrop {
+        --klog-backdrop-default-front-top: 64px;
+      }
+      @media (min-width: 1025px) {
+        :host,
+        klog-backdrop {
+          --klog-backdrop-default-front-top: 16px;
+        }
+      }
+
+      @media (min-width: 1025px) {
+        [hidden-on-desktop] {
+          display: none!important;
+        }
+      }
+      @media (min-width: 769px) and (max-width: 1023px) {
+        [hidden-on-tablet] {
+          display: none!important;
+        }
+      }
+      @media (max-width: 768px) {
+        [hidden-on-hidden-on-desktop hidden-on-tablet] {
+          display: none!important;
+        }
       }
     </style>
   </template>

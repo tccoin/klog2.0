@@ -14,7 +14,7 @@ import '../data/klog-data-collection.js';
 
 class KlogNote extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-dialog"></style>
     <style include="klog-style-note"></style>
@@ -24,7 +24,7 @@ class KlogNote extends PolymerElement {
     <app-route route="{{subroute1}}" pattern="/:share" data="{{shareData}}"></app-route>
     <klog-backdrop id="backdrop" class="layout" gesture-disabled="true" moving="{{moving}}" front-switch-disabled="">
       <app-toolbar class="backdrop-back-toolbar" slot="back" id="toolbar">
-        <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden\$="{{!mobile}}"></paper-icon-button>
+        <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden-on-desktop></paper-icon-button>
         <div class="title">
           <div main-title="">
             <iron-icon icon="klog"></iron-icon>
@@ -81,7 +81,7 @@ class KlogNote extends PolymerElement {
             '--klog-header-background': 'var(--klog-page-background)',
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
-          toolbar: html``
+          toolbar: html ``
         }
       },
     };
@@ -274,7 +274,9 @@ class KlogNote extends PolymerElement {
   add() {
     let collection = this.collection == 'all' ? '笔记' : this.collection;
     this.dispatchEvent(new CustomEvent('editor-open', {
-      bubbles: true, composed: true, detail: {
+      bubbles: true,
+      composed: true,
+      detail: {
         backTo: window.location.hash,
         preset: {
           markdown: '@(' + collection + ')[]',
