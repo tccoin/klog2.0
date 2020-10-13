@@ -17,7 +17,7 @@ import '../style/klog-style-layout.js';
 
 class KlogLayout extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-layout"></style>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-dialog"></style>
@@ -162,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.14.8<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.14.9<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -247,11 +247,13 @@ class KlogLayout extends PolymerElement {
     this.addEventListener('about-help', e => this.aboutHelp());
     this.addEventListener('about-log', e => this.aboutLog());
     this.addEventListener('require-update', e => {
+      let _e = e;
       this.$.page.addEventListener('iron-select', e => {
         let pageElement = this.$.page.querySelector(`[name = '${e.target.selected}']`);;
         if (pageElement && pageElement.refresh) {
           pageElement.refresh();
         }
+        if (_e.detail.callback) { _e.detail.callback(this.$); }
       }, { once: true });
     });
     this.addEventListener('after-selected', e => {
@@ -275,7 +277,8 @@ class KlogLayout extends PolymerElement {
     try {
       const oldPage = this.page;
       if (page != oldPage) {
-        const importPromise = import(`../page/klog-${page}.js`);
+        const importPromise =
+          import (`../page/klog-${page}.js`);
         if (!this.loading) {
           await this._unloadPage(oldPage);
           this.loading = true;
@@ -416,7 +419,7 @@ class KlogLayout extends PolymerElement {
           '--klog-header-height': '64px',
           '--klog-header-opacity': 1,
         },
-        toolbar: html``
+        toolbar: html ``
       };
       parent = defaultLayout;
     } else {
@@ -434,7 +437,7 @@ class KlogLayout extends PolymerElement {
     if (!layout) return {};
     layout = Object.assign({}, layout);
     for (let key in layout) {
-      if (typeof (layout[key]) == 'object' && 'mobile' in layout[key] && 'desktop' in layout[key]) {
+      if (typeof(layout[key]) == 'object' && 'mobile' in layout[key] && 'desktop' in layout[key]) {
         layout[key] = this.mobile ? layout[key].mobile : layout[key].desktop;
       }
     }
@@ -550,7 +553,7 @@ class KlogLayout extends PolymerElement {
       const buttons = this.$.header.querySelectorAll('[on-click]');
       for (let button of buttons) {
         const functionName = button.getAttribute('on-click');
-        if (typeof (pageElement[functionName]) == 'function') {
+        if (typeof(pageElement[functionName]) == 'function') {
           button.addEventListener('click', pageElement[functionName].bind(pageElement));
         } else {
           console.log(`Error when bind function ${functionName}`);
@@ -576,10 +579,7 @@ class KlogLayout extends PolymerElement {
       ]
     }];
     if (this.login) {
-      mainMenu[0].items.splice(2, 0,
-        { name: 'message', text: '通知', icon: 'notifications', path: 'message' },
-        { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' },
-      );
+      mainMenu[0].items.splice(2, 0, { name: 'message', text: '通知', icon: 'notifications', path: 'message' }, { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' }, );
     } else {
       let category = {
         name: 'user',
@@ -656,7 +656,9 @@ class KlogLayout extends PolymerElement {
 
   aboutUpdate() {
     this.dispatchEvent(new CustomEvent('update-service-worker', {
-      bubbles: true, composed: true, detail: {
+      bubbles: true,
+      composed: true,
+      detail: {
         callback: updateFound => {
           if (!updateFound) {
             this.showToast('Klog 已是最新版本');
@@ -693,9 +695,9 @@ class KlogLayout extends PolymerElement {
     const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
     // const documentHeight = this.$.page.querySelector(`[name = '${this.page}']`).clientHeight;
     // const windowHeight = scrollTarget.clientHeight;
-    const destinationOffset = typeof destination === 'number'
-      ? destination
-      : destination.getBoundingClientRect().top + target.scrollTop;
+    const destinationOffset = typeof destination === 'number' ?
+      destination :
+      destination.getBoundingClientRect().top + target.scrollTop;
     // const destinationOffsetToScroll = Math.round(documentHeight - destinationOffset < windowHeight ? documentHeight - windowHeight : destinationOffset);
     const destinationOffsetToScroll = destinationOffset;
     if ('requestAnimationFrame' in window === false) {

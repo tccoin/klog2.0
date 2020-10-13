@@ -11,7 +11,7 @@ import '../style/klog-style-toast.js';
 
 class KlogApp extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-toast"></style>
     <style>
       :host {
@@ -117,7 +117,8 @@ class KlogApp extends PolymerElement {
     this._loadingTimeout = setTimeout(() => {
       this.loadingTimeoutPrompt = true;
     }, 5000);
-    await import('./klog-layout.js');
+    await
+    import ('./klog-layout.js');
     this.loading = false;
     clearTimeout(this._loadingTimeout);
   }
@@ -135,8 +136,7 @@ class KlogApp extends PolymerElement {
     } catch (err) {
       if (err.message == '404') {
         window.location.hash = `#/404/`;
-      } else if (err.message == 'Loading interrupted' || err.message == 'Redirect') {
-      } else {
+      } else if (err.message == 'Loading interrupted' || err.message == 'Redirect') {} else {
         console.error(err);
       }
     }
@@ -149,7 +149,10 @@ class KlogApp extends PolymerElement {
   ready() {
     super.ready();
     this._loadLayout();
-    // event
+    this._initGlobalEvent();
+  }
+
+  _initGlobalEvent() {
     this.addEventListener('app-load', (e) => {
       if (e.detail.backTo != undefined) this._backTo = e.detail.backTo;
       if (e.detail.page) window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
@@ -157,6 +160,25 @@ class KlogApp extends PolymerElement {
     this.addEventListener('app-reload', (e) => this.reload());
     this.addEventListener('userinfo-updated', (e) => {
       this._updateUserinfo(e.detail.result);
+    });
+    this.addEventListener('timeline-set-filter', (e) => {
+      console.log(e);
+      const callback = (pages) => {
+        pages.timeline.$.keywordInput.value = e.detail.keyword;
+        pages.timeline.setFilter(e);
+      };
+      if (this.$.layout.$.page.selected == 'timeline') {
+        callback(this.$.layout.$);
+      }
+      this.$.layout.dispatchEvent(new CustomEvent('require-update', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          page: 'timeline',
+          callback: callback
+        }
+      }));
+      window.location.hash = '#/timeline';
     });
     this.addEventListener('user-login-page-open', (e) => {
       this.$.layout.$.login.continue = e.detail ? e.detail.continue : window.location.hash;
@@ -180,7 +202,7 @@ class KlogApp extends PolymerElement {
     this._notifyNetworkStatus();
     this.addEventListener('show-toast', e => this.showToast(e.detail.text, e.detail.link, e.detail.option));
     this.addEventListener('update-service-worker', (e) => {
-      let callback = e.detail && e.detail.callback ? e.detail.callback : function () { };
+      let callback = e.detail && e.detail.callback ? e.detail.callback : function() {};
       this._updateServiceWorker(callback);
     });
   }
@@ -202,7 +224,7 @@ class KlogApp extends PolymerElement {
   }
 
   _updateServiceWorker(callback) {
-    callback = callback || function () { };
+    callback = callback || function() {};
     if ('serviceWorker' in navigator) {
       if (this._swUpdateFound) {
         this._updateFound();
@@ -252,10 +274,10 @@ class KlogApp extends PolymerElement {
   }
 
   showToast(text, link, option = {}) {
-    const toast = document.createElement('paper-toast');
-    Object.assign(toast, { text: text, duration: 2000, withBackdrop: false }, option);
-    if (link) {
-      toast.innerHTML = `<a ${link.href ? `href="${link.href}"` : ''}>${link.title}</a>`;
+      const toast = document.createElement('paper-toast');
+      Object.assign(toast, { text: text, duration: 2000, withBackdrop: false }, option);
+      if (link) {
+        toast.innerHTML = `<a ${link.href ? `href="${link.href}"` : ''}>${link.title}</a>`;
       toast.querySelector('a').addEventListener('click', e => link.onclick(e));
     }
     this.shadowRoot.append(toast);

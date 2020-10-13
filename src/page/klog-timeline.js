@@ -15,14 +15,14 @@ import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
 class KlogTimeline extends PolymerElement {
   static get template() {
-    return html`
+    return html `
       ${this.styleTemplate}
       ${this.contentTemplate}
     `;
   }
 
   static get styleTemplate() {
-    return html`
+    return html `
     <style include="klog-style-layout"></style>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-timeline"></style>
@@ -30,7 +30,7 @@ class KlogTimeline extends PolymerElement {
   }
 
   static get contentTemplate() {
-    return html`
+    return html `
     <klog-data-timeline id="data" last-response="{{list}}"></klog-data-timeline>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
@@ -112,7 +112,7 @@ class KlogTimeline extends PolymerElement {
             '--klog-header-background': { mobile: 'var(--primary-background-color)', desktop: 'transparent' },
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
-          toolbar: html`
+          toolbar: html `
               <app-toolbar>
                 <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                 <div class="title" on-click="refresh">
@@ -267,8 +267,7 @@ class KlogTimeline extends PolymerElement {
         let progress = Math.max(0, Math.min(1, (this.$.filter.offsetTop + this.$.filter.offsetHeight - y - 32) / 32));
         this.$.filter.style.transform = `scale(${0.95 + progress * 0.05})`;
         this.$.filter.style.opacity = progress;
-      }
-      else {
+      } else {
         this.$.filter.style.transform = `scale(1)`;
         this.$.filter.style.opacity = 1;
       }
@@ -306,29 +305,29 @@ class KlogTimeline extends PolymerElement {
     };
   }
 
+
   setFilter(e) {
-    if (e.target.tagName == 'KLOG-CHIP') {
-      const filterName = e.target.getAttribute('name');
-      // view
-      const newView =  this.filterPreset[filterName].view || 'default';
-      // keyword
-      let newKeyword;
-      if (filterName == 'search') {
-        this.$.keywordInput.focus();
-        newKeyword = this.$.keywordInput.value;
-      } else {
-        newKeyword = this.filterPreset[filterName].keyword || '';
-      }
-      // duplicated
-      if(this.view == newView&&this.keyword==newKeyword&&this.filterName==filterName){
-        return;
-      }
-      this.view = newView;
-      this.keyword = newKeyword;
-      this.updateTimeline(false, true);
-      this.updateView();
-      this.filterName = filterName;
+    if (!e.detail.filterName && e.target.tagName != 'KLOG-CHIP') { return; }
+    const filterName = e.detail.filterName || e.target.getAttribute('name');
+    // view
+    const newView = this.filterPreset[filterName].view || 'default';
+    // keyword
+    let newKeyword;
+    if (filterName == 'search') {
+      this.$.keywordInput.focus();
+      newKeyword = this.$.keywordInput.value;
+    } else {
+      newKeyword = this.filterPreset[filterName].keyword || '';
     }
+    // duplicated
+    if (this.view == newView && this.keyword == newKeyword && this.filterName == filterName) {
+      return;
+    }
+    this.view = newView;
+    this.keyword = newKeyword;
+    this.updateTimeline(false, true);
+    this.updateView();
+    this.filterName = filterName;
   }
 
   updateView(e) {
@@ -360,7 +359,7 @@ class KlogTimeline extends PolymerElement {
     this._pageScrollHandler = e => {
       let y = this.$.scrollTarget.scrollTop;
       let wh = window.innerHeight; // container height
-      let eh = this.scrollHeight;  // element height
+      let eh = this.scrollHeight; // element height
       if (y + wh * 1.4 >= eh) {
         this._loadNextPage();
       }
@@ -400,7 +399,7 @@ class KlogTimeline extends PolymerElement {
         let hasKeyword = false;
         for (let attr of attrs) {
           if (x[attr]) {
-            let value = typeof (x[attr]) == 'string' ? x[attr] : x[attr].toString();
+            let value = typeof(x[attr]) == 'string' ? x[attr] : x[attr].toString();
             hasKeyword |= value.indexOf(this.keyword) > -1
           }
         }
@@ -419,7 +418,9 @@ class KlogTimeline extends PolymerElement {
 
   add() {
     this.dispatchEvent(new CustomEvent('editor-open', {
-      bubbles: true, composed: true, detail: {
+      bubbles: true,
+      composed: true,
+      detail: {
         backTo: window.location.hash,
         preset: {
           markdown: '@(日常)[]',

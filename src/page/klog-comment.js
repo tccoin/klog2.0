@@ -7,7 +7,7 @@ import './klog-editor-textarea.js';
 
 class KlogComment extends KlogDataCommentMixin(PolymerElement) {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-author"></style>
     ${this.styleTemplate}
     <klog-data-comment id="data"></klog-data-comment>
@@ -17,7 +17,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
   }
 
   static get styleTemplate() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;
@@ -141,7 +141,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
   }
 
   static get inputTemplate() {
-    return html`
+    return html `
     <div class="klog-author input-container">
       <klog-image class="author-avatar" src="{{_userAvatarUrl}}" avatar></klog-image>
       <div class="text">
@@ -344,7 +344,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
     let commentId = this._getCommentData(e.target).objectId;
     this.showToast('确定要删除这条评论吗？', {
       title: '确认删除',
-      onclick: async () => {
+      onclick: async() => {
         await this.deleteComment(commentId);
         await this.refresh();
         this.showToast('评论已删除');

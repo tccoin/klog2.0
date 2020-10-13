@@ -27,6 +27,16 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       max-width: calc(70 * var(--klog-markdown-font-size) + 32px);
     }
 
+    .article-category .article-collection,
+    .article-category .article-tag {
+      cursor: pointer;
+    }
+
+    .article-category .article-collection:hover,
+    .article-category .article-tag:hover {
+      text-decoration: underline;
+    }
+
     .klog-author .author-avatar,
     .klog-author .author-name{
       cursor: pointer;

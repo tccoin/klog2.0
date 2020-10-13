@@ -15,7 +15,7 @@ import './klog-comment.js';
 
 class KlogArticle extends PolymerElement {
   static get template() {
-    return html`
+    return html `
 <style include="klog-style-article"></style>
 <app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{_subroute}}"></app-route>
 <app-route route="{{_subroute}}" pattern="/:share" data="{{shareData}}"></app-route>
@@ -25,7 +25,7 @@ class KlogArticle extends PolymerElement {
 <div class="article-container" id="content">
   <div class="section">
     <!--article header-->
-    <div class="article-category" hidden="{{!article.title}}">
+    <div class="article-category" hidden="{{!article.title}}" on-click="_searchTimeline">
       <span class="article-collection">{{article.collection}}</span>
       <template is="dom-repeat" items="{{article.tags}}">
         <span class="article-tag">#{{item}}</span>
@@ -109,7 +109,7 @@ class KlogArticle extends PolymerElement {
           styles: {
             '--klog-header-background': { mobile: 'var(--klog-article-theme-color)', desktop: 'transparent' },
           },
-          toolbar: html`
+          toolbar: html `
             <app-toolbar>
               <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
               <div class="title">
@@ -222,7 +222,9 @@ class KlogArticle extends PolymerElement {
 
   edit() {
     this.dispatchEvent(new CustomEvent('editor-open', {
-      bubbles: true, composed: true, detail: {
+      bubbles: true,
+      composed: true,
+      detail: {
         articleId: this.article.objectId,
         backTo: window.location.hash
       }
@@ -251,6 +253,29 @@ class KlogArticle extends PolymerElement {
   updateImmersiveMode(immersive) {
     this.immersive = immersive;
     if (immersive) this.dispatchEvent(new CustomEvent('drawer-disable', { bubbles: true, composed: true }));
+  }
+
+  searchTimeline(keyword) {
+    this.dispatchEvent(new CustomEvent('timeline-set-filter', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        filterName: 'search',
+        keyword: keyword
+      }
+    }));
+  }
+
+  _searchTimeline(e) {
+    let keyword;
+    if (e.target.classList.contains('article-tag')) {
+      keyword = e.target.innerText.substr(1);
+    } else if (e.target.classList.contains('article-collection')) {
+      keyword = e.target.innerText;
+    }
+    if (keyword) {
+      this.searchTimeline(keyword);
+    }
   }
 }
 

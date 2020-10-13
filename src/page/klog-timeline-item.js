@@ -11,7 +11,7 @@ import '../ui/klog-render-timestamp.js';
 
 class KlogTimelineItem extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-card"></style>
     <style>
       :host {
@@ -46,6 +46,7 @@ class KlogTimelineItem extends PolymerElement {
         @apply --shadow-elevation-8dp;
       }
 
+      .card-subtitle .card-collection:hover,
       .card-meta .meta-title:hover {
         text-decoration: underline;
       }
@@ -111,7 +112,7 @@ class KlogTimelineItem extends PolymerElement {
 
         <!--title-->
         <div class="card-subtitle" hidden\$="{{!data.title}}">
-          {{data.collection}}
+          <span class="card-collection">{{data.collection}}</span>
           <div class="dot-divider" hidden$="{{!authorHidden}}"></div>
           <klog-render-timestamp time-stamp="{{data.date}}" hidden$="{{!authorHidden}}"></klog-render-timestamp>
         </div>
@@ -216,7 +217,10 @@ class KlogTimelineItem extends PolymerElement {
   read(e) {
     e.stopPropagation();
     e.preventDefault();
-    if (e.target.classList.contains('meta-avatar') || e.target.classList.contains('meta-title')) {
+    if (e.target.classList.contains('card-collection')) {
+      console.log(e.target.innerText);
+      this.searchTimeline(e.target.innerText);
+    } else if (e.target.classList.contains('meta-avatar') || e.target.classList.contains('meta-title')) {
       const page = 'zone/' + this.data.author.objectId;
       this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
     } else {
@@ -224,6 +228,17 @@ class KlogTimelineItem extends PolymerElement {
       const backTo = this.backTo || 'timeline';
       this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page, backTo } }));
     }
+  }
+
+  searchTimeline(keyword) {
+    this.dispatchEvent(new CustomEvent('timeline-set-filter', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        filterName: 'search',
+        keyword: keyword
+      }
+    }));
   }
 
   refresh() {
@@ -239,8 +254,8 @@ class KlogTimelineItem extends PolymerElement {
         // update styles
         promises.push(
           this._calculateAttachments()
-            .then(() => this._calculateCardStyle())
-            .then(() => this._updateActionsContainer())
+          .then(() => this._calculateCardStyle())
+          .then(() => this._updateActionsContainer())
         );
         // clamp
         let text = this.$.card.querySelector('#text');
@@ -325,7 +340,9 @@ class KlogTimelineItem extends PolymerElement {
         cover ? [4, 4] : [4, 4];
     }
     images[0].cover = cover;
-    let gallery = [[]];
+    let gallery = [
+      []
+    ];
     let number = 0;
     for (let image of images) {
       if (layout[0] == 0) {
