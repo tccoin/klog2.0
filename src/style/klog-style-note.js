@@ -162,7 +162,7 @@ containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
         }
       }
       @media (max-width: 768px) {
-        [hidden-on-hidden-on-desktop hidden-on-tablet] {
+        [hidden-on-mobile] {
           display: none!important;
         }
       }

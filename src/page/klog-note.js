@@ -24,14 +24,14 @@ class KlogNote extends PolymerElement {
     <app-route route="{{subroute1}}" pattern="/:share" data="{{shareData}}"></app-route>
     <klog-backdrop id="backdrop" class="layout" gesture-disabled="true" moving="{{moving}}" front-switch-disabled="">
       <app-toolbar class="backdrop-back-toolbar" slot="back" id="toolbar">
-        <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden-on-desktop></paper-icon-button>
+        <paper-icon-button icon="menu" on-click="openKlogDrawer"></paper-icon-button>
         <div class="title">
           <div main-title="">
             <iron-icon icon="klog"></iron-icon>
           </div>
         </div>
         <div class="divider"></div>
-        <paper-button on-click="add" hidden\$="{{!mobile}}">
+        <paper-button on-click="add" hidden-on-desktop>
           <iron-icon icon="note_add"></iron-icon>新建笔记
         </paper-button>
       </app-toolbar>
@@ -183,7 +183,7 @@ class KlogNote extends PolymerElement {
       let items = {
         name: 'collection',
         text: '笔记本',
-        items: [{ name: 'add', text: '新建笔记', icon: 'note_add', raised: true }]
+        items: [{ name: 'add', text: '新建笔记', icon: 'note_add', desktop: true, raised: true }]
       };
       for (let item of this.collections) {
         items.items.push({ name: item, text: item, icon: 'label' });
