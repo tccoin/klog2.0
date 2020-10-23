@@ -2,7 +2,7 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 
 class KlogImage extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;
@@ -55,7 +55,7 @@ class KlogImage extends PolymerElement {
         --klog-media-border-radius: 50%;
       }
     </style>
-    <!-- {{_placeholderData.stats.entropy}} -->
+    <!-- {{mediaInfo.stats.entropy}} -->
     <img id="img" src="{{_src}}">
     <div id="bg"></div>
 `;
@@ -170,6 +170,7 @@ class KlogImage extends PolymerElement {
     setTimeout(() => {
       this.lazy = false;
       this.load()();
+      this.dispatchEvent(new CustomEvent('media-loading', { bubbles: true, composed: true }));
     }, 1);
   }
 
@@ -244,15 +245,16 @@ class KlogImage extends PolymerElement {
     this.placeHolderPromise = new Promise(resolve => {
       req.addEventListener('load', () => {
         try {
-          this._placeholderData = JSON.parse(req.response);
+          this.mediaInfo = JSON.parse(req.response);
         } catch (error) {
           console.log('placeholder error: ', url);
         }
-        this.savePlaceholderData(url, this._placeholderData);
+        this.savePlaceholderData(url, this.mediaInfo);
         if (!headless) {
           this.updatePlaceholder();
         }
-        setTimeout(() => resolve(this._placeholderData), 1);
+        this.dispatchEvent(new CustomEvent('media-info-updated', { bubbles: true, composed: true, detail: { mediaInfo: this.mediaInfo } }));
+        setTimeout(() => resolve(this.mediaInfo), 1);
       });
       req.open('get', url, true);
       req.send();
@@ -268,7 +270,7 @@ class KlogImage extends PolymerElement {
   }
 
   updatePlaceholder() {
-    let data = this._placeholderData;
+    let data = this.mediaInfo;
     if (!this.fixed) {
       let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
       let maxWidth = parseInt(mediaWidth);

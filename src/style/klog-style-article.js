@@ -205,7 +205,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       }
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 769px) {
       klog-markdown {
         --klog-media-width: 739px;
 
@@ -252,7 +252,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       }
     }
 
-    @media (min-width: 768px) and (max-width: 1439px) {
+    @media (min-width: 769px) and (max-width: 1439px) {
       :host {
         --klog-markdown-font-size: 16px;
         --klog-markdown-line-height: 1.8;

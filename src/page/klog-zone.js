@@ -17,21 +17,38 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     return html `
     <style include="klog-style-card"></style>
     <style>
-    .info-container{
-      width: 300px;
-      padding: 0 16px;
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      .info-container{
+        width: 300px;
+        padding: 0 16px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+      }
+      :host([mobile]) .info-container{
+        width: 100vw;
+        height: auto;
+        position: relative;
+        bottom: auto;
+      }
+      .info-container::after {
+        @apply --overlay-style;
+        z-index: -2;
+        background: var(--klog-header-background);
+        transition: all .25s ease;
+        filter: blur(15px);
+        background-size: cover;
+        background-position: center center;
+        transform: scale(1.3);
+        opacity: 1;
     }
-    :host([mobile]) .info-container{
-      width: 100vw;
-      height: auto;
-      position: relative;
-      bottom: auto;
+    .info-container::before {
+      @apply --overlay-style;
+      z-index: -1;
+      background: var(--primary-background-color);
+      opacity: 0.7;
     }
-    .main-container{
+      .main-container{
       padding-left:300px;
     }
     :host([mobile]) .main-container{
@@ -39,20 +56,24 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       padding-top: 24px;
     }
     .info-container paper-button{
-      width: 100%;
+      width: calc(100% - 8px);
       font-size: 15px;
       color: var(--secondary-text-color);
-      background: var(--secondary-background-color);
+    }
+    .info-container paper-button::after{
+      @apply --overlay-style;
+      background: var(--primary-text-color);
+      opacity:0.1;
     }
     .info-container paper-button iron-icon{
       padding-right: 8px;
     }
     .author-avatar{
-      width: 75px;
-      height: 75px;
+      width: 100px;
+      height: 100px;
       border-radius: 5px;
       --klog-media-border-radius: 5px;
-      margin: 64px 0 16px;
+      margin: 64px auto 16px;
       @apply --shadow-elevation-2dp;
     }
     .author-name{
@@ -62,10 +83,12 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       text-overflow: ellipsis;
       white-space: nowrap;
       max-width: 100%;
+      text-align: center;
     }
     .author-introduction{
       word-break: break-word;
       color: var(--secondary-text-color);
+      text-align: center;
     }
     :host([exit]) .info-container {
       transform: translateX(-5vh);
@@ -80,10 +103,10 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     <klog-data-list id="data" type="timeline" last-response="{{list}}" keyword="{{keyword}}" key="date"></klog-data-list>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="info-container klog-card" id="info">
-    <paper-button on-click="back"><iron-icon icon="arrow_back"></iron-icon>返回 Klog</paper-button>
-    <klog-image class="author-avatar" src="{{authorPublic.avatarUrl}}" avatar></klog-image>
-    <div class="author-name">{{authorPublic.displayName}}</div>
-    <div class="author-introduction">{{authorPublic.introduction}}</div>
+      <paper-button on-click="back"><iron-icon icon="arrow_back"></iron-icon>返回 Klog</paper-button>
+      <klog-image class="author-avatar" id="avatar" src="{{authorPublic.avatarUrl}}" theme="{{theme}}" lazy fixed avatar></klog-image>
+      <div class="author-name">{{authorPublic.displayName}}</div>
+      <div class="author-introduction">{{authorPublic.introduction}}</div>
     </div>
     <div class="main-container" id="container">
       <div class="filter-container item" id="filter" on-click="setFilter">
@@ -175,11 +198,28 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
   ready() {
     super.ready();
+
+    // avatar
+    this.$.avatar.addEventListener('media-info-updated', (e) => {
+      const mediaInfo = e.detail.mediaInfo.palette;
+      const color = this.theme == 'light' ? mediaInfo.LightVibrant.rgb : mediaInfo.DarkVibrant.rgb;
+      this.$.info.style.backgroundColor = `rgb(${color.join()})`;
+      this.$.avatar.lazyload();
+    });
+    this.$.avatar.addEventListener('media-loading', (e) => {
+      this.style.setProperty('--klog-header-background', `url('${this.$.avatar.$.img.src}')`);
+    });
+
+    // filter
     this.addEventListener('timeline-set-filter', (e) => {
       e.stopPropagation();
       this.$.keywordInput.value = e.detail.keyword;
       this.setFilter(e);
     });
+  }
+
+  unload() {
+    this.$.avatar.lazy = true;
   }
 
   async update(subroute) {

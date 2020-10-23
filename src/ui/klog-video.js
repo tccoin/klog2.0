@@ -3,7 +3,7 @@ import '@polymer/paper-ripple/paper-ripple.js';
 
 class KlogVideo extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;
@@ -213,7 +213,7 @@ class KlogVideo extends PolymerElement {
 
 
   updatePlaceholder() {
-    let data = this._placeholderData;
+    let data = this.mediaInfo;
     if (!this.fixed) {
       let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
       let maxWidth = parseInt(mediaWidth);

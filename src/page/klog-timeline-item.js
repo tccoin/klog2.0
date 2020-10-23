@@ -40,6 +40,7 @@ class KlogTimelineItem extends PolymerElement {
       .card {
         width: calc(100% - 16px);
         cursor: pointer;
+        transition: transform .05s ease, box-shadow .2s ease;
       }
 
       .card:hover {
@@ -82,6 +83,12 @@ class KlogTimelineItem extends PolymerElement {
         transform: scale(0);
         opacity: 0;
         width: 0;
+      }
+
+      @media (min-width: 769px) {
+        .card:active {
+          transform: scale(0.98);
+        }
       }
 
       @media (max-width: 632px) {

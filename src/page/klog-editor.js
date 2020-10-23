@@ -163,7 +163,7 @@ class KlogEditor extends PolymerElement {
           --klog-backdrop-default-front-top: 16px;
         }
       }
-      @media (min-width: 768px) {
+      @media (min-width: 769px) {
         :host {
           --klog-markdown-media: {
             width: fit-content;

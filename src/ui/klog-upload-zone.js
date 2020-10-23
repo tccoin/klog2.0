@@ -5,7 +5,7 @@ import '../data/klog-data-uploader.js';
 
 class KlogUploadZone extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;
@@ -58,7 +58,7 @@ class KlogUploadZone extends PolymerElement {
         opacity: 0;
       }
 
-      @media (min-width: 768px) {
+      @media (min-width: 769px) {
         .moblie-only {
           display: none;
         }

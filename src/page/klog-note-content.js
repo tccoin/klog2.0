@@ -10,7 +10,7 @@ import '../ui/klog-markdown.js';
 
 class KlogNoteContent extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-toolbar"></style>
     <style>
@@ -103,7 +103,7 @@ class KlogNoteContent extends PolymerElement {
         @apply(--shadow-elevation-2dp);
       }
 
-      @media (min-width: 768px) {
+      @media (min-width: 769px) {
         :host {
           --klog-markdown-media: {
             width: fit-content;
@@ -230,7 +230,9 @@ class KlogNoteContent extends PolymerElement {
 
   edit() {
     this.dispatchEvent(new CustomEvent('editor-open', {
-      bubbles: true, composed: true, detail: {
+      bubbles: true,
+      composed: true,
+      detail: {
         articleId: this.article.objectId,
         backTo: window.location.hash
       }

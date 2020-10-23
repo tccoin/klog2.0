@@ -120,7 +120,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
         display: none!important;
       }
 
-      @media (min-width: 768px) {
+      @media (min-width: 769px) {
         klog-markdown {
           --klog-media-width: 584px;
         }
