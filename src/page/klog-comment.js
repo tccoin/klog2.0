@@ -2,6 +2,7 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { KlogDataCommentMixin } from '../data/klog-data-comment-mixin.js';
 import '@polymer/paper-button/paper-button.js';
 import '../ui/klog-icons.js';
+import '../ui/klog-emoticon-selector.js';
 import '../style/klog-style-author.js';
 import './klog-editor-textarea.js';
 
@@ -56,8 +57,10 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
         background: none;
       }
 
-      #replyButton{
-       margin: 8px 0 -12px -12px;
+      .comment-actions{
+        display: flex;
+        align-items: center;
+        margin: 8px 0 -12px -12px;
       }
 
       .klog-author .author-info{
@@ -157,7 +160,12 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
         </div>
         <div class="comment-content" on-click="focus">
           <klog-editor-textarea id="input" placeholder="聊天鬼才你来啦！(＾o＾)ﾉ"></klog-editor-textarea>
-          <paper-button on-click="_submitComment" id="replyButton"><iron-icon icon="save_alt"></iron-icon>评论</paper-button>
+          <div class="comment-actions">
+            <klog-emoticon-selector>
+              <paper-icon-button icon="insert_emoticon"></paper-icon-button>
+            </klog-emoticon-selector>
+            <paper-button on-click="_submitComment" id="replyButton"><iron-icon icon="save_alt"></iron-icon>评论</paper-button>
+          </div>
         </div>
       </div>
     </div>`
@@ -232,6 +240,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
     super.ready();
     this.updateInput('create');
     this.$.input.addEventListener('input', () => this._checkUserLogin());
+    this.addEventListener('emoticon-select', e => this.$.input.insert(e.detail.emoticon));
   }
 
   lazyload() {

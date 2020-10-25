@@ -24,6 +24,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         left: 0;
         top: 0;
         bottom: 0;
+        border-radius: 0;
       }
       :host([mobile]) .info-container{
         width: 100vw;
@@ -41,59 +42,60 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         background-position: center center;
         transform: scale(1.3);
         opacity: 1;
-    }
-    .info-container::before {
-      @apply --overlay-style;
-      z-index: -1;
-      background: var(--primary-background-color);
-      opacity: 0.7;
-    }
-      .main-container{
-      padding-left:300px;
-    }
-    :host([mobile]) .main-container{
-      padding-left: 0;
-      padding-top: 24px;
-    }
-    .info-container paper-button{
-      width: calc(100% - 8px);
-      font-size: 15px;
-      color: var(--secondary-text-color);
-    }
-    .info-container paper-button::after{
-      @apply --overlay-style;
-      background: var(--primary-text-color);
-      opacity:0.1;
-    }
-    .info-container paper-button iron-icon{
-      padding-right: 8px;
-    }
-    .author-avatar{
-      width: 100px;
-      height: 100px;
-      border-radius: 5px;
-      --klog-media-border-radius: 5px;
-      margin: 64px auto 16px;
-      @apply --shadow-elevation-2dp;
-    }
-    .author-name{
-      margin: 16px auto 16px;
-      font-size: 1.4em;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 100%;
-      text-align: center;
-    }
-    .author-introduction{
-      word-break: break-word;
-      color: var(--secondary-text-color);
-      text-align: center;
-    }
-    :host([exit]) .info-container {
-      transform: translateX(-5vh);
-      opacity: 0;
-    }
+      }
+      .info-container::before {
+        @apply --overlay-style;
+        z-index: -1;
+        background: var(--primary-background-color);
+        opacity: 0.7;
+      }
+        .main-container{
+        padding-left:300px;
+      }
+      :host([mobile]) .main-container{
+        padding-left: 0;
+        padding-top: 24px;
+      }
+      .info-container paper-button{
+        width: calc(100% - 8px);
+        font-size: 15px;
+        color: var(--secondary-text-color);
+        overflow: hidden;
+      }
+      .info-container paper-button::after{
+        @apply --overlay-style;
+        background: var(--primary-text-color);
+        opacity:0.1;
+      }
+      .info-container paper-button iron-icon{
+        padding-right: 8px;
+      }
+      .author-avatar{
+        width: 100px;
+        height: 100px;
+        border-radius: 5px;
+        --klog-media-border-radius: 5px;
+        margin: 64px auto 16px;
+        @apply --shadow-elevation-2dp;
+      }
+      .author-name{
+        margin: 16px auto 16px;
+        font-size: 1.4em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+        text-align: center;
+      }
+      .author-introduction{
+        word-break: break-word;
+        color: var(--secondary-text-color);
+        text-align: center;
+      }
+      :host([exit]) .info-container {
+        transform: translateX(-5vh);
+        opacity: 0;
+      }
     </style>
     `;
   }

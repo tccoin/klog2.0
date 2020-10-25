@@ -6,7 +6,8 @@ containerKlogStyleScrollbar.innerHTML = `<dom-module id="klog-style-scrollbar">
       @media (min-width: 769px) {
 
         :host::-webkit-scrollbar,
-        ::-webkit-scrollbar {
+        ::-webkit-scrollbar,
+        .klog-scrollbar::-webkit-scrollbar {
           width: var(--scrollbar-width);
           height: var(--scrollbar-width);
         }
