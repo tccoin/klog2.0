@@ -234,7 +234,7 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
       }
 
       .klog-article-content .toc-container {
-        padding: 16px 8px 16px 16px;
+        padding: 16px;
         max-height: 33vh;
         overflow-y: auto;
       }
@@ -253,18 +253,10 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         margin: 0;
       }
 
-      .klog-article-content .toc>ol {
-        padding-left: 0;
-      }
-
       .klog-article-content .toc ol {
         counter-reset: section;
         list-style-type: none;
         margin: 0;
-      }
-
-      .klog-article-content .toc ol:after {
-        content: none;
       }
 
       .klog-article-content .toc li>span {
@@ -329,6 +321,10 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         bottom: 0;
         background-color: var(--border-color);
       }
+      .klog-article-content .toc ol>li>ol::after {
+        left: calc(var(--klog-markdown-font-size, 14px) / 4);
+      }
+
 
       /*subtitle style for pure-text list*/
       .klog-article-content li>[secondary] {

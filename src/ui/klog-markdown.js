@@ -14,7 +14,7 @@ import '../lib/clamp.js';
 import { getDefaultMarkdownPreference } from '../data/klog-data-preference.js';
 class KlogMarkdown extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-markdown"></style>
     <style include="han-style"></style>
@@ -139,32 +139,32 @@ class KlogMarkdown extends PolymerElement {
   }
 
   initRanderer() {
-    let renderer = new marked.Renderer();
+      let renderer = new marked.Renderer();
 
-    renderer.heading = (text, depth) => {
-      this._headingIndex += 1;
-      let id = 'heading-' + this.BKDRHash(this._headingIndex + '-' + depth + '-' + text);
-      let classList = '';
-      classList += this.preference.centeredHeading == 'true' ? 'centered-heading ' : '';
-      classList += this.preference.numberedHeading == 'true' ? 'numbered-heading ' : '';
-      classList = classList ? `class="${classList}" ` : '';
-      this._headings.push({ depth: depth, text: text, id: id });
-      let actions = '';
-      if (this.headingActions) {
-        const hash = 'id-' + id;
-        const button = `<paper-icon-button class="button" icon="link" for="${hash}" on-click="share"></paper-icon-button>`;
-        actions = `<div class="heading-actions">${button}</div>`;
-      }
-      return `<h${depth} ${classList} id="${id}" depth="${depth}">${text}${actions}</h${depth}>\n`;
-    };
+      renderer.heading = (text, depth) => {
+        this._headingIndex += 1;
+        let id = 'heading-' + this.BKDRHash(this._headingIndex + '-' + depth + '-' + text);
+        let classList = '';
+        classList += this.preference.centeredHeading == 'true' ? 'centered-heading ' : '';
+        classList += this.preference.numberedHeading == 'true' ? 'numbered-heading ' : '';
+        classList = classList ? `class="${classList}" ` : '';
+        this._headings.push({ depth: depth, text: text, id: id });
+        let actions = '';
+        if (this.headingActions) {
+          const hash = 'id-' + id;
+          const button = `<paper-icon-button class="button" icon="link" for="${hash}" on-click="share"></paper-icon-button>`;
+          actions = `<div class="heading-actions">${button}</div>`;
+        }
+        return `<h${depth} ${classList} id="${id}" depth="${depth}">${text}${actions}</h${depth}>\n`;
+      };
 
 
-    renderer.image = (href, text) => {
-      let mediaType = 'image';
-      if (href.match(/\.mp4$/i)) {
-        mediaType = 'video';
-      }
-      let out = `<klog-${mediaType}  content
+      renderer.image = (href, text) => {
+          let mediaType = 'image';
+          if (href.match(/\.mp4$/i)) {
+            mediaType = 'video';
+          }
+          let out = `<klog-${mediaType}  content
       ${(this.mobile || false) ? 'mobile' : ''}
       src="${href}"
       alt="${text}"
@@ -212,7 +212,7 @@ class KlogMarkdown extends PolymerElement {
       },
       parse: () => {
         this._hasToc = true;
-        return '<div class="toc"><div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><div class="toc-container"></div></div>'
+        return '<div class="toc"><div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><ol class="toc-container"></ol></div>'
       }
     };
 
