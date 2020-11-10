@@ -325,7 +325,6 @@ class KlogApp extends PolymerElement {
 
   _updateTheme(themeStrategy) {
     // 主题更新策略
-    console.log(themeStrategy);
     let theme = themeStrategy;
     if (themeStrategy == 'system') {
       if (window.matchMedia('(prefers-color-scheme)').media) {

@@ -246,6 +246,7 @@ class KlogLayout extends PolymerElement {
     this.addEventListener('drawer-toggle', e => this.$.drawer.open());
     this.addEventListener('about-help', e => this.aboutHelp());
     this.addEventListener('about-log', e => this.aboutLog());
+    this.addEventListener('page-scroll', e => this.scrollTo(e.detail.destination));
     this.addEventListener('page-set-top', () => {
       this.$.page.style.position = 'relative';
       this.$.page.style.zIndex = 101;
@@ -707,7 +708,7 @@ class KlogLayout extends PolymerElement {
       easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t },
     };
     const scrollTarget = this.$.scrollTarget;
-    const start = window.pageYOffset;
+    const start = scrollTarget.scrollTop;
     const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
     // const documentHeight = this.$.page.querySelector(`[name = '${this.page}']`).clientHeight;
     // const windowHeight = scrollTarget.clientHeight;
@@ -723,10 +724,10 @@ class KlogLayout extends PolymerElement {
       this._stopScroll = false;
       const scroll = () => {
         const now = 'now' in window.performance ? performance.now() : new Date().getTime();
-        const time = Math.min(1, ((now - startTime) / duration));
-        const timeFunction = easings[easing](time);
+        const progress = (now - startTime) / duration;
+        const timeFunction = easings[easing](Math.min(1, progress));
         scrollTarget.scrollTop = Math.ceil((timeFunction * (destinationOffsetToScroll - start)) + start);
-        if (window.pageYOffset === destinationOffsetToScroll || this._stopScroll) {
+        if (window.pageYOffset === destinationOffsetToScroll || this._stopScroll || progress >= 1) {
           this._stopScroll = false;
           scrollTarget.style.scrollBehavior = 'smooth';
           return;

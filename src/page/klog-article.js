@@ -54,11 +54,12 @@ class KlogArticle extends PolymerElement {
 <!--fab-->
 <div class="section fab-section">
   <div class="fab-container">
-    <klog-fab icon="edit" id="fab" class="edit-fab" label="编辑" on-click="edit" hidden="{{!isOwner}}" extended="{{fabExtended}}"></klog-fab>
+    <klog-fab icon="edit" id="fabEdit" label="编辑" on-click="edit" hidden="{{!isOwner}}" extended="{{fabExtended}}"></klog-fab>
+    <klog-fab icon="comment" id="fabComment" label="评论" on-click="_scrollToComment" hidden="{{isOwner}}" extended="{{fabExtended}}"></klog-fab>
   </div>
 </div>
 <!--comment-->
-<div class="comment-container">
+<div class="comment-container" id="commentContainer">
   <div class="section">
     <klog-comment id="comment" article-id="{{article.objectId}}" userinfo="{{userinfo}}" article-author-id="{{article.author.objectId}}" theme="{{theme}}" mobile="{{mobile}}" login="{{login}}"></klog-comment>
   </div>
@@ -160,12 +161,13 @@ class KlogArticle extends PolymerElement {
     this._scrollHandler = () => {
       let y = this.$.scrollTarget.scrollTop;
       this.fabExtended = !this.mobile;
+      let fab = this.isOwner ? this.$.fabEdit : this.$.fabComment;
       if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 <= window.innerHeight * 0.9) {
-        this.$.fab.style.position = 'absolute';
-        this.$.fab.style.bottom = `-${this.fabExtended ? 24 : 28}px`;
+        fab.style.position = 'absolute';
+        fab.style.bottom = `-${this.fabExtended ? 24 : 28}px`;
       } else {
-        this.$.fab.style.position = 'fixed';
-        this.$.fab.style.bottom = '10vh';
+        fab.style.position = 'fixed';
+        fab.style.bottom = '10vh';
       }
     };
     window.addEventListener('resize', this._scrollHandler);
@@ -276,6 +278,16 @@ class KlogArticle extends PolymerElement {
     if (keyword) {
       this.searchTimeline(keyword);
     }
+  }
+
+  _scrollToComment() {
+    this.dispatchEvent(new CustomEvent('page-scroll', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        destination: this.$.commentContainer.offsetTop
+      }
+    }));
   }
 }
 
