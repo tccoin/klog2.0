@@ -160,7 +160,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
         </div>
         <div class="comment-content" on-click="focus">
           <klog-editor-textarea id="input" placeholder="聊天鬼才你来啦！(＾o＾)ﾉ"></klog-editor-textarea>
-          <div class="comment-actions">
+          <div class="comment-actions" on-click="doNotFocus">
             <klog-emoticon-selector>
               <paper-icon-button icon="insert_emoticon"></paper-icon-button>
             </klog-emoticon-selector>
@@ -283,6 +283,10 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
 
   focus() {
     this.$.input.$.input.$.textarea.focus();
+  }
+
+  doNotFocus(e) {
+    e.stopPropagation();
   }
 
   _isAuthor(data) {
