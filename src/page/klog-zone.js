@@ -100,6 +100,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         word-break: break-word;
         color: var(--secondary-text-color);
         text-align: center;
+        margin-bottom: calc(var(--klog-card-padding) * 3);
       }
       :host([exit]) .info-container {
         transform: translateX(-5vh);
@@ -125,7 +126,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     <div class="main-container" id="container">
       <div id="pageHeader"></div>
       <klog-chip name="search" id="mobileSearchInput" icon="search" hidden="{{!mobile}}" checkmark-animation-disabled>
-        <input slot="expand-content" id="keywordInput">
+        <input slot="expand-content" id="keywordInputMobile">
         <paper-icon-button slot="expand-content" icon="close" on-click="_mobileSearchClose"></paper-icon-button>
       </klog-chip>
       <div class="filter-container item" id="filter" on-click="setFilter">

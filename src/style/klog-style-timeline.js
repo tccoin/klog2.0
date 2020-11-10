@@ -85,6 +85,7 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         background: none;
         border-bottom: 1px solid var(--primary-color);
         outline: none;
+        border-radius: 0;
       }
 
       klog-chip[name=search] {
@@ -94,8 +95,8 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
       klog-chip#mobileSearchInput{
         display: flex;
         margin: 0;
-        z-index: 100;
         position: fixed;
+        z-index: 101;
         top: 0;
         width: 100%;
         height: 64px;

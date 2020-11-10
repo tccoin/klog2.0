@@ -40,7 +40,7 @@ class KlogTimeline extends PolymerElement {
       </div>
       
       <klog-chip name="search" id="mobileSearchInput" icon="search" hidden="{{!mobile}}" checkmark-animation-disabled>
-        <input slot="expand-content" id="keywordInput">
+        <input slot="expand-content" id="keywordInputMobile" type="text">
         <paper-icon-button slot="expand-content" icon="close" on-click="_mobileSearchClose"></paper-icon-button>
       </klog-chip>
       <div class="filter-container item" id="filter" on-click="setFilter">
@@ -243,18 +243,21 @@ class KlogTimeline extends PolymerElement {
       }
     };
 
-    this.$.keywordInput.addEventListener('input', () => {
-      const cb = () => {
-        if (this.filterName == 'search') {
-          this.keyword = this.$.keywordInput.value;
-          this.updateTimeline(false, true);
+    for (let input of[this.$.keywordInput, this.$.keywordInputMobile]) {
+      input.addEventListener('input', () => {
+        const cb = () => {
+          if (this.filterName == 'search') {
+            this.keyword = input.value;
+            this.updateTimeline(false, true);
+          }
+        };
+        if (this._keywordInputTimeout) {
+          clearTimeout(this._keywordInputTimeout);
         }
-      };
-      if (this._keywordInputTimeout) {
-        clearTimeout(this._keywordInputTimeout);
-      }
-      this._keywordInputTimeout = setTimeout(cb, 1000);
-    });
+        this._keywordInputTimeout = setTimeout(cb, 1000);
+      });
+    }
+
   }
 
   menuSelect(category, item) {
@@ -323,6 +326,7 @@ class KlogTimeline extends PolymerElement {
   }
 
   _mobileSearch() {
+    this.dispatchEvent(new CustomEvent('page-set-top', { bubbles: true, composed: true }));
     this.setFilter({
       detail: {
         filterName: 'search'
@@ -331,6 +335,7 @@ class KlogTimeline extends PolymerElement {
   }
 
   _mobileSearchClose() {
+    this.dispatchEvent(new CustomEvent('page-unset-top', { bubbles: true, composed: true }));
     this.setFilter({
       detail: {
         filterName: 'default'
@@ -346,8 +351,9 @@ class KlogTimeline extends PolymerElement {
     // keyword
     let newKeyword;
     if (filterName == 'search') {
-      this.$.keywordInput.focus();
-      newKeyword = this.$.keywordInput.value;
+      let input = this.mobile ? this.$.keywordInputMobile : this.$.keywordInput;
+      this.$.keywordInputMobile.focus();
+      newKeyword = input.value;
     } else {
       newKeyword = this.filterPreset[filterName].keyword || '';
     }
