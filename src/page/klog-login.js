@@ -1,10 +1,9 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
-import '../lib/web-animations-next-lite.min.js';
-import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-item/paper-item.js';
+import '../ui/klog-menu-button.js';
 import '../ui/klog-icons.js';
 import '../style/klog-style-login.js';
 import '../ui/klog-input.js';
@@ -27,15 +26,15 @@ class KlogLogin extends PolymerElement {
         </klog-input>
       </div>
       <div class="actions">
-        <paper-icon-button id="go" icon="arrow_forward" on-click="login" primary=""></paper-icon-button>
-        <paper-menu-button>
+        <paper-icon-button id="go" icon="arrow_forward" on-click="login" primary></paper-icon-button>
+        <klog-menu-button>
           <paper-icon-button icon="more_horiz" slot="dropdown-trigger"></paper-icon-button>
-          <paper-listbox slot="dropdown-content">
-            <paper-item on-click="signup">注册</paper-item>
-            <paper-item on-click="resetPassword">重设密码</paper-item>
-            <paper-item on-click="anonymousLogin">匿名登录</paper-item>
+          <paper-listbox slot="dropdown-content" id="listbox" on-iron-select="_listboxSelect">
+            <paper-item>注册</paper-item>
+            <paper-item>重设密码</paper-item>
+            <paper-item>匿名登录</paper-item>
           </paper-listbox>
-        </paper-menu-button>
+        </klog-menu-button>
       </div>
     </div>
 `;
@@ -144,9 +143,8 @@ class KlogLogin extends PolymerElement {
       setTimeout(() => {
         this.continue = this.continue || '#/';
         window.location = '/#/';
-        setTimeout(() => window.location.reload(), 100);
         this.password = '';
-      }, 500);
+      }, 200);
     }, () => {
       this.title = 'error';
     });
@@ -165,6 +163,17 @@ class KlogLogin extends PolymerElement {
     for (let element of this.shadowRoot.querySelectorAll(`h1[name],h2[name]`)) {
       if (element.getAttribute('name') != title) element.classList.add('hidden')
     }
+  }
+
+  _listboxSelect() {
+    if (this.$.listbox.selected == 0) {
+      this.signup();
+    } else if (this.$.listbox.selected == 1) {
+      this.resetPassword();
+    } else if (this.$.listbox.selected == 2) {
+      this.anonymousLogin();
+    }
+    this.$.listbox.selected = null;
   }
 }
 

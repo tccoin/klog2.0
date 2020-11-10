@@ -1,7 +1,6 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
-import '@polymer/paper-menu-button/paper-menu-button.js';
-import '../lib/web-animations-next-lite.min.js';
+import '../ui/klog-menu-button.js';
 import '../style/klog-style-scrollbar.js';
 const KlogEmoticonSelector = document.createElement('template');
 
@@ -34,14 +33,14 @@ KlogEmoticonSelector.innerHTML = `<dom-module id="klog-emoticon-selector">
       }
     </style>
 
-    <paper-menu-button>
+    <klog-menu-button>
     <div slot="dropdown-trigger"><slot></slot></div>
     <div class="emoticon-container" slot="dropdown-content" on-click="_select">
       <template is="dom-repeat" items="{{emoticonList}}">
         <span class="emoticon-item">{{item}}</span>
       </template>
     </div>
-  </paper-menu-button>
+  </klog-menu-button>
 
   </template>
 

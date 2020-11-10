@@ -103,7 +103,7 @@ class KlogDropdownMenu extends PolymerElement {
         border-color: var(--primary-color);
       }
     </style>
-    <paper-dropdown-menu id="menu" label="{{label}}" vertical-align="{{verticalAlign}}" horizontal-align="{{horizontalAlign}}" vertical-offset="{{verticalOffset}}">
+    <paper-dropdown-menu no-animations id="menu" label="{{label}}" vertical-align="{{verticalAlign}}" horizontal-align="{{horizontalAlign}}" vertical-offset="{{verticalOffset}}">
       <div slot="dropdown-content">
         <slot id="content" name="dropdown-content" slot="dropdown-content"></slot>
       </div>

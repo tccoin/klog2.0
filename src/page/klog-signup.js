@@ -2,11 +2,10 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
-import '../lib/web-animations-next-lite.min.js';
-import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-dialog/paper-dialog.js';
+import '../ui/klog-menu-button.js';
 import '../ui/klog-icons.js';
 import '../style/klog-style-login.js';
 import '../style/klog-style-dialog.js';
@@ -46,12 +45,12 @@ class KlogSignup extends PolymerElement {
       </div>
       <div class="actions">
         <paper-icon-button id="go" icon="done" on-click="signup" primary=""></paper-icon-button>
-        <paper-menu-button>
+        <klog-menu-button>
           <paper-icon-button icon="more_horiz" slot="dropdown-trigger"></paper-icon-button>
-          <paper-listbox slot="dropdown-content">
-            <paper-item on-click="login">登录</paper-item>
+          <paper-listbox slot="dropdown-content" id="listbox" on-iron-select="_listboxSelect">
+            <paper-item>登录</paper-item>
           </paper-listbox>
-        </paper-menu-button>
+        </klog-menu-button>
       </div>
     </div>
 `;
@@ -143,8 +142,7 @@ class KlogSignup extends PolymerElement {
       this.title = 'success';
       setTimeout(() => {
         this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
-        setTimeout(() => window.location.reload(), 100);
-      }, 1500);
+      }, 1000);
     }, err => {
       window.err = err;
       console.log(err, err.code);
@@ -176,6 +174,13 @@ class KlogSignup extends PolymerElement {
     for (let element of this.shadowRoot.querySelectorAll(`h1[name],h2[name]`)) {
       if (element.getAttribute('name') != title) element.classList.add('hidden')
     }
+  }
+
+  _listboxSelect() {
+    if (this.$.listbox.selected == 0) {
+      this.login();
+    }
+    this.$.listbox.selected = null;
   }
 }
 
