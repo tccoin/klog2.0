@@ -127,7 +127,7 @@ class KlogImage extends PolymerElement {
   }
 
   srcChanged(src) {
-    if (!src) return;
+    if (!src || !src.match(/^(http|https):\/\//)) return;
     this._initQueue();
     // process url
     let oriSrc = src;
