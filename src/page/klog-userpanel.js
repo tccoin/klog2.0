@@ -23,7 +23,7 @@ import '../ui/klog-dropdown-menu.js';
 
 class KlogUserpanel extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-card"></style>
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-dialog"></style>
@@ -226,7 +226,7 @@ class KlogUserpanel extends PolymerElement {
               { name: 'logout', text: '注销', icon: 'power_settings_new' }
             ]
           }],
-          toolbar: html`
+          toolbar: html `
             <app-toolbar>
               <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                 <div class="title">
@@ -293,13 +293,8 @@ class KlogUserpanel extends PolymerElement {
 
   logout() {
     this.userinfo.klogUser.logout();
-    this.dispatchEvent(new CustomEvent('user-login-page-open', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        continue: '#/timeline/'
-      }
-    }));
+    window.location = '/#/';
+    setTimeout(() => window.location.reload(), 100);
   }
 
   newArticle() {

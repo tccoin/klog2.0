@@ -4,7 +4,7 @@ import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
 
 class KlogDropdownMenu extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;

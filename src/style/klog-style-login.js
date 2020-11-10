@@ -36,6 +36,7 @@ containerKlogStyleLogin.innerHTML = `<dom-module id="klog-style-login">
         white-space: nowrap;
         user-select: none;
         -webkit-user-select: none;
+        overflow: hidden;
       }
 
       .titles a {

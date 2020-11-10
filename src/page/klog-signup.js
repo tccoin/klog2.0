@@ -14,7 +14,7 @@ import '../ui/klog-input.js';
 
 class KlogSignup extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-login"></style>
     <style include="klog-style-dialog"></style>
     <paper-dialog id="dialog" with-backdrop="">
@@ -90,7 +90,7 @@ class KlogSignup extends PolymerElement {
           styles: {
             '--klog-layout-background': 'var(--primary-background-color)',
           },
-          toolbar: html`
+          toolbar: html `
               <app-toolbar>
                 <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                 <div class="title">
@@ -111,7 +111,7 @@ class KlogSignup extends PolymerElement {
     this.$.passwordInput.addEventListener('keyup', (e) => {
       if (e.keyCode == 13) this.login();
     });
-    this.$.go.addEventListener('mousedown', function () {
+    this.$.go.addEventListener('mousedown', function() {
       this.shadowRoot.querySelector('#ink').classList.remove('circle');
     });
     this.$.dialog.addEventListener('opened-changed', e => {
@@ -143,6 +143,7 @@ class KlogSignup extends PolymerElement {
       this.title = 'success';
       setTimeout(() => {
         this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
+        setTimeout(() => window.location.reload(), 100);
       }, 1500);
     }, err => {
       window.err = err;

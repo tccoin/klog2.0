@@ -11,7 +11,7 @@ import '../ui/klog-input.js';
 
 class KlogLogin extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-login"></style>
     <app-localstorage-document key="email" data="{{email}}"></app-localstorage-document>
     <div class="login-card">
@@ -72,7 +72,7 @@ class KlogLogin extends PolymerElement {
           styles: {
             '--klog-layout-background': 'var(--primary-background-color)',
           },
-          toolbar: html`
+          toolbar: html `
               <app-toolbar>
                 <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                 <div class="title">
@@ -93,7 +93,7 @@ class KlogLogin extends PolymerElement {
     this.$.passwordInput.addEventListener('keyup', (e) => {
       if (e.keyCode == 13) this.login();
     });
-    this.$.go.addEventListener('mousedown', function () {
+    this.$.go.addEventListener('mousedown', function() {
       this.shadowRoot.querySelector('#ink').classList.remove('circle');
     });
   }
@@ -112,16 +112,16 @@ class KlogLogin extends PolymerElement {
     this.login();
   }
 
-  async resetPassword(){
-    if(this.email!=''){
-      try{
+  async resetPassword() {
+    if (this.email != '') {
+      try {
         await this.user.resetPassword(this.email);
-      }catch(err){
+      } catch (err) {
         this.showToast('请检查你输入的邮箱地址');
         return;
       }
       this.showToast('密码重设邮件已发送到你的邮箱');
-    }else{
+    } else {
       this.showToast('请填写注册时使用的邮箱地址');
     }
   }
@@ -143,9 +143,10 @@ class KlogLogin extends PolymerElement {
       this.title = 'success';
       setTimeout(() => {
         this.continue = this.continue || '#/';
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
+        window.location = '/#/';
+        setTimeout(() => window.location.reload(), 100);
         this.password = '';
-      }, 1500);
+      }, 500);
     }, () => {
       this.title = 'error';
     });

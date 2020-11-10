@@ -176,7 +176,6 @@ class KlogDataUser extends PolymerElement {
   logout() {
     AV.User.logOut();
     this.user = AV.User.current();
-    this.dispatchEvent(new CustomEvent('app-reload', { bubbles: true, composed: true }));
   }
 
 }
