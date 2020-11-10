@@ -76,7 +76,7 @@ class KlogEditorHeader extends PolymerElement {
         }
       }
       @media (max-width: 768px) {
-        [hidden-on-hidden-on-desktop hidden-on-tablet] {
+        [hidden-on-mobile] {
           display: none!important;
         }
       }

@@ -162,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.14.12<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.14.13<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -574,22 +574,30 @@ class KlogLayout extends PolymerElement {
       style: 'color:var(--primary-text-color)',
       items: [
         { name: 'timeline', text: '时间轴', icon: 'timeline', path: 'timeline' },
-        { name: 'note', text: '笔记', icon: 'book', path: 'note/all/' },
-        { name: 'console', text: '控制台', icon: 'console' }
+        { name: 'note', text: '笔记', icon: 'book', path: 'note/all/' }
       ]
     }];
     if (this.login) {
-      mainMenu[0].items.splice(2, 0, { name: 'message', text: '通知', icon: 'notifications', path: 'message' }, { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' }, );
-    } else {
-      let category = {
+      mainMenu.push({
         name: 'user',
-        text: '',
+        text: '用户',
+        items: [
+          { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' },
+          { name: 'message', text: '通知', icon: 'notifications', path: 'message' },
+          { name: 'console', text: '控制台', icon: 'console' }
+        ]
+      });
+      // mainMenu[0].items.splice(2, 0, { name: 'message', text: '通知', icon: 'notifications', path: 'message' }, { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' }, );
+    } else {
+      mainMenu.push({
+        name: 'user',
+        text: '用户',
         items: [
           { name: 'login', text: '登录', icon: 'account_circle', path: 'login', raised: true },
-          { name: 'signup', text: '注册', icon: 'account_box', path: 'signup' }
+          { name: 'signup', text: '注册', icon: 'account_box', path: 'signup' },
+          { name: 'console', text: '控制台', icon: 'console' }
         ]
-      };
-      mainMenu.push(category);
+      });
     }
     return mainMenu;
   }
@@ -604,7 +612,7 @@ class KlogLayout extends PolymerElement {
   }
 
   _menuSelectHandle(category, item) {
-    if (category == 'main' && item == 'console') this.$.about.open();
+    if (item == 'console') this.$.about.open();
     let pageElement = this.$.page.querySelector(`[name='${this.page}']`);
     if (pageElement && pageElement.menuSelect) {
       return pageElement.menuSelect(category, item);

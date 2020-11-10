@@ -49,12 +49,21 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         background: var(--primary-background-color);
         opacity: 0.7;
       }
-        .main-container{
+      .main-container{
         padding-left:300px;
       }
       :host([mobile]) .main-container{
         padding-left: 0;
         padding-top: 24px;
+      }
+      .info-container-header{
+        display: flex;
+        align-items: center;
+        margin-top: 9px;
+      }
+      .info-container-header paper-icon-button{
+        margin-left: 12px;
+        flex-shrink: 0;
       }
       .info-container paper-button{
         width: calc(100% - 8px);
@@ -105,20 +114,28 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     <klog-data-list id="data" type="timeline" last-response="{{list}}" keyword="{{keyword}}" key="date"></klog-data-list>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="info-container klog-card" id="info">
-      <paper-button on-click="back"><iron-icon icon="arrow_back"></iron-icon>返回 Klog</paper-button>
+      <div class="info-container-header">
+        <paper-button on-click="back"><iron-icon icon="arrow_back"></iron-icon>返回 Klog</paper-button>
+        <paper-icon-button on-click="_mobileSearch" icon="search" hidden="{{!mobile}}"></paper-icon-button>
+      </div>
       <klog-image class="author-avatar" id="avatar" src="{{authorPublic.avatarUrl}}" theme="{{theme}}" lazy fixed avatar></klog-image>
       <div class="author-name">{{authorPublic.displayName}}</div>
       <div class="author-introduction">{{authorPublic.introduction}}</div>
     </div>
     <div class="main-container" id="container">
+      <div id="pageHeader"></div>
+      <klog-chip name="search" id="mobileSearchInput" icon="search" hidden="{{!mobile}}" checkmark-animation-disabled>
+        <input slot="expand-content" id="keywordInput">
+        <paper-icon-button slot="expand-content" icon="close" on-click="_mobileSearchClose"></paper-icon-button>
+      </klog-chip>
       <div class="filter-container item" id="filter" on-click="setFilter">
-        <klog-chip name="search" icon="search" checkmark-animation-disabled>
-          <input slot="expand-content" id="keywordInput">
-        </klog-chip>
         <klog-chip name="default" label="全部"></klog-chip>
         <klog-chip name="daily" label="日常"></klog-chip>
         <klog-chip name="note" label="笔记"></klog-chip>
         <klog-chip name="gallery" label="相册"></klog-chip>
+        <klog-chip name="search" icon="search" hidden="{{mobile}}" checkmark-animation-disabled>
+          <input slot="expand-content" id="keywordInput">
+        </klog-chip>
       </div>
       <div class="timeline-container" id="timelineContainer">
         <template is="dom-repeat" items="{{cards}}">
@@ -203,14 +220,14 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
     // avatar
     this.$.avatar.addEventListener('media-info-updated', (e) => {
-      const mediaInfo = e.detail.mediaInfo.palette;
-      const color = this.theme == 'light' ? mediaInfo.LightVibrant.rgb : mediaInfo.DarkVibrant.rgb;
-      this.$.info.style.backgroundColor = `rgb(${color.join()})`;
+      // const mediaInfo = e.detail.mediaInfo.palette;
+      // const color = this.theme == 'light' ? mediaInfo.LightVibrant.rgb : mediaInfo.DarkVibrant.rgb;
+      // this.$.info.style.backgroundColor = `rgb(${color.join()})`;
       this.$.avatar.lazyload();
     });
-    this.$.avatar.addEventListener('media-loading', (e) => {
-      this.style.setProperty('--klog-header-background', `url('${this.$.avatar.$.img.src}')`);
-    });
+    // this.$.avatar.addEventListener('media-loading', (e) => {
+    //   this.style.setProperty('--klog-header-background', `url('${this.$.avatar.$.img.src}')`);
+    // });
 
     // filter
     this.addEventListener('timeline-set-filter', (e) => {

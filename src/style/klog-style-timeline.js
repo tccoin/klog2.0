@@ -19,37 +19,60 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         transition: all .15s ease;
       }
 
+      .page-header-container{
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        padding: 0 8px;
+        margin: 0 auto 24px;
+        box-sizing: border-box;
+        cursor: default;
+        user-select: none;
+      }
+
+      .page-header-title{
+        display: inline;
+        font-size: 32px;
+        font-weight: bolder;
+        margin-right: 16px;
+        color: var(--primary-text-color);
+      }
+
+      .page-header-subtitle{
+        margin-bottom: 16px;
+        color: var(--secondary-text-color);
+      }
+
       :host([mobile]) .main-container{
         padding: 96px 0 64px;
       }
 
       .filter-container {
         width: calc(100vw + 92px) !important;
-        padding: 0 50px;
+        padding-left: 48px;
         position: relative;
         left: -46px;
         box-sizing: border-box;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        font-size: 0;
       }
 
       klog-chip {
-        height: 40px;
         margin: 0 4px;
         vertical-align: middle;
         --klog-chip-text-color: var(--secondary-text-color);
         --divider-color: var(--secondary-text-color);
         --klog-chip-style: {
+          font-size: 1.1em;
           font-weight: bold;
           padding: 8px 18px;
         }
+        border-radius: 24px;
+        --klog-chip-background-color: transparent;
       }
 
-      klog-chip[name=search] {
-        --primary-color: var(--paper-cyan-700);
-        --klog-chip-expand-width: 64px;
+      klog-chip[active] {
+        --klog-chip-background-color: var(--primary-background-color);
+        --klog-chip-background-opacity: 1;
+        @apply(--shadow-elevation-2dp);
       }
 
       klog-chip[name=search] input {
@@ -62,6 +85,40 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         background: none;
         border-bottom: 1px solid var(--primary-color);
         outline: none;
+      }
+
+      klog-chip[name=search] {
+        --klog-chip-expand-width: 128px;
+      }
+
+      klog-chip#mobileSearchInput{
+        display: flex;
+        margin: 0;
+        z-index: 100;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 64px;
+        border-radius: 0;
+        box-shadow: 0 0 black;
+        --klog-chip-style: {
+          padding: 0;
+        }
+        --klog-chip-border-radius: 0;
+        --klog-chip-expand-width: calc(100% - 64px);
+      }
+      klog-chip#mobileSearchInput:not([active]){
+        display: none;
+      }
+      klog-chip#mobileSearchInput input{
+        width: calc(100% - 96px);
+        height: 32px;
+        padding: 0 8px;
+        margin: 0 8px;
+      }
+      klog-chip#mobileSearchInput paper-icon-button{
+        float: right;
+        color: var(--primary-text-color);
       }
 
       klog-chip[name=daily] {
@@ -119,6 +176,10 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
 
       :host([exit]) klog-fab {
         transform: scale(0);
+      }
+
+      [hidden] {
+        display: none;
       }
     </style>
   </template>

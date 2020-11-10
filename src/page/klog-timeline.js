@@ -34,14 +34,23 @@ class KlogTimeline extends PolymerElement {
     <klog-data-timeline id="data" last-response="{{list}}"></klog-data-timeline>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
+      <div class="page-header-container item" id="pageHeader" hidden="{{mobile}}">
+        <span class="page-header-title">时间轴</span>
+        <span class="page-header-subtitle">不要温和地走进那个良夜。<br>怒斥，怒斥光明的消逝。</span>
+      </div>
+      
+      <klog-chip name="search" id="mobileSearchInput" icon="search" hidden="{{!mobile}}" checkmark-animation-disabled>
+        <input slot="expand-content" id="keywordInput">
+        <paper-icon-button slot="expand-content" icon="close" on-click="_mobileSearchClose"></paper-icon-button>
+      </klog-chip>
       <div class="filter-container item" id="filter" on-click="setFilter">
-        <klog-chip name="search" icon="search" checkmark-animation-disabled="">
-          <input slot="expand-content" id="keywordInput">
-        </klog-chip>
         <klog-chip name="default" label="全部"></klog-chip>
         <klog-chip name="daily" label="日常"></klog-chip>
         <klog-chip name="note" label="笔记"></klog-chip>
         <klog-chip name="gallery" label="相册"></klog-chip>
+        <klog-chip name="search" icon="search" on-click="setFilter" hidden="{{mobile}}" checkmark-animation-disabled>
+          <input slot="expand-content" id="keywordInput">
+        </klog-chip>
       </div>
       <div class="timeline-container" id="timelineContainer">
         <template is="dom-repeat" items="{{cards}}">
@@ -117,11 +126,10 @@ class KlogTimeline extends PolymerElement {
                 <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                 <div class="title" on-click="refresh">
                   <div main-title><iron-icon icon="klog"></iron-icon></div>
-                  <div class="divider"></div>
-                  <div page-title>时间轴</div>
                   <paper-ripple></paper-ripple>
                 </div>
                 <div class="divider"></div>
+                <paper-icon-button on-click="_mobileSearch" icon="search" mobile></paper-icon-button>
                 <paper-button on-click="add" mobile>
                   <iron-icon icon="post_add"></iron-icon>
                   <span>优里卡！</span>
@@ -262,6 +270,15 @@ class KlogTimeline extends PolymerElement {
       if (!this.$.scrollTarget) return;
       let y = this.$.scrollTarget.scrollTop;
       this.updateButtonExtended = y == 0 || !this.mobile;
+      // header animation
+      if (y > 16) {
+        let progress = Math.max(0, Math.min(1, (this.$.pageHeader.offsetTop + this.$.pageHeader.offsetHeight - y - 32) / 32));
+        this.$.pageHeader.style.transform = `scale(${0.95 + progress * 0.05})`;
+        this.$.pageHeader.style.opacity = progress;
+      } else {
+        this.$.pageHeader.style.transform = `scale(1)`;
+        this.$.pageHeader.style.opacity = 1;
+      }
       // filter animation
       if (y > 16) {
         let progress = Math.max(0, Math.min(1, (this.$.filter.offsetTop + this.$.filter.offsetHeight - y - 32) / 32));
@@ -287,7 +304,7 @@ class KlogTimeline extends PolymerElement {
       for (let target of intersectinglist) {
         let margin = target.offsetTop + target.offsetHeight - y;
         let progress1 = Math.max(0, Math.min(1, (margin - 64) / 64));
-        let progress2 = Math.max(0, Math.min(1, (margin - 64) / (64 + target.offsetHeight)));
+        let progress2 = Math.max(0, Math.min(1, margin / target.offsetHeight));
         target.style.transform = `scale(${0.9 + progress2 * 0.1})`;
         if (this.preference && this.preference.backdropBlurEnabled) {
           target.style.opacity = 1;
@@ -305,6 +322,21 @@ class KlogTimeline extends PolymerElement {
     };
   }
 
+  _mobileSearch() {
+    this.setFilter({
+      detail: {
+        filterName: 'search'
+      }
+    });
+  }
+
+  _mobileSearchClose() {
+    this.setFilter({
+      detail: {
+        filterName: 'default'
+      }
+    });
+  }
 
   setFilter(e) {
     if (!e.detail.filterName && e.target.tagName != 'KLOG-CHIP') { return; }
@@ -336,9 +368,9 @@ class KlogTimeline extends PolymerElement {
 
   _filterNameUpdate(filterName, oldFilterName) {
     let activeChip, oldActiveChip;
-    activeChip = filterName ? this.$.filter.querySelector(`[name=${filterName}]`) : this.$.defaultFilter;
+    activeChip = filterName ? this._getChip(filterName) : this.$.defaultFilter;
     if (oldFilterName) {
-      oldActiveChip = this.$.filter.querySelector(`[name=${oldFilterName}]`);
+      oldActiveChip = this._getChip(oldFilterName);
     } else {
       oldActiveChip = this.$.defaultFilter;
     }
@@ -350,6 +382,14 @@ class KlogTimeline extends PolymerElement {
       if (oldActiveChip)
         oldActiveChip.active = false;
       activeChip.active = true;
+    }
+  }
+
+  _getChip(filterName) {
+    if (filterName == 'search' && this.mobile) {
+      return this.$.container.querySelector(`#mobileSearchInput`);
+    } else {
+      return this.$.container.querySelector(`[name=${filterName}]:not([hidden])`);
     }
   }
 

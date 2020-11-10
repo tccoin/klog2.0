@@ -24,9 +24,9 @@ class KlogNote extends PolymerElement {
     <app-route route="{{subroute1}}" pattern="/:share" data="{{shareData}}"></app-route>
     <klog-backdrop id="backdrop" class="layout" gesture-disabled="true" moving="{{moving}}" front-switch-disabled="">
       <app-toolbar class="backdrop-back-toolbar" slot="back" id="toolbar">
-        <paper-icon-button icon="menu" on-click="openKlogDrawer"></paper-icon-button>
+        <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden-on-desktop></paper-icon-button>
         <div class="title">
-          <div main-title="">
+          <div main-title>
             <iron-icon icon="klog"></iron-icon>
           </div>
         </div>

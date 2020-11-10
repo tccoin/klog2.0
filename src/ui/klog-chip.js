@@ -6,7 +6,7 @@ import '../style/klog-style.js';
 
 class KlogChip extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: inline-block;
@@ -14,6 +14,8 @@ class KlogChip extends PolymerElement {
         -webkit-user-select: none;
         cursor: default;
         outline: none;
+        overflow: hidden;
+        --klog-chip-border-radius: 24px;
       }
 
       .container {
@@ -21,7 +23,6 @@ class KlogChip extends PolymerElement {
         text-overflow: ellipsis;
         white-space: nowrap;
         max-width: 100%;
-        height: 24px;
       }
 
       iron-icon {
@@ -36,7 +37,7 @@ class KlogChip extends PolymerElement {
 
       .checkmark {
         width: 0;
-        height: 20px;
+        height: 24px;
         vertical-align: middle;
         color: var(--primary-text-color);
         -webkit-transition: width .15s cubic-bezier(.4, 0, .2, 1);
@@ -45,7 +46,7 @@ class KlogChip extends PolymerElement {
       }
 
       :host([active]) .checkmark {
-        width: 20px;
+        width: 24px;
       }
 
       .checkmark path {
@@ -79,10 +80,9 @@ class KlogChip extends PolymerElement {
 
       paper-button {
         padding: 6px 16px;
-        font-size: 14px;
+        font-size: 18px;
         margin: 0;
         min-width: auto;
-        border-radius: 20px;
         color: var(--klog-chip-text-color, --primary-text-color);
         overflow: hidden;
         text-transform: none;
@@ -90,10 +90,14 @@ class KlogChip extends PolymerElement {
         width: 100%;
         outline: none;
         @apply --klog-chip-style;
+        border-radius: var(--klog-chip-border-radius);
       }
 
       paper-button::after {
         @apply --overlay-style;
+        z-index: -1;
+        background-color: var(--klog-chip-background-color);
+        opacity: var(--klog-chip-background-opacity);
       }
 
       :host([disabled]) paper-button {
