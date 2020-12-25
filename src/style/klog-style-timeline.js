@@ -98,6 +98,7 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         position: fixed;
         z-index: 101;
         top: 0;
+        left: 0;
         width: 100%;
         height: 64px;
         border-radius: 0;

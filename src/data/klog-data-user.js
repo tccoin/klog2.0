@@ -82,7 +82,6 @@ class KlogDataUser extends PolymerElement {
         let markdownPreference = Object.assign({}, this.defaultMarkdownPreference, preference.markdown || {});
         preference.markdown = markdownPreference;
         let publicinfoJson = publicinfo.toJSON();
-        console.log(publicinfoJson);
         return this.userinfoUpdated(true, {
           createdAt: userJson.createdAt,
           updatedAt: userJson.updatedAt,

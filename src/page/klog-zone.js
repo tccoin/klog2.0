@@ -17,44 +17,32 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     return html `
     <style include="klog-style-card"></style>
     <style>
+      :host{
+        display: flex;
+        flex-direction: row;
+        margin: auto;
+        width: fit-content;
+      }
       .info-container{
         width: 300px;
-        padding: 0 16px;
+        margin: 64px 0 0;
         position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        border-radius: 0;
+        z-index: 101;
+        border-radius: 5px;
+        transition: box-shadow .3s ease;
+        @apply --shadow-elevation-2dp;
       }
-      :host([mobile]) .info-container{
-        width: 100vw;
-        height: auto;
-        position: relative;
-        bottom: auto;
-      }
-      .info-container::after {
-        @apply --overlay-style;
-        z-index: -2;
-        background: var(--klog-header-background);
-        transition: all .25s ease;
-        filter: blur(15px);
-        background-size: cover;
-        background-position: center center;
-        transform: scale(1.3);
-        opacity: 1;
-      }
-      .info-container::before {
-        @apply --overlay-style;
-        z-index: -1;
-        background: var(--primary-background-color);
-        opacity: 0.7;
+      .info-container:hover{
+        @apply --shadow-elevation-16dp;
       }
       .main-container{
-        padding-left:300px;
+        padding-left: 300px;
+        width: fit-content;
+        max-width: 100vw;
       }
-      :host([mobile]) .main-container{
-        padding-left: 0;
-        padding-top: 24px;
+      .item{
+        width: calc(100vw - 332px);
+        margin: 0 8px 16px 16px;
       }
       .info-container-header{
         display: flex;
@@ -80,31 +68,52 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         padding-right: 8px;
       }
       .author-avatar{
-        width: 100px;
-        height: 100px;
-        border-radius: 5px;
-        --klog-media-border-radius: 5px;
-        margin: 64px auto 16px;
-        @apply --shadow-elevation-2dp;
+        width: 100%;
+        margin: 0;
       }
       .author-name{
-        margin: 16px auto 16px;
-        font-size: 1.4em;
+        margin: 24px 16px 0;
+        font-size: 1.6em;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         max-width: 100%;
-        text-align: center;
-      }
+        font-weight: bolder;
+    }
       .author-introduction{
         word-break: break-word;
         color: var(--secondary-text-color);
-        text-align: center;
-        margin-bottom: calc(var(--klog-card-padding) * 3);
+        margin: 0 16px calc(var(--klog-card-padding) * 3);
       }
       :host([exit]) .info-container {
         transform: translateX(-5vh);
         opacity: 0;
+      }
+      @media (max-width: 767px) {
+        :host{
+          flex-direction: column;
+        }
+        .info-container{
+          width: 100vw;
+          height: auto;
+          margin: 0;
+          position: relative;
+          z-index: 1;
+          bottom: auto;
+          border-radius: 0;
+          transition: border-radius 50ms ease,transform .1s ease;
+          @apply --shadow-elevation-16dp;
+        }
+        .main-container{
+          padding: 48px 0 32px!important;
+        }
+        klog-timeline-item.item{
+          width: 100vw!important;
+          margin: 16px 0px;
+        }
+        klog-chip#mobileSearchInput{
+          @apply --shadow-elevation-4dp;
+        }
       }
     </style>
     `;
@@ -115,11 +124,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     <klog-data-list id="data" type="timeline" last-response="{{list}}" keyword="{{keyword}}" key="date"></klog-data-list>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="info-container klog-card" id="info">
-      <div class="info-container-header">
-        <paper-button on-click="back"><iron-icon icon="arrow_back"></iron-icon>返回 Klog</paper-button>
-        <paper-icon-button on-click="_mobileSearch" icon="search" hidden="{{!mobile}}"></paper-icon-button>
-      </div>
-      <klog-image class="author-avatar" id="avatar" src="{{authorPublic.avatarUrl}}" theme="{{theme}}" lazy fixed avatar></klog-image>
+      <klog-image class="author-avatar" id="avatar" src="{{authorPublic.avatarUrl}}" theme="{{theme}}" lazy content></klog-image>
       <div class="author-name">{{authorPublic.displayName}}</div>
       <div class="author-introduction">{{authorPublic.introduction}}</div>
     </div>
@@ -195,7 +200,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
           header: {
             fixed: true,
             short: false,
-            shadow: { mobile: 'on', desktop: 'off' },
+            shadow: { mobile: 'off', desktop: 'off' },
           },
           customMenu: [{
             name: 'timeline',
@@ -207,10 +212,18 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
             ]
           }],
           styles: {
-            '--klog-header-background': { mobile: 'var(--primary-background-color)', desktop: 'transparent' },
+            '--klog-header-background': 'transparent',
             '--klog-header-text-color': 'var(--primary-text-color)',
           },
-          toolbar: html ``
+          toolbar: html `
+              <app-toolbar>
+                <div class="title" on-click="back">
+                  <div main-title><iron-icon icon="klog"></iron-icon></div>
+                  <paper-ripple></paper-ripple>
+                </div>
+                <div class="divider"></div>
+                <paper-icon-button on-click="_mobileSearch" icon="search" mobile></paper-icon-button>
+              </app-toolbar>`
         }
       },
     };
@@ -236,6 +249,20 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       this.$.keywordInput.value = e.detail.keyword;
       this.setFilter(e);
     });
+
+    this._oldScrollHandler = this._scrollHandler;
+    this._scrollHandler = e => {
+      if (!this.$.scrollTarget) return;
+      let y = this.$.scrollTarget.scrollTop;
+      let progress = y / this.$.info.clientHeight;
+      if (this.mobile) {
+        this.$.info.style.transform = `scale(${Math.max(0.95,1-progress*0.1*3)})`;
+        this.$.info.style.borderRadius = `${Math.min(10,progress*10*3)}px`;
+      } else {
+        this.$.info.style.transform = `translateY(-${Math.min(48,y)}px)`;
+      }
+      this._oldScrollHandler(e);
+    };
   }
 
   unload() {
