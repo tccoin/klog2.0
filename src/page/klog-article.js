@@ -54,7 +54,7 @@ class KlogArticle extends PolymerElement {
   <!--update info-->
   <div class="section article-update-info">
   <klog-render-timestamp time-stamp="{{parseDate(article.updatedAt)}}">最后更新于</klog-render-timestamp>。<br>
-    <klog-render-license license="{{article.license}}" default="{{article.author.license}}"></klog-render-license>
+    <klog-render-license license="{{article.license}}" default-license="{{article.author.license}}"></klog-render-license>
   </div>
 </div>
 <!--fab-->

@@ -23,7 +23,7 @@ class KlogRenderLicense extends KlogDataLicenseMixin(PolymerElement) {
       license: {
         type: String
       },
-      default: {
+      defaultLicense: {
         type: String
       },
     }
@@ -31,7 +31,7 @@ class KlogRenderLicense extends KlogDataLicenseMixin(PolymerElement) {
 
   static get observers() {
     return [
-      '_update(license, default)'
+      '_update(license, defaultLicense)'
     ]
   }
 

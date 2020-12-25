@@ -132,7 +132,7 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
         <div class="form-item">
           <div class="text-container">
             <span class="title">预览</span><br>
-            <div class="description"><klog-render-license license="{{userinfo.license}}" default="{{userinfo.license}}"></klog-render-license></div>
+            <div class="description"><klog-render-license license="{{userinfo.license}}" default-license="{{userinfo.license}}"></klog-render-license></div>
           </div>
         </div>
 
