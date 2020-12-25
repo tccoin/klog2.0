@@ -15,7 +15,7 @@ class KlogDataList extends PolymerElement {
       },
       select: {
         type: Array,
-        value: ['title', 'text', 'path', 'collection', 'keywords']
+        value: ['title', 'text', 'path', 'license', 'collection', 'keywords']
       },
       include: {
         type: Array,

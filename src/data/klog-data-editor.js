@@ -40,6 +40,10 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
         type: String,
         notify: true,
       },
+      license: {
+        type: String,
+        notify: true,
+      },
       displayPath: {
         type: String,
         notify: true,
@@ -335,6 +339,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
         }
         this.markdown = data.markdown;
         this.path = data.path;
+        this.license = data.license;
         this.randomPath = data.path;
         this.private = data.immersive ? true : data.private;
         this.immersive = data.immersive;
@@ -379,6 +384,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
     article.set('markdown', this.markdown);
     article.set('text', this.text);
     article.set('path', this.path || this.randomPath);
+    article.set('license', this.license || 'default');
     article.set('private', this.immersive || this.private);
     article.set('immersive', this.immersive);
     article.set('image', this.image);

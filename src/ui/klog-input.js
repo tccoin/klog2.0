@@ -4,7 +4,7 @@ import '../style/klog-style.js';
 
 class KlogInput extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;
@@ -63,7 +63,7 @@ class KlogInput extends PolymerElement {
           width: auto;
           padding: 0 8px;
           left: -8px;
-          background: var(--primary-background-color);
+          background: var(--klog-input-background-color, var(--primary-background-color));
         }
 
         --paper-input-container-underline: {

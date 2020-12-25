@@ -173,14 +173,14 @@ class KlogEditor extends PolymerElement {
       }
     </style>
     <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
-    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" tokens="{{tokens}}" title="{{title}}" path="{{path}}" random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}" private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}" error="{{err}}" current-line="{{currentLine}}" word-count="{{wordCount}}">
+    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" tokens="{{tokens}}" title="{{title}}" path="{{path}}" license="{{license}}" random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}" private="{{private}}" immersive="{{immersive}}" fileinfo="{{fileinfo}}" error="{{err}}" current-line="{{currentLine}}" word-count="{{wordCount}}">
     </klog-data-editor>
     <div class="layout">
       <klog-backdrop id="backdrop">
         <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
         </klog-editor-header>
         <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
-          <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" random-path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}"></klog-editor-info-form>
+          <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" license="{{license}}" random-path="{{randomPath}}" private="{{private}}" immersive="{{immersive}}"></klog-editor-info-form>
           <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
         </iron-pages>
         <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
@@ -237,6 +237,9 @@ class KlogEditor extends PolymerElement {
       preset: {
         type: Object,
         value: {}
+      },
+      license: {
+        type: String,
       },
       path: {
         type: String,

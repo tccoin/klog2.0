@@ -47,9 +47,10 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     .article-container {
+      position: relative;
       width: 100%;
       margin: auto;
-      padding: 64px 0 0;
+      padding: 64px 0 72px;
       background: var(--primary-background-color);
       min-height: calc(100vh - 280px);
       @apply(--shadow-elevation-2dp);
@@ -80,6 +81,17 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       color: #FFF;
       transform: translateX(-100%);
       transition: transform 0.2s ease 0s, box-shadow 0.2s ease 0s, opacity 0.2s ease 0s;
+    }
+
+    .article-update-info{
+      padding: 0 16px;
+      position: absolute;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      color: var(--secondary-text-color);
+      cursor: default;
+      user-select: none;
     }
 
     .article-footer {

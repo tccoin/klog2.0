@@ -20,8 +20,10 @@ import '../ui/klog-upload-zone.js';
 import '../data/klog-data-user.js';
 import '../ui/klog-input.js';
 import '../ui/klog-dropdown-menu.js';
+import '../ui/klog-render-license.js'
+import { KlogDataLicenseMixin } from '../data/klog-data-license-mixin.js';
 
-class KlogUserpanel extends PolymerElement {
+class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
   static get template() {
     return html `
     <style include="klog-style-card"></style>
@@ -84,6 +86,10 @@ class KlogUserpanel extends PolymerElement {
         width: 200px;
       }
 
+      paper-listbox paper-item{
+        white-space: nowrap;
+      }
+
       /*animation*/
 
       :host([exit]) .klog-card {
@@ -113,26 +119,56 @@ class KlogUserpanel extends PolymerElement {
     </div>
 
     <div class="klog-card" mobile="[[mobile]]">
-      <div class="card-meta">外观</div>
+      <div class="card-meta">版权</div>
       <div class="form">
-        <klog-dropdown-menu label="主题" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
-          <paper-tabs selected="{{preference.theme}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
-            <paper-tab name="light">浅色</paper-tab>
-            <paper-tab name="dark">深色</paper-tab>
-            <paper-tab name="system">跟随系统</paper-tab>
-            <paper-tab name="time">根据时间</paper-tab>
-          </paper-tabs>
+        <klog-dropdown-menu label="默认协议" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+          <paper-listbox selected="{{userinfo.license}}" on-selected-changed="updatePublicinfo" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
+          <template is="dom-repeat" items="{{licenseList}}">
+              <paper-item name="{{item.name}}">{{item.abbreviation}}</paper-item>
+            </template>
+          </paper-listbox>
         </klog-dropdown-menu>
 
-        <!-- <div class="form-item">
+        <div class="form-item">
           <div class="text-container">
-            <span class="title">毛玻璃效果</span><br>
-            <span class="description">实验性</span>
+            <span class="title">预览</span><br>
+            <div class="description"><klog-render-license license="{{userinfo.license}}" default="{{userinfo.license}}"></klog-render-license></div>
           </div>
-          <paper-toggle-button checked="{{preference.backdropBlurEnabled}}"></paper-toggle-button>
         </div>
-        -->
+
+        <div class="form-item">
+          <div class="text-container">
+            <span class="title">选择协议</span><br>
+            <span class="description">打开协议选择器</span>
+          </div>
+          <paper-button on-click="openLicenseChooser">
+            <iron-icon icon="launch"></iron-icon>
+          </paper-button>
+        </div>
       </div>
+    </div>
+
+      <div class="klog-card" mobile="[[mobile]]">
+        <div class="card-meta">外观</div>
+        <div class="form">
+          <klog-dropdown-menu label="主题" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+            <paper-tabs selected="{{preference.theme}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
+              <paper-tab name="light">浅色</paper-tab>
+              <paper-tab name="dark">深色</paper-tab>
+              <paper-tab name="system">跟随系统</paper-tab>
+              <paper-tab name="time">根据时间</paper-tab>
+            </paper-tabs>
+          </klog-dropdown-menu>
+  
+          <!-- <div class="form-item">
+            <div class="text-container">
+              <span class="title">毛玻璃效果</span><br>
+              <span class="description">实验性</span>
+            </div>
+            <paper-toggle-button checked="{{preference.backdropBlurEnabled}}"></paper-toggle-button>
+          </div>
+          -->
+        </div>
 
 
       <!-- <paper-toggle-button checked="{{preference.darkThemeDisabled}}">没有黑夜</paper-toggle-button> -->
@@ -142,7 +178,7 @@ class KlogUserpanel extends PolymerElement {
 
 
     <div class="klog-card" mobile="[[mobile]]" id="animation">
-      <div class="card-meta">阅读偏好</div>
+      <div class="card-meta">阅读</div>
       <div class="form">
         <klog-dropdown-menu label="标题序号" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
           <paper-tabs selected="{{preference.markdown.numberedHeading}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
@@ -323,9 +359,12 @@ class KlogUserpanel extends PolymerElement {
     this.$.uploadAvatarDialog.open();
   }
 
+  openLicenseChooser() {
+    window.open("https://chooser-beta.creativecommons.org/");
+  }
+
   updateAvatarUrl(avatarinfo) {
     this.userinfo.avatarUrl = avatarinfo.host + '/' + avatarinfo.key;
-    console.log(this.userinfo.avatarUrl);
     this.$.uploadAvatarDialog.close();
     this.updatePublicinfo();
   }
@@ -350,21 +389,27 @@ class KlogUserpanel extends PolymerElement {
   }
 
   updatePublicinfo() {
-    let newInfo = {
-      displayName: {
-        publicRead: true,
-        value: this.userinfo.displayName
-      },
-      introduction: {
-        publicRead: true,
-        value: this.userinfo.introduction
-      },
-      avatarUrl: {
-        publicRead: true,
-        value: this.userinfo.avatarUrl
-      },
-    };
-    this._updateUserinfo(newInfo);
+    setTimeout(() => {
+      let newInfo = {
+        displayName: {
+          publicRead: true,
+          value: this.userinfo.displayName
+        },
+        introduction: {
+          publicRead: true,
+          value: this.userinfo.introduction
+        },
+        avatarUrl: {
+          publicRead: true,
+          value: this.userinfo.avatarUrl
+        },
+        license: {
+          publicRead: true,
+          value: this.userinfo.license
+        },
+      };
+      this._updateUserinfo(newInfo);
+    }, 1);
   }
 
   updatePreference() {

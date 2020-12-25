@@ -4,7 +4,7 @@ const KlogDataUserPublicMixin = (superClass) => class extends KlogDataMixin(supe
 
   loadUserPublic(userPublicId) {
     let userPublic = AV.Object.createWithoutData('UserPublic', userPublicId);
-    // userPublic.select(['avatarUrl', 'displayName', 'introduction']);
+    userPublic.select(['avatarUrl', 'displayName', 'introduction', 'license']);
     return userPublic.fetch().then(data => {
       return data.toJSON()
     }).catch(err => {
@@ -14,7 +14,7 @@ const KlogDataUserPublicMixin = (superClass) => class extends KlogDataMixin(supe
 
   findUserPublic(displayName) {
     let query = new AV.Query('UserPublic');
-    query.select(['avatarUrl', 'displayName', 'introduction']);
+    query.select(['avatarUrl', 'displayName', 'introduction', 'license']);
     query.descending('displayName');
     query.equalTo('displayName', displayName);
     return query.find().then((data) => {

@@ -3,18 +3,34 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-progress/paper-progress.js';
 import '@polymer/paper-toggle-button/paper-toggle-button.js';
 import '@polymer/paper-dialog/paper-dialog.js';
+import '@polymer/paper-item/paper-item.js';
+import '@polymer/paper-listbox/paper-listbox.js';
+import '../ui/klog-dropdown-menu.js';
 import '../style/klog-style-form.js';
 import '../ui/klog-input.js';
 import '../style/klog-style.js';
+import { KlogDataLicenseMixin } from '../data/klog-data-license-mixin.js';
 
-class KlogEditorInfoForm extends PolymerElement {
+class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-form"></style>
     <style>
       :host {
         display: block;
-        --primary-background-color: var(--klog-page-background);
+        --klog-input-background-color: var(--klog-page-background);
+      }
+
+      paper-listbox{
+        display: flex;
+        flex-direction: row;
+        max-width: 343px;
+        flex-wrap: wrap;
+      }
+
+      paper-listbox paper-item{
+        user-select: none;
+        width: fit-content;
       }
 
       #deleteButton {
@@ -27,6 +43,14 @@ class KlogEditorInfoForm extends PolymerElement {
     </style>
     <!-- <klog-input label="标题" value="{{title}}" outlined></klog-input> -->
     <klog-input label="路径" id="pathInput" placeholder="{{randomPath}}" value="{{path}}" outlined=""></klog-input>
+
+    <klog-dropdown-menu label="版权协议" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+      <paper-listbox selected="{{license}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
+      <template is="dom-repeat" items="{{fullLicenseList}}">
+          <paper-item name="{{item.name}}">{{item.abbreviation}}</paper-item>
+        </template>
+      </paper-listbox>
+    </klog-dropdown-menu>
 
     <div class="form-item">
       <div class="text-container">
@@ -81,6 +105,10 @@ class KlogEditorInfoForm extends PolymerElement {
       },
       private: {
         type: Boolean,
+        notify: true,
+      },
+      license: {
+        type: String,
         notify: true,
       },
       immersive: {

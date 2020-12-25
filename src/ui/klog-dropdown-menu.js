@@ -83,7 +83,7 @@ class KlogDropdownMenu extends PolymerElement {
           width: auto;
           padding: 0 8px;
           left: -8px;
-          background: var(--primary-background-color);
+          background: var(--klog-input-background-color, var(--primary-background-color));
         }
 
         --paper-input-container-underline: {

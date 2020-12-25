@@ -92,6 +92,7 @@ class KlogDataUser extends PolymerElement {
           displayName: publicinfoJson.displayName,
           introduction: publicinfoJson.introduction,
           avatarUrl: publicinfoJson.avatarUrl,
+          license: publicinfoJson.license,
           klogUser: this
         });
       }

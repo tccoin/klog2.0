@@ -11,6 +11,7 @@ import '../data/klog-data-article.js';
 import '../ui/klog-image.js';
 import '../ui/klog-fab.js';
 import '../ui/klog-render-timestamp.js';
+import '../ui/klog-render-license.js';
 import './klog-comment.js';
 
 class KlogArticle extends PolymerElement {
@@ -43,12 +44,17 @@ class KlogArticle extends PolymerElement {
             <span class="author-intro divider">{{article.author.introduction}}</span>
           </template>
         </div>
-        <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发表于&nbsp;</klog-render-timestamp>
+        <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发表于</klog-render-timestamp>
       </div>
     </div>
     <!--article content-->
     <klog-markdown class="article-main" id="markdown" markdown="{{article.markdown}}" link-prefix="article/{{path}}" hide-independent-title="true" theme="{{theme}}" preference="{{userinfo.preference.markdown}}" mobile="{{mobile}}" lazy heading-actions>
     </klog-markdown>
+  </div>
+  <!--update info-->
+  <div class="section article-update-info">
+  <klog-render-timestamp time-stamp="{{parseDate(article.updatedAt)}}">最后更新于</klog-render-timestamp>。<br>
+    <klog-render-license license="{{article.license}}" default="{{article.author.license}}"></klog-render-license>
   </div>
 </div>
 <!--fab-->
