@@ -295,9 +295,11 @@ class KlogImage extends PolymerElement {
       this.$.bg.style.height = '100%';
     }
     this.$.img.style.position = 'absolute';
-    let c = this.theme == 'light' ? data.palette.LightVibrant.rgb : data.palette.DarkVibrant.rgb;
-    this.$.bg.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
-    this.$.img.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
+    if ('palette' in data) {
+      let c = this.theme == 'light' ? data.palette.LightVibrant.rgb : data.palette.DarkVibrant.rgb;
+      this.$.bg.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
+      this.$.img.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
+    }
   }
 }
 
