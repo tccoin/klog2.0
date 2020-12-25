@@ -227,7 +227,7 @@ class KlogTimelineItem extends PolymerElement {
     if (e.target.classList.contains('card-collection')) {
       this.searchTimeline(e.target.innerText);
     } else if (e.target.classList.contains('meta-avatar') || e.target.classList.contains('meta-title')) {
-      const page = 'zone/' + this.data.author.objectId;
+      const page = this.data.author.username || 'zone/' + this.data.author.objectId;
       this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
     } else {
       const page = 'article/' + this.data.path;

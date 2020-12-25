@@ -22,8 +22,9 @@ import '../ui/klog-input.js';
 import '../ui/klog-dropdown-menu.js';
 import '../ui/klog-render-license.js'
 import { KlogDataLicenseMixin } from '../data/klog-data-license-mixin.js';
+import { KlogDataUserPublicMixin } from '../data/klog-data-user-public-mixin.js';
 
-class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
+class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(PolymerElement)) {
   static get template() {
     return html `
     <style include="klog-style-card"></style>
@@ -90,6 +91,11 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
         white-space: nowrap;
       }
 
+      span.primary{
+        color: var(--primary-color);
+        font-weight: bolder;
+      }
+
       /*animation*/
 
       :host([exit]) .klog-card {
@@ -99,13 +105,43 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
     </style>
     <klog-data-user id="user" disabled=""></klog-data-user>
 
+    <div class="klog-card" mobile="[[mobile]]" hidden="{{_hasUsername}}">
+      <div class="card-meta">设置用户名</div>
+      <div class="card-content">
+        用户名与账户一一对应，设定后可以通过用户名快捷访问个人页面。
+      </div>
+      <div class="form">
+
+        <klog-input label="用户名" value="{{username}}" outlined></klog-input>
+
+        <div class="form-item">
+          <div class="text-container">
+            <span class="title">个人页面</span><br>
+            <span class="description" hidden="{{!username}}">klog.app/<span class="primary">#/{{username}}</span></span>
+            <span class="description" hidden="{{username}}">klog.app/#/zone/{{userinfo.publicinfo.id}}</span>
+          </div>
+        </div>
+
+        <div class="form-item">
+          <div class="text-container">
+            <span class="title">确认并保存</span><br>
+            <span class="description">之后将无法修改</span>
+          </div>
+          <paper-button on-click="updateUsername">
+            <iron-icon icon="done"></iron-icon>
+          </paper-button>
+        </div>
+
+      </div>
+    </div>
+
     <div class="klog-card" mobile="[[mobile]]">
       <div class="card-meta">公开信息</div>
       <div class="form">
-        <klog-input label="头像路径" value="{{userinfo.avatarUrl}}" outlined="" hidden="">
+        <klog-input label="头像路径" value="{{userinfo.avatarUrl}}" outlined hidden>
         </klog-input>
-        <klog-input label="昵称" on-change="updatePublicinfo" value="{{userinfo.displayName}}" outlined=""></klog-input>
-        <klog-input label="个人介绍" on-change="updatePublicinfo" value="{{userinfo.introduction}}" outlined=""></klog-input>
+        <klog-input label="昵称" on-change="updatePublicinfo" value="{{userinfo.displayName}}" outlined></klog-input>
+        <klog-input label="个人介绍" on-change="updatePublicinfo" value="{{userinfo.introduction}}" outlined></klog-input>
 
         <div class="form-item">
           <div class="text-container">
@@ -121,7 +157,7 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
     <div class="klog-card" mobile="[[mobile]]">
       <div class="card-meta">版权</div>
       <div class="form">
-        <klog-dropdown-menu label="默认协议" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+        <klog-dropdown-menu label="默认协议" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
           <paper-listbox selected="{{userinfo.license}}" on-selected-changed="updatePublicinfo" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
           <template is="dom-repeat" items="{{licenseList}}">
               <paper-item name="{{item.name}}">{{item.abbreviation}}</paper-item>
@@ -151,7 +187,7 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
       <div class="klog-card" mobile="[[mobile]]">
         <div class="card-meta">外观</div>
         <div class="form">
-          <klog-dropdown-menu label="主题" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+          <klog-dropdown-menu label="主题" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
             <paper-tabs selected="{{preference.theme}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
               <paper-tab name="light">浅色</paper-tab>
               <paper-tab name="dark">深色</paper-tab>
@@ -180,20 +216,20 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
     <div class="klog-card" mobile="[[mobile]]" id="animation">
       <div class="card-meta">阅读</div>
       <div class="form">
-        <klog-dropdown-menu label="标题序号" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+        <klog-dropdown-menu label="标题序号" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
           <paper-tabs selected="{{preference.markdown.numberedHeading}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
             <paper-tab name="true">显示</paper-tab>
             <paper-tab name="auto">自动</paper-tab>
             <paper-tab name="false">隐藏</paper-tab>
           </paper-tabs>
         </klog-dropdown-menu>
-        <klog-dropdown-menu label="标题位置" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+        <klog-dropdown-menu label="标题位置" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
           <paper-tabs selected="{{preference.markdown.centeredHeading}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
             <paper-tab name="false">正常</paper-tab>
             <paper-tab name="true">居中</paper-tab>
           </paper-tabs>
         </klog-dropdown-menu>
-        <klog-dropdown-menu label="大段代码" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+        <klog-dropdown-menu label="大段代码" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
           <paper-tabs selected="{{preference.markdown.overflowCode}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
             <paper-tab name="true">滚动</paper-tab>
             <paper-tab name="false">全部显示</paper-tab>
@@ -286,6 +322,7 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
   }
 
   load(userLoadPromise) {
+    this._hasUsername = true;
     if (!this.login) {
       return userLoadPromise.then(result => {
         if (!result.login) {
@@ -298,6 +335,7 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
           this.preference = result.userinfo.preference;
           this.userinfo = result.userinfo;
           this.login = result.login;
+          this._hasUsername = Boolean(this.userinfo.username);
         }
       });
     }
@@ -311,6 +349,32 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
         composed: true,
         detail: { value: e.detail.value }
       }));
+    });
+  }
+
+  updateUsername() {
+    if (!/^[a-zA-Z]/.test(this.username)) {
+      return this.showToast('用户名第一位请使用字母');
+    } else if (this.username.length < 6) {
+      return this.showToast('用户名长度至少6位');
+    } else if (this.username.length > 20) {
+      return this.showToast('用户名长度至多20位');
+    }
+    this.validateUsername(this.username).then(isValid => {
+      if (isValid) {
+        let newInfo = {
+          username: {
+            publicRead: true,
+            value: this.username
+          }
+        };
+        this._updateUserinfo(newInfo, false).then(() => {
+          this.showToast('用户名已保存');
+          this._hasUsername = true;
+        });
+      } else {
+        return this.showToast('用户名已被占用');
+      }
     });
   }
 
@@ -369,10 +433,10 @@ class KlogUserpanel extends KlogDataLicenseMixin(PolymerElement) {
     this.updatePublicinfo();
   }
 
-  _updateUserinfo(info) {
+  _updateUserinfo(info, toast = true) {
     let klogUser = this.userinfo.klogUser;
-    klogUser.update(info).then(() => {
-      this.showToast('已更新账户');
+    return klogUser.update(info).then(() => {
+      if (toast) this.showToast('已更新账户');
       klogUser.updateUserinfo();
     });
   }

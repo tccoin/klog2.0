@@ -144,7 +144,7 @@ class KlogArticle extends PolymerElement {
   }
 
   openZone() {
-    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'zone/' + this.article.author.objectId } }));
+    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.article.author.username || 'zone/' + this.article.author.objectId } }));
   }
 
   loadArticle(path) {

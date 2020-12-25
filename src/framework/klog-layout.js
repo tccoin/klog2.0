@@ -162,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.15.1<br>2017-2020<br>Powered by Kr with Love.</p>
+      <p>v2.16.0<br>2017-2020<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -285,10 +285,12 @@ class KlogLayout extends PolymerElement {
     this._userinfoHandle(userLoadPromise);
     const oldPage = this.page;
     if (page != oldPage) {
-      const importPromise =
-        import (`../page/klog-${page}.js`).catch(() => {
-          throw new Error('404')
-        });
+      if (!this._pageValidate(page)) {
+        // 不是有效页面，有可能是username
+        page = 'zone';
+      }
+      let importPromise =
+        import (`../page/klog-${page}.js`);
       if (!this.loading) {
         await this._unloadPage(oldPage);
         this.loading = true;
@@ -304,6 +306,10 @@ class KlogLayout extends PolymerElement {
     await this._updatePage(page, subroute);
     await this._checkInterrupt(page);
     return this._getPage(page);
+  }
+
+  _pageValidate(page) {
+    return ['404', 'apps', 'article', 'editor', 'lab', 'login', 'signup', 'message', 'note', 'timeline', 'userpanel', 'zone'].includes(page);
   }
 
   async _userinfoHandle(userLoadPromise) {

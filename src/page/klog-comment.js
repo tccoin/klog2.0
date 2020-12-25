@@ -302,7 +302,7 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
   openZone(e) {
     e.stopPropagation();
     const commentData = this._getCommentData(e.target);
-    const page = 'zone/' + commentData.author.objectId;
+    const page = commentData.author.username || 'zone/' + commentData.author.objectId;
     this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
   }
 

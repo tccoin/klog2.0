@@ -240,15 +240,24 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
   unload() {
     this.$.avatar.lazy = true;
+    this._lastScrollY = this.$.scrollTarget.scrollTop;
   }
 
   async update(subroute) {
     this.loading = true;
-    this.authorPublicId = subroute.path.replace(/[\/\\]/, '');
-    this.cardBackTo = 'zone/' + this.authorPublicId;
     // author publicinfo
-    this.loadAuthorPublic(this.authorPublicId);
+    if (subroute.prefix == '/zone') {
+      this.authorPublicId = subroute.path.replace(/[\/\\]/, '');
+      this.cardBackTo = 'zone/' + this.authorPublicId;
+      await this.loadAuthorPublic('id', this.authorPublicId);
+    } else {
+      this.authorUsername = subroute.prefix.replace(/[\/\\]/, '');
+      this.cardBackTo = this.authorUsername + (subroute.path || '');
+      await this.loadAuthorPublic('username', this.authorUsername);
+      this.authorPublicId = this.authorPublic.objectId;
+    }
     // timeline
+    let needRefresh = this.$.data.userPublicId != this.authorPublicId;
     this.$.data.userPublicId = this.authorPublicId;
     if (!this.isTimelineInit) {
       this.$.data.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'date', 'attachments', 'collection', 'tags'];
@@ -261,7 +270,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       this.loading = false;
       const y = this._lastScrollY || 0;
       this.$.scrollTarget.scrollTop = y;
-      await this.refresh();
+      if (needRefresh) await this.refresh();
       await this._scrollHandler();
     }
   }
@@ -270,8 +279,13 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
   }
 
-  async loadAuthorPublic(authorPublicId) {
-    let authorPublic = await this.loadUserPublic(authorPublicId);
+  async loadAuthorPublic(key, value) {
+    let authorPublic;
+    if (key == 'id') {
+      authorPublic = await this.loadUserPublic(value);
+    } else if (key == 'username') {
+      authorPublic = await this.loadUserPublicByUsername(value);
+    }
     if (!authorPublic.introduction) {
       authorPublic.introduction = 'PLACEHOLDER_FOR_THOSE_LAZY_PEOPLE_WHO_DO_NOT_WRITE_ANYTHING_DESCRIBING_THEMSELVES';
     }
