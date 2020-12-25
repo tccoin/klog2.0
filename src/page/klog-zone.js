@@ -96,6 +96,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         .info-container{
           width: 100vw;
           height: auto;
+          min-height: 100vh;
           margin: 0;
           position: relative;
           z-index: 1;
@@ -105,7 +106,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
           @apply --shadow-elevation-16dp;
         }
         .main-container{
-          padding: 48px 0 32px!important;
+          padding: 32px 0 32px!important;
         }
         klog-timeline-item.item{
           width: 100vw!important;
