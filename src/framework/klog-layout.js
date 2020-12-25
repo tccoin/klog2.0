@@ -283,29 +283,27 @@ class KlogLayout extends PolymerElement {
 
   async load(page, subroute, userLoadPromise) {
     this._userinfoHandle(userLoadPromise);
-    try {
-      const oldPage = this.page;
-      if (page != oldPage) {
-        const importPromise =
-          import (`../page/klog-${page}.js`);
-        if (!this.loading) {
-          await this._unloadPage(oldPage);
-          this.loading = true;
-        }
-        await importPromise;
-        this.page = page;
-        await this._checkInterrupt(page);
-        await this._getPageLayout(page);
-        this.loading = false;
-        await this._loadPage(page, userLoadPromise);
-        await this._checkInterrupt(page);
+    const oldPage = this.page;
+    if (page != oldPage) {
+      const importPromise =
+        import (`../page/klog-${page}.js`).catch(() => {
+          throw new Error('404')
+        });
+      if (!this.loading) {
+        await this._unloadPage(oldPage);
+        this.loading = true;
       }
-      await this._updatePage(page, subroute);
+      await importPromise;
+      this.page = page;
       await this._checkInterrupt(page);
-      return this._getPage(page);
-    } catch (err) {
-      return Promise.reject(err);
+      await this._getPageLayout(page);
+      this.loading = false;
+      await this._loadPage(page, userLoadPromise);
+      await this._checkInterrupt(page);
     }
+    await this._updatePage(page, subroute);
+    await this._checkInterrupt(page);
+    return this._getPage(page);
   }
 
   async _userinfoHandle(userLoadPromise) {
