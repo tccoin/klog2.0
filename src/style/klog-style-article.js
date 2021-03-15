@@ -52,7 +52,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       margin: auto;
       padding: 64px 0 72px;
       background: var(--primary-background-color);
-      min-height: calc(100vh - 280px);
+      min-height: calc(100vh - 350px);
       @apply(--shadow-elevation-2dp);
     }
 
