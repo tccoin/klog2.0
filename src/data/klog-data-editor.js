@@ -52,10 +52,6 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
         type: Boolean,
         notify: true,
       },
-      immersive: {
-        type: Boolean,
-        notify: true,
-      },
       attachments: {
         type: Array,
         notify: true,
@@ -315,7 +311,6 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
     this.path = '';
     this.previews = [];
     this.attachments = [];
-    this.immersive = false;
     if (requestNewPath) {
       this._generateRandomPath();
     }
@@ -330,7 +325,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
           this.reset(true);
           return
         }
-        data = Object.assign({ private: true, immersive: false }, data.toJSON());
+        data = Object.assign({ private: true }, data.toJSON());
         if (!AV._config.useMasterKey) {
           if (this.userinfo == undefined || data.author.objectId != this.userinfo.publicinfo.id) {
             this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
@@ -341,8 +336,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
         this.path = data.path;
         this.license = data.license;
         this.randomPath = data.path;
-        this.private = data.immersive ? true : data.private;
-        this.immersive = data.immersive;
+        this.private = data.private;
         this.data = data;
         return;
       });
@@ -385,8 +379,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
     article.set('text', this.text);
     article.set('path', this.path || this.randomPath);
     article.set('license', this.license || 'default');
-    article.set('private', this.immersive || this.private);
-    article.set('immersive', this.immersive);
+    article.set('private', this.private);
     article.set('image', this.image);
     article.set('attachments', this.attachments);
     article.set('collection', this.collection);

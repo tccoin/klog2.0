@@ -74,7 +74,7 @@ class KlogArticle extends PolymerElement {
 <div class="section article-footer">
   <span class="logo">
     <iron-icon icon="klog"></iron-icon>
-    <a href="#/timeline/" class="immersive"></a>
+    <a href="#/timeline/"></a>
   </span>
 </div>
 `;
@@ -96,10 +96,6 @@ class KlogArticle extends PolymerElement {
       backTo: {
         type: String,
         value: 'timeline'
-      },
-      immersive: {
-        type: Boolean,
-        reflectToAttribute: true,
       },
       layout: {
         type: Object,
@@ -134,7 +130,6 @@ class KlogArticle extends PolymerElement {
       'loadArticle(routeData.path)',
       'updateTitle(article.title)',
       'articleloaded(article.objectId)',
-      'updateImmersiveMode(article.immersive)',
       'updateScrollerQuery(shareData.share)'
     ]
   }
@@ -256,11 +251,6 @@ class KlogArticle extends PolymerElement {
         documentTitle: title + ' - Klog'
       }
     }));
-  }
-
-  updateImmersiveMode(immersive) {
-    this.immersive = immersive;
-    if (immersive) this.dispatchEvent(new CustomEvent('drawer-disable', { bubbles: true, composed: true }));
   }
 
   searchTimeline(keyword) {

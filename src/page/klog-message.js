@@ -21,10 +21,6 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
         value: true,
         reflectToAttribute: true,
       },
-      immersive: {
-        type: Boolean,
-        reflectToAttribute: true,
-      },
       layout: {
         type: Object,
         value: {

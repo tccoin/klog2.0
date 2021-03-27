@@ -57,15 +57,7 @@ class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
         <span class="title">私有</span><br>
         <span class="description">这篇文章不会被推送至时间轴</span>
       </div>
-      <paper-toggle-button checked="{{private}}" disabled="{{immersive}}"></paper-toggle-button>
-    </div>
-
-    <div class="form-item">
-      <div class="text-container">
-        <span class="title">独立页面</span><br>
-        <span class="description">分享时关闭 Klog UI</span>
-      </div>
-      <paper-toggle-button checked="{{immersive}}"></paper-toggle-button>
+      <paper-toggle-button checked="{{private}}"></paper-toggle-button>
     </div>
 
     <div class="form-item" hidden\$="{{!articleId}}">
@@ -73,7 +65,7 @@ class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
         <span class="title">保存但不置顶</span><br>
         <span class="description">防止时间轴扰动</span>
       </div>
-      <paper-button on-click="save" disabled="{{_calcSaveButtonDisabled(articleId,loading,private,immersive)}}">
+      <paper-button on-click="save" disabled="{{_calcSaveButtonDisabled(articleId,loading,private)}}">
         <iron-icon icon="save_alt"></iron-icon>
       </paper-button>
     </div>
@@ -109,10 +101,6 @@ class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
       },
       license: {
         type: String,
-        notify: true,
-      },
-      immersive: {
-        type: Boolean,
         notify: true,
       },
       loading: {
@@ -169,7 +157,7 @@ class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
   }
 
   _calcSaveButtonDisabled() {
-    return !this.articleId || this.private || this.loading || this.immersive;
+    return !this.articleId || this.private || this.loading;
   }
 
   _calcDeleteButtonDisabled() {

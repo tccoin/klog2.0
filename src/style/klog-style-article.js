@@ -175,16 +175,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       display: none;
     }
 
-    /*immersive mode*/
-
-    :host(:not([immersive])) .immersive {
-      display: none !important;
-    }
-
-    :host([immersive]) .non-immersive {
-      display: none !important;
-    }
-
     /*media block*/
 
     @media (max-width: 662px) {
