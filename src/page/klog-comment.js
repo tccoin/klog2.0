@@ -1,12 +1,13 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { KlogDataCommentMixin } from '../data/klog-data-comment-mixin.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 import '@polymer/paper-button/paper-button.js';
 import '../ui/klog-icons.js';
 import '../ui/klog-emoticon-selector.js';
 import '../style/klog-style-author.js';
 import './klog-editor-textarea.js';
 
-class KlogComment extends KlogDataCommentMixin(PolymerElement) {
+class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
   static get template() {
     return html `
     <style include="klog-style-author"></style>
@@ -310,18 +311,18 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
     const method = this._inputMethod;
     const data = this._inputData;
     if (this.$.input.value.length == 0) {
-      this.showToast('什么话都不说，这是坠好的！');
+      this.openToast('什么话都不说，这是坠好的！');
       return;
     } else if (method == 'create') {
       const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      this.showToast('评论已发送');
+      this.openToast('评论已发送');
     } else if (method == 'edit') {
       await this.updateComment(data.objectId, this.$.input.value);
-      this.showToast('评论已修改');
+      this.openToast('评论已修改');
     } else if (method == 'reply') {
       const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
-      this.showToast('回复已发送');
+      this.openToast('回复已发送');
     }
     await this.refresh();
     this.resetInput();
@@ -355,25 +356,14 @@ class KlogComment extends KlogDataCommentMixin(PolymerElement) {
 
   async _deleteComment(e) {
     let commentId = this._getCommentData(e.target).objectId;
-    this.showToast('确定要删除这条评论吗？', {
+    this.openToast('确定要删除这条评论吗？', {
       title: '确认删除',
       onclick: async() => {
         await this.deleteComment(commentId);
         await this.refresh();
-        this.showToast('评论已删除');
+        this.openToast('评论已删除');
       }
     });
-  }
-
-  showToast(text, link) {
-    this.dispatchEvent(new CustomEvent('show-toast', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: text,
-        link: link
-      }
-    }));
   }
 
   _calcCancelButtonDisabled(method) {

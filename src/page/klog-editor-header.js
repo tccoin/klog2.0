@@ -88,7 +88,7 @@ class KlogEditorHeader extends PolymerElement {
         <paper-icon-button icon="arrow_back" on-click="back"></paper-icon-button>
         <div class="divider"></div>
         <paper-toggle-button checked="{{preview}}" hidden-on-desktop hidden-on-tablet></paper-toggle-button>
-        <paper-icon-button icon="more_vert" on-click="openKlogDrawer" hidden-on-desktop></paper-icon-button>
+        <paper-icon-button icon="more_vert" on-click="insert" hidden-on-desktop></paper-icon-button>
         <paper-icon-button for="infoform" icon="highlight" on-click="activeFront" hidden="" id="infoformButton"></paper-icon-button>
         <paper-icon-button for="infoform" icon="settings" on-click="activeFront" hidden-on-desktop>
         </paper-icon-button>
@@ -137,8 +137,8 @@ class KlogEditorHeader extends PolymerElement {
     super.ready();
   }
 
-  openKlogDrawer() {
-    this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+  insert() {
+    this.dispatchEvent(new CustomEvent('insert-drawer-open', { bubbles: true, composed: true }));
   }
 
   back() {

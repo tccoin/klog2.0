@@ -1,17 +1,13 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-progress/paper-progress.js';
 import '@polymer/paper-toggle-button/paper-toggle-button.js';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-item/paper-item.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '../ui/klog-dropdown-menu.js';
 import '../style/klog-style-form.js';
 import '../ui/klog-input.js';
 import '../style/klog-style.js';
 import { KlogDataLicenseMixin } from '../data/klog-data-license-mixin.js';
 
-class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
+class KlogEditorInfoForm extends KlogUiMixin(KlogDataLicenseMixin(PolymerElement)) {
   static get template() {
     return html `
     <style include="klog-style-form"></style>
@@ -21,16 +17,8 @@ class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
         --klog-input-background-color: var(--klog-page-background);
       }
 
-      paper-listbox{
-        display: flex;
-        flex-direction: row;
-        max-width: 343px;
-        flex-wrap: wrap;
-      }
-
-      paper-listbox paper-item{
-        user-select: none;
-        width: fit-content;
+      #licenseInput{
+        cursor: pointer;
       }
 
       #deleteButton {
@@ -42,15 +30,8 @@ class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
       }
     </style>
     <!-- <klog-input label="标题" value="{{title}}" outlined></klog-input> -->
-    <klog-input label="路径" id="pathInput" placeholder="{{randomPath}}" value="{{path}}" outlined=""></klog-input>
-
-    <klog-dropdown-menu label="版权协议" outlined="" vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
-      <paper-listbox selected="{{license}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
-      <template is="dom-repeat" items="{{fullLicenseList}}">
-          <paper-item name="{{item.name}}">{{item.abbreviation}}</paper-item>
-        </template>
-      </paper-listbox>
-    </klog-dropdown-menu>
+    <klog-input label="路径" id="pathInput" placeholder="{{randomPath}}" value="{{path}}" outlined></klog-input>
+    <klog-input label="版权协议" id="licenseInput"  value="{{licenseAbbreviation}}" on-click="openLicenseDrawer" outlined></klog-input>
 
     <div class="form-item">
       <div class="text-container">
@@ -102,6 +83,7 @@ class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
       license: {
         type: String,
         notify: true,
+        observer: '_updateLicenseAbbreviation',
       },
       loading: {
         type: Boolean,
@@ -136,6 +118,14 @@ class KlogEditorInfoForm extends KlogDataLicenseMixin(PolymerElement) {
 
   save() {
     this.dispatchEvent(new CustomEvent('save', { bubbles: true, composed: true, detail: { quiet: true } }));
+  }
+
+  openLicenseDrawer() {
+    this.openDrawer('版权协议', [{ name: 'license', items: this.getLicenseMenu(this.fullLicenseList) }]);
+  }
+
+  _updateLicenseAbbreviation(license) {
+    this.licenseAbbreviation = this.fullLicenseList.find(x => x['name'] == license)['abbreviation'];
   }
 
   delete() {

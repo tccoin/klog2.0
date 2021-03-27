@@ -52,6 +52,7 @@ class KlogRenderLicense extends KlogDataLicenseMixin(PolymerElement) {
       }
       let icons = '';
       for (let icon of license.icon) {
+        if (icon == 'cc') continue;
         icons += `
           <span class="item">
             <iron-icon icon="license:${icon}" id="${icon}"></iron-icon>

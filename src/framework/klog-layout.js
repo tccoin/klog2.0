@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from './klog-ui-mixin.js';
 import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@polymer/iron-media-query/iron-media-query.js';
@@ -9,13 +10,14 @@ import '@polymer/app-layout/app-toolbar/app-toolbar.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
 import '../ui/klog-drawer.js';
 import '../ui/klog-menu.js';
+import '../style/klog-style.js';
 import '../style/klog-style-scrollbar.js';
 import '../style/klog-style-dialog.js';
 import '../style/klog-style-toast.js';
 import '../style/klog-style-dialog.js';
 import '../style/klog-style-layout.js';
 
-class KlogLayout extends PolymerElement {
+class KlogLayout extends KlogUiMixin(PolymerElement) {
   static get template() {
     return html `
     <style include="klog-style-layout"></style>
@@ -121,7 +123,7 @@ class KlogLayout extends PolymerElement {
     </style>
     <!-- Drawer -->
     <klog-drawer id="drawer" heading="{{drawerHeading}}">
-      <klog-menu login="{{login}}" page="{{page}}" items="{{menu}}"></klog-menu>
+      <klog-menu items="{{menu}}"></klog-menu>
     </klog-drawer>
     <!-- Layout -->
     <div id="main" class="main-container">
@@ -133,7 +135,7 @@ class KlogLayout extends PolymerElement {
       <app-header id="header" mobile$="{{mobile}}"></app-header>
       <!-- Sidebar -->
       <div id="sidebar" class="sidebar-container">
-        <klog-menu login="{{login}}" page="{{page}}" items="{{menu}}"></klog-menu>
+        <klog-menu items="{{menu}}"></klog-menu>
       </div>
       <!-- Pages -->
       <iron-pages id="page" class="page-container" role="main" selected="{{page}}" attr-for-selected="name" selected-attribute="visible">
@@ -244,9 +246,10 @@ class KlogLayout extends PolymerElement {
     super.ready();
     this.$.scrollTarget = this.$.page;
     this.$.scrollTarget.style.scrollBehavior = 'smooth';
+    this.initUiEvent();
     this.addEventListener('layout-update', e => this.updateLayout(e.detail, false));
     this.addEventListener('menu-select', e => this._menuSelectHandle(e.detail.category, e.detail.item));
-    this.addEventListener('drawer-toggle', e => this.$.drawer.open());
+    this.addEventListener('main-drawer-open', e => this.$.drawer.open());
     this.addEventListener('about-help', e => this.aboutHelp());
     this.addEventListener('about-log', e => this.aboutLog());
     this.addEventListener('page-scroll', e => this.scrollTo(e.detail.destination));
@@ -683,7 +686,7 @@ class KlogLayout extends PolymerElement {
       detail: {
         callback: updateFound => {
           if (!updateFound) {
-            this.showToast('Klog 已是最新版本');
+            this.openToast('Klog 已是最新版本');
           }
         }
       }
@@ -692,17 +695,6 @@ class KlogLayout extends PolymerElement {
 
   aboutGitHub() {
     window.open("https://github.com/tccoin/klog2.0");
-  }
-
-  showToast(text, link) {
-    this.dispatchEvent(new CustomEvent('show-toast', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: text,
-        link: link
-      }
-    }));
   }
 
   scrollTo(destination, duration = 200, easing = 'easeInOut') {

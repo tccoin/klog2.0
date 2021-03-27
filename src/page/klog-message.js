@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -6,7 +7,7 @@ import '@polymer/paper-ripple/paper-ripple.js';
 import '../style/klog-style-card.js';
 import { KlogDataMessageMixin } from '../data/klog-data-message-mixin.js';
 
-class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
+class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
 
   static get is() { return 'klog-message'; }
 
@@ -176,19 +177,8 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
       this.messages = messages;
       this.messageGroups = this.groupByDate(messages);
     }).then(() => {
-      if (toast) this.showToast('通知已更新');
+      if (toast) this.openToast('通知已更新');
     });
-  }
-
-  showToast(text, link) {
-    this.dispatchEvent(new CustomEvent('show-toast', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: text,
-        link: link
-      }
-    }));
   }
 
   _getLink(container) {

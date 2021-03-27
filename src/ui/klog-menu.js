@@ -167,13 +167,6 @@ class KlogMenu extends PolymerElement {
 
   static get properties() {
     return {
-      page: {
-        type: String
-      },
-      login: {
-        type: Boolean,
-        value: false
-      },
       items: {
         type: Object,
         observer: '_calcMenu'

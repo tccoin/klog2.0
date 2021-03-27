@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-progress/paper-progress.js';
@@ -14,9 +15,9 @@ import '../data/klog-data-list.js';
 import '../ui/klog-image.js';
 import '../ui/klog-icons.js';
 
-class KlogLab extends KlogDataMessageMixin(PolymerElement) {
+class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-layout"></style>
     <style include="klog-style-card"></style>
     <style>
@@ -107,7 +108,7 @@ class KlogLab extends KlogDataMessageMixin(PolymerElement) {
             short: false,
             shadow: 'off'
           },
-          toolbar: html`
+          toolbar: html `
       <app-toolbar>
         <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
       </app-toolbar>`
@@ -225,19 +226,9 @@ class KlogLab extends KlogDataMessageMixin(PolymerElement) {
 
   async sendGlobalMessage() {
     await this.createMessage('text', '5ea323e42f040b00087e42ae', ['channel-default'], { 'text': this.globalMessage });
-    this.showToast('发送成功');
+    this.openToast('发送成功');
   }
 
-  showToast(text, link) {
-    this.dispatchEvent(new CustomEvent('show-toast', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: text,
-        link: link
-      }
-    }));
-  }
 }
 
 window.customElements.define(KlogLab.is, KlogLab);

@@ -101,8 +101,8 @@ class KlogSignup extends PolymerElement {
     };
   }
 
-  openDrawer() {
-    this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+  openMainDrawer() {
+    this.dispatchEvent(new CustomEvent('main-drawer-open', { bubbles: true, composed: true }));
   }
 
   ready() {

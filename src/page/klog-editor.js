@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-button/paper-button.js';
@@ -21,7 +22,8 @@ import '../ui/klog-pages.js';
 import '../ui/klog-markdown.js';
 import '../ui/klog-upload-zone.js';
 
-class KlogEditor extends PolymerElement {
+class KlogEditor extends KlogUiMixin(PolymerElement) {
+
   static get template() {
     return html `
     <style include="klog-style-scrollbar"></style>
@@ -174,31 +176,40 @@ class KlogEditor extends PolymerElement {
         }
       }
     </style>
+
+    <!-- Data -->
     <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
     <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" tokens="{{tokens}}" title="{{title}}" path="{{path}}" license="{{license}}" random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}" private="{{private}}" fileinfo="{{fileinfo}}" error="{{err}}" current-line="{{currentLine}}" word-count="{{wordCount}}">
     </klog-data-editor>
-    <div class="layout">
-      <klog-backdrop id="backdrop">
-        <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
-        </klog-editor-header>
-        <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
-          <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" license="{{license}}" random-path="{{randomPath}}" private="{{private}}"></klog-editor-info-form>
-          <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
-        </iron-pages>
-        <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
-          <!-- <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}"> -->
-          <klog-editor-textarea id="textarea" loading="{{loading}}" tokens="{{tokens}}" value="{{markdown}}" preview="{{preview}}" placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
-          <klog-markdown id="markdown" tokens="{{tokens}}" mobile="{{mobile}}" markdown="{{preview}}" theme="[[theme]]" word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}" breadcrumbs="">
-            <div slot="after" class="info">字数统计: {{wordCount}}</div>
-          </klog-markdown>
-          <!-- <klog-imarkdown id="imarkdown" tokens="{{tokens}}" markdown="{{preview}}" theme="[[theme]]"
-            word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}"
-            breadcrumbs>
-            <div slot="after" class="info">字数统计: {{wordCount}}</div>
-          </klog-imarkdown> -->
-        </klog-pages>
-      </klog-backdrop>
-    </div>
+
+    <!-- Backdrop -->
+    <klog-backdrop id="backdrop">
+      <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
+      </klog-editor-header>
+      <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
+        <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" license="{{license}}" random-path="{{randomPath}}" private="{{private}}"></klog-editor-info-form>
+        <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
+      </iron-pages>
+      <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
+        <!-- <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}"> -->
+        <klog-editor-textarea id="textarea" loading="{{loading}}" tokens="{{tokens}}" value="{{markdown}}" preview="{{preview}}" placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
+        <klog-markdown id="markdown" tokens="{{tokens}}" mobile="{{mobile}}" markdown="{{preview}}" theme="[[theme]]" word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}" breadcrumbs="">
+          <div slot="after" class="info">字数统计: {{wordCount}}</div>
+        </klog-markdown>
+        <!-- <klog-imarkdown id="imarkdown" tokens="{{tokens}}" markdown="{{preview}}" theme="[[theme]]"
+          word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}"
+          breadcrumbs>
+          <div slot="after" class="info">字数统计: {{wordCount}}</div>
+        </klog-imarkdown> -->
+      </klog-pages>
+    </klog-backdrop>
+
+    <!-- Drawer -->
+    <klog-drawer id="insertDrawer" heading="{{insertDrawer.heading}}">
+      <klog-menu page="{{page}}" items="{{insertDrawer.menu}}"></klog-menu>
+    </klog-drawer>
+
+    <!-- Floating Toolbar -->
     <div class="floating-toolbar"></div>
 `;
   }
@@ -242,6 +253,7 @@ class KlogEditor extends PolymerElement {
       },
       license: {
         type: String,
+        value: 'default'
       },
       path: {
         type: String,
@@ -272,7 +284,13 @@ class KlogEditor extends PolymerElement {
   }
 
   load(userLoadPromise) {
-    this.updateMenu();
+    this.dispatchEvent(new CustomEvent('layout-update', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        customMenu: [this.editMenu, this.actionMenu]
+      }
+    }));
     return userLoadPromise.then(result => {
       if (!result.login) {
         this.dispatchEvent(new CustomEvent('user-login-page-open', {
@@ -339,43 +357,6 @@ class KlogEditor extends PolymerElement {
     }
   }
 
-
-  updateMenu() {
-    this.dispatchEvent(new CustomEvent('layout-update', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        drawerHeading: '插入',
-        customMenu: [{
-          name: 'edit',
-          desktop: true,
-          items: [
-            { name: 'save', text: '保存', icon: 'publish', raised: true },
-            { name: 'upload', text: '上传文件', icon: 'insert_drive_file' },
-            { name: 'collection', text: '分类和标签', icon: 'category' },
-            { name: 'settings', text: '其它设置', icon: 'settings' },
-          ]
-        }, {
-          name: 'action',
-          items: [
-            { subtitle: true, text: '插入', desktop: true },
-            { name: 'table', text: '表格', icon: 'border_all' },
-            { name: 'code', text: '代码', icon: 'code' },
-            { name: 'formula', text: '公式', icon: 'functions' },
-            { name: 'toc', text: '目录', icon: 'menu_book' },
-            { name: 'quote', text: '引用', icon: 'format_quote' },
-            { name: 'ref', text: '来源', icon: 'comment' },
-            { name: 'heading-1', text: '一级标题', icon: 'title' },
-            { name: 'heading-2', text: '二级标题', icon: 'title' },
-            { name: 'heading-3', text: '三级标题', icon: 'title' },
-            { name: 'ul', text: '无序列表', icon: 'format_list_bulleted' },
-            { name: 'ol', text: '有序列表', icon: 'format_list_numbered' },
-          ]
-        }]
-      }
-    }));
-  }
-
   menuSelect(category, item) {
     if (category == 'action') {
       if (item == 'table') {
@@ -423,11 +404,41 @@ class KlogEditor extends PolymerElement {
       } else if (item == 'settings') {
         this.$.header.$.infoformButton.click();
       }
+    } else if (category == 'license') {
+      this.license = item;
     }
   }
 
   ready() {
     super.ready();
+    // layout
+    this.editMenu = {
+      name: 'edit',
+      desktop: true,
+      items: [
+        { name: 'save', text: '保存', icon: 'publish', raised: true },
+        { name: 'upload', text: '上传文件', icon: 'insert_drive_file' },
+        { name: 'collection', text: '分类和标签', icon: 'category' },
+        { name: 'settings', text: '其它设置', icon: 'settings' },
+      ]
+    };
+    this.actionMenu = {
+      name: 'action',
+      items: [
+        { subtitle: true, text: '插入', desktop: true },
+        { name: 'table', text: '表格', icon: 'border_all' },
+        { name: 'code', text: '代码', icon: 'code' },
+        { name: 'formula', text: '公式', icon: 'functions' },
+        { name: 'toc', text: '目录', icon: 'menu_book' },
+        { name: 'quote', text: '引用', icon: 'format_quote' },
+        { name: 'ref', text: '来源', icon: 'comment' },
+        { name: 'heading-1', text: '一级标题', icon: 'title' },
+        { name: 'heading-2', text: '二级标题', icon: 'title' },
+        { name: 'heading-3', text: '三级标题', icon: 'title' },
+        { name: 'ul', text: '无序列表', icon: 'format_list_bulleted' },
+        { name: 'ol', text: '有序列表', icon: 'format_list_numbered' },
+      ]
+    };
     // init floating toolbar
     this._initFloatingToolbar();
     // preset
@@ -447,6 +458,7 @@ class KlogEditor extends PolymerElement {
       console.log(data);
     });
     //event
+    this.addEventListener('insert-drawer-open', () => this.openDrawer('插入', [this.actionMenu]));
     this.$.textarea.addEventListener('klog-editor-input', (e) => {
       const selection = e.detail.selection;
       const position = e.detail.caretPosition;
@@ -501,7 +513,7 @@ class KlogEditor extends PolymerElement {
         //ui
         this.loading = false;
         this._pathChanged();
-        this.showToast('已保存', { title: '查看', href: this.backTo });
+        this.openToast('已保存', { title: '查看', href: this.backTo });
       }, err => {
         this.set('err', err);
         this.loading = false;
@@ -518,7 +530,7 @@ class KlogEditor extends PolymerElement {
         this.dispatchEvent(new CustomEvent('require-update', { bubbles: true, composed: true, detail: { page: 'note' } }));
         //ui
         this.loading = false;
-        this.showToast('已删除', undefined, { duration: 500, noCancelOnOutsideClick: false });
+        this.openToast('已删除', undefined, { duration: 500, noCancelOnOutsideClick: false });
         //route
         this.backTo = /#\/(article|timeline)/.test(this.backTo) ? '#/timeline' : '#/note/all/';
         setTimeout(() => {
@@ -612,37 +624,26 @@ class KlogEditor extends PolymerElement {
     const err = this.err;
     if (!err) return;
     if (err.code == -1 && err.message.indexOf('offline') > -1) {
-      this.showToast('无法保存, 请检查网络连接');
+      this.openToast('无法保存, 请检查网络连接');
     } else if (err.message == 'empty') {
-      this.showToast('球球李写点什么吧！');
+      this.openToast('球球李写点什么吧！');
     } else if (err.message == 'path illegal') {
-      this.showToast('路径里不可以有奇怪的符号 ( ´ー`)');
+      this.openToast('路径里不可以有奇怪的符号 ( ´ー`)');
     } else if (err.message == 'path used') {
-      this.showToast('这个路径已经被使用啦，请换一个 ( ´ー`)');
+      this.openToast('这个路径已经被使用啦，请换一个 ( ´ー`)');
     } else if (err.message == 'path start with hyphen') {
-      this.showToast('路径不能以短横线开头 ( ´ー`)');
+      this.openToast('路径不能以短横线开头 ( ´ー`)');
     } else if (err.message == 'path too short') {
-      this.showToast('你设置的路径太短啦 ( ´ー`)');
+      this.openToast('你设置的路径太短啦 ( ´ー`)');
     } else if (err.code == 403) {
-      this.showToast('没有权限, 你只能编辑自己的文章哦');
+      this.openToast('没有权限, 你只能编辑自己的文章哦');
     } else if (err.code == 404) {
-      this.showToast('无法保存, 请备份后新建文章');
+      this.openToast('无法保存, 请备份后新建文章');
     } else if (err.message == '' && !err.code) {} else {
-      this.showToast('保存失败, 请备份文章后再试一次');
+      this.openToast('保存失败, 请备份文章后再试一次');
       console.log(this.err);
     }
     this._errChangedTimeout = setTimeout(() => this.err = null, 3000);
-  }
-
-  showToast(text, link) {
-    this.dispatchEvent(new CustomEvent('show-toast', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: text,
-        link: link
-      }
-    }));
   }
 }
 

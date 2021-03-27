@@ -133,7 +133,7 @@ class KlogNote extends PolymerElement {
   }
 
   openKlogDrawer() {
-    this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent('main-drawer-open', { bubbles: true, composed: true }));
   }
 
   load(userLoadPromise) {

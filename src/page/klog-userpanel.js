@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
@@ -24,7 +25,7 @@ import '../ui/klog-render-license.js'
 import { KlogDataLicenseMixin } from '../data/klog-data-license-mixin.js';
 import { KlogDataUserPublicMixin } from '../data/klog-data-user-public-mixin.js';
 
-class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(PolymerElement)) {
+class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseMixin(PolymerElement))) {
   static get template() {
     return html `
     <style include="klog-style-card"></style>
@@ -96,6 +97,10 @@ class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(Polymer
         font-weight: bolder;
       }
 
+      #licenseInput{
+        cursor: pointer;
+      }
+
       /*animation*/
 
       :host([exit]) .klog-card {
@@ -157,13 +162,7 @@ class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(Polymer
     <div class="klog-card" mobile="[[mobile]]">
       <div class="card-meta">版权</div>
       <div class="form">
-        <klog-dropdown-menu label="默认协议" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
-          <paper-listbox selected="{{userinfo.license}}" on-selected-changed="updatePublicinfo" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
-          <template is="dom-repeat" items="{{licenseList}}">
-              <paper-item name="{{item.name}}">{{item.abbreviation}}</paper-item>
-            </template>
-          </paper-listbox>
-        </klog-dropdown-menu>
+        <klog-input label="版权协议" id="licenseInput" value="{{licenseAbbreviation}}" on-click="openLicenseDrawer" outlined></klog-input>
 
         <div class="form-item">
           <div class="text-container">
@@ -316,6 +315,7 @@ class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(Polymer
 
   static get observers() {
     return [
+      '_updateLicenseAbbreviation(userinfo.license)',
       'updateAvatarUrl(avatarinfo)',
       'updatePreference(preference.theme,preference.defaultPage,preference.backdropBlurEnabled,preference.markdown.numberedHeading,preference.markdown.centeredHeading,preference.markdown.overflowCode)',
     ]
@@ -354,11 +354,11 @@ class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(Polymer
 
   updateUsername() {
     if (!/^[a-zA-Z]/.test(this.username)) {
-      return this.showToast('用户名第一位请使用字母');
+      return this.openToast('用户名第一位请使用字母');
     } else if (this.username.length < 6) {
-      return this.showToast('用户名长度至少6位');
+      return this.openToast('用户名长度至少6位');
     } else if (this.username.length > 20) {
-      return this.showToast('用户名长度至多20位');
+      return this.openToast('用户名长度至多20位');
     }
     this.validateUsername(this.username).then(isValid => {
       if (isValid) {
@@ -369,23 +369,34 @@ class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(Polymer
           }
         };
         this._updateUserinfo(newInfo, false).then(() => {
-          this.showToast('用户名已保存');
+          this.openToast('用户名已保存');
           this._hasUsername = true;
         });
       } else {
-        return this.showToast('用户名已被占用');
+        return this.openToast('用户名已被占用');
       }
     });
+  }
+
+  openLicenseDrawer() {
+    this.openDrawer('版权协议', [{ name: 'license', items: this.getLicenseMenu(this.licenseList) }]);
+  }
+
+  _updateLicenseAbbreviation(license) {
+    this.licenseAbbreviation = this.fullLicenseList.find(x => x['name'] == license)['abbreviation'];
   }
 
   menuSelect(category, item) {
     if (category == 'account' && item == 'logout') {
       this.logout();
+    } else if (category == 'license') {
+      console.log(item);
+      this.set('userinfo.license', item);
     }
   }
 
-  openDrawer() {
-    this.dispatchEvent(new CustomEvent('drawer-toggle', {
+  openMainDrawer() {
+    this.dispatchEvent(new CustomEvent('main-drawer-open', {
       bubbles: true,
       composed: true
     }));
@@ -436,20 +447,9 @@ class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(Polymer
   _updateUserinfo(info, toast = true) {
     let klogUser = this.userinfo.klogUser;
     return klogUser.update(info).then(() => {
-      if (toast) this.showToast('已更新账户');
+      if (toast) this.openToast('已更新账户');
       klogUser.updateUserinfo();
     });
-  }
-
-  showToast(text, link) {
-    this.dispatchEvent(new CustomEvent('show-toast', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: text,
-        link: link
-      }
-    }));
   }
 
   updatePublicinfo() {

@@ -6,8 +6,6 @@ import '@polymer/app-route/app-location.js';
 import '@polymer/app-route/app-route.js';
 import '../data/klog-data-user.js';
 import './klog-layout.js';
-import '../style/klog-style.js';
-import '../style/klog-style-toast.js';
 
 class KlogApp extends PolymerElement {
   static get template() {
@@ -199,7 +197,6 @@ class KlogApp extends PolymerElement {
     window.addEventListener('online', (e) => this._notifyNetworkStatus(e));
     window.addEventListener('offline', (e) => this._notifyNetworkStatus(e));
     this._notifyNetworkStatus();
-    this.addEventListener('show-toast', e => this.showToast(e.detail.text, e.detail.link, e.detail.option));
     this.addEventListener('update-service-worker', (e) => {
       let callback = e.detail && e.detail.callback ? e.detail.callback : function() {};
       this._updateServiceWorker(callback);
@@ -258,7 +255,7 @@ class KlogApp extends PolymerElement {
 
   _updateFound(sw) {
     console.log('Update for Klog found.');
-    this.showToast('Klog 更新已就绪', {
+    this.openToast('Klog 更新已就绪', {
       title: 'Link Start!',
       onclick: () => this.reload()
     }, { duration: 10000 });
@@ -270,22 +267,6 @@ class KlogApp extends PolymerElement {
 
   back() {
     window.history.back();
-  }
-
-  showToast(text, link, option = {}) {
-      const toast = document.createElement('paper-toast');
-      Object.assign(toast, { text: text, duration: 2000, withBackdrop: false }, option);
-      if (link) {
-        toast.innerHTML = `<a ${link.href ? `href="${link.href}"` : ''}>${link.title}</a>`;
-      toast.querySelector('a').addEventListener('click', e => link.onclick(e));
-    }
-    this.shadowRoot.append(toast);
-    toast.addEventListener('opened-changed', function (e) {
-      if (!e.detail.value) {
-        this.parentNode.removeChild(this);
-      }
-    });
-    toast.open();
   }
 
   _calcPage(page) {
@@ -314,11 +295,11 @@ class KlogApp extends PolymerElement {
 
   _notifyNetworkStatus() {
     if (this.offline) {
-      this.showToast('村里通网啦 σ`∀´)');
+      this.openToast('村里通网啦 σ`∀´)');
     }
     this.offline = !navigator.onLine;
     if (this.offline) {
-      this.showToast('没有网啦！！(´ﾟДﾟ`)');
+      this.openToast('没有网啦！！(´ﾟДﾟ`)');
     }
   }
 

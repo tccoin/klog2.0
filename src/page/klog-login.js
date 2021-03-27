@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-listbox/paper-listbox.js';
@@ -8,7 +9,7 @@ import '../ui/klog-icons.js';
 import '../style/klog-style-login.js';
 import '../ui/klog-input.js';
 
-class KlogLogin extends PolymerElement {
+class KlogLogin extends KlogUiMixin(PolymerElement) {
   static get template() {
     return html `
     <style include="klog-style-login"></style>
@@ -83,8 +84,8 @@ class KlogLogin extends PolymerElement {
     };
   }
 
-  openDrawer() {
-    this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+  openMainDrawer() {
+    this.dispatchEvent(new CustomEvent('main-drawer-open', { bubbles: true, composed: true }));
   }
 
   ready() {
@@ -116,24 +117,13 @@ class KlogLogin extends PolymerElement {
       try {
         await this.user.resetPassword(this.email);
       } catch (err) {
-        this.showToast('请检查你输入的邮箱地址');
+        this.openToast('请检查你输入的邮箱地址');
         return;
       }
-      this.showToast('密码重设邮件已发送到你的邮箱');
+      this.openToast('密码重设邮件已发送到你的邮箱');
     } else {
-      this.showToast('请填写注册时使用的邮箱地址');
+      this.openToast('请填写注册时使用的邮箱地址');
     }
-  }
-
-  showToast(text, link) {
-    this.dispatchEvent(new CustomEvent('show-toast', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: text,
-        link: link
-      }
-    }));
   }
 
   login() {

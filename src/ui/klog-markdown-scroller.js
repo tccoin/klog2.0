@@ -1,8 +1,9 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 
-class klogMarkdownScroller extends PolymerElement {
+class klogMarkdownScroller extends KlogUiMixin(PolymerElement) {
   static get template() {
-    return html`
+    return html `
     <div id="toastContainer"></div>
 `;
   }
@@ -55,7 +56,7 @@ class klogMarkdownScroller extends PolymerElement {
 
   generateLink(hash) {
     let link = `${window.location.href.replace(/#.*/, '')}#/${this.linkPrefix}/${hash}`;
-    this.showToast('复制链接到剪贴板？', {
+    this.openToast('复制链接到剪贴板？', {
       title: '确定',
       href: link,
       onclick: e => {
@@ -71,23 +72,13 @@ class klogMarkdownScroller extends PolymerElement {
         input.focus();
         document.execCommand('copy');
         document.body.removeChild(input);
-        this.showToast('已复制');
+        this.openToast('已复制');
         this.updateQueryByHash(hash);
         this.scroll();
       }
     });
   }
 
-  showToast(text, link) {
-    this.dispatchEvent(new CustomEvent('show-toast', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: text,
-        link: link
-      }
-    }));
-  }
 }
 
 window.customElements.define(klogMarkdownScroller.is, klogMarkdownScroller);

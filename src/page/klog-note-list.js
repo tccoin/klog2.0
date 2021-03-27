@@ -11,7 +11,7 @@ import './klog-note-search.js';
 
 class KlogNoteList extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-toolbar"></style>
     <style>
@@ -260,8 +260,8 @@ class KlogNoteList extends PolymerElement {
     ]
   }
 
-  openDrawer() {
-    this.dispatchEvent(new CustomEvent('drawer-toggle', { bubbles: true, composed: true }));
+  openMainDrawer() {
+    this.dispatchEvent(new CustomEvent('main-drawer-open', { bubbles: true, composed: true }));
   }
 
   ready() {
@@ -328,7 +328,9 @@ class KlogNoteList extends PolymerElement {
       this.dispatchEvent(new CustomEvent('note-update-path', {
         detail: {
           path: list[0].path
-        }, bubbles: true, composed: true
+        },
+        bubbles: true,
+        composed: true
       }));
     });
   }
@@ -367,7 +369,7 @@ class KlogNoteList extends PolymerElement {
     this._resetPage();
     this._pageScrollHandler = e => {
       let y = this.$.scrollTarget.scrollTop;
-      let wh = this.scrollHeight;         // container height
+      let wh = this.scrollHeight; // container height
       let eh = this.$.items.scrollHeight; // element height
       if (y + wh * 1.4 >= eh) {
         this._loadNextPage();
