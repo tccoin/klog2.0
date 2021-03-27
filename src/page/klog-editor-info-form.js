@@ -32,6 +32,8 @@ class KlogEditorInfoForm extends KlogUiMixin(KlogDataLicenseMixin(PolymerElement
     <!-- <klog-input label="标题" value="{{title}}" outlined></klog-input> -->
     <klog-input label="路径" id="pathInput" placeholder="{{randomPath}}" value="{{path}}" outlined></klog-input>
     <klog-input label="版权协议" id="licenseInput"  value="{{licenseAbbreviation}}" on-click="openLicenseDrawer" outlined></klog-input>
+    <!--<klog-input label="分类" value="{{collection}}" outlined></klog-input>
+    <klog-input label="标签" value="{{tagsString}}" outlined></klog-input>-->
 
     <div class="form-item">
       <div class="text-container">
@@ -105,6 +107,13 @@ class KlogEditorInfoForm extends KlogUiMixin(KlogDataLicenseMixin(PolymerElement
         type: String,
         value: 'keyboard-arrow-up'
       },
+      collection: {
+        type: String
+      },
+      tags: {
+        type: Array,
+        observer: '_updateTagsString'
+      },
       articleId: {
         type: String,
         observer: 'articleIdChanged'
@@ -152,6 +161,10 @@ class KlogEditorInfoForm extends KlogUiMixin(KlogDataLicenseMixin(PolymerElement
 
   _calcDeleteButtonDisabled() {
     return !this.articleId || this.loading;
+  }
+
+  _updateTagsString() {
+    this.tagsString = this.tags.join(', ');
   }
 }
 

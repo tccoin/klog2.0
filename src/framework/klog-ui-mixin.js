@@ -34,9 +34,9 @@ const UiMixin = (superClass) => class extends superClass {
     menu.items = items;
     drawer.append(menu);
     this.shadowRoot.append(drawer);
-    drawer.addEventListener('opened-changed', function(e) {
+    drawer.$.drawer.addEventListener('opened-changed', function(e) {
       if (!e.detail.value) {
-        this.parentNode.removeChild(this);
+        drawer.parentNode.removeChild(drawer);
       }
     });
     drawer.open();

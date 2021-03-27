@@ -187,13 +187,13 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
       <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
       </klog-editor-header>
       <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
-        <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" license="{{license}}" random-path="{{randomPath}}" private="{{private}}"></klog-editor-info-form>
+        <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" collection="{{collection}}" tags="{{tags}}" license="{{license}}" random-path="{{randomPath}}" private="{{private}}"></klog-editor-info-form>
         <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
       </iron-pages>
       <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
         <!-- <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}"> -->
         <klog-editor-textarea id="textarea" loading="{{loading}}" tokens="{{tokens}}" value="{{markdown}}" preview="{{preview}}" placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
-        <klog-markdown id="markdown" tokens="{{tokens}}" mobile="{{mobile}}" markdown="{{preview}}" theme="[[theme]]" word-count="{{wordCount}}" collection="{{collection}}" preference="{{userinfo.preference.markdown}}" breadcrumbs="">
+        <klog-markdown id="markdown" tokens="{{tokens}}" mobile="{{mobile}}" markdown="{{preview}}" theme="[[theme]]" word-count="{{wordCount}}" collection="{{collection}}" tags="{{tags}}" preference="{{userinfo.preference.markdown}}" breadcrumbs="">
           <div slot="after" class="info">字数统计: {{wordCount}}</div>
         </klog-markdown>
         <!-- <klog-imarkdown id="imarkdown" tokens="{{tokens}}" markdown="{{preview}}" theme="[[theme]]"
@@ -418,7 +418,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
       items: [
         { name: 'save', text: '保存', icon: 'publish', raised: true },
         { name: 'upload', text: '上传文件', icon: 'insert_drive_file' },
-        { name: 'collection', text: '分类和标签', icon: 'category' },
+        // { name: 'collection', text: '分类和标签', icon: 'category' },
         { name: 'settings', text: '其它设置', icon: 'settings' },
       ]
     };

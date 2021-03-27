@@ -390,7 +390,6 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
     if (category == 'account' && item == 'logout') {
       this.logout();
     } else if (category == 'license') {
-      console.log(item);
       this.set('userinfo.license', item);
     }
   }
