@@ -64,9 +64,9 @@ class KlogEditor extends PolymerElement {
         width: calc(100vw - var(--klog-layout-margin-left));
         margin: 64px auto 16px;
         padding: 16px;
-        max-height: calc(var(--klog-layout-page-height) - 224px);
+        max-height: calc(var(--klog-layout-page-height) - 216px);
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: auto;
         display: flex;
         justify-content: center;
       }
@@ -349,13 +349,13 @@ class KlogEditor extends PolymerElement {
           items: [
             { name: 'save', text: '保存', icon: 'publish', desktop: true, raised: true },
             { name: 'upload', text: '上传文件', icon: 'insert_drive_file', desktop: true },
-            { name: 'collection', text: '分类和标签', icon: 'category' },
             { name: 'settings', text: '其它设置', icon: 'settings', desktop: true },
           ]
         }, {
           name: 'action',
           text: '插入',
           items: [
+            { name: 'collection', text: '分类和标签', icon: 'category' },
             { name: 'table', text: '表格', icon: 'border_all' },
             { name: 'code', text: '代码', icon: 'code' },
             { name: 'formula', text: '公式', icon: 'functions' },

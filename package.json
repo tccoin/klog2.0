@@ -7,7 +7,7 @@
     "node": ">=12.16.0"
   },
   "scripts": {
-    "serve": "npx es-dev-server --node-resolve --open --port 3000 --app-index index-debug.html --hostname 0.0.0.0",
+    "serve": "npx es-dev-server --node-resolve --open --port 4000 --app-index index-debug.html --hostname localhost",
     "test": "npx es-dev-server -r build",
     "build": "gulp",
     "version": "polymer --pversion"
