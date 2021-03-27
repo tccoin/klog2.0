@@ -195,7 +195,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         value: {
           documentTitle: 'Klog',
           drawer: 'auto',
-          mainMenu: true,
+          mainMenu: false,
           sidebar: 'off',
           scrollToTop: false,
           header: {
@@ -203,15 +203,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
             short: false,
             shadow: { mobile: 'off', desktop: 'off' },
           },
-          customMenu: [{
-            name: 'timeline',
-            text: '时间轴',
-            items: [
-              { name: 'add', text: '优里卡！', icon: 'post_add', raised: true },
-              { name: 'help', text: '写作入门', icon: 'bookmark' },
-              { name: 'log', text: '最近更新', icon: 'bookmark' },
-            ]
-          }],
           styles: {
             '--klog-header-background': 'transparent',
             '--klog-header-text-color': 'var(--primary-text-color)',

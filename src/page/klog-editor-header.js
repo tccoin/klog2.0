@@ -3,6 +3,7 @@ import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-progress/paper-progress.js';
 import '@polymer/paper-dialog/paper-dialog.js';
+import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/paper-toggle-button/paper-toggle-button.js';
 import '../style/klog-style-toolbar.js';
@@ -17,6 +18,7 @@ class KlogEditorHeader extends PolymerElement {
       :host {
         display: block;
         padding: 0;
+        --klog-header-background: transparent;
       }
 
       app-toolbar {
@@ -81,22 +83,29 @@ class KlogEditorHeader extends PolymerElement {
         }
       }
     </style>
-    <app-toolbar>
-      <paper-icon-button icon="arrow_back" on-click="back"></paper-icon-button>
-      <div class="divider"></div>
-      <paper-toggle-button checked="{{preview}}" hidden-on-desktop hidden-on-tablet></paper-toggle-button>
-      <paper-icon-button icon="more_vert" on-click="openKlogDrawer" hidden-on-desktop></paper-icon-button>
-      <paper-icon-button for="infoform" icon="highlight" on-click="activeFront" hidden="" id="infoformButton"></paper-icon-button>
-      <paper-icon-button for="infoform" icon="settings" on-click="activeFront" hidden-on-desktop>
-      </paper-icon-button>
-      <paper-icon-button for="uploadzone" icon="insert_drive_file" on-click="upload" hidden-on-desktop></paper-icon-button>
-      <paper-icon-button for="browser" icon="book" on-click="activeFront" disabled="{{loading}}" hidden="">
-      </paper-icon-button>
-      <paper-button raised="" id="saveButton" on-click="publish" disabled="{{loading}}" hidden-on-desktop>
-        <iron-icon icon="publish"></iron-icon>保存
-      </paper-button>
-      <paper-progress indeterminate="" disabled="{{!loading}}"></paper-progress>
-    </app-toolbar>
+    <iron-pages id="pages" selected="0">
+      <app-toolbar>
+        <paper-icon-button icon="arrow_back" on-click="back"></paper-icon-button>
+        <div class="divider"></div>
+        <paper-toggle-button checked="{{preview}}" hidden-on-desktop hidden-on-tablet></paper-toggle-button>
+        <paper-icon-button icon="more_vert" on-click="openKlogDrawer" hidden-on-desktop></paper-icon-button>
+        <paper-icon-button for="infoform" icon="highlight" on-click="activeFront" hidden="" id="infoformButton"></paper-icon-button>
+        <paper-icon-button for="infoform" icon="settings" on-click="activeFront" hidden-on-desktop>
+        </paper-icon-button>
+        <paper-icon-button for="uploadzone" icon="insert_drive_file" on-click="upload" hidden-on-desktop></paper-icon-button>
+        <paper-icon-button for="browser" icon="book" on-click="activeFront" disabled="{{loading}}" hidden="">
+        </paper-icon-button>
+        <paper-button raised="" id="saveButton" on-click="publish" disabled="{{loading}}" hidden-on-desktop>
+          <iron-icon icon="publish"></iron-icon>保存
+        </paper-button>
+        <paper-progress indeterminate="" disabled="{{!loading}}"></paper-progress>
+      </app-toolbar>
+      <app-toolbar>
+        <paper-icon-button icon="arrow_back" on-click="back"></paper-icon-button>
+        <div class="divider"></div>
+        <paper-icon-button icon="close" on-click="activeFront"></paper-icon-button>
+      </app-toolbar>
+    </iron-pages>
 `;
   }
 
@@ -141,12 +150,16 @@ class KlogEditorHeader extends PolymerElement {
   }
 
   upload(e) {
-    if (this.mobile) this.activeFront(e);
-    else this.$.uploadzone.$.input.click();
+    if (this.mobile) {
+      this.activeFront(e);
+    } else {
+      this.$.uploadzone.$.input.click();
+    }
   }
 
   activeFront(e) {
-    if (!this.$.backdrop.active)
+    if (!this.$.backdrop.active) {
+      this.$.pages.selected = 1;
       this.dispatchEvent(new CustomEvent('active-backdrop-front', {
         bubbles: true,
         composed: true,
@@ -154,12 +167,14 @@ class KlogEditorHeader extends PolymerElement {
           selected: e.target.getAttribute('for')
         }
       }));
-    else
+    } else {
+      this.$.pages.selected = 0;
       this.$.backdrop.hide();
+    }
   }
 
   _is(val) {
-    return !!val
+    return Boolean(val)
   }
 
   _updateSelected(preview) {

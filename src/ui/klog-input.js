@@ -8,7 +8,7 @@ class KlogInput extends PolymerElement {
     <style>
       :host {
         display: block;
-        margin: 0 0 16px 0;
+        margin: 4px 0 16px 0;
       }
 
       :host([hidden]) {

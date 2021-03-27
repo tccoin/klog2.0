@@ -43,12 +43,12 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
           },
           customMenu: [{
             name: 'message',
-            text: '通知',
             items: [
+              { subtitle: true, text: '通知' },
               { name: 'refresh', text: '刷新', icon: 'refresh' },
             ]
           }],
-          toolbar: html`
+          toolbar: html `
           <app-toolbar>
             <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
             <div class="title">
@@ -75,7 +75,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
 
 
   static get styleTemplate() {
-    return html`
+    return html `
     <style include="klog-style-card"></style>
     <style>
       :host {
@@ -106,14 +106,14 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
   }
 
   static get template() {
-    return html`
+    return html `
       ${this.styleTemplate}
       <div class="main-container">${this.messageTemplate}</div>
       `;
   }
 
   static get messageTemplate() {
-    return html`
+    return html `
       <template is="dom-repeat" items="{{messageGroups}}" as="group">
         <div class="group-container">
           <div class="klog-card-label">{{group.name}}</div>
@@ -140,8 +140,7 @@ class KlogMessage extends KlogDataMessageMixin(PolymerElement) {
   }
 
   static get observers() {
-    return [
-    ]
+    return []
   }
 
 

@@ -110,9 +110,9 @@ class KlogTimeline extends PolymerElement {
           },
           customMenu: [{
             name: 'timeline',
-            text: '时间轴',
             items: [
-              { name: 'add', text: '优里卡！', icon: 'post_add', raised: true },
+              { subtitle: true, text: '时间轴' },
+              { name: 'add', text: '优里卡！', icon: 'post_add', raised: true, desktop: true },
               { name: 'help', text: 'Klog入门', icon: 'bookmark' },
               { name: 'log', text: '最近更新', icon: 'bookmark' },
             ]

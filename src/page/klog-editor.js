@@ -62,9 +62,9 @@ class KlogEditor extends PolymerElement {
 
       .klog-editor-back-pages {
         width: calc(100vw - var(--klog-layout-margin-left));
-        margin: 64px auto 16px;
-        padding: 16px;
-        max-height: calc(var(--klog-layout-page-height) - 216px);
+        margin: 0 auto;
+        padding: 64px 16px 32px;
+        max-height: calc(var(--klog-layout-page-height) - 152px);
         box-sizing: border-box;
         overflow: auto;
         display: flex;
@@ -74,10 +74,12 @@ class KlogEditor extends PolymerElement {
       klog-editor-info-form {
         width: 100vw;
         max-width: 360px;
+        height: fit-content;
       }
 
       klog-upload-zone {
         width: 100%;
+        height: fit-content;
       }
 
       .klog-editor-main-pages {
@@ -270,7 +272,7 @@ class KlogEditor extends PolymerElement {
   }
 
   load(userLoadPromise) {
-    this.mainMenu();
+    this.updateMenu();
     return userLoadPromise.then(result => {
       if (!result.login) {
         this.dispatchEvent(new CustomEvent('user-login-page-open', {
@@ -338,24 +340,25 @@ class KlogEditor extends PolymerElement {
   }
 
 
-  mainMenu() {
+  updateMenu() {
     this.dispatchEvent(new CustomEvent('layout-update', {
       bubbles: true,
       composed: true,
       detail: {
+        drawerHeading: '插入',
         customMenu: [{
           name: 'edit',
-          text: '',
+          desktop: true,
           items: [
-            { name: 'save', text: '保存', icon: 'publish', desktop: true, raised: true },
-            { name: 'upload', text: '上传文件', icon: 'insert_drive_file', desktop: true },
-            { name: 'settings', text: '其它设置', icon: 'settings', desktop: true },
+            { name: 'save', text: '保存', icon: 'publish', raised: true },
+            { name: 'upload', text: '上传文件', icon: 'insert_drive_file' },
+            { name: 'collection', text: '分类和标签', icon: 'category' },
+            { name: 'settings', text: '其它设置', icon: 'settings' },
           ]
         }, {
           name: 'action',
-          text: '插入',
           items: [
-            { name: 'collection', text: '分类和标签', icon: 'category' },
+            { subtitle: true, text: '插入', desktop: true },
             { name: 'table', text: '表格', icon: 'border_all' },
             { name: 'code', text: '代码', icon: 'code' },
             { name: 'formula', text: '公式', icon: 'functions' },
@@ -375,13 +378,6 @@ class KlogEditor extends PolymerElement {
 
   menuSelect(category, item) {
     if (category == 'action') {
-      // if (item == 'collection') {
-      //   if (this.markdown.match(/@\(.*\)\[.*\]/)) {
-      //     this.showToast('已经有分类啦！');
-      //   } else {
-      //     this.markdown = '@(笔记)[]\n' + this.markdown;
-      //   }
-      // } else
       if (item == 'table') {
         this.$.textarea.insert('\n|  header', `  |  header  |
 |  :----:  | : ----:  |
@@ -423,7 +419,7 @@ class KlogEditor extends PolymerElement {
       } else if (item == 'upload') {
         this.$.header.upload();
       } else if (item == 'collection') {
-        this.$.header.publish();
+        this.$.header.$.infoformButton.click();
       } else if (item == 'settings') {
         this.$.header.$.infoformButton.click();
       }

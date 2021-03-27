@@ -293,8 +293,8 @@ class KlogUserpanel extends KlogDataUserPublicMixin(KlogDataLicenseMixin(Polymer
           },
           customMenu: [{
             name: 'account',
-            text: '账户',
             items: [
+              { subtitle: true, text: '账户' },
               { name: 'logout', text: '注销', icon: 'power_settings_new' }
             ]
           }],

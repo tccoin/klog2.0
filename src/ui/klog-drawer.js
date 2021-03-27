@@ -4,7 +4,7 @@ import '../style/klog-style-scrollbar.js';
 
 class KlogDrawer extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style include="klog-style-scrollbar"></style>
     <style>
       :host {
@@ -44,7 +44,9 @@ class KlogDrawer extends PolymerElement {
     </style>
     <app-drawer id="drawer" swipe-open="{{!disabled}}" opened="{{opened}}">
       <div class="container" id="scrollTarget">
-        <div class="title">{{heading}}</div>
+        <template is="dom-if" if="{{heading}}">
+          <div class="title">{{heading}}</div>
+        </template>
         <slot></slot>
       </div>
     </app-drawer>

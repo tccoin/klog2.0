@@ -120,7 +120,7 @@ class KlogLayout extends PolymerElement {
       }
     </style>
     <!-- Drawer -->
-    <klog-drawer id="drawer" heading="记录未来">
+    <klog-drawer id="drawer" heading="{{drawerHeading}}">
       <klog-menu login="{{login}}" page="{{page}}" items="{{menu}}"></klog-menu>
     </klog-drawer>
     <!-- Layout -->
@@ -162,7 +162,7 @@ class KlogLayout extends PolymerElement {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.16.3<br>2017-2021<br>Powered by Kr with Love.</p>
+      <p>v2.16.4<br>2017-2021<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -200,6 +200,9 @@ class KlogLayout extends PolymerElement {
         value: false
       },
       documentTitle: {
+        type: String
+      },
+      drawerHeading: {
         type: String
       },
       drawer: {
@@ -422,6 +425,7 @@ class KlogLayout extends PolymerElement {
           background: 'var(--primary-background-color)',
           color: 'var(--secondary-text-color)',
         },
+        drawerHeading: '记录未来',
         customMenu: [],
         mainMenu: false,
         styles: {
@@ -580,48 +584,45 @@ class KlogLayout extends PolymerElement {
     }
   }
 
-  _getMainMenu() {
-    let mainMenu = [{
+  _addMainMenu(menu) {
+    let before = [{
       name: 'main',
-      text: '',
-      style: 'color:var(--primary-text-color)',
       items: [
         { name: 'timeline', text: '时间轴', icon: 'timeline', path: 'timeline' },
         { name: 'note', text: '笔记', icon: 'book', path: 'note/all/' }
       ]
     }];
+    let after = [];
     if (this.login) {
-      mainMenu.push({
+      before[0].items.push({ name: 'message', text: '通知', icon: 'notifications', path: 'message' });
+      after.push({
         name: 'user',
-        text: '用户',
         items: [
+          { subtitle: true, text: '用户' },
           { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' },
-          { name: 'message', text: '通知', icon: 'notifications', path: 'message' },
           { name: 'console', text: '控制台', icon: 'console' }
         ]
       });
-      // mainMenu[0].items.splice(2, 0, { name: 'message', text: '通知', icon: 'notifications', path: 'message' }, { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' }, );
     } else {
-      mainMenu.push({
+      after.push({
         name: 'user',
-        text: '用户',
         items: [
+          { subtitle: true, text: '用户' },
           { name: 'login', text: '登录', icon: 'account_circle', path: 'login', raised: true },
           { name: 'signup', text: '注册', icon: 'account_box', path: 'signup' },
           { name: 'console', text: '控制台', icon: 'console' }
         ]
       });
     }
-    return mainMenu;
+    return before.concat(menu, after);
   }
 
   _updateMenu() {
-    let menu = [];
     if (this.mainMenu) {
-      menu = menu.concat(this._getMainMenu());
+      this.menu = this._addMainMenu(this.customMenu);
+    } else {
+      this.menu = this.customMenu;
     }
-    menu = menu.concat(this.customMenu);
-    this.menu = menu;
   }
 
   _menuSelectHandle(category, item) {

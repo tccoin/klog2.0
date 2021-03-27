@@ -182,8 +182,10 @@ class KlogNote extends PolymerElement {
     if (this.collections && this.collections.length > 0) {
       let items = {
         name: 'collection',
-        text: '笔记本',
-        items: [{ name: 'add', text: '新建笔记', icon: 'note_add', desktop: true, raised: true }]
+        items: [
+          { subtitle: true, text: '笔记本' },
+          { name: 'add', text: '新建笔记', icon: 'note_add', raised: true, desktop: true }
+        ]
       };
       for (let item of this.collections) {
         items.items.push({ name: item, text: item, icon: 'label' });
@@ -193,8 +195,7 @@ class KlogNote extends PolymerElement {
     if (this.bookmarks && this.bookmarks.length > 0) {
       let items = {
         name: 'bookmark',
-        text: '书签',
-        items: []
+        items: [{ subtitle: true, text: '书签' }]
       };
       for (let item of this.bookmarks) {
         items.items.push({ name: item.path, text: item.title, icon: 'bookmark' });

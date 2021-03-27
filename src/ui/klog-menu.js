@@ -119,11 +119,15 @@ class KlogMenu extends PolymerElement {
 
 
       @media (min-width: 1025px) {
+        .subtitle.mobile,
+        .divider.mobile,
         .item.mobile {
           display: none!important;
         }
       }
       @media (max-width: 1024px) {
+        .subtitle.desktop,
+        .divider.desktop,
         .item.desktop {
           display: none!important;
         }
@@ -133,11 +137,11 @@ class KlogMenu extends PolymerElement {
       <div name="idle" id="idle"></div>
       <template is="dom-repeat" items="{{menu}}">
         <template is="dom-if" if="{{item.divider}}">
-          <div class="divider"></div>
+          <div class\$="{{item.className}}"></div>
         </template>
 
         <template is="dom-if" if="{{item.subtitle}}">
-          <div class="subtitle"><span>{{item.text}}</span></div>
+          <div class\$="{{item.className}}"><span>{{item.text}}</span></div>
         </template>
 
         <template is="dom-if" if="{{item.item}}">
@@ -185,30 +189,33 @@ class KlogMenu extends PolymerElement {
     this._items = items;
     const menu = [];
     let hasRaised = false;
+    let classList = [];
     for (let category of items) {
       if (menu.length != 0) {
         menu.push({
-          divider: true
+          divider: true,
+          className: classList.concat(['divider']).join(' ')
         });
       }
-      if (category.text) {
-        menu.push({
-          subtitle: true,
-          name: category.name,
-          text: category.text
-        });
-      }
+      classList = [];
+      if (category.desktop) { classList.push('desktop'); }
+      if (category.mobile) { classList.push('mobile'); }
       for (let item of category.items) {
-        let className = 'item';
+        let itemClassList = [];
+        if (item.desktop) { itemClassList.push('desktop'); }
+        if (item.mobile) { itemClassList.push('mobile'); }
+        if (item.subtitle) {
+          menu.push({
+            subtitle: true,
+            text: item.text,
+            className: classList.concat(['subtitle'], itemClassList).join(' ')
+          });
+          continue;
+        }
+        itemClassList.push('item');
         if (item.raised && !hasRaised) {
           hasRaised = true;
-          className += ' raised';
-        }
-        if (item.desktop) {
-          className += ' desktop';
-        }
-        if (item.mobile) {
-          className += ' mobile';
+          itemClassList.push('raised');
         }
         menu.push({
           item: true,
@@ -216,7 +223,7 @@ class KlogMenu extends PolymerElement {
           text: item.text,
           icon: item.icon,
           category: category.name,
-          className: className,
+          className: classList.concat(itemClassList).join(' '),
           style: category.style || '',
           path: item.path || ''
         });
