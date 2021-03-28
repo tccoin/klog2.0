@@ -103,8 +103,7 @@ class KlogNote extends PolymerElement {
       if (this.selected == 0) {
         this.article = {};
       }
-      this.$.backdrop.active = false;
-      this.$.backdrop.update();
+      this.$.backdrop.closest();
     });
     this.addEventListener('note-share', (e) => {
       this.share(e.detail.path);
@@ -120,7 +119,7 @@ class KlogNote extends PolymerElement {
       this.path = e.detail.path;
     });
     this.$.shareDialog.addEventListener('opened-changed', e => {
-      this.dispatchEvent(new CustomEvent('backdrop-opened-changed', {
+      this.dispatchEvent(new CustomEvent('editor-backdrop-opened-changed', {
         bubbles: true,
         composed: true,
         detail: { value: e.detail.value }

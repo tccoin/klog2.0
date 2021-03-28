@@ -12,7 +12,7 @@ import '../lib/web-animations-next-lite.min.js';
 import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/app-route/app-route.js';
 import '../ui/klog-icons.js';
-import './klog-editor-info-form.js';
+import './klog-editor-backdrop-pages.js';
 import './klog-editor-header.js';
 import './klog-editor-textarea.js';
 import '../data/klog-data-editor.js';
@@ -62,21 +62,12 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         background-color: var(--primary-background-color);
       }
 
-      .klog-editor-back-pages {
+      klog-editor-backdrop-pages {
         width: calc(100vw - var(--klog-layout-margin-left));
-        margin: 0 auto;
-        padding: 64px 16px 32px;
         max-height: calc(var(--klog-layout-page-height) - 152px);
-        box-sizing: border-box;
-        overflow: auto;
-        display: flex;
-        justify-content: center;
-      }
-
-      klog-editor-info-form {
-        width: 100vw;
-        max-width: 360px;
-        height: fit-content;
+        margin: 0 auto;
+        padding: 64px 16px 16px;
+        scroll-behavior: smooth;
       }
 
       klog-upload-zone {
@@ -137,11 +128,11 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         transition: opacity .2s ease, transform .1s ease;
       }
 
-      .klog-editor-back-pages {
+      klog-editor-backdrop-pages {
         transition: .2s all 0s ease;
       }
 
-      :host([exit]) .klog-editor-back-pages,
+      :host([exit]) klog-editor-backdrop-pages,
       :host([exit]) .klog-editor-main-pages {
         opacity: 0;
         transform: translateY(5vh);
@@ -154,10 +145,6 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
 
       :host([exit]) klog-editor-header {
         opacity: 0;
-      }
-
-      #backPages{
-        scroll-behavior: smooth;
       }
 
       /*media*/
@@ -188,12 +175,15 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
 
     <!-- Backdrop -->
     <klog-backdrop id="backdrop">
+
+      <!-- header -->
       <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
       </klog-editor-header>
-      <iron-pages id="backPages" slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
-        <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" collection="{{collection}}" tags="{{tags}}" license="{{license}}" random-path="{{randomPath}}" private="{{private}}"></klog-editor-info-form>
-        <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
-      </iron-pages>
+
+      <!-- back -->
+      <klog-editor-backdrop-pages id="backdropPages" slot="back" class="klog-editor-back-pages" selected="{{backdropSelected}}" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" collection="{{collection}}" tags="{{tags}}" markdown="{{markdown}}" license="{{license}}" random-path="{{randomPath}}" private="{{private}}"></klog-editor-backdrop-pages>
+
+      <!-- front -->
       <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}">
         <!-- <klog-pages slot="front" class="klog-editor-main-pages" selected="{{selected}}" disabled="{{!mobile}}"> -->
         <klog-editor-textarea id="textarea" loading="{{loading}}" tokens="{{tokens}}" value="{{markdown}}" preview="{{preview}}" placeholder="摸了摸了" current-line="{{currentLine}}"></klog-editor-textarea>
@@ -206,6 +196,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
           <div slot="after" class="info">字数统计: {{wordCount}}</div>
         </klog-imarkdown> -->
       </klog-pages>
+
     </klog-backdrop>
 
     <!-- Drawer -->
@@ -287,6 +278,80 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
     };
   }
 
+  ready() {
+    super.ready();
+    // layout
+    this.editMenu = {
+      name: 'edit',
+      desktop: true,
+      items: [
+        { name: 'save', text: '保存', icon: 'publish', raised: true },
+        { name: 'upload', text: '上传文件', icon: 'insert_drive_file' },
+        { name: 'category', text: '分类和标签', icon: 'category', desktop: true },
+        { name: 'settings', text: '其它设置', icon: 'settings' },
+      ]
+    };
+    this.actionMenu = {
+      name: 'action',
+      items: [
+        { subtitle: true, text: '插入', desktop: true },
+        { name: 'table', text: '表格', icon: 'border_all' },
+        { name: 'code', text: '代码', icon: 'code' },
+        { name: 'formula', text: '公式', icon: 'functions' },
+        { name: 'toc', text: '目录', icon: 'menu_book' },
+        { name: 'quote', text: '引用', icon: 'format_quote' },
+        { name: 'ref', text: '来源', icon: 'comment' },
+        { name: 'heading-1', text: '一级标题', icon: 'title' },
+        { name: 'heading-2', text: '二级标题', icon: 'title' },
+        { name: 'heading-3', text: '三级标题', icon: 'title' },
+        { name: 'ul', text: '无序列表', icon: 'format_list_bulleted' },
+        { name: 'ol', text: '有序列表', icon: 'format_list_numbered' },
+      ]
+    };
+    // init floating toolbar
+    this._initFloatingToolbar();
+    // preset
+    this._defaultPreset = {
+      markdown: '@(笔记)[]',
+      private: true
+    };
+    // bind
+    this.$.textarea.$.preview = this.$.markdown;
+    this.$.markdown.updateScrollTarget(this.$.markdown);
+    setTimeout(() => {
+      //connect the components
+      this.$.data.editor = this;
+      this.scrollTarget = document.querySelector('html');
+    }, 1);
+    // activate the leancloud server
+    AV.Cloud.run('warmup').then(function(data) {
+      console.log(data);
+    });
+    //event
+    this.addEventListener('open-insert-drawer', () => this.openDrawer('插入', [this.actionMenu]));
+    this.$.textarea.addEventListener('editor-textarea-input', (e) => this._textareaInputHandle(e.detail));
+    this.$.textarea.addEventListener('scroll', (e) => this.updateFloatingToolbar(false));
+    this.$.textarea.addEventListener('mousedown', (e) => this.updateFloatingToolbar(false));
+    this.addEventListener('editor-open-backdrop', (e) => this.openBackdrop(e.detail.selected));
+    this.addEventListener('editor-close-backdrop', (e) => this.closeBackdrop());
+    this.addEventListener('editor-toggle-backdrop', (e) => this.toggleBackdrop(e.detail.selected));
+    this.addEventListener('editor-upload', (e) => this.upload());
+    this.addEventListener('upload-success', (e) => {
+      e.stopPropagation();
+      this._uploadSuccessHandle(e.detail.fileinfo);
+    });
+    this.addEventListener('editor-save', (e) => this.save(e.detail.quiet));
+    this.addEventListener('editor-delete', () => this.delete());
+    this.addEventListener('editor-back', (e) => this.back());
+    this.addEventListener('keydown', (e) => this._keydownHandle(e));
+    this.addEventListener('dragover', e => this.openBackdrop('uploadzone'), false);
+    this.addEventListener('dragleave', e => this.$.backdrop.close(), false);
+    this.addEventListener('drop', e => {
+      e.stopPropagation();
+      e.preventDefault();
+    }, false);
+  }
+
   load(userLoadPromise) {
     this.dispatchEvent(new CustomEvent('layout-update', {
       bubbles: true,
@@ -317,10 +382,6 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
     }, 1);
   }
 
-  _updateArticleId() {
-    this.articleId = this.routeData.id;
-  }
-
   unload() {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -330,6 +391,10 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         resolve();
       }, 150);
     });
+  }
+
+  _updateArticleId() {
+    this.articleId = this.routeData.id;
   }
 
   _initFloatingToolbar() {
@@ -400,170 +465,17 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
       }
     } else if (category == 'edit') {
       if (item == 'save') {
-        this.$.header.publish();
+        this.save(false);
       } else if (item == 'upload') {
-        this.$.header.upload();
-      } else if (item == 'collection') {
-        this.$.header.$.infoformButton.click();
+        this.upload();
       } else if (item == 'settings') {
-        this.$.header.$.infoformButton.click();
+        this.toggleBackdrop('settings');
+      } else if (item == 'category') {
+        this.toggleBackdrop('category');
       }
     } else if (category == 'license') {
       this.license = item;
     }
-  }
-
-  ready() {
-    super.ready();
-    // layout
-    this.editMenu = {
-      name: 'edit',
-      desktop: true,
-      items: [
-        { name: 'save', text: '保存', icon: 'publish', raised: true },
-        { name: 'upload', text: '上传文件', icon: 'insert_drive_file' },
-        // { name: 'collection', text: '分类和标签', icon: 'category' },
-        { name: 'settings', text: '其它设置', icon: 'settings' },
-      ]
-    };
-    this.actionMenu = {
-      name: 'action',
-      items: [
-        { subtitle: true, text: '插入', desktop: true },
-        { name: 'table', text: '表格', icon: 'border_all' },
-        { name: 'code', text: '代码', icon: 'code' },
-        { name: 'formula', text: '公式', icon: 'functions' },
-        { name: 'toc', text: '目录', icon: 'menu_book' },
-        { name: 'quote', text: '引用', icon: 'format_quote' },
-        { name: 'ref', text: '来源', icon: 'comment' },
-        { name: 'heading-1', text: '一级标题', icon: 'title' },
-        { name: 'heading-2', text: '二级标题', icon: 'title' },
-        { name: 'heading-3', text: '三级标题', icon: 'title' },
-        { name: 'ul', text: '无序列表', icon: 'format_list_bulleted' },
-        { name: 'ol', text: '有序列表', icon: 'format_list_numbered' },
-      ]
-    };
-    // init floating toolbar
-    this._initFloatingToolbar();
-    // preset
-    this._defaultPreset = {
-      markdown: '@(笔记)[]',
-      private: true
-    };
-    // bond
-    this.$.textarea.$.preview = this.$.markdown;
-    this.$.markdown.updateScrollTarget(this.$.markdown);
-    // this.$.imarkdown.updateScrollTarget(this.$.imarkdown);
-    this.$.header.$.uploadzone = this.$.uploadzone;
-    this.$.header.$.backdrop = this.$.backdrop;
-    this.$.header.$.backPages = this.$.backPages;
-    this.$.infoform.$.header = this.$.header;
-    // activate the leancloud server
-    AV.Cloud.run('warmup').then(function(data) {
-      console.log(data);
-    });
-    //event
-    this.addEventListener('insert-drawer-open', () => this.openDrawer('插入', [this.actionMenu]));
-    this.$.textarea.addEventListener('klog-editor-input', (e) => {
-      const selection = e.detail.selection;
-      const position = e.detail.caretPosition;
-      const lineHeight = e.detail.lineHeight;
-      this.updateFloatingToolbar(
-        (selection[0] != selection[1]) && !this.mobile, [position.x, position.y - lineHeight * 0.5]
-      );
-    });
-    this.$.textarea.addEventListener('scroll', (e) => {
-      this.updateFloatingToolbar(false);
-    });
-    this.$.textarea.addEventListener('mousedown', (e) => {
-      this.updateFloatingToolbar(false);
-    });
-    this.addEventListener('open-backdrop', (e) => {
-      let newSelected = e.detail.selected;
-      if (this.$.backdrop.active && this.backSelected != newSelected) this.$.backdrop.toggle();
-      this.backSelected = newSelected;
-      this.$.backdrop.show();
-    });
-    this.addEventListener('upload-success', (e) => {
-      e.stopPropagation();
-      this.set("fileinfo", e.detail.fileinfo);
-      if (this.$.uploadzone.remainingNumber == 1) {
-        this.$.backdrop.toggle();
-      }
-    });
-    this.addEventListener('new', (e) => {
-      e.stopPropagation();
-      if (this.loading) return
-      this.$.data.reset(true);
-      //browser
-      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
-    });
-    this.addEventListener('reset', (e) => {
-      e.stopPropagation();
-      if (this.loading) return
-      this.$.data.reset();
-      //browser
-      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'editor/' } }));
-    });
-    this.addEventListener('save', (e) => {
-      e.stopPropagation();
-      if (this.loading) return
-      this.loading = true;
-      this.$.data.quiet = e.detail.quiet || false;
-      this.$.data.save().then((updatedArticle) => {
-        //data
-        this.$.data.articleId = updatedArticle.id;
-        //event
-        this.dispatchEvent(new CustomEvent('require-update', { bubbles: true, composed: true, detail: { page: 'note' } }));
-        //ui
-        this.loading = false;
-        this._pathChanged();
-        this.openToast('已保存', { title: '查看', href: this.backTo });
-      }, err => {
-        this.set('err', err);
-        this.loading = false;
-      });
-    });
-    this.addEventListener('delete', (e) => {
-      e.stopPropagation();
-      if (this.loading) return
-      this.loading = true;
-      this.$.data.delete().then((success) => {
-        //data
-        this.$.data.reset();
-        //event
-        this.dispatchEvent(new CustomEvent('require-update', { bubbles: true, composed: true, detail: { page: 'note' } }));
-        //ui
-        this.loading = false;
-        this.openToast('已删除', undefined, { duration: 500, noCancelOnOutsideClick: false });
-        //route
-        this.backTo = /#\/(article|timeline)/.test(this.backTo) ? '#/timeline' : '#/note/all/';
-        setTimeout(() => {
-          this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo } }));
-        }, 500);
-      }, (err) => {
-        this.set('err', err);
-        this.loading = false;
-      });
-    });
-    this.addEventListener('keydown', (e) => {
-      if (e.ctrlKey == true && e.keyCode == 83) {
-        //ctrl s
-        e.preventDefault();
-        if (!this.loading) {
-          this.dispatchEvent(new CustomEvent('save', { bubbles: true, composed: true, detail: { quiet: true } }));
-        }
-      }
-    });
-    this.addEventListener('back', (e) => this.back());
-    this.addEventListener('dragover', e => this.dragover(e), false);
-    this.addEventListener('dragleave', e => this.dragleave(e), false);
-    this.addEventListener('drop', e => this.drop(e), false);
-    setTimeout(() => {
-      //connect the components
-      this.$.data.editor = this;
-      this.scrollTarget = document.querySelector('html');
-    }, 1);
   }
 
   back() {
@@ -576,23 +488,60 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
     }
   }
 
-  dragover() {
-    this.dispatchEvent(new CustomEvent('open-backdrop', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        selected: 'uploadzone'
+  upload() {
+    if (this.mobile) {
+      this.openBackdrop('uploadzone');
+    } else {
+      this.$.backdropPages.$.uploadzone.$.input.click();
+    }
+  }
+
+  toggleBackdrop(selected) {
+    if (this.$.backdrop.opened && this.backdropSelected == selected) {
+      this.closeBackdrop();
+    } else {
+      this.openBackdrop(selected);
+    }
+  }
+
+  async openBackdrop(selected) {
+    this.$.header.$.pages.selected = 1;
+    let newSelected = selected;
+    if (this.$.backdrop.opened && this.backdropSelected != newSelected) await this.$.backdrop.close();
+    this.backdropSelected = newSelected;
+    this.$.backdrop.open();
+  }
+
+  closeBackdrop() {
+    this.$.header.$.pages.selected = 0;
+    this.$.backdropPages.scrollTop = 0;
+    this.$.backdrop.close();
+  }
+
+  _keydownHandle(e) {
+    if (e.ctrlKey == true && e.keyCode == 83) {
+      //ctrl s
+      e.preventDefault();
+      if (!this.loading) {
+        this.dispatchEvent(new CustomEvent('editor-save', { bubbles: true, composed: true, detail: { quiet: true } }));
       }
-    }));
+    }
   }
 
-  dragleave() {
-    this.$.backdrop.hide();
+  _uploadSuccessHandle(fileinfo) {
+    this.set("fileinfo", fileinfo);
+    if (this.$.uploadzone.remainingNumber == 1) {
+      this.$.backdrop.toggle();
+    }
   }
 
-  drop(e) {
-    e.stopPropagation();
-    e.preventDefault();
+  _textareaInputHandle(info) {
+    const selection = info.selection;
+    const position = info.caretPosition;
+    const lineHeight = info.lineHeight;
+    this.updateFloatingToolbar(
+      (selection[0] != selection[1]) && !this.mobile, [position.x, position.y - lineHeight * 0.5]
+    );
   }
 
   _idChanged(id) {
@@ -610,8 +559,49 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
 
   reset(requestNewPath) {
     this.loading = false;
-    this.$.backdrop.hide();
+    this.$.backdrop.close();
     this.$.data.reset(requestNewPath);
+  }
+
+  save(quiet = false) {
+    if (this.loading) return
+    this.loading = true;
+    this.$.data.quiet = quiet;
+    this.$.data.save().then((updatedArticle) => {
+      //data
+      this.$.data.articleId = updatedArticle.id;
+      //event
+      this.dispatchEvent(new CustomEvent('require-update', { bubbles: true, composed: true, detail: { page: 'note' } }));
+      //ui
+      this.loading = false;
+      this._pathChanged();
+      this.openToast('已保存', { title: '查看', href: this.backTo });
+    }, err => {
+      this.set('err', err);
+      this.loading = false;
+    });
+  }
+
+  delete() {
+    if (this.loading) return
+    this.loading = true;
+    this.$.data.delete().then((success) => {
+      //data
+      this.$.data.reset();
+      //event
+      this.dispatchEvent(new CustomEvent('require-update', { bubbles: true, composed: true, detail: { page: 'note' } }));
+      //ui
+      this.loading = false;
+      this.openToast('已删除', undefined, { duration: 500, noCancelOnOutsideClick: false });
+      //route
+      this.backTo = /#\/(article|timeline)/.test(this.backTo) ? '#/timeline' : '#/note/all/';
+      setTimeout(() => {
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo } }));
+      }, 500);
+    }, (err) => {
+      this.set('err', err);
+      this.loading = false;
+    });
   }
 
   _loadPreset() {

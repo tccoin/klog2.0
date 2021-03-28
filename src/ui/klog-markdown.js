@@ -216,7 +216,7 @@ class KlogMarkdown extends PolymerElement {
       }
     };
 
-    block.at = {
+    block.category = {
       reg: /^@\(([\s\S]*?)\)(\[([\s\S]*?)\])?(?:\n+|$)/,
       lex: function (src, cap) {
         src = src.substring(cap[0].length);
@@ -224,6 +224,8 @@ class KlogMarkdown extends PolymerElement {
         return { src: src, text: cap }
       },
       parse: (cap) => {
+        if(this._initCategory) return '';
+        else this._initCategory = true;
         this.collection = cap[0] || '';
         this.tags = cap[1] ? cap[1].toLowerCase().split(',') : [];
         if (this.breadcrumbs) {
@@ -528,6 +530,7 @@ class KlogMarkdown extends PolymerElement {
     this._headingIndex = 0;
     this._headings = [];
     this._hasToc = false;
+    this._initCategory = false;
     // no markdown
     if (!markdown) {
       this.$.scroller.reset();

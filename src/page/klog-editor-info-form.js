@@ -126,7 +126,7 @@ class KlogEditorInfoForm extends KlogUiMixin(KlogDataLicenseMixin(PolymerElement
   }
 
   save() {
-    this.dispatchEvent(new CustomEvent('save', { bubbles: true, composed: true, detail: { quiet: true } }));
+    this.dispatchEvent(new CustomEvent('editor-save', { bubbles: true, composed: true, detail: { quiet: true } }));
   }
 
   openLicenseDrawer() {
@@ -147,7 +147,7 @@ class KlogEditorInfoForm extends KlogUiMixin(KlogDataLicenseMixin(PolymerElement
       }, 200);
       return
     }
-    this.dispatchEvent(new CustomEvent('delete', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent('editor-delete', { bubbles: true, composed: true }));
     this.dispatchEvent(new CustomEvent('klog-backdrop-toggle', { bubbles: true, composed: true }));
   }
 

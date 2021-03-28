@@ -40,7 +40,7 @@ class KlogBackdrop extends PolymerElement {
 
   static get properties() {
     return {
-      active: {
+      opened: {
         type: Boolean,
         value: false,
         observer: 'update'
@@ -82,20 +82,21 @@ class KlogBackdrop extends PolymerElement {
   }
 
   deactive() {
-    this.active = false;
+    this.opened = false;
     this.update();
   }
 
   toggle() {
-    this.active = !this.active;
+    this.opened = !this.opened;
   }
 
-  show() {
-    this.active = true;
+  open() {
+    this.opened = true;
   }
 
-  hide() {
-    this.active = false;
+  close() {
+    this.opened = false;
+    return new Promise((resolve) => setTimeout(() => resolve(), 200));
   }
 
   movestart(clientY) {
@@ -121,20 +122,17 @@ class KlogBackdrop extends PolymerElement {
     this.$.front.style.transition = "transform .2s ease";
     let backHeight = this.$.back.scrollHeight;
     let currentY = this.$.front.getBoundingClientRect().top;
-    this.active = currentY > backHeight * 0.8;
+    this.opened = currentY > backHeight * 0.8;
     this.update();
   }
 
   update() {
     // event
-    if (this.active) {
-      this.dispatchEvent(new CustomEvent('klog-backdrop-active', { bubbles: true, composed: true }));
-    } else {
-      this.dispatchEvent(new CustomEvent('klog-backdrop-deactive', { bubbles: true, composed: true }));
-    }
+    this.dispatchEvent(new CustomEvent('opened-changed', { bubbles: true, composed: true, detail: { value: this.opened } }));
+
     // transform
     let backHeight = this.$.back.scrollHeight;
-    this.$.front.style.transform = this.active ? `translateY(${backHeight}px)` : 'translateY(var(--klog-backdrop-default-front-top))';
+    this.$.front.style.transform = this.opened ? `translateY(${backHeight}px)` : 'translateY(var(--klog-backdrop-default-front-top))';
   }
 }
 

@@ -344,7 +344,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
   ready() {
     super.ready();
     this.$.uploadAvatarDialog.addEventListener('opened-changed', e => {
-      this.dispatchEvent(new CustomEvent('backdrop-opened-changed', {
+      this.dispatchEvent(new CustomEvent('editor-backdrop-opened-changed', {
         bubbles: true,
         composed: true,
         detail: { value: e.detail.value }

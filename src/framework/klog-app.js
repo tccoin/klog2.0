@@ -305,7 +305,6 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     }
   }
 
-
   _updateTheme(themeStrategy) {
     // 主题更新策略
     let theme = themeStrategy;

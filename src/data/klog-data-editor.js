@@ -397,7 +397,6 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
     // save article
     article = await article.save();
     // send message
-    console.log(article);
     if (!this.quiet) {
       const update = (messageId) => this.updateMessage(messageId, 'article-update');
       try {

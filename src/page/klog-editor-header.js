@@ -59,10 +59,6 @@ class KlogEditorHeader extends PolymerElement {
         --paper-progress-container-color: transparent;
       }
 
-      #infoFormDialog {
-        width: 300px;
-      }
-
       .divider {
         flex: 1;
       }
@@ -89,11 +85,9 @@ class KlogEditorHeader extends PolymerElement {
         <div class="divider"></div>
         <paper-toggle-button checked="{{preview}}" hidden-on-desktop hidden-on-tablet></paper-toggle-button>
         <paper-icon-button icon="add_circle" on-click="insert" hidden-on-desktop></paper-icon-button>
-        <paper-icon-button for="infoform" icon="highlight" on-click="activeFront" hidden="" id="infoformButton"></paper-icon-button>
-        <paper-icon-button for="infoform" icon="settings" on-click="activeFront" hidden-on-desktop>
+        <paper-icon-button id="settingsButton" for="settings" icon="settings" on-click="toggleBackdrop" hidden-on-desktop>
         </paper-icon-button>
         <paper-icon-button for="uploadzone" icon="insert_drive_file" on-click="upload" hidden-on-desktop></paper-icon-button>
-        <paper-icon-button for="browser" icon="book" on-click="activeFront" disabled="{{loading}}" hidden="">
         </paper-icon-button>
         <paper-button raised="" id="saveButton" on-click="publish" disabled="{{loading}}" hidden-on-desktop>
           <iron-icon icon="publish"></iron-icon>保存
@@ -103,7 +97,7 @@ class KlogEditorHeader extends PolymerElement {
       <app-toolbar>
         <paper-icon-button icon="arrow_back" on-click="back"></paper-icon-button>
         <div class="divider"></div>
-        <paper-icon-button icon="close" on-click="activeFront"></paper-icon-button>
+        <paper-icon-button icon="close" on-click="closeBackdrop"></paper-icon-button>
       </app-toolbar>
     </iron-pages>
 `;
@@ -138,40 +132,28 @@ class KlogEditorHeader extends PolymerElement {
   }
 
   insert() {
-    this.dispatchEvent(new CustomEvent('insert-drawer-open', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent('open-insert-drawer', { bubbles: true, composed: true }));
   }
 
   back() {
-    this.dispatchEvent(new CustomEvent('back', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent('editor-back', { bubbles: true, composed: true }));
   }
 
   publish() {
-    this.dispatchEvent(new CustomEvent('save', { bubbles: true, composed: true, detail: { quiet: false } }));
+    this.dispatchEvent(new CustomEvent('editor-save', { bubbles: true, composed: true, detail: { quiet: false } }));
   }
 
   upload(e) {
-    if (this.mobile) {
-      this.activeFront(e);
-    } else {
-      this.$.uploadzone.$.input.click();
-    }
+    this.dispatchEvent(new CustomEvent('editor-upload', { bubbles: true, composed: true }));
   }
 
-  activeFront(e) {
-    if (!this.$.backdrop.active) {
-      this.$.pages.selected = 1;
-      this.dispatchEvent(new CustomEvent('open-backdrop', {
-        bubbles: true,
-        composed: true,
-        detail: {
-          selected: e.target.getAttribute('for')
-        }
-      }));
-    } else {
-      this.$.backPages.scrollTop = 0;
-      this.$.pages.selected = 0;
-      this.$.backdrop.hide();
-    }
+  toggleBackdrop(e) {
+    let selected = (e.target.tagName == 'IRON-ICON' ? e.target.parentNode : e.target).getAttribute('for');
+    this.dispatchEvent(new CustomEvent('editor-toggle-backdrop', { bubbles: true, composed: true, detail: { selected } }));
+  }
+
+  closeBackdrop() {
+    this.dispatchEvent(new CustomEvent('editor-close-backdrop', { bubbles: true, composed: true }));
   }
 
   _is(val) {

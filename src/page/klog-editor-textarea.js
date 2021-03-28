@@ -85,7 +85,7 @@ class KlogEditorTextarea extends PolymerElement {
   ready() {
     super.ready();
     this._input = this.$.input.$.textarea;
-    this._input.addEventListener('input', () => this._updateCurrentStatus());
+    this._input.addEventListener('editor-textarea-input', () => this._updateCurrentStatus());
     this._input.addEventListener('keyup', (e) => this._updateCurrentStatus());
     this.addEventListener('click', () => this._updateCurrentStatus());
     this._input.addEventListener('keydown', (e) => this.keydown(e));
@@ -382,7 +382,7 @@ class KlogEditorTextarea extends PolymerElement {
     // mirror.style.visibility = 'initial';
     anchor.parentNode.removeChild(anchor);
     // kick
-    this.dispatchEvent(new CustomEvent('klog-editor-input', {
+    this.dispatchEvent(new CustomEvent('input', {
       bubbles: true,
       composed: true,
       detail: {
