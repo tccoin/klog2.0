@@ -133,8 +133,8 @@ class KlogMenu extends PolymerElement {
         }
       }
     </style>
-    <iron-selector id="itemsSelector" attr-for-selected="name" selected="{{itemsSelected}}" on-iron-select="itemsSelect">
-      <div name="idle" id="idle"></div>
+    <iron-selector id="itemsSelector" attr-for-selected="item-name" selected="{{itemsSelected}}" on-iron-select="itemsSelect">
+      <div item-name="idle" id="idle"></div>
       <template is="dom-repeat" items="{{menu}}">
         <template is="dom-if" if="{{item.divider}}">
           <div class\$="{{item.className}}"></div>
@@ -147,6 +147,7 @@ class KlogMenu extends PolymerElement {
         <template is="dom-if" if="{{item.item}}">
           <div
             class\$="{{item.className}}"
+            item-name\$="{{item.category}}:{{item.name}}"
             name\$="{{item.name}}"
             category\$="{{item.category}}"
             path\$="{{item.path}}"
