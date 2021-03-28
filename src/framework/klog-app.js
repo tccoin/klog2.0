@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from './klog-ui-mixin.js';
 import '@polymer/paper-styles/paper-styles.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
@@ -7,7 +8,7 @@ import '@polymer/app-route/app-route.js';
 import '../data/klog-data-user.js';
 import './klog-layout.js';
 
-class KlogApp extends PolymerElement {
+class KlogApp extends KlogUiMixin(PolymerElement) {
   static get template() {
     return html `
     <style include="klog-style-toast"></style>
@@ -146,6 +147,7 @@ class KlogApp extends PolymerElement {
 
   ready() {
     this._initGlobalEvent();
+    this.initUiEvent();
     super.ready();
     this._loadLayout();
   }

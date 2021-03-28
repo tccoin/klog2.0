@@ -156,6 +156,10 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         opacity: 0;
       }
 
+      #backPages{
+        scroll-behavior: smooth;
+      }
+
       /*media*/
       :host,
       klog-backdrop {
@@ -186,7 +190,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
     <klog-backdrop id="backdrop">
       <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
       </klog-editor-header>
-      <iron-pages slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
+      <iron-pages id="backPages" slot="back" class="klog-editor-back-pages" selected="{{backSelected}}" attr-for-selected="name">
         <klog-editor-info-form id="infoform" name="infoform" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" path="{{path}}" collection="{{collection}}" tags="{{tags}}" license="{{license}}" random-path="{{randomPath}}" private="{{private}}"></klog-editor-info-form>
         <klog-upload-zone name="uploadzone" id="uploadzone"></klog-upload-zone>
       </iron-pages>
@@ -452,6 +456,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
     // this.$.imarkdown.updateScrollTarget(this.$.imarkdown);
     this.$.header.$.uploadzone = this.$.uploadzone;
     this.$.header.$.backdrop = this.$.backdrop;
+    this.$.header.$.backPages = this.$.backPages;
     this.$.infoform.$.header = this.$.header;
     // activate the leancloud server
     AV.Cloud.run('warmup').then(function(data) {
@@ -473,7 +478,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
     this.$.textarea.addEventListener('mousedown', (e) => {
       this.updateFloatingToolbar(false);
     });
-    this.addEventListener('active-backdrop-front', (e) => {
+    this.addEventListener('open-backdrop', (e) => {
       let newSelected = e.detail.selected;
       if (this.$.backdrop.active && this.backSelected != newSelected) this.$.backdrop.toggle();
       this.backSelected = newSelected;
@@ -572,7 +577,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
   }
 
   dragover() {
-    this.dispatchEvent(new CustomEvent('active-backdrop-front', {
+    this.dispatchEvent(new CustomEvent('open-backdrop', {
       bubbles: true,
       composed: true,
       detail: {

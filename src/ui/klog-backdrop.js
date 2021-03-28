@@ -23,7 +23,7 @@ class KlogBackdrop extends PolymerElement {
         top: 0px;
         bottom: var(--klog-backdrop-default-front-top);
         transform: translateY(var(--klog-backdrop-default-front-top));
-        transition: transform.2s ease;
+        transition: transform .2s ease;
         z-index: 99;
       }
     </style>

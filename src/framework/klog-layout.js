@@ -246,9 +246,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     super.ready();
     this.$.scrollTarget = this.$.page;
     this.$.scrollTarget.style.scrollBehavior = 'smooth';
-    this.initUiEvent();
     this.addEventListener('layout-update', e => this.updateLayout(e.detail, false));
-    this.addEventListener('menu-select', e => this._menuSelectHandle(e.detail.category, e.detail.item));
     this.addEventListener('main-drawer-open', e => this.$.drawer.open());
     this.addEventListener('about-help', e => this.aboutHelp());
     this.addEventListener('about-log', e => this.aboutLog());
@@ -628,7 +626,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     }
   }
 
-  _menuSelectHandle(category, item) {
+  menuSelectHandle(category, item) {
     if (item == 'console') this.$.about.open();
     let pageElement = this.$.page.querySelector(`[name='${this.page}']`);
     if (pageElement && pageElement.menuSelect) {

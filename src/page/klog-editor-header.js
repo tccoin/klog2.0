@@ -160,7 +160,7 @@ class KlogEditorHeader extends PolymerElement {
   activeFront(e) {
     if (!this.$.backdrop.active) {
       this.$.pages.selected = 1;
-      this.dispatchEvent(new CustomEvent('active-backdrop-front', {
+      this.dispatchEvent(new CustomEvent('open-backdrop', {
         bubbles: true,
         composed: true,
         detail: {
@@ -168,6 +168,7 @@ class KlogEditorHeader extends PolymerElement {
         }
       }));
     } else {
+      this.$.backPages.scrollTop = 0;
       this.$.pages.selected = 0;
       this.$.backdrop.hide();
     }

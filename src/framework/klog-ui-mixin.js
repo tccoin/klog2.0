@@ -5,6 +5,7 @@ const UiMixin = (superClass) => class extends superClass {
   initUiEvent() {
     this.addEventListener('toast-open', e => this._openToast(e.detail.text, e.detail.link, e.detail.option));
     this.addEventListener('drawer-open', e => this._openDrawer(e.detail.heading, e.detail.menu, e.detail.option));
+    this.addEventListener('menu-select', e => this.$.layout.menuSelectHandle(e.detail.category, e.detail.item));
   }
 
   _openToast(text, link, option = {}) {
