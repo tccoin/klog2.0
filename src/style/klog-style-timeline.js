@@ -44,7 +44,7 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
       }
 
       :host([mobile]) .main-container{
-        padding: 96px 0 64px;
+        padding: 80px 0 64px;
       }
 
       .filter-container {
@@ -77,15 +77,13 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
 
       klog-chip[name=search] input {
         width: 100%;
-        height: 19px;
-        color: var(--primary-color);
-        font-weight: bold;
-        font-size: inherit;
+        font-weight: normal;
+        font-size: 20px;
         border: none;
         background: none;
-        border-bottom: 1px solid var(--primary-color);
         outline: none;
         border-radius: 0;
+        padding: 0 0 0 4px;
       }
 
       klog-chip[name=search] {
@@ -107,14 +105,13 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
           padding: 0;
         }
         --klog-chip-border-radius: 0;
-        --klog-chip-expand-width: calc(100% - 64px);
+        --klog-chip-expand-width: calc(100% - 56px);
       }
       klog-chip#mobileSearchInput:not([active]){
         display: none;
       }
       klog-chip#mobileSearchInput input{
-        width: calc(100% - 96px);
-        height: 32px;
+        width: calc(100% - 72px);
         padding: 0 8px;
         margin: 0 8px;
       }

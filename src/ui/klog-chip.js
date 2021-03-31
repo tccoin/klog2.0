@@ -70,6 +70,7 @@ class KlogChip extends PolymerElement {
 
       :host .expand-container {
         overflow: hidden;
+        display: flex;
         width: 0px;
         transition: width .15s cubic-bezier(.4, 0, .6, 1) 50ms;
       }

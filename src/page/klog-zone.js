@@ -37,7 +37,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       }
       .main-container{
         padding-left: 300px;
-        width: fit-content;
         max-width: 100vw;
       }
       .item{
@@ -258,8 +257,20 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
   }
 
   unload() {
+    super.unload();
     this.$.avatar.lazy = true;
-    this._lastScrollY = this.$.scrollTarget.scrollTop;
+  }
+
+  _mobileSearch() {
+    super._mobileSearch();
+    this.$.info.hidden = true;
+    this.$.container.style = 'padding-top:64px!important';
+  }
+
+  _mobileSearchClose() {
+    super._mobileSearchClose();
+    this.$.info.hidden = false;
+    this.$.container.style = '';
   }
 
   async update(subroute) {

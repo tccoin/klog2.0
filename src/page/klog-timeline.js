@@ -172,6 +172,7 @@ class KlogTimeline extends PolymerElement {
     this.$.scrollTarget.removeEventListener('scroll', this._pageScrollHandler);
     this._lastScrollY = this.$.scrollTarget.scrollTop;
     this.loading = true;
+    this._mobileSearchClose();
     await this._timeout(new Promise(resolve => {
       this.$.timelineContainer.addEventListener('transitionend', resolve)
     }), 500);
@@ -332,6 +333,7 @@ class KlogTimeline extends PolymerElement {
         filterName: 'search'
       }
     });
+    this.$.filter.hidden = true;
   }
 
   _mobileSearchClose() {
@@ -341,6 +343,7 @@ class KlogTimeline extends PolymerElement {
         filterName: 'default'
       }
     });
+    this.$.filter.hidden = false;
   }
 
   setFilter(e) {
@@ -352,7 +355,7 @@ class KlogTimeline extends PolymerElement {
     let newKeyword;
     if (filterName == 'search') {
       let input = this.mobile ? this.$.keywordInputMobile : this.$.keywordInput;
-      this.$.keywordInputMobile.focus();
+      setTimeout(() => input.focus(), 1);
       newKeyword = input.value;
     } else {
       newKeyword = this.filterPreset[filterName].keyword || '';
