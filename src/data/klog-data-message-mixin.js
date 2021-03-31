@@ -12,6 +12,7 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
     query.include('from', 'article', 'article.author', 'comment', 'comment.author', 'comment.replyToAuthor');
     query.descending('createdAt');
     query.containedIn('channels', this._processChannels(channels, userPublicId));
+    query.limit(1000);
     const data = await query.find();
     const result = this._processMessages(data, userPublicId, accessPrivate);
     return result;
@@ -22,6 +23,7 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
     query.select(['article', 'comment']);
     query.descending('createdAt');
     query.containedIn('channels', this._processChannels([channel], userPublicId));
+    query.limit(1000);
     const data = await query.find();
     const result = data.length > 0 ? data.map(x => x.toJSON()) : [];
     if (result.length == 0) {
@@ -81,7 +83,7 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
         message = this._processMessageAccess(message, accessPrivate ? userPublicId : '');
         message = this._processMessageDisplay(message, userPublicId);
         result.push(message);
-      } catch (err) { }
+      } catch (err) {}
     }
     return result;
   }
@@ -94,7 +96,7 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
     const isCoworker = false;
     const isAuthor = article ? article.author.objectId == userPublicId : false;
     if (article && article.private && !isAuthor && !useMasterKey && !isCoworker) {
-      throw new Error('private article');
+      // throw new Error('private article');
     }
     return message;
   }

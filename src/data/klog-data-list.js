@@ -28,7 +28,7 @@ class KlogDataList extends PolymerElement {
       },
       limit: {
         type: Number,
-        value: 200,
+        value: 500,
       },
       userinfo: {
         type: Object
