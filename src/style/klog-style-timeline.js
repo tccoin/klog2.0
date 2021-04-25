@@ -77,6 +77,7 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
 
       klog-chip[name=search] input {
         width: 100%;
+        color: var(--primary-text-color);
         font-weight: normal;
         font-size: 20px;
         border: none;

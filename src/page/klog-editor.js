@@ -64,7 +64,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
 
       klog-editor-backdrop-pages {
         width: calc(100vw - var(--klog-layout-margin-left));
-        max-height: calc(var(--klog-layout-page-height) - 152px);
+        max-height: calc(var(--klog-layout-page-height) - 152px - var(--safe-area-inset-top));
         margin: 0 auto;
         padding: 64px 16px 16px;
         scroll-behavior: smooth;

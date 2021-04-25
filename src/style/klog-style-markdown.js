@@ -164,6 +164,11 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
 
       .klog-article-content #content>[media] {
         @apply(--klog-markdown-media-container);
+        margin-bottom: 1em;
+      }
+
+      .klog-article-content #content>[media]+br {
+        display: none;
       }
 
       .klog-article-content klog-video,

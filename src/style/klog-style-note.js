@@ -21,7 +21,7 @@ containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
 
       .layout {
         width: 100%;
-        height: var(--klog-layout-page-height);
+        height: calc(var(--klog-layout-page-height) - var(--safe-area-inset-top));
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -32,7 +32,6 @@ containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
       .layout .backdrop-back-toolbar {
         position: fixed;
         left: 0;
-        top: 0;
         width: 100%;
         box-sizing: border-box;
       }

@@ -27,6 +27,7 @@ class KlogArticle extends PolymerElement {
   <div class="section">
     <!--article header-->
     <div class="article-category" hidden="{{!article.title}}" on-click="_searchTimeline">
+      <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}"></klog-render-timestamp>
       <span class="article-collection">{{article.collection}}</span>
       <template is="dom-repeat" items="{{article.tags}}">
         <span class="article-tag">#{{item}}</span>
@@ -44,7 +45,7 @@ class KlogArticle extends PolymerElement {
             <span class="author-intro divider">{{article.author.introduction}}</span>
           </template>
         </div>
-        <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}">发表于</klog-render-timestamp>
+        
       </div>
     </div>
     <!--article content-->
@@ -106,18 +107,19 @@ class KlogArticle extends PolymerElement {
           sidebar: 'off',
           header: {
             fixed: true,
-            short: { mobile: true, desktop: false },
-            shadow: { mobile: 'scroll', desktop: 'off' }
+            short: false,
+            blur: { mobile: true, desktop: false },
+            right: { mobile: true, desktop: false },
+            shadow: { mobile: 'off', desktop: 'off' }
           },
           styles: {
-            '--klog-header-background': { mobile: 'var(--klog-article-theme-color)', desktop: 'transparent' },
+            '--klog-header-background': 'transparent',
+            '--klog-header-opacity': 0
           },
           toolbar: html `
             <app-toolbar>
-              <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
-              <div class="title">
-                <div main-title></div>
-              </div>
+              <paper-icon-button class="navigation" icon="arrow_back" on-click="back" desktop></paper-icon-button>
+              <paper-icon-button class="navigation" icon="close" on-click="back" mobile></paper-icon-button>
             </app-toolbar>`
         }
       }
@@ -163,9 +165,10 @@ class KlogArticle extends PolymerElement {
       let y = this.$.scrollTarget.scrollTop;
       this.fabExtended = !this.mobile;
       let fab = this.isOwner ? this.$.fabEdit : this.$.fabComment;
-      if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 <= window.innerHeight * 0.9) {
+      let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
+      if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 - safeareaTop <= window.innerHeight * 0.9) {
         fab.style.position = 'absolute';
-        fab.style.bottom = `-${this.fabExtended ? 24 : 28}px`;
+        fab.style.bottom = `${this.fabExtended ? (-24+safeareaTop) : (-28+safeareaTop)}px`;
       } else {
         fab.style.position = 'fixed';
         fab.style.bottom = '10vh';

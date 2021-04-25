@@ -15,6 +15,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     <style>
       :host {
         display: block;
+        --safe-area-inset-top: env(safe-area-inset-top);
       }
 
       .page-container {
@@ -333,14 +334,14 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     document.querySelector('html').style.background = theme == 'light' ? '#e0e0e0' : '#000000';
     let metaThemeColor = document.querySelector("meta[name=theme-color]");
     metaThemeColor.setAttribute("content", theme == 'light' ? '#e0e0e0' : '#000000');
-    const statusBar = document.querySelector('#statusbarFix');
-    const statusBarBackground = document.querySelector('#statusbarFixBackground');
-    window.ShadyCSS && window.ShadyCSS.styleSubtree(statusBarBackground, {
-      '--klog-statusbar-opacity': 0.8,
-      '--klog-statusbar-color': theme == 'light' ? '#e0e0e0' : '#000000'
-    });
-    statusBar.style.backdropFilter = 'initial';
-    statusBar.style.webkitBackdropFilter = 'initial';
+    // const statusBar = document.querySelector('#statusbarFix');
+    // const statusBarBackground = document.querySelector('#statusbarFixBackground');
+    // window.ShadyCSS && window.ShadyCSS.styleSubtree(statusBarBackground, {
+    //   '--klog-statusbar-opacity': 0.8,
+    //   '--klog-statusbar-color': theme == 'light' ? '#e0e0e0' : '#000000'
+    // });
+    // statusBar.style.backdropFilter = 'initial';
+    // statusBar.style.webkitBackdropFilter = 'initial';
   }
 
   _updatePreference(preference) {

@@ -18,6 +18,10 @@ containerKlogStyleLayout.innerHTML = `<dom-module id="klog-style-layout">
         color: var(--primary-color);
         z-index: 99;
       }
+
+      iron-pages {
+        padding-top: var(--safe-area-inset-top);
+      }
     </style>
   </template>
 </dom-module>`;

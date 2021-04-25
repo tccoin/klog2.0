@@ -120,11 +120,29 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         max-width: 300px;
         width: 100%;
       }
+
+      /*actionbar*/
+      #actionbarBackground{
+        display: block;
+        width: 100vw;
+        height: var(--safe-area-inset-top);
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 1000001;
+        background: var(--klog-header-background);
+        opacity: var(--klog-header-opacity);
+        /*-webkit-backdrop-filter: saturate(180%) blur(10px);
+        backdrop-filter: saturate(180%) blur(10px);*/
+        transition: all .25s ease;
+      }
     </style>
     <!-- Drawer -->
     <klog-drawer id="drawer" heading="{{drawerHeading}}">
       <klog-menu items="{{menu}}"></klog-menu>
     </klog-drawer>
+    <!-- Actionbar Background -->
+    <div id="actionbarBackground"></div>
     <!-- Layout -->
     <div id="main" class="main-container">
       <!-- Media query -->
@@ -164,7 +182,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.16.7<br>2017-2021<br>Powered by Kr with Love.</p>
+      <p>v2.16.9<br>2017-2021<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -279,7 +297,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
       this.$.page.style = `-webkit-overflow-scrolling:${!e.detail.value ? 'touch' : 'unset'}`;
     });
     const setPageHeight = () => {
-      this.style.setProperty('--klog-layout-page-height', this.mobile ? `${window.innerHeight}px` : '100vh');
+      this.style.setProperty('--klog-layout-page-height', this.mobile ? `calc(${window.innerHeight}px + var(--safe-area-inset-top))` : '100vh');
     }
     setPageHeight();
     window.addEventListener('resize', setPageHeight);
@@ -408,6 +426,9 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
 
     // update menu
     this._updateMenu();
+
+    // update actionbar backgtound
+    console.log(layout.styles);
   }
 
   _updateCompleteLayout(layout, useDefault) {
@@ -422,6 +443,8 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         header: {
           fixed: true,
           short: false,
+          right: false,
+          blur: false,
           shadow: 'on', // on off scroll
           background: 'var(--primary-background-color)',
           color: 'var(--secondary-text-color)',
@@ -506,6 +529,8 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     }
     this._setAttribute(this.$.header, 'fixed', !header.fixed);
     this._setAttribute(this.$.header, 'short', !header.short);
+    this._setAttribute(this.$.header, 'blur', !header.blur);
+    this._setAttribute(this.$.header, 'right', !header.right);
     this._setAttribute(this.$.header, 'collapsed', true);
     this._bindEvent(this.$.scrollTarget, 'scroll', this._shortScrollHandle, !header.short);
     this._bindEvent(this.$.scrollTarget, 'scroll', this._shadowScrollHandle, header.shadow != 'scroll');

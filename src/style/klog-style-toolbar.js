@@ -10,11 +10,43 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         right: 0;
         width: 100%;
         z-index: 100;
+        padding-top: var(--safe-area-inset-top);
         height: var(--klog-header-height, 64px);
         color: var(--klog-header-text-color, var(--secondary-text-color));
         overflow: hidden;
         transition: box-shadow .3s ease, opacity .25s ease, width .25s cubic-bezier(0.4, 0, 0.2, 1) !important;
       }
+
+      app-header:not([mobile]) [mobile]{
+        display: none !important;
+      }
+
+      app-header[mobile] [desktop]{
+        display: none !important;
+      }
+
+      app-header[right] app-toolbar{
+        justify-content: flex-end;
+      }
+
+      app-header[blur] paper-icon-button{
+        -webkit-backdrop-filter: saturate(180%) blur(10px);
+        backdrop-filter: saturate(180%) blur(10px);
+        width: 32px;
+        height: 32px;
+        padding: 4px;
+        flex-basis: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+      }
+
+      app-header[blur] paper-icon-button::after{
+        @apply(--overlay-style);
+        z-index: -1;
+        background-color: var(--primary-background-color);
+        opacity: 0.7;
+      }
+
 
       app-toolbar {
         display: flex;
@@ -36,10 +68,6 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         background: var(--klog-header-background, var(--primary-background-color));
         opacity: var(--klog-header-opacity, 1);
         transition: all .25s ease;
-      }
-
-       app-header:not([mobile]) app-toolbar:not([mobile]) [mobile]{
-        display: none !important;
       }
 
       app-toolbar>.divider {

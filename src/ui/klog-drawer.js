@@ -25,6 +25,7 @@ class KlogDrawer extends PolymerElement {
       }
 
       .container {
+        padding-top: var(--safe-area-inset-top);
         height: var(--klog-layout-page-height);
         overflow: auto;
         scroll-behavior: smooth;
