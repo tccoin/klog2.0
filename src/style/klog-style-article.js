@@ -29,21 +29,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       font-size: 16px;
     }
 
-    .klog-author .author-info{
-      font-size: 1.2em;
-      padding-top: 8px;
-      align-items: start;
-    }
-
-    .klog-author .author-avatar,
-    .klog-author .author-name{
-      cursor: pointer;
-    }
-
-    .klog-author .author-name:hover{
-      text-decoration: underline;
-    }
-
     .article-container {
       width: 100%;
       margin: auto;
@@ -157,6 +142,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
     .article-title {
       padding: 0 16px;
+      margin-bottom: 64px;
     }
 
     .article-title h1 {
@@ -183,8 +169,24 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     .article-author {
-      margin: 64px auto 64px;
+      margin: 0 auto 64px;
       padding: 16px;
+    }
+
+    .klog-author .author-info{
+      font-size: 1.2em;
+      padding-top: 8px;
+      align-items: start;
+      letter-spacing: 0.05em;
+    }
+
+    .klog-author .author-avatar,
+    .klog-author .author-name{
+      cursor: pointer;
+    }
+
+    .klog-author .author-name:hover{
+      text-decoration: underline;
     }
 
     [hidden] {
