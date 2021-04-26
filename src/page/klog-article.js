@@ -165,7 +165,7 @@ class KlogArticle extends PolymerElement {
       this.fabExtended = !this.mobile;
       let fab = this.isOwner ? this.$.fabEdit : this.$.fabComment;
       let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
-      if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 - safeareaTop <= window.innerHeight * 0.9) {
+      if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 - 2 * safeareaTop <= window.innerHeight * 0.9) {
         fab.style.position = 'absolute';
         fab.style.bottom = `${this.fabExtended ? (-24+safeareaTop) : (-28+safeareaTop)}px`;
       } else {
