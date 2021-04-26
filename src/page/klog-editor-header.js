@@ -25,9 +25,9 @@ class KlogEditorHeader extends PolymerElement {
         width: 100vw;
         position: fixed;
         left: 0;
+        top: 0!important;
         color: var(--primary-text-color);
         background: transparent;
-        --paper-progress-container-color: transparent;
       }
 
       app-toolbar paper-icon-button {

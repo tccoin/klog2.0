@@ -120,29 +120,11 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         max-width: 300px;
         width: 100%;
       }
-
-      /*actionbar*/
-      #actionbarBackground{
-        display: block;
-        width: 100vw;
-        height: var(--safe-area-inset-top);
-        position: fixed;
-        left: 0;
-        top: 0;
-        z-index: 1000001;
-        background: var(--klog-header-background);
-        opacity: var(--klog-header-opacity);
-        /*-webkit-backdrop-filter: saturate(180%) blur(10px);
-        backdrop-filter: saturate(180%) blur(10px);*/
-        transition: all .25s ease;
-      }
     </style>
     <!-- Drawer -->
     <klog-drawer id="drawer" heading="{{drawerHeading}}">
       <klog-menu items="{{menu}}"></klog-menu>
     </klog-drawer>
-    <!-- Actionbar Background -->
-    <div id="actionbarBackground"></div>
     <!-- Layout -->
     <div id="main" class="main-container">
       <!-- Media query -->
@@ -182,7 +164,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.16.9<br>2017-2021<br>Powered by Kr with Love.</p>
+      <p>v2.17.0<br>2017-2021<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -426,9 +408,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
 
     // update menu
     this._updateMenu();
-
-    // update actionbar backgtound
-    console.log(layout.styles);
   }
 
   _updateCompleteLayout(layout, useDefault) {
@@ -443,7 +422,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         header: {
           fixed: true,
           short: false,
-          right: false,
           blur: false,
           shadow: 'on', // on off scroll
           background: 'var(--primary-background-color)',
@@ -530,7 +508,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     this._setAttribute(this.$.header, 'fixed', !header.fixed);
     this._setAttribute(this.$.header, 'short', !header.short);
     this._setAttribute(this.$.header, 'blur', !header.blur);
-    this._setAttribute(this.$.header, 'right', !header.right);
     this._setAttribute(this.$.header, 'collapsed', true);
     this._bindEvent(this.$.scrollTarget, 'scroll', this._shortScrollHandle, !header.short);
     this._bindEvent(this.$.scrollTarget, 'scroll', this._shadowScrollHandle, header.shadow != 'scroll');
@@ -593,13 +570,16 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     // event
     const pageElement = this.$.page.querySelector(`[name = '${this.page}']`);
     if (pageElement) {
-      const buttons = this.$.header.querySelectorAll('[on-click]');
-      for (let button of buttons) {
-        const functionName = button.getAttribute('on-click');
-        if (typeof(pageElement[functionName]) == 'function') {
-          button.addEventListener('click', pageElement[functionName].bind(pageElement));
-        } else {
-          console.log(`Error when bind function ${functionName}`);
+      let eventlist = ['keydown', 'click', 'input'];
+      for (let event of eventlist) {
+        let buttons = this.$.header.querySelectorAll('[on-' + event + ']');
+        for (let button of buttons) {
+          let functionName = button.getAttribute('on-' + event);
+          if (typeof(pageElement[functionName]) == 'function') {
+            button.addEventListener(event, pageElement[functionName].bind(pageElement));
+          } else {
+            console.log(`Error when bind function ${functionName}`);
+          }
         }
       }
     }

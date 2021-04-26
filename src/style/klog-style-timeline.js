@@ -91,36 +91,6 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         --klog-chip-expand-width: 128px;
       }
 
-      klog-chip#mobileSearchInput{
-        display: flex;
-        margin: 0;
-        position: fixed;
-        z-index: 101;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 64px;
-        border-radius: 0;
-        box-shadow: 0 0 black;
-        --klog-chip-style: {
-          padding: 0;
-        }
-        --klog-chip-border-radius: 0;
-        --klog-chip-expand-width: calc(100% - 56px);
-      }
-      klog-chip#mobileSearchInput:not([active]){
-        display: none;
-      }
-      klog-chip#mobileSearchInput input{
-        width: calc(100% - 72px);
-        padding: 0 8px;
-        margin: 0 8px;
-      }
-      klog-chip#mobileSearchInput paper-icon-button{
-        float: right;
-        color: var(--primary-text-color);
-      }
-
       klog-chip[name=daily] {
         --primary-color: var(--paper-amber-900);
       }

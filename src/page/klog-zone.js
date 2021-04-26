@@ -95,8 +95,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         .info-container{
           width: 100vw;
           height: auto;
-          min-height: 100vh;
-          margin: 0;
+          margin: 64px 0 0 0;
           position: relative;
           z-index: 1;
           bottom: auto;
@@ -110,9 +109,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         klog-timeline-item.item{
           width: 100vw!important;
           margin: 16px 0px;
-        }
-        klog-chip#mobileSearchInput{
-          @apply --shadow-elevation-4dp;
         }
       }
     </style>
@@ -130,10 +126,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     </div>
     <div class="main-container" id="container">
       <div id="pageHeader"></div>
-      <klog-chip name="search" id="mobileSearchInput" icon="search" hidden="{{!mobile}}" checkmark-animation-disabled>
-        <input slot="expand-content" id="keywordInputMobile">
-        <paper-icon-button slot="expand-content" icon="close" on-click="_mobileSearchClose"></paper-icon-button>
-      </klog-chip>
       <div class="filter-container item" id="filter" on-click="setFilter">
         <klog-chip name="default" label="全部"></klog-chip>
         <klog-chip name="daily" label="日常"></klog-chip>
@@ -196,28 +188,39 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
           drawer: 'auto',
           mainMenu: false,
           sidebar: 'off',
-          scrollToTop: false,
-          header: {
-            fixed: true,
-            short: false,
-            shadow: { mobile: 'off', desktop: 'off' },
-          },
-          styles: {
-            '--klog-header-background': 'transparent',
-            '--klog-header-text-color': 'var(--primary-text-color)',
-          },
-          toolbar: html `
-              <app-toolbar>
-                <div class="title" on-click="back">
-                  <div main-title><iron-icon icon="klog"></iron-icon></div>
-                  <paper-ripple></paper-ripple>
-                </div>
-                <div class="divider"></div>
-                <paper-icon-button on-click="_mobileSearch" icon="search" mobile></paper-icon-button>
-              </app-toolbar>`
+          scrollToTop: false
         }
       },
     };
+  }
+
+  showDefaultToolbar() {
+    this.dispatchEvent(new CustomEvent('layout-update', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        header: {
+          fixed: true,
+          short: false,
+          blur: { mobile: true, desktop: false },
+          shadow: { mobile: 'scroll', desktop: 'off' },
+        },
+        styles: {
+          '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
+          '--klog-header-text-color': 'var(--primary-text-color)',
+          '--klog-header-opacity': 0.8
+        },
+        toolbar: html `
+        <app-toolbar>
+          <div class="title" on-click="back">
+            <div main-title><iron-icon icon="klog"></iron-icon></div>
+            <paper-ripple></paper-ripple>
+          </div>
+          <div class="divider"></div>
+          <paper-icon-button on-click="showSearchToolbar" icon="search" mobile></paper-icon-button>
+        </app-toolbar>`
+      }
+    }));
   }
 
   ready() {
@@ -259,18 +262,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
   unload() {
     super.unload();
     this.$.avatar.lazy = true;
-  }
-
-  _mobileSearch() {
-    super._mobileSearch();
-    this.$.info.hidden = true;
-    this.$.container.style = 'padding-top:64px!important';
-  }
-
-  _mobileSearchClose() {
-    super._mobileSearchClose();
-    this.$.info.hidden = false;
-    this.$.container.style = '';
   }
 
   async update(subroute) {

@@ -67,10 +67,12 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
           header: {
             fixed: true,
             short: false,
-            shadow: 'off',
+            blur: true,
+            shadow: 'scroll',
           },
           styles: {
             '--klog-layout-background': 'var(--primary-background-color)',
+            '--klog-header-opacity': 0.8
           },
           toolbar: html `
               <app-toolbar>

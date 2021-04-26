@@ -25,7 +25,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     .fab-section{
-      max-width: 90vw;
+      max-width: calc(var(--klog-media-width) - 16px);
       font-size: 16px;
     }
 
@@ -58,7 +58,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
     klog-fab{
       position: fixed;
-      bottom: 10vh;
+      bottom: 32px;
       right: auto;
       width: 96px;
       background-color: transparent;
@@ -121,6 +121,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     .article-category {
       line-height: 1.5;
       padding: 0 16px;
+      font-size: 1.1em;
       letter-spacing: 0.1em;
       color: var(--secondary-text-color);
     }
@@ -142,11 +143,11 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
     .article-title {
       padding: 0 16px;
-      margin-bottom: 64px;
+      margin-bottom: 48px;
     }
 
     .article-title h1 {
-      font-size: 3em;
+      font-size: 2.5em;
       font-weight: 400;
       line-height: 1;
       margin: 0.1em 0 0.5em;
@@ -169,12 +170,12 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     .article-author {
-      margin: 0 auto 64px;
+      margin: 0 auto 48px;
       padding: 16px;
     }
 
     .klog-author .author-info{
-      font-size: 1.2em;
+      font-size: 1.1em;
       padding-top: 8px;
       align-items: start;
       letter-spacing: 0.05em;
@@ -197,7 +198,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     /*media block*/
 
     @media (max-width: 662px) {
-      klog-markdown {
+      :host {
 
         --klog-media-border-radius: 0px;
 
@@ -218,7 +219,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     @media (min-width: 663px) {
-      klog-markdown {
+      :host {
         --klog-markdown-media: {
           @apply(--shadow-elevation-8dp);
           width: fit-content;
@@ -227,7 +228,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     @media (min-width: 769px) {
-      klog-markdown {
+      :host {
         --klog-media-width: 739px;
 
         --klog-markdown-media-container: {
@@ -240,25 +241,25 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     @media (min-width: 1024px) {
-      klog-markdown {
+      :host {
         --klog-media-width: 871px;
       }
     }
 
     @media (min-width: 1280px) {
-      klog-markdown {
+      :host {
         --klog-media-width: 1024px;
       }
     }
   
     @media (min-width: 1440px) {
-      klog-markdown {
+      :host {
         --klog-media-width: 1280px;
       }
     }
   
     @media (min-width: 2560px) {
-      klog-markdown {
+      :host {
         --klog-media-width: 1440px;
       }
     }
@@ -301,6 +302,13 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
       :host(:hover)::-webkit-scrollbar-thumb {
         background-color: var(--scrollbar-thumb-active-color) !important;
+      }
+    }
+
+    /*header*/
+    @media (max-width: 767px) {
+      .article-container {
+        padding: calc(40px + var(--safe-area-inset-top)) 0 72px;
       }
     }
 

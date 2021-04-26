@@ -108,8 +108,6 @@ class KlogArticle extends PolymerElement {
           header: {
             fixed: true,
             short: false,
-            blur: { mobile: true, desktop: false },
-            right: { mobile: true, desktop: false },
             shadow: { mobile: 'off', desktop: 'off' }
           },
           styles: {
@@ -119,7 +117,8 @@ class KlogArticle extends PolymerElement {
           toolbar: html `
             <app-toolbar>
               <paper-icon-button class="navigation" icon="arrow_back" on-click="back" desktop></paper-icon-button>
-              <paper-icon-button class="navigation" icon="close" on-click="back" mobile></paper-icon-button>
+              <div class="divider"></div>
+              <paper-icon-button class="navigation" icon="close" on-click="back" mobile minimum></paper-icon-button>
             </app-toolbar>`
         }
       }
@@ -171,7 +170,7 @@ class KlogArticle extends PolymerElement {
         fab.style.bottom = `${this.fabExtended ? (-24+safeareaTop) : (-28+safeareaTop)}px`;
       } else {
         fab.style.position = 'fixed';
-        fab.style.bottom = '10vh';
+        fab.style.bottom = '32px';
       }
     };
     window.addEventListener('resize', this._scrollHandler);

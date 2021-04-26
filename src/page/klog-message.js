@@ -32,11 +32,13 @@ class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
           header: {
             fixed: true,
             short: false,
-            shadow: 'off',
+            blur: { mobile: true, desktop: false },
+            shadow: { mobile: 'scroll', desktop: 'off' },
           },
           styles: {
-            '--klog-header-background': 'transparent',
+            '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
             '--klog-header-text-color': 'var(--primary-text-color)',
+            '--klog-header-opacity': 0.8
           },
           customMenu: [{
             name: 'message',

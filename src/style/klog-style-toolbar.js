@@ -14,7 +14,7 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         height: var(--klog-header-height, 64px);
         color: var(--klog-header-text-color, var(--secondary-text-color));
         overflow: hidden;
-        transition: box-shadow .3s ease, opacity .25s ease, width .25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        transition: box-shadow .25s ease, opacity .2s ease, width .2s cubic-bezier(0.4, 0, 0.2, 1) !important;
       }
 
       app-header:not([mobile]) [mobile]{
@@ -25,49 +25,29 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         display: none !important;
       }
 
-      app-header[right] app-toolbar{
-        justify-content: flex-end;
-      }
-
-      app-header[blur] paper-icon-button{
-        -webkit-backdrop-filter: saturate(180%) blur(10px);
-        backdrop-filter: saturate(180%) blur(10px);
-        width: 32px;
-        height: 32px;
-        padding: 4px;
-        flex-basis: 32px;
-        border-radius: 50%;
-        overflow: hidden;
-      }
-
-      app-header[blur] paper-icon-button::after{
-        @apply(--overlay-style);
-        z-index: -1;
-        background-color: var(--primary-background-color);
-        opacity: 0.7;
-      }
-
-
       app-toolbar {
         display: flex;
         width: 100%;
         z-index: 100;
         box-sizing: border-box;
         background-color: transparent;
-        transition: opacity .25s ease;
+        padding-top: var(--safe-area-inset-top)!important;
+        top: calc(-1 * var(--safe-area-inset-top))!important;
+        height: calc(64px + var( --safe-area-inset-top))!important;
+        transition: all .2s ease;
+      }
+
+      app-header[blur] app-toolbar {
+        -webkit-backdrop-filter: saturate(180%) blur(10px);
+        backdrop-filter: saturate(180%) blur(10px);
       }
 
       app-toolbar::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
+        @apply --overlay-style;
         z-index: -1;
         background: var(--klog-header-background, var(--primary-background-color));
         opacity: var(--klog-header-opacity, 1);
-        transition: all .25s ease;
+        transition: all .2s ease;
       }
 
       app-toolbar>.divider {
@@ -125,6 +105,25 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         outline: none;
       }
 
+      app-toolbar paper-icon-button[minimum]{
+        -webkit-backdrop-filter: saturate(180%) blur(10px);
+        backdrop-filter: saturate(180%) blur(10px);
+        width: 32px;
+        height: 32px;
+        padding: 4px;
+        margin-top: -16px;
+        flex-basis: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+      }
+
+      app-toolbar paper-icon-button[minimum]::after{
+        @apply(--overlay-style);
+        z-index: -1;
+        background-color: var(--primary-background-color);
+        opacity: 0.7;
+      }
+
       app-toolbar paper-button {
         font-size: 14px;
         font-weight: bold;
@@ -165,6 +164,19 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
 
       app-header[shadow] {
         box-shadow: 0 1px 8px rgba(0, 0, 0, .3);
+      }
+
+      app-toolbar input {
+        width: calc(100% - 72px);
+        padding: 0 8px;
+        margin: 0 8px;
+        color: var(--primary-text-color);
+        font-weight: normal;
+        font-size: 20px;
+        border: none;
+        background: none;
+        outline: none;
+        border-radius: 0;
       }
 
       /*short*/

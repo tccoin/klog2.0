@@ -38,11 +38,6 @@ class KlogTimeline extends PolymerElement {
         <span class="page-header-title">时间轴</span>
         <span class="page-header-subtitle">不要温和地走进那个良夜。<br>怒斥，怒斥光明的消逝。</span>
       </div>
-      
-      <klog-chip name="search" id="mobileSearchInput" icon="search" hidden="{{!mobile}}" checkmark-animation-disabled>
-        <input slot="expand-content" id="keywordInputMobile" type="text">
-        <paper-icon-button slot="expand-content" icon="close" on-click="_mobileSearchClose"></paper-icon-button>
-      </klog-chip>
       <div class="filter-container item" id="filter" on-click="setFilter">
         <klog-chip name="default" label="全部"></klog-chip>
         <klog-chip name="daily" label="日常"></klog-chip>
@@ -103,11 +98,6 @@ class KlogTimeline extends PolymerElement {
           mainMenu: true,
           sidebar: 'auto',
           scrollToTop: false,
-          header: {
-            fixed: true,
-            short: false,
-            shadow: { mobile: 'on', desktop: 'off' },
-          },
           customMenu: [{
             name: 'timeline',
             items: [
@@ -117,24 +107,6 @@ class KlogTimeline extends PolymerElement {
               { name: 'log', text: '最近更新', icon: 'bookmark' },
             ]
           }],
-          styles: {
-            '--klog-header-background': { mobile: 'var(--primary-background-color)', desktop: 'transparent' },
-            '--klog-header-text-color': 'var(--primary-text-color)',
-          },
-          toolbar: html `
-              <app-toolbar>
-                <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
-                <div class="title" on-click="refresh">
-                  <div main-title><iron-icon icon="klog"></iron-icon></div>
-                  <paper-ripple></paper-ripple>
-                </div>
-                <div class="divider"></div>
-                <paper-icon-button on-click="_mobileSearch" icon="search" mobile></paper-icon-button>
-                <paper-button on-click="add" mobile>
-                  <iron-icon icon="post_add"></iron-icon>
-                  <span>优里卡！</span>
-                </paper-button>
-              </app-toolbar>`
         }
       },
     };
@@ -148,6 +120,7 @@ class KlogTimeline extends PolymerElement {
     this.$.scrollTarget.style.setProperty('scroll-behavior', '');
     this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
     this.$.scrollTarget.addEventListener('scroll', this._pageScrollHandler);
+    this.showDefaultToolbar();
   }
 
   async update(subroute) {
@@ -244,21 +217,25 @@ class KlogTimeline extends PolymerElement {
       }
     };
 
-    for (let input of[this.$.keywordInput, this.$.keywordInputMobile]) {
-      input.addEventListener('input', () => {
-        const cb = () => {
-          if (this.filterName == 'search') {
-            this.keyword = input.value;
-            this.updateTimeline(false, true);
-          }
-        };
-        if (this._keywordInputTimeout) {
-          clearTimeout(this._keywordInputTimeout);
-        }
-        this._keywordInputTimeout = setTimeout(cb, 1000);
-      });
-    }
+    this.$.keywordInput.addEventListener('input', e => this._searchInput(e));
 
+  }
+
+  _searchInput(e) {
+    let keyword = e.target.value;
+    const cb = () => {
+      this.keyword = keyword;
+      this.updateTimeline(false, true);
+    };
+    if (e.key == 'Enter') {
+      cb();
+    } else {
+      if (this._keywordInputTimeout) {
+        clearTimeout(this._keywordInputTimeout);
+      }
+      this._keywordInputTimeout = setTimeout(cb, 1000);
+      console.log(keyword);
+    }
   }
 
   menuSelect(category, item) {
@@ -377,12 +354,13 @@ class KlogTimeline extends PolymerElement {
 
   _filterNameUpdate(filterName, oldFilterName) {
     let activeChip, oldActiveChip;
-    activeChip = filterName ? this._getChip(filterName) : this.$.defaultFilter;
+    activeChip = filterName ? this.$.container.querySelector(`[name=${filterName}]`) : this.$.defaultFilter;
     if (oldFilterName) {
-      oldActiveChip = this._getChip(oldFilterName);
+      oldActiveChip = this.$.container.querySelector(`[name=${oldFilterName}]`);
     } else {
       oldActiveChip = this.$.defaultFilter;
     }
+    console.log(activeChip, oldActiveChip);
     if (!filterName) {
       if (this.$.defaultFilter.active) return
       oldActiveChip.active = false;
@@ -394,12 +372,63 @@ class KlogTimeline extends PolymerElement {
     }
   }
 
-  _getChip(filterName) {
-    if (filterName == 'search' && this.mobile) {
-      return this.$.container.querySelector(`#mobileSearchInput`);
-    } else {
-      return this.$.container.querySelector(`[name=${filterName}]:not([hidden])`);
-    }
+  showDefaultToolbar() {
+    this.dispatchEvent(new CustomEvent('layout-update', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        header: {
+          fixed: true,
+          short: false,
+          blur: { mobile: true, desktop: false },
+          shadow: { mobile: 'scroll', desktop: 'off' },
+        },
+        styles: {
+          '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
+          '--klog-header-text-color': 'var(--primary-text-color)',
+          '--klog-header-opacity': 0.8
+        },
+        toolbar: html `
+          <app-toolbar>
+            <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
+            <div class="title" on-click="refresh">
+              <div main-title><iron-icon icon="klog"></iron-icon></div>
+              <paper-ripple></paper-ripple>
+            </div>
+            <div class="divider"></div>
+            <paper-icon-button on-click="showSearchToolbar" icon="search" mobile></paper-icon-button>
+            <paper-button on-click="add" mobile>
+              <iron-icon icon="post_add"></iron-icon>
+              <span>优里卡！</span>
+            </paper-button>
+          </app-toolbar>`
+      }
+    }));
+  }
+
+  showSearchToolbar() {
+    this.dispatchEvent(new CustomEvent('layout-update', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        header: {
+          fixed: true,
+          short: false,
+          blur: { mobile: true, desktop: false },
+          shadow: { mobile: 'scroll', desktop: 'off' },
+        },
+        styles: {
+          '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
+          '--klog-header-text-color': 'var(--primary-text-color)',
+          '--klog-header-opacity': 0.8
+        },
+        toolbar: html `
+          <app-toolbar>
+            <input id="keywordInputMobile" type="text" placeholder="搜索时间轴" on-keydown="_searchInput" on-input="_searchInput">
+            <paper-icon-button icon="close" on-click="showDefaultToolbar"></paper-icon-button>
+          </app-toolbar>`
+      }
+    }));
   }
 
   _initPageloader() {

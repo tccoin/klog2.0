@@ -16,7 +16,7 @@ containerKlogStyle.innerHTML = `<custom-style>
         right: 0;
         background-color: var(--overlay-background);
         opacity: var(--overlay-opacity);
-        transition: opacity .15s ease-out;
+        transition: all .2s ease;
       }
 
       --fit-layout: {

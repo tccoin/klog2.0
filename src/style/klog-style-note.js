@@ -32,6 +32,7 @@ containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
       .layout .backdrop-back-toolbar {
         position: fixed;
         left: 0;
+        top: 0!important;
         width: 100%;
         box-sizing: border-box;
       }
