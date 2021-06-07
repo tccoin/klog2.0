@@ -377,6 +377,7 @@ class KlogTimeline extends PolymerElement {
     this.keyword = '';
     this.updateTimeline(false, true);
     this.$.filter.hidden = false;
+    this.$.pageHeader.hidden = false;
     this.dispatchEvent(new CustomEvent('layout-update', {
       bubbles: true,
       composed: true,
@@ -412,6 +413,7 @@ class KlogTimeline extends PolymerElement {
 
   showSearchToolbar() {
     this.$.filter.hidden = true;
+    this.$.pageHeader.hidden = true;
     this.dispatchEvent(new CustomEvent('layout-update', {
       bubbles: true,
       composed: true,

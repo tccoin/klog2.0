@@ -49,6 +49,7 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
 
       .filter-container {
         width: calc(100vw + 92px) !important;
+        margin: 0 auto 0;
         padding-left: 48px;
         position: relative;
         left: -46px;
@@ -124,6 +125,7 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
       }
 
       .timeline-container {
+        margin-top: 16px;
         transition: all .2s ease-out;
       }
 
