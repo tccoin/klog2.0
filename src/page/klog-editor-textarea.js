@@ -91,6 +91,8 @@ class KlogEditorTextarea extends PolymerElement {
     this._input.addEventListener('keydown', (e) => this.keydown(e));
     this._input.addEventListener('paste', (e) => this.paste(e));
 
+    this._updateCurrentStatus();
+
     setTimeout(() => {
       if (this.$.preview) {
         this.$.preview.addEventListener('markdown-rendered', () => this._updatePointers());
@@ -308,12 +310,16 @@ class KlogEditorTextarea extends PolymerElement {
 
   insertLine(before = '', after = '') {
     let [value, input, currentLineStart, currentLineEnd] = [this.value, this._input, this.currentLineStart, this.currentLineEnd];
-    this.value = value.substr(0, currentLineStart) + before + value.substr(currentLineStart, currentLineEnd - currentLineStart) + after + value.substr(currentLineEnd);
+    this.value = value.substr(0, currentLineStart) + (before ? before + '\n' : '') + value.substr(currentLineStart, currentLineEnd - currentLineStart) + (after ? after + '\n' : '') + value.substr(currentLineEnd);
     if (before) {
-      this._setSelection(currentLineStart + (before.split('\n').length - 2));
+      this._setSelection(currentLineStart + before.length + before.split('\n').length - 1);
     } else {
-      this._setSelection(currentLineEnd + (after.split('\n').length - 2));
+      this._setSelection(currentLineEnd + after.length + after.split('\n').length - 1);
     }
+    setTimeout(() => {
+      console.log(this.value.substr(this.currentLineStart, this.currentLineEnd - this.currentLineStart));
+    }, 1);
+    // console.log(currentLineStart, currentLineEnd);
     this._fireInput();
   }
 
@@ -323,6 +329,7 @@ class KlogEditorTextarea extends PolymerElement {
     } else {
       this._tokens = [];
     }
+    this._updateCurrentStatus();
   }
 
   _updateCurrentStatus() {

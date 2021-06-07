@@ -336,6 +336,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
     this.addEventListener('editor-close-backdrop', (e) => this.closeBackdrop());
     this.addEventListener('editor-toggle-backdrop', (e) => this.toggleBackdrop(e.detail.selected));
     this.addEventListener('editor-upload', (e) => this.upload());
+    this.addEventListener('editor-exception', (e) => this._editorExceptionHandle(e.detail.exceptionType));
     this.addEventListener('upload-success', (e) => {
       e.stopPropagation();
       this._uploadSuccessHandle(e.detail.fileinfo);
@@ -391,6 +392,12 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         resolve();
       }, 150);
     });
+  }
+
+  _editorExceptionHandle(exceptionType) {
+    if (exceptionType == 'unsupported-video') {
+      this.openToast('目前仅支持直接播放mp4格式视频，上传的文件将作为链接显示', null, { duration: 4000 });
+    }
   }
 
   _updateArticleId() {
@@ -530,8 +537,8 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
 
   _uploadSuccessHandle(fileinfo) {
     this.set("fileinfo", fileinfo);
-    if (this.$.uploadzone.remainingNumber == 1) {
-      this.$.backdrop.toggle();
+    if (this.$.backdropPages.$.uploadzone.remainingNumber == 1 && !this.mobile) {
+      this.closeBackdrop();
     }
   }
 

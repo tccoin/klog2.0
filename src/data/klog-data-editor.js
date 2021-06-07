@@ -177,7 +177,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
           text: this.unescape(token.text)
         };
         if (token.type == 'image') {
-          if (/\.mp4$/.test(token.href)) {
+          if (/\.mp4$/i.test(token.href)) {
             attachment.video = true;
           } else {
             attachment.image = true;
@@ -296,13 +296,17 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
     let out;
     if (mimeType.indexOf('image') > -1) {
       out = `![](${url})`;
-    } else if (mimeType.indexOf('video') > -1) {
-      out = `[<V>${fileinfo.fname}](${url})`;
+      this.editor.$.textarea.insertLine('', out);
+    } else if (/\.mp4$/i.test(fileinfo.key)) {
+      out = `![${fileinfo.fname}](${url})`;
+      this.editor.$.textarea.insertLine('', out);
     } else {
       out = `[${fileinfo.fname}](${url})`;
+      if (mimeType.indexOf('video') > -1) {
+        this.dispatchEvent(new CustomEvent('editor-exception', { bubbles: true, composed: true, detail: { exceptionType: 'unsupported-video' } }));
+        this.editor.$.textarea.insert(out);
+      }
     }
-    if (this.markdown) out = '\n' + out
-    this.editor.$.textarea.insertLine('', out);
   }
 
   reset(requestNewPath = false) {

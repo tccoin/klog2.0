@@ -30,6 +30,8 @@ class KlogUploadZone extends PolymerElement {
       .info {
         padding: 16px 16px 40px;
         text-align: center;
+        min-height: 168px;
+        box-sizing: border-box;
       }
 
       iron-icon {
@@ -80,8 +82,7 @@ class KlogUploadZone extends PolymerElement {
       </div>
       <div class="state hidden" name="dropover">松手上传</div>
       <div class="state hidden" name="uploading">上传至β时间线…
-        <br>{{stylishProgress(progress)}}
-        <br>还有{{remainingNumber}}个文件(　ﾟ 3ﾟ)</div>
+        <br>{{stylishProgress(progress)}} / {{remainingNumber}}
     </div>
     <paper-ripple></paper-ripple>
 `;
