@@ -9,7 +9,7 @@ const settings = require('./settings');
 
 if (!settings.tls) {
   const httpserver = app(fastify({ maxParamLength: 200 }));
-  httpserver.listen(3000, '0.0.0.0', (err, address) => {
+  httpserver.listen(3001, '0.0.0.0', (err, address) => {
     if (err) {
       console.log(err)
       process.exit(1)

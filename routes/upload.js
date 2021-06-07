@@ -4,7 +4,8 @@
 const path = require('path');
 const fs = require('fs');
 const md5File = require('md5-file');
-var mime = require('mime-types');
+const mime = require('mime-types');
+const pump = require('pump');
 
 async function merge(bucketname, name, total, rename) {
   let filePath = `pan/${bucketname}/${name}`;
@@ -55,12 +56,17 @@ async function merge(bucketname, name, total, rename) {
 // receive parts
 let _uploadedPart = 0;
 
-module.exports = function (app, opts, next) {
+module.exports = function(app, opts, next) {
   // upload test
   app.get('/test', (request, reply, next) => {
     reply
       .header('Content-Type', 'text/html; charset=UTF-8')
       .send('<form action="/upload" method="post" enctype="multipart/form-data"><input type="file" name="file" /><input type="submit" value="submit"></form>');
+  });
+
+  app.options('/', (request, reply, next) => {
+    reply.header("Access-Control-Allow-Origin", "*");
+    reply.send('');
   });
 
   app.post('/', (request, reply, next) => {
@@ -74,11 +80,11 @@ module.exports = function (app, opts, next) {
 
     const uploadDir = 'pan/' + request.query.bucketname;
 
-    const mp = request.multipart(handler, function (err) {
+    const mp = request.multipart(handler, function(err) {
       console.log('LOG upload completed')
     });
 
-    mp.on('field', function (key, value) {
+    mp.on('field', function(key, value) {
       console.log('form-data', key, value)
     });
 
