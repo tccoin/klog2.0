@@ -45,7 +45,6 @@ class KlogRenderTimestamp extends PolymerElement {
     var date = new Date(timeStamp);
     var currentTimeStamp = Date.parse(new Date());
     var d = (currentTimeStamp - timeStamp) / 1000;
-    console.log(typeof(timeStamp) != 'number', d, new Date().getDate(), date.getDate());
     if (typeof(timeStamp) != 'number') {
       return ''
     } else if (d < 60) {
