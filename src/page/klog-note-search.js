@@ -3,7 +3,7 @@ import '@polymer/iron-input/iron-input.js';
 
 class KlogNoteSearch extends PolymerElement {
   static get template() {
-    return html`
+    return html `
     <style>
       :host {
         display: block;
@@ -116,7 +116,9 @@ class KlogNoteSearch extends PolymerElement {
     this.$.input.addEventListener('input', () => {
       this.countdown();
     });
+
     this._width = this.offsetWidth;
+    window.addEventListener('resize', () => this._width = this.offsetWidth);
   }
 
   _updateInput(value) {

@@ -60,7 +60,7 @@ class KlogUploadZone extends PolymerElement {
         opacity: 0;
       }
 
-      @media (min-width: 769px) {
+      @media (min-width: 768px) {
         .moblie-only {
           display: none;
         }

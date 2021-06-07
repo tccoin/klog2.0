@@ -1298,6 +1298,13 @@
   dependencies:
     "@polymer/polymer" "^3.0.0"
 
+"@polymer/iron-fit-behavior@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@polymer/iron-fit-behavior/-/iron-fit-behavior-3.1.0.tgz#8197a61e0ce2234e9bf8fbd7a1ae53d1a06026b0"
+  integrity sha512-ABcgIYqrjhmUT8tiuolqeGttF/8pd3sEymUDrO1vXbZu4FWIvoLNndrMDFvs++AGd12Mjf5pYy84NJc6dB8Vig==
+  dependencies:
+    "@polymer/polymer" "^3.0.0"
+
 "@polymer/iron-flex-layout@^3.0.0-pre.26":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@polymer/iron-flex-layout/-/iron-flex-layout-3.0.1.tgz#36f9e1a8eb792d279b2bc75d362628721ad37f0c"
@@ -1506,10 +1513,10 @@
     "@polymer/paper-dialog-behavior" "^3.0.0-pre.26"
     "@polymer/polymer" "^3.0.0"
 
-"@polymer/paper-dropdown-menu@^3.0.1":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@polymer/paper-dropdown-menu/-/paper-dropdown-menu-3.1.0.tgz#3983baafc9a05c1475a680a7aa6512f994c89c88"
-  integrity sha512-orxH2FzBCjUleXex//STZHjgWXm7z09+JRPnhJld7xEheRDE7XrKsrsS0Xl7f8bBqUrisdaL9HTX9yBJ/k8bbQ==
+"@polymer/paper-dropdown-menu@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@polymer/paper-dropdown-menu/-/paper-dropdown-menu-3.2.0.tgz#17f507ef864dc18365a92e256bde628c2d352956"
+  integrity sha512-2ohwSHF+RLSK6kA0UkkMiMQF6EZcaEYWAA25kfisI6DWie7yozKrpQNsqvwfOEHU6DdDMIotrOtH1TM88YS8Zg==
   dependencies:
     "@polymer/iron-a11y-keys-behavior" "^3.0.0-pre.26"
     "@polymer/iron-form-element-behavior" "^3.0.0-pre.26"
@@ -1518,7 +1525,7 @@
     "@polymer/iron-validatable-behavior" "^3.0.0-pre.26"
     "@polymer/paper-behaviors" "^3.0.0-pre.27"
     "@polymer/paper-input" "^3.1.0"
-    "@polymer/paper-menu-button" "^3.0.0-pre.26"
+    "@polymer/paper-menu-button" "^3.1.0"
     "@polymer/paper-ripple" "^3.0.0-pre.26"
     "@polymer/paper-styles" "^3.0.0-pre.26"
     "@polymer/polymer" "^3.3.1"
@@ -1589,15 +1596,15 @@
     "@polymer/paper-styles" "^3.0.0-pre.26"
     "@polymer/polymer" "^3.0.0"
 
-"@polymer/paper-menu-button@^3.0.0-pre.26":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@polymer/paper-menu-button/-/paper-menu-button-3.0.1.tgz#318fc4d884a01d42ed0f3f3b5a6f78548d64befa"
-  integrity sha512-Rxte2Fp7N2BMI2FMM7tB25IkvD11DhjMklcg97JP1jnlHbJNrXPh5SSX2bdtabz49UE8vejIsrxZ+AGsB5nqIQ==
+"@polymer/paper-menu-button@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@polymer/paper-menu-button/-/paper-menu-button-3.1.0.tgz#3eb2fb88ba3cdaa4c39be6ae3530efa40b1eccf3"
+  integrity sha512-q0G0/rvYD/FFmIBMGCQWjfXzRqwFw9+WHSYV4uOQzM1Ln8LMXSAd+2CENsbVwtMh6fmBePj15ZlU8SM2dt1WDQ==
   dependencies:
     "@polymer/iron-a11y-keys-behavior" "^3.0.0-pre.26"
     "@polymer/iron-behaviors" "^3.0.0-pre.26"
     "@polymer/iron-dropdown" "^3.0.0-pre.26"
-    "@polymer/iron-fit-behavior" "^3.0.0-pre.26"
+    "@polymer/iron-fit-behavior" "^3.1.0"
     "@polymer/neon-animation" "^3.0.0-pre.26"
     "@polymer/paper-styles" "^3.0.0-pre.26"
     "@polymer/polymer" "^3.0.0"
@@ -9692,24 +9699,24 @@ optipng-bin@^3.0.0:
     bin-wrapper "^3.0.0"
     logalot "^2.0.0"
 
-optipng-bin@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/optipng-bin/-/optipng-bin-6.0.0.tgz#376120fa79d5e71eee2f524176efdd3a5eabd316"
-  integrity sha512-95bB4y8IaTsa/8x6QH4bLUuyvyOoGBCLDA7wOgDL8UFqJpSUh1Hob8JRJhit+wC1ZLN3tQ7mFt7KuBj0x8F2Wg==
+optipng-bin@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/optipng-bin/-/optipng-bin-7.0.0.tgz#2dfcc68a5f006e7746e76ad64d317d6fb7c7f9ed"
+  integrity sha512-mesUAwfedu5p9gRQwlYgD6Svw5IH3VUIWDJj/9cNpP3yFNbbEVqkTMWYhrIEn/cxmbGA3LpZrdoV2Yl8OfmnIA==
   dependencies:
     bin-build "^3.0.0"
     bin-wrapper "^4.0.0"
     logalot "^2.0.0"
 
-optipng@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/optipng/-/optipng-2.1.0.tgz#312f8fe6009272554a7fe3eb9f4af6558a776ae4"
-  integrity sha512-Qih2It6tRiHr6tjxY3fL16G+vXJa4+LbpIA4vrNabpvpCOzlnNUwNQqQg9h4lxu/fTz3yReqlqqeIna+KVhTDA==
+optipng@^2.1.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/optipng/-/optipng-2.2.0.tgz#116bba442c4ca5db1b51a338833103e5578b3cc9"
+  integrity sha512-qVLokbWDo++lO/cThbrlcRNBuTKHgwWC1nV5ri0O8BHfjIBBHVUyReo4hP0C0U8I0qIu//DYlDp59IEf1iL1yQ==
   dependencies:
     gettemporaryfilepath "^1.0.0"
     memoizeasync "^1.1.0"
-    optipng-bin "^6.0.0"
-    which "^1.2.14"
+    optipng-bin "^7.0.0"
+    which "^2.0.1"
 
 ordered-read-streams@^0.3.0:
   version "0.3.0"
@@ -13376,11 +13383,6 @@ wd@^1.2.0:
     q "^1.5.1"
     request "2.88.0"
     vargs "^0.1.0"
-
-web-animations-js@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/web-animations-js/-/web-animations-js-2.3.2.tgz#a51963a359c543f97b47c7d4bc2d811f9fc9e153"
-  integrity sha512-TOMFWtQdxzjWp8qx4DAraTWTsdhxVSiWa6NkPFSaPtZ1diKUxTn4yTix73A1euG1WbSOMMPcY51cnjTIHrGtDA==
 
 web-component-tester@^6.9.0:
   version "6.9.2"

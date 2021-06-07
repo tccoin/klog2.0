@@ -8,12 +8,14 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/paper-toggle-button/paper-toggle-button.js';
 import '../style/klog-style-toolbar.js';
 import '../style/klog-style-dialog.js';
+import '../style/klog-style-media.js';
 
 class KlogEditorHeader extends PolymerElement {
   static get template() {
     return html `
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-dialog"></style>
+    <style include="klog-style-media"></style>
     <style>
       :host {
         display: block;
@@ -61,22 +63,6 @@ class KlogEditorHeader extends PolymerElement {
 
       .divider {
         flex: 1;
-      }
-
-      @media (min-width: 1025px) {
-        [hidden-on-desktop] {
-          display: none!important;
-        }
-      }
-      @media (min-width: 769px) and (max-width: 1023px) {
-        [hidden-on-tablet] {
-          display: none!important;
-        }
-      }
-      @media (max-width: 768px) {
-        [hidden-on-mobile] {
-          display: none!important;
-        }
       }
     </style>
     <iron-pages id="pages" selected="0">

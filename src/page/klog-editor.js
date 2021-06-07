@@ -8,7 +8,6 @@ import '@polymer/iron-media-query/iron-media-query.js';
 import '@polymer/iron-image/iron-image.js';
 import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/paper-toast/paper-toast.js';
-import '../lib/web-animations-next-lite.min.js';
 import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/app-route/app-route.js';
 import '../ui/klog-icons.js';
@@ -152,13 +151,13 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
       klog-backdrop {
         --klog-backdrop-default-front-top: 64px;
       }
-      @media (min-width: 1025px) {
+      @media (min-width: 1024px) {
         :host,
         klog-backdrop {
           --klog-backdrop-default-front-top: 16px;
         }
       }
-      @media (min-width: 769px) {
+      @media (min-width: 768px) {
         :host {
           --klog-markdown-media: {
             width: fit-content;

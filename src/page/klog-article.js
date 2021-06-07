@@ -116,9 +116,9 @@ class KlogArticle extends PolymerElement {
           },
           toolbar: html `
             <app-toolbar>
-              <paper-icon-button class="navigation" icon="arrow_back" on-click="back" desktop></paper-icon-button>
+              <paper-icon-button class="navigation" icon="arrow_back" on-click="back" hidden-on-mobile hidden-on-tablet></paper-icon-button>
               <div class="divider"></div>
-              <paper-icon-button class="navigation" icon="close" on-click="back" mobile minimum></paper-icon-button>
+              <paper-icon-button class="navigation" icon="close" on-click="back" hidden-on-desktop minimum></paper-icon-button>
             </app-toolbar>`
         }
       }

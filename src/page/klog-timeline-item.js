@@ -85,7 +85,7 @@ class KlogTimelineItem extends PolymerElement {
         width: 0;
       }
 
-      @media (min-width: 769px) {
+      @media (min-width: 768px) {
         .card:active {
           transform: scale(0.98);
         }

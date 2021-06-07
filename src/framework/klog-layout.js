@@ -129,8 +129,8 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     <div id="main" class="main-container">
       <!-- Media query -->
       <iron-media-query query="max-width: 767px" query-matches="{{mobile}}"></iron-media-query>
-      <iron-media-query query="max-width: 1024px" query-matches="{{tablet}}"></iron-media-query>
-      <iron-media-query query="max-width: 1440px" query-matches="{{laptop}}"></iron-media-query>
+      <iron-media-query query="(min-width: 768px) and (max-width: 1023px)" query-matches="{{tablet}}"></iron-media-query>
+      <iron-media-query query="min-width: 1024px" query-matches="{{desktop}}"></iron-media-query>
       <!-- Header -->
       <app-header id="header" mobile$="{{mobile}}"></app-header>
       <!-- Sidebar -->
@@ -143,7 +143,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
           <paper-spinner active="{{loading}}"></paper-spinner>
         </div>
         <klog-404 name="404" page="{{page}}"></klog-404>
-        <klog-timeline name="timeline" id="timeline" preference="{{preference}}" mobile="{{mobile}}" theme="{{theme}}">
+        <klog-timeline name="timeline" id="timeline" preference="{{preference}}" mobile="{{mobile}}" tablet="{{tablet}}" desktop="{{desktop}}" theme="{{theme}}">
         </klog-timeline>
         <klog-article name="article" theme="{{theme}}" mobile="{{mobile}}">
         </klog-article>
@@ -231,8 +231,8 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
 
   static get observers() {
     return [
-      '_updateSidebar(sidebar,tablet)',
-      '_updateDrawer(drawer,tablet)',
+      '_updateSidebar(sidebar,undefined,desktop)',
+      '_updateDrawer(drawer,undefined,desktop)',
       '_updateDocumentTitle(documentTitle)',
       '_updateStyles(styles)',
       '_updateHeader(header)',
@@ -246,6 +246,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     super.ready();
     this.$.scrollTarget = this.$.page;
     this.$.scrollTarget.style.scrollBehavior = 'smooth';
+    window.addEventListener('resize', () => this.updateLayout(Object.assign(this._layout, { scrollToTop: false }), false));
     this.addEventListener('layout-update', e => this.updateLayout(e.detail, false));
     this.addEventListener('main-drawer-open', e => this.$.drawer.open());
     this.addEventListener('about-help', e => this.aboutHelp());
@@ -457,26 +458,29 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     layout = Object.assign({}, layout);
     for (let key in layout) {
       if (typeof(layout[key]) == 'object' && 'mobile' in layout[key] && 'desktop' in layout[key]) {
-        layout[key] = this.mobile ? layout[key].mobile : layout[key].desktop;
+        if (!('tablet' in layout[key])) {
+          layout[key].tablet = layout[key].mobile;
+        }
+        layout[key] = this.mobile ? layout[key].mobile : (this.tablet ? layout[key].tablet : layout[key].desktop);
       }
     }
     return layout;
   }
 
-  _updateSidebar(sidebar, tablet) {
-    if (sidebar == 'auto') sidebar = tablet ? 'off' : 'on';
+  _updateSidebar(sidebar) {
+    if (sidebar == 'auto') sidebar = this.desktop ? 'on' : 'off';
     this._setAttribute(this, 'sidebar-off', sidebar == 'on');
   }
 
-  async _updateDrawer(drawer, tablet, header = undefined) {
+  async _updateDrawer(drawer, header = undefined) {
     if (!header) { header = this.$.header; }
     await new Promise(resolve => setTimeout(resolve, 1));
-    if (drawer == 'auto') drawer = tablet ? 'on' : 'off';
+    if (drawer == 'auto') drawer = this.desktop ? 'on' : 'off';
     this.$.drawer.disabled = drawer == 'off';
     // drawer-button
     const drawerButton = header.querySelector('[name=drawer-button]');
     if (drawerButton) {
-      this._setAttribute(drawerButton, 'hidden', drawer == 'on');
+      this._setAttribute(drawerButton, 'hidden', drawer == 'off');
       await new Promise(resolve => setTimeout(resolve, 1));
     }
     // drawer disabled
@@ -534,7 +538,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
       toolbar.content.children[0].style.setProperty('top', '0');
       toolbar.content.children[0].style.setProperty('z-index', 99);
       this._setAttribute(toolbar.content.children[0], 'exit');
-      await this._updateDrawer(this.drawer, this.tablet, toolbar.content);
+      await this._updateDrawer(this.drawer, toolbar.content);
       clone = document.importNode(toolbar.content, true);
       this.$.header.append(clone);
       await new Promise(resolve => setTimeout(resolve, 1));

@@ -4,6 +4,7 @@ import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-spinner/paper-spinner-lite.js';
 import '../style/klog-style-scrollbar.js';
 import '../style/klog-style-toolbar.js';
+import '../style/klog-style-media.js';
 import '../ui/klog-icons.js';
 import '../data/klog-data-article.js';
 import '../ui/klog-markdown.js';
@@ -13,6 +14,7 @@ class KlogNoteContent extends PolymerElement {
     return html `
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-toolbar"></style>
+    <style include="klog-style-media"></style>
     <style>
       :host {
         flex: 1;
@@ -72,7 +74,7 @@ class KlogNoteContent extends PolymerElement {
         content: none;
       }
 
-      :host(:not([mobile])) app-toolbar {
+      .note-toolbar {
         position: absolute;
         width: auto;
         z-index: 10;
@@ -87,7 +89,7 @@ class KlogNoteContent extends PolymerElement {
         background: var(--secondary-background-color);
       }
 
-      :host(:not([mobile])) app-toolbar paper-icon-button {
+      .note-toolbar paper-icon-button {
         height: 36px;
         width: 36px;
         flex-basis: 36px;
@@ -99,20 +101,16 @@ class KlogNoteContent extends PolymerElement {
         @apply(--shadow-elevation-4dp);
       }
 
-      :host(:not([mobile])) app-toolbar.raised {
+      .note-toolbar.raised {
         @apply(--shadow-elevation-2dp);
       }
 
-      @media (min-width: 769px) {
+      @media (min-width: 768px) {
         :host {
           --klog-markdown-media: {
             width: fit-content;
             @apply(--shadow-elevation-8dp);
           }
-        }
-
-        [mobile] {
-          display: none !important;
         }
       }
 
@@ -135,7 +133,7 @@ class KlogNoteContent extends PolymerElement {
       <paper-spinner-lite active=""></paper-spinner-lite>
     </div>
 
-    <app-toolbar id="notetool" short="">
+    <app-toolbar id="notetool" short hidden-on-tablet hidden-on-desktop>
       <paper-icon-button icon="arrow_back" on-click="back" mobile=""></paper-icon-button>
       <div class="divider"></div>
       <div class="actions">
@@ -144,6 +142,14 @@ class KlogNoteContent extends PolymerElement {
         <paper-icon-button icon="{{bookmarksIcon}}" on-click="toggleBookmark"></paper-icon-button>
       </div>
     </app-toolbar>
+
+    <div class="note-toolbar" hidden-on-mobile>
+      <div class="actions">
+        <paper-icon-button icon="edit" on-click="edit"></paper-icon-button>
+        <paper-icon-button icon="share" on-click="share"></paper-icon-button>
+        <paper-icon-button icon="{{bookmarksIcon}}" on-click="toggleBookmark"></paper-icon-button>
+      </div>
+    </div>
 
     <div class="main-container" id="scrollTarget">
       <div class="body">

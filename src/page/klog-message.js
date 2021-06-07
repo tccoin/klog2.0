@@ -56,7 +56,7 @@ class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
               <div page-title>通知中心</div>
             </div>
             <div class="divider"></div>
-            <paper-button on-click="refresh" mobile>
+            <paper-button on-click="refresh" hidden-on-desktop>
               <iron-icon icon="refresh"></iron-icon>
               <span>刷新</span>
             </paper-button>

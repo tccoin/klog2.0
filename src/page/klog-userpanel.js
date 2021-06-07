@@ -6,7 +6,6 @@ import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@polymer/paper-ripple/paper-ripple.js';
 import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-toggle-button/paper-toggle-button.js';
 import '@polymer/paper-radio-group/paper-radio-group.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-listbox/paper-listbox.js';
@@ -186,7 +185,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
       <div class="klog-card" mobile="[[mobile]]">
         <div class="card-meta">外观</div>
         <div class="form">
-          <klog-dropdown-menu label="主题" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+          <klog-dropdown-menu label="主题" outlined vertical-offset="64" horizontal-offset="-16">
             <paper-tabs selected="{{preference.theme}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
               <paper-tab name="light">浅色</paper-tab>
               <paper-tab name="dark">深色</paper-tab>
@@ -215,20 +214,20 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
     <div class="klog-card" mobile="[[mobile]]" id="animation">
       <div class="card-meta">阅读</div>
       <div class="form">
-        <klog-dropdown-menu label="标题序号" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+        <klog-dropdown-menu label="标题序号" outlined vertical-offset="64" horizontal-offset="-16">
           <paper-tabs selected="{{preference.markdown.numberedHeading}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
             <paper-tab name="true">显示</paper-tab>
             <paper-tab name="auto">自动</paper-tab>
             <paper-tab name="false">隐藏</paper-tab>
           </paper-tabs>
         </klog-dropdown-menu>
-        <klog-dropdown-menu label="标题位置" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+        <klog-dropdown-menu label="标题位置" outlined vertical-offset="64" horizontal-offset="-16">
           <paper-tabs selected="{{preference.markdown.centeredHeading}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
             <paper-tab name="false">正常</paper-tab>
             <paper-tab name="true">居中</paper-tab>
           </paper-tabs>
         </klog-dropdown-menu>
-        <klog-dropdown-menu label="大段代码" outlined vertical-align="top" horizontal-align="left" vertical-offset="62" horizontal-offset="-16">
+        <klog-dropdown-menu label="大段代码" outlined vertical-offset="64" horizontal-offset="-16">
           <paper-tabs selected="{{preference.markdown.overflowCode}}" slot="dropdown-content" class="dropdown-content" attr-for-selected="name">
             <paper-tab name="true">滚动</paper-tab>
             <paper-tab name="false">全部显示</paper-tab>
@@ -420,7 +419,8 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
   }
 
   resetMarkdownPreference() {
-    this.set("preference.markdown", this.$.user.defaultMarkdownPreference);
+    this.set("preference.markdown", Object.assign({}, this.$.user.defaultPreference.markdown));
+    console.log(this.$.user.defaultPreference.markdown);
   }
 
   loadList() {

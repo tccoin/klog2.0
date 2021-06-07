@@ -1,7 +1,9 @@
+import '../style/klog-style-media.js';
 const containerKlogStyleNote = document.createElement('template');
 
 containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
   <template>
+    <style include="klog-style-media"></style>
     <style>
       :host {
         display: block;
@@ -144,26 +146,10 @@ containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
       klog-backdrop {
         --klog-backdrop-default-front-top: 64px;
       }
-      @media (min-width: 1025px) {
+      @media (min-width: 1024px) {
         :host,
         klog-backdrop {
           --klog-backdrop-default-front-top: 16px;
-        }
-      }
-
-      @media (min-width: 1025px) {
-        [hidden-on-desktop] {
-          display: none!important;
-        }
-      }
-      @media (min-width: 769px) and (max-width: 1023px) {
-        [hidden-on-tablet] {
-          display: none!important;
-        }
-      }
-      @media (max-width: 768px) {
-        [hidden-on-mobile] {
-          display: none!important;
         }
       }
     </style>

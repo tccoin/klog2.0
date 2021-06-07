@@ -16,7 +16,7 @@ class KlogMenuButton extends PolymerElement {
       <div on-click="toggle">
         <slot name="dropdown-trigger"></slot>
       </div>
-      <iron-dropdown id="dropdown" opened="{{opened}}">
+      <iron-dropdown id="dropdown" opened="{{opened}}" vertical-align="{{verticalAlign}}" horizontal-align="{{horizontalAlign}}" vertical-offset="{{verticalOffset}}">
         <div slot="dropdown-content" class="dropdown-content klog-card">
             <slot id="content" name="dropdown-content"></slot>
         </div>
@@ -44,6 +44,14 @@ class KlogMenuButton extends PolymerElement {
 
   toggle() {
     this.opened = !this.opened;
+  }
+
+  open() {
+    this.opened = true;
+  }
+
+  close() {
+    this.opened = false;
   }
 }
 customElements.define(KlogMenuButton.is, KlogMenuButton);

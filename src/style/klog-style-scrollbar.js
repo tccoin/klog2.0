@@ -3,7 +3,7 @@ const containerKlogStyleScrollbar = document.createElement('template');
 containerKlogStyleScrollbar.innerHTML = `<dom-module id="klog-style-scrollbar">
   <template>
     <style>
-      @media (min-width: 769px) {
+      @media (min-width: 768px) {
 
         :host::-webkit-scrollbar,
         ::-webkit-scrollbar,
@@ -36,7 +36,7 @@ containerKlogStyleScrollbar.innerHTML = `<dom-module id="klog-style-scrollbar">
       --scrollbar-thumb-radius: calc(var(--scrollbar-width) / 2);
     }
 
-    @media (min-width: 769px) {
+    @media (min-width: 768px) {
       ::-webkit-scrollbar {
         width: var(--scrollbar-width);
         background-color: var(--klog-page-background);

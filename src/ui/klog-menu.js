@@ -118,14 +118,14 @@ class KlogMenu extends PolymerElement {
       }
 
 
-      @media (min-width: 1025px) {
+      @media (min-width: 1024px) {
         .subtitle.mobile,
         .divider.mobile,
         .item.mobile {
           display: none!important;
         }
       }
-      @media (max-width: 1024px) {
+      @media (max-width: 1023px) {
         .subtitle.desktop,
         .divider.desktop,
         .item.desktop {

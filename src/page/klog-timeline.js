@@ -10,6 +10,7 @@ import '../style/klog-style-timeline.js';
 import './klog-timeline-item.js';
 import '../ui/klog-chip.js';
 import '../ui/klog-fab.js';
+import '../style/klog-style-media.js';
 
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
@@ -26,6 +27,7 @@ class KlogTimeline extends PolymerElement {
     <style include="klog-style-layout"></style>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-timeline"></style>
+    <style include="klog-style-media"></style>
     `;
   }
 
@@ -34,7 +36,7 @@ class KlogTimeline extends PolymerElement {
     <klog-data-timeline id="data" last-response="{{list}}"></klog-data-timeline>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
-      <div class="page-header-container item" id="pageHeader" hidden="{{mobile}}">
+      <div class="page-header-container item" id="pageHeader" hidden-on-mobile>
         <span class="page-header-title">时间轴</span>
         <span class="page-header-subtitle">不要温和地走进那个良夜。<br>怒斥，怒斥光明的消逝。</span>
       </div>
@@ -43,7 +45,7 @@ class KlogTimeline extends PolymerElement {
         <klog-chip name="daily" label="日常"></klog-chip>
         <klog-chip name="note" label="笔记"></klog-chip>
         <klog-chip name="gallery" label="相册"></klog-chip>
-        <klog-chip name="search" icon="search" on-click="setFilter" hidden="{{mobile}}" checkmark-animation-disabled>
+        <klog-chip name="search" icon="search" on-click="setFilter" hidden="{{!desktop}}" checkmark-animation-disabled>
           <input slot="expand-content" id="keywordInput">
         </klog-chip>
       </div>
@@ -120,6 +122,7 @@ class KlogTimeline extends PolymerElement {
     this.$.scrollTarget.style.setProperty('scroll-behavior', '');
     this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
     this.$.scrollTarget.addEventListener('scroll', this._pageScrollHandler);
+
     this.showDefaultToolbar();
   }
 
@@ -234,7 +237,6 @@ class KlogTimeline extends PolymerElement {
         clearTimeout(this._keywordInputTimeout);
       }
       this._keywordInputTimeout = setTimeout(cb, 1000);
-      console.log(keyword);
     }
   }
 
@@ -331,7 +333,7 @@ class KlogTimeline extends PolymerElement {
     // keyword
     let newKeyword;
     if (filterName == 'search') {
-      let input = this.mobile ? this.$.keywordInputMobile : this.$.keywordInput;
+      let input = this.desktop ? this.$.keywordInput : this.$.keywordInputMobile;
       setTimeout(() => input.focus(), 1);
       newKeyword = input.value;
     } else {
@@ -360,7 +362,6 @@ class KlogTimeline extends PolymerElement {
     } else {
       oldActiveChip = this.$.defaultFilter;
     }
-    console.log(activeChip, oldActiveChip);
     if (!filterName) {
       if (this.$.defaultFilter.active) return
       oldActiveChip.active = false;
@@ -373,6 +374,9 @@ class KlogTimeline extends PolymerElement {
   }
 
   showDefaultToolbar() {
+    this.keyword = '';
+    this.updateTimeline(false, true);
+    this.$.filter.hidden = false;
     this.dispatchEvent(new CustomEvent('layout-update', {
       bubbles: true,
       composed: true,
@@ -396,8 +400,8 @@ class KlogTimeline extends PolymerElement {
               <paper-ripple></paper-ripple>
             </div>
             <div class="divider"></div>
-            <paper-icon-button on-click="showSearchToolbar" icon="search" mobile></paper-icon-button>
-            <paper-button on-click="add" mobile>
+            <paper-icon-button on-click="showSearchToolbar" icon="search" hidden-on-desktop></paper-icon-button>
+            <paper-button on-click="add" hidden-on-desktop>
               <iron-icon icon="post_add"></iron-icon>
               <span>优里卡！</span>
             </paper-button>
@@ -407,6 +411,7 @@ class KlogTimeline extends PolymerElement {
   }
 
   showSearchToolbar() {
+    this.$.filter.hidden = true;
     this.dispatchEvent(new CustomEvent('layout-update', {
       bubbles: true,
       composed: true,
@@ -415,10 +420,10 @@ class KlogTimeline extends PolymerElement {
           fixed: true,
           short: false,
           blur: { mobile: true, desktop: false },
-          shadow: { mobile: 'scroll', desktop: 'off' },
+          shadow: { mobile: 'on', desktop: 'off' },
         },
         styles: {
-          '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
+          '--klog-header-background': { mobile: 'var(--primary-background-color)', desktop: 'transparent' },
           '--klog-header-text-color': 'var(--primary-text-color)',
           '--klog-header-opacity': 0.8
         },

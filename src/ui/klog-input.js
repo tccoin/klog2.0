@@ -83,7 +83,9 @@ class KlogInput extends PolymerElement {
         border-color: var(--primary-color);
       }
     </style>
-    <paper-input label="{{label}}" placeholder="{{placeholder}}" value="{{value}}" disabled="{{disabled}}" type="{{type}}" name="{{name}}"></paper-input>
+    <paper-input label="{{label}}" placeholder="{{placeholder}}" value="{{value}}" disabled="{{disabled}}" type="{{type}}" name="{{name}}" readonly="{{readonly}}">
+      <div slot="suffix"><slot name="suffix"></slot></div>
+    </paper-input>
 `;
   }
 
@@ -100,6 +102,10 @@ class KlogInput extends PolymerElement {
       },
       type: {
         type: String
+      },
+      readonly: {
+        type: Boolean,
+        value: false
       }
     }
   }

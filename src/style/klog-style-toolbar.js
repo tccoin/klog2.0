@@ -1,7 +1,9 @@
+import '../style/klog-style-media.js';
 const containerKlogStyleToolbar = document.createElement('template');
 
 containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
   <template>
+    <style include="klog-style-media"></style>
     <style>
       app-header {
         position: fixed;
@@ -15,14 +17,6 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         color: var(--klog-header-text-color, var(--secondary-text-color));
         overflow: hidden;
         transition: box-shadow .25s ease, opacity .2s ease, width .2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      }
-
-      app-header:not([mobile]) [mobile]{
-        display: none !important;
-      }
-
-      app-header[mobile] [desktop]{
-        display: none !important;
       }
 
       app-toolbar {
