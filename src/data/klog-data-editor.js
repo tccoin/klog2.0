@@ -304,8 +304,8 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
       out = `[${fileinfo.fname}](${url})`;
       if (mimeType.indexOf('video') > -1) {
         this.dispatchEvent(new CustomEvent('editor-exception', { bubbles: true, composed: true, detail: { exceptionType: 'unsupported-video' } }));
-        this.editor.$.textarea.insert(out);
       }
+      this.editor.$.textarea.insert(out);
     }
   }
 
