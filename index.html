@@ -2,7 +2,8 @@
 <html lang="zh-Hans">
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Klog</title>
   <meta name="description" content="Share everything.">
   <meta charset="utf-8">
@@ -34,7 +35,7 @@
       background-color: #000;
       scroll-behavior: smooth;
     }
-    
+
     body {
       margin: 0;
       font-family: -apple-system, Roboto, "Nimbus Sans L", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
@@ -44,16 +45,16 @@
       width: 100%;
       overscroll-behavior-y: none;
     }
-    
+
     body[unresolved] klog-app {
       display: none;
     }
   </style>
   <script src="./node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js" async></script>
   <script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" async></script>
-  <script src="https://c.lcfile.com/static/js/3.11.1/av-min.js"></script>
+  <script src="https://code.bdstatic.com/npm/leancloud-storage@4.12.0/dist/av-min.js"></script>
   <script type="module">
-    (async () => { /* LeanClouds * appId and appKey will be replaced by app.js */ const appId = '{{GLOBAL_APPID}}'; const appKey = '{{GLOBAL_APPKEY}}'; await AV.init({ appId, appKey, serverURLs: 'https://us.leancloud.cn' }); await import('./src/framework/klog-app.js');
+    (async () => { /* LeanClouds * appId and appKey will be replaced by app.js */ const appId = '{{GLOBAL_APPID}}'; const appKey = '{{GLOBAL_APPKEY}}'; await AV.init({ appId, appKey }); await import('./src/framework/klog-app.js');
     })();
   </script>
 </head>
