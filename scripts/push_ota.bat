@@ -1,4 +1,4 @@
 bc c -r build/build.zip build/*
-ssh klog "rm -rf /home/klog2.0/build/*"
+ssh klog "rm -rf /root/klog2.0/build/*"
 sftp -b scripts/sftp.txt klog
-ssh klog "unzip /home/klog2.0/build/build.zip -d /home/klog2.0/build"
+ssh klog "unzip /root/klog2.0/build/build.zip -d /root/klog2.0/build"
