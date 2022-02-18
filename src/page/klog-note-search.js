@@ -2,8 +2,8 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-input/iron-input.js';
 
 class KlogNoteSearch extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style>
       :host {
         display: block;
@@ -88,88 +88,88 @@ class KlogNoteSearch extends PolymerElement {
       <template is="dom-repeat" items="{{collections}}">{{item}}</template>
     </div> -->
 `;
-  }
-
-  static get is() { return 'klog-note-search'; }
-
-  static get properties() {
-    return {
-      keyword: {
-        type: String,
-        notify: true,
-        observer: '_updateInput'
-      },
-      active: {
-        type: Boolean,
-        value: true
-      }
     }
-  }
 
-  ready() {
-    super.ready();
-    this.$.icon.addEventListener('click', () => this.search());
-    this.$.input.addEventListener('keyup', (e) => {
-      if (e.keyCode == 13)
-        this.search();
-    });
-    this.$.input.addEventListener('input', () => {
-      this.countdown();
-    });
+    static get is() { return 'klog-note-search'; }
 
-    this._width = this.offsetWidth;
-    window.addEventListener('resize', () => this._width = this.offsetWidth);
-  }
+    static get properties() {
+        return {
+            keyword: {
+                type: String,
+                notify: true,
+                observer: '_updateInput'
+            },
+            active: {
+                type: Boolean,
+                value: true
+            }
+        };
+    }
 
-  _updateInput(value) {
-    this.$.input.value = value;
-  }
+    ready() {
+        super.ready();
+        this.$.icon.addEventListener('click', () => this.search());
+        this.$.input.addEventListener('keyup', (e) => {
+            if (e.keyCode == 13)
+                this.search();
+        });
+        this.$.input.addEventListener('input', () => {
+            this.countdown();
+        });
 
-  countdown() {
-    if (this._timeout) clearTimeout(this._timeout);
-    this._timeout = setTimeout(() => {
-      this.search();
-    }, 500);
-  }
+        this._width = this.offsetWidth;
+        window.addEventListener('resize', () => this._width = this.offsetWidth);
+    }
 
-  setWidth(width) {
-    this._width = width;
-  }
+    _updateInput(value) {
+        this.$.input.value = value;
+    }
 
-  focus() {
-    this.$.input.focus();
-  }
+    countdown() {
+        if (this._timeout) clearTimeout(this._timeout);
+        this._timeout = setTimeout(() => {
+            this.search();
+        }, 500);
+    }
 
-  blur() {
-    this.$.input.blur();
-  }
+    setWidth(width) {
+        this._width = width;
+    }
 
-  select() {
-    this.$.input.select();
-  }
+    focus() {
+        this.$.input.focus();
+    }
 
-  search() {
-    if (this.active) this.keyword = this.$.input.value;
-  }
+    blur() {
+        this.$.input.blur();
+    }
 
-  setAnimation(p) {
-    requestAnimationFrame(() => this._setAnimation(p));
-  }
+    select() {
+        this.$.input.select();
+    }
 
-  _setAnimation(p) {
-    p = Math.min(Math.max(p, 0), 1);
-    let opacityInput = p == 1 ? 1 : 0,
-      opacityBg = Math.max(1 - (1 - p) * 1.5, 0),
-      width = p * (this._width - 72) + 72,
-      radius = 24 - p * 19,
-      x = (this._width - width) * (1 - p),
-      y = -48 * (1 - p);
-    this.style = `transform: translate(${x}px, ${y}px);width: ${width}px; border-radius: ${radius}px;`;
-    this.$.input.style = `opacity:${opacityInput};`;
-    this.$.bg.style = `opacity:calc(${opacityBg} * var(--overlay-style_-_opacity));transform:scaleX(${p});`;
-    this.$.container.style = (p == 0 ? 'border-radius: 24px;' : '');
-    this.active = p > 0;
-  }
+    search() {
+        if (this.active) this.keyword = this.$.input.value;
+    }
+
+    setAnimation(p) {
+        requestAnimationFrame(() => this._setAnimation(p));
+    }
+
+    _setAnimation(p) {
+        p = Math.min(Math.max(p, 0), 1);
+        let opacityInput = p == 1 ? 1 : 0,
+            opacityBg = Math.max(1 - (1 - p) * 1.5, 0),
+            width = p * (this._width - 72) + 72,
+            radius = 24 - p * 19,
+            x = (this._width - width) * (1 - p),
+            y = -48 * (1 - p);
+        this.style = `transform: translate(${x}px, ${y}px);width: ${width}px; border-radius: ${radius}px;`;
+        this.$.input.style = `opacity:${opacityInput};`;
+        this.$.bg.style = `opacity:calc(${opacityBg} * var(--overlay-style_-_opacity));transform:scaleX(${p});`;
+        this.$.container.style = (p == 0 ? 'border-radius: 24px;' : '');
+        this.active = p > 0;
+    }
 }
 
 window.customElements.define(KlogNoteSearch.is, KlogNoteSearch);

@@ -15,11 +15,9 @@ import '../ui/klog-render-license.js';
 import './klog-comment.js';
 
 class KlogArticle extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
 <style include="klog-style-article"></style>
-<app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{_subroute}}"></app-route>
-<app-route route="{{_subroute}}" pattern="/:share" data="{{shareData}}"></app-route>
 <klog-data-article id="data" path="{{path}}" last-response="{{article}}" last-error="{{error}}" is-owner="{{isOwner}}">
 </klog-data-article>
 <!--article-->
@@ -79,214 +77,219 @@ class KlogArticle extends PolymerElement {
   </span>
 </div>
 `;
-  }
+    }
 
-  static get is() { return 'klog-article'; }
+    static get is() { return 'klog-article'; }
 
-  static get properties() {
-    return {
-      isOwner: {
-        type: Boolean,
-        value: false
-      },
-      loading: {
-        type: Boolean,
-        value: true,
-        reflectToAttribute: true,
-      },
-      backTo: {
-        type: String,
-        value: 'timeline'
-      },
-      layout: {
-        type: Object,
-        value: {
-          documentTitle: '文章 - Klog',
-          drawer: 'off',
-          mainMenu: false,
-          sidebar: 'off',
-          header: {
-            fixed: true,
-            short: false,
-            shadow: { mobile: 'off', desktop: 'off' }
-          },
-          styles: {
-            '--klog-header-background': 'transparent',
-            '--klog-header-opacity': 0
-          },
-          toolbar: html `
+    static get properties() {
+        return {
+            isOwner: {
+                type: Boolean,
+                value: false
+            },
+            loading: {
+                type: Boolean,
+                value: true,
+                reflectToAttribute: true,
+            },
+            backTo: {
+                type: String,
+                value: 'timeline'
+            },
+            layout: {
+                type: Object,
+                value: {
+                    documentTitle: '文章 - Klog',
+                    drawer: 'off',
+                    mainMenu: false,
+                    sidebar: 'off',
+                    header: {
+                        fixed: true,
+                        short: false,
+                        shadow: { mobile: 'off', desktop: 'off' }
+                    },
+                    styles: {
+                        '--klog-header-background': 'transparent',
+                        '--klog-header-opacity': 0
+                    },
+                    toolbar: html `
             <app-toolbar>
               <paper-icon-button class="navigation" icon="arrow_back" on-click="back" hidden-on-mobile hidden-on-tablet></paper-icon-button>
               <div class="divider"></div>
               <paper-icon-button class="navigation" icon="close" on-click="back" hidden-on-desktop minimum></paper-icon-button>
             </app-toolbar>`
+                }
+            }
+        };
+    }
+
+    static get observers() {
+        return [
+            'handleError(error)',
+            'loadArticle(routeData.path)',
+            'updateTitle(article.title)'
+        ];
+    }
+
+    back() {
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || 'timeline', now: false } }));
+    }
+
+    openZone() {
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.article.author.username || 'zone/' + this.article.author.objectId } }));
+    }
+
+    loadArticle(path) {
+        if (window.location.hash.indexOf('#/article') == -1) return;
+        if (!path || this.path == path) return;
+        this.path = path;
+    }
+
+    ready() {
+        super.ready();
+        this.setAttribute('tabindex', 1);
+        this.addEventListener('keydown', (e) => {
+            if (e.ctrlKey == true && e.keyCode == 69) {
+                //ctrl e
+                e.preventDefault();
+                this.edit();
+            }
+        });
+
+        this._scrollHandler = () => {
+            this.fabExtended = !this.mobile;
+            let fab = this.isOwner ? this.$.fabEdit : this.$.fabComment;
+            let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
+            if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 - 2 * safeareaTop <= window.innerHeight * 0.9) {
+                fab.style.position = 'absolute';
+                fab.style.bottom = `${this.fabExtended ? (-24 + safeareaTop) : (-28 + safeareaTop)}px`;
+            } else {
+                fab.style.position = 'fixed';
+                fab.style.bottom = '32px';
+            }
+        };
+        window.addEventListener('resize', this._scrollHandler);
+        setTimeout(() => {
+            this.$.comment.updateScrollTarget(this.$.scrollTarget);
+        }, 1);
+    }
+
+    async update(userLoadPromise, subroute) {
+        // user
+        const result = await userLoadPromise;
+        this.$.data.userinfo = result.userinfo;
+        this.userinfo = result.userinfo;
+        this.login = result.login;
+        // data
+        this.loading = true;
+        let params = subroute.path.split('/').splice(1);
+        if (params.length >= 1 && params[0]) {
+            let path = params[0];
+            if (this.$.data.isPathNew(path)) {
+                this.path = path;
+                await new Promise(resolve=>this.$.data.addEventListener('success', resolve, { once: true }));
+
+                this.$.avatar.lazyload();
+                this._scrollHandler();
+            }
+            if (params.length >= 2 && params[1]) {
+                let share = params[1];
+                this.updateScrollerQuery(share);
+            }
         }
-      }
-    };
-  }
-
-  static get observers() {
-    return [
-      'handleError(error)',
-      'loadArticle(routeData.path)',
-      'updateTitle(article.title)',
-      'articleloaded(article.objectId)',
-      'updateScrollerQuery(shareData.share)'
-    ]
-  }
-
-  back() {
-    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || 'timeline', now: false } }));
-  }
-
-  openZone() {
-    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.article.author.username || 'zone/' + this.article.author.objectId } }));
-  }
-
-  loadArticle(path) {
-    if (window.location.hash.indexOf('#/article') == -1) return
-    if (!path || this.path == path) return
-    this.path = path;
-  }
-
-  ready() {
-    super.ready();
-    this.setAttribute('tabindex', 1);
-    this.addEventListener('keydown', (e) => {
-      if (e.ctrlKey == true && e.keyCode == 69) {
-        //ctrl e
-        e.preventDefault();
-        this.edit();
-      }
-    });
-
-    this._scrollHandler = () => {
-      let y = this.$.scrollTarget.scrollTop;
-      this.fabExtended = !this.mobile;
-      let fab = this.isOwner ? this.$.fabEdit : this.$.fabComment;
-      let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
-      if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 - 2 * safeareaTop <= window.innerHeight * 0.9) {
-        fab.style.position = 'absolute';
-        fab.style.bottom = `${this.fabExtended ? (-24+safeareaTop) : (-28+safeareaTop)}px`;
-      } else {
-        fab.style.position = 'fixed';
-        fab.style.bottom = '32px';
-      }
-    };
-    window.addEventListener('resize', this._scrollHandler);
-    setTimeout(() => {
-      this.$.comment.updateScrollTarget(this.$.scrollTarget);
-    }, 1);
-  }
-
-  async load(userLoadPromise) {
-    this.$.markdown.updateScrollTarget(this.$.scrollTarget);
-    this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
-    this.loading = true;
-    userLoadPromise.then(result => {
-      this.$.data.userinfo = result.userinfo;
-      this.userinfo = result.userinfo;
-      this.login = result.login;
-    });
-  }
-
-  articleloaded() {
-    if (this.article && this.article.objectId) {
-      this.loading = false;
-      this.$.avatar.lazyload();
-      this._scrollHandler();
     }
-  }
 
-  update(subroute) {
-    this.route = subroute;
-  }
-
-  async unload() {
-    this.$.scrollTarget.removeEventListener('scroll', this._scrollHandler);
-    this.loading = true;
-    await this._timeout(new Promise(resolve => { this.$.content.addEventListener('transitionend', resolve) }), 500);
-    this.path = '';
-    this.isOwner = false;
-    this.article = {
-      markdown: ''
-    };
-    this.$.comment.resetInput();
-  }
-
-  _timeout(promise, timeout) {
-    return Promise.race([
-      promise,
-      new Promise(resolve => { setTimeout(resolve, timeout) })
-    ]);
-  }
-
-  updateScrollerQuery(hash) {
-    this.$.markdown.$.scroller.updateQueryByHash(hash);
-  }
-
-  edit() {
-    this.dispatchEvent(new CustomEvent('editor-open', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        articleId: this.article.objectId,
-        backTo: window.location.hash
-      }
-    }));
-  }
-
-  handleError() {
-    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
-  }
-
-  parseDate(date) {
-    return Date.parse(date)
-  }
-
-  updateTitle(title) {
-    if (!title) return
-    this.dispatchEvent(new CustomEvent('layout-update', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        documentTitle: title + ' - Klog'
-      }
-    }));
-  }
-
-  searchTimeline(keyword) {
-    this.dispatchEvent(new CustomEvent('timeline-set-filter', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        filterName: 'search',
-        keyword: keyword
-      }
-    }));
-  }
-
-  _searchTimeline(e) {
-    let keyword;
-    if (e.target.classList.contains('article-tag')) {
-      keyword = e.target.innerText.substr(1);
-    } else if (e.target.classList.contains('article-collection')) {
-      keyword = e.target.innerText;
+    async load() {
+        this.loading = false;
+        this.$.markdown.updateScrollTarget(this.$.scrollTarget);
+        this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
     }
-    if (keyword) {
-      this.searchTimeline(keyword);
-    }
-  }
 
-  _scrollToComment() {
-    this.dispatchEvent(new CustomEvent('page-scroll', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        destination: this.$.commentContainer.offsetTop
-      }
-    }));
-  }
+    async unload() {
+        this.$.scrollTarget.removeEventListener('scroll', this._scrollHandler);
+        this.loading = true;
+        await this._timeout(new Promise(resolve => { this.$.content.addEventListener('transitionend', resolve); }), 500);
+        this.path = '';
+        this.isOwner = false;
+        this.article = {
+            markdown: ''
+        };
+        this.$.comment.resetInput();
+    }
+
+    _timeout(promise, timeout) {
+        return Promise.race([
+            promise,
+            new Promise(resolve => { setTimeout(resolve, timeout); })
+        ]);
+    }
+
+    updateScrollerQuery(hash) {
+        this.$.markdown.$.scroller.updateQueryByHash(hash);
+    }
+
+    edit() {
+        this.dispatchEvent(new CustomEvent('editor-open', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                articleId: this.article.objectId,
+                backTo: window.location.hash
+            }
+        }));
+    }
+
+    handleError() {
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
+    }
+
+    parseDate(date) {
+        return Date.parse(date);
+    }
+
+    updateTitle(title) {
+        if (!title) return;
+        this.dispatchEvent(new CustomEvent('layout-update', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                documentTitle: title + ' - Klog'
+            }
+        }));
+    }
+
+    searchTimeline(keyword) {
+        this.dispatchEvent(new CustomEvent('timeline-set-filter', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                filterName: 'search',
+                keyword: keyword
+            }
+        }));
+    }
+
+    _searchTimeline(e) {
+        let keyword;
+        if (e.target.classList.contains('article-tag')) {
+            keyword = e.target.innerText.substr(1);
+        } else if (e.target.classList.contains('article-collection')) {
+            keyword = e.target.innerText;
+        }
+        if (keyword) {
+            this.searchTimeline(keyword);
+        }
+    }
+
+    _scrollToComment() {
+        this.dispatchEvent(new CustomEvent('page-scroll', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                destination: this.$.commentContainer.offsetTop
+            }
+        }));
+    }
 }
 
 window.customElements.define(KlogArticle.is, KlogArticle);

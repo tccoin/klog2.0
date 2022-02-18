@@ -12,8 +12,8 @@ import '../style/klog-style-dialog.js';
 import '../ui/klog-input.js';
 
 class KlogSignup extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style include="klog-style-login"></style>
     <style include="klog-style-dialog"></style>
     <paper-dialog id="dialog" with-backdrop="">
@@ -54,134 +54,137 @@ class KlogSignup extends PolymerElement {
       </div>
     </div>
 `;
-  }
+    }
 
-  static get is() { return 'klog-signup'; }
+    static get is() { return 'klog-signup'; }
 
-  static get properties() {
-    return {
-      email: {
-        type: String,
-        value: ''
-      },
-      password: {
-        type: String,
-        value: ''
-      },
-      title: {
-        type: String,
-        value: 'welcome',
-        observer: '_titleChanged'
-      },
-      layout: {
-        type: Object,
-        value: {
-          documentTitle: '注册 - Klog',
-          drawer: 'auto',
-          mainMenu: true,
-          sidebar: 'auto',
-          scrollToTop: false,
-          header: {
-            fixed: true,
-            short: false,
-            shadow: 'off',
-          },
-          styles: {
-            '--klog-layout-background': 'var(--primary-background-color)',
-          },
-          toolbar: html `
+    static get properties() {
+        return {
+            email: {
+                type: String,
+                value: ''
+            },
+            password: {
+                type: String,
+                value: ''
+            },
+            title: {
+                type: String,
+                value: 'welcome',
+                observer: '_titleChanged'
+            },
+            layout: {
+                type: Object,
+                value: {
+                    documentTitle: '注册 - Klog',
+                    drawer: 'auto',
+                    mainMenu: true,
+                    sidebar: 'auto',
+                    scrollToTop: false,
+                    header: {
+                        fixed: true,
+                        short: false,
+                        shadow: 'off',
+                    },
+                    styles: {
+                        '--klog-layout-background': 'var(--primary-background-color)',
+                    },
+                    toolbar: html `
               <app-toolbar>
                 <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                 <div class="title">
                   <div main-title><iron-icon icon="klog"></iron-icon></div>
                 </div>
               </app-toolbar>`
+                }
+            },
+        };
+    }
+
+    openMainDrawer() {
+        this.dispatchEvent(new CustomEvent('main-drawer-open', { bubbles: true, composed: true }));
+    }
+
+    ready() {
+        super.ready();
+        this.$.passwordInput.addEventListener('keyup', (e) => {
+            if (e.keyCode == 13) this.login();
+        });
+        this.$.go.addEventListener('mousedown', function() {
+            this.shadowRoot.querySelector('#ink').classList.remove('circle');
+        });
+        this.$.dialog.addEventListener('opened-changed', e => {
+            this.dispatchEvent(new CustomEvent('editor-backdrop-opened-changed', {
+                bubbles: true,
+                composed: true,
+                detail: { value: e.detail.value }
+            }));
+        });
+    }
+
+
+    load() {
+        this.title = 'welcome';
+        this.continue = this.continue || '#/timeline';
+        setTimeout(() => this.$.dialog.open(), 500);
+    }
+
+    async update(userLoadPromise, route) {
+        // user
+        const result = await userLoadPromise;
+        this.user = result.user;
+    }
+
+    signup() {
+        this.title = 'loading';
+        if (this.password.length <= 6) {
+            this.title = 'error_short_password';
+            return;
         }
-      },
-    };
-  }
+        this.user.signup(this.email, this.password).then(() => {
+            this.title = 'success';
+            setTimeout(() => {
+                this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
+            }, 1000);
+        }, err => {
+            window.err = err;
+            console.log(err, err.code);
+            if (err) {
+                if (err.code == 125) {
+                    this.title = 'error_email_format';
+                } else if (err.code == 203) {
+                    this.title = 'error_email_taken';
+                } else {
+                    this.title = 'error_info';
+                }
+            } else {
+                this.title = 'error_info';
+            }
 
-  openMainDrawer() {
-    this.dispatchEvent(new CustomEvent('main-drawer-open', { bubbles: true, composed: true }));
-  }
-
-  ready() {
-    super.ready();
-    this.$.passwordInput.addEventListener('keyup', (e) => {
-      if (e.keyCode == 13) this.login();
-    });
-    this.$.go.addEventListener('mousedown', function() {
-      this.shadowRoot.querySelector('#ink').classList.remove('circle');
-    });
-    this.$.dialog.addEventListener('opened-changed', e => {
-      this.dispatchEvent(new CustomEvent('editor-backdrop-opened-changed', {
-        bubbles: true,
-        composed: true,
-        detail: { value: e.detail.value }
-      }));
-    });
-  }
-
-
-  load(userLoadPromise) {
-    this.title = 'welcome';
-    userLoadPromise.then(result => {
-      this.user = result.user;
-    });
-    this.continue = this.continue || '#/timeline';
-    setTimeout(() => this.$.dialog.open(), 500);
-  }
-
-  signup() {
-    this.title = 'loading';
-    if (this.password.length <= 6) {
-      this.title = 'error_short_password';
-      return;
+        });
     }
-    this.user.signup(this.email, this.password).then(() => {
-      this.title = 'success';
-      setTimeout(() => {
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
-      }, 1000);
-    }, err => {
-      window.err = err;
-      console.log(err, err.code);
-      if (err) {
-        if (err.code == 125) {
-          this.title = 'error_email_format';
-        } else if (err.code == 203) {
-          this.title = 'error_email_taken';
-        } else {
-          this.title = 'error_info';
+
+    login() {
+        this.dispatchEvent(new CustomEvent('user-login-page-open', {
+            bubbles: true,
+            composed: true,
+            detail: { continue: this.continue }
+        }));
+    }
+
+    _titleChanged(title) {
+        this.shadowRoot.querySelector(`h1[name=${title}],h2[name=${title}]`).classList.remove('hidden');
+        for (let element of this.shadowRoot.querySelectorAll('h1[name],h2[name]')) {
+            if (element.getAttribute('name') != title) element.classList.add('hidden');
         }
-      } else {
-        this.title = 'error_info';
-      }
-
-    });
-  }
-
-  login() {
-    this.dispatchEvent(new CustomEvent('user-login-page-open', {
-      bubbles: true,
-      composed: true,
-      detail: { continue: this.continue }
-    }));
-  }
-
-  _titleChanged(title) {
-    this.shadowRoot.querySelector(`h1[name=${title}],h2[name=${title}]`).classList.remove('hidden');
-    for (let element of this.shadowRoot.querySelectorAll(`h1[name],h2[name]`)) {
-      if (element.getAttribute('name') != title) element.classList.add('hidden')
     }
-  }
 
-  _listboxSelect() {
-    if (this.$.listbox.selected == 0) {
-      this.login();
+    _listboxSelect() {
+        if (this.$.listbox.selected == 0) {
+            this.login();
+        }
+        this.$.listbox.selected = null;
     }
-    this.$.listbox.selected = null;
-  }
 }
 
 window.customElements.define(KlogSignup.is, KlogSignup);
