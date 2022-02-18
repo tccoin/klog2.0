@@ -1,8 +1,8 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 
 class KlogImage extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style>
       :host {
         display: block;
@@ -59,248 +59,243 @@ class KlogImage extends PolymerElement {
     <img id="img" src="{{_src}}">
     <div id="bg"></div>
 `;
-  }
-
-  static get is() { return 'klog-image'; }
-
-  static get properties() {
-    return {
-      src: {
-        type: String,
-        reflectToAttribute: true
-      },
-      avatar: {
-        type: Boolean,
-        reflectToAttribute: true,
-      },
-      timeline: {
-        type: Boolean,
-        reflectToAttribute: true,
-      },
-      editor: {
-        type: Boolean,
-        reflectToAttribute: true,
-      },
-      content: {
-        type: Boolean,
-        reflectToAttribute: true,
-      },
-      content: {
-        type: Boolean,
-        reflectToAttribute: true,
-      },
-      gallery: {
-        type: Boolean,
-        reflectToAttribute: true
-      },
-      galleryCover: {
-        type: Boolean,
-        reflectToAttribute: true
-      },
-      theme: {
-        type: String
-      },
-      lazy: {
-        type: Boolean,
-        reflectToAttribute: true
-      },
-      fixed: {
-        type: Boolean,
-        value: false
-      }
     }
-  }
 
-  static get observers() {
-    return [
-      'srcChanged(src)'
-    ]
-  }
+    static get is() { return 'klog-image'; }
 
-  encode(url) {
-    let result = url.replace(/(\?.*)?$/, '').match(/(.*\/)(.*)$/);
-    return result[1] + encodeURIComponent(result[2]);
-  }
-
-  _isKlogStorage(src) {
-    return src.indexOf('storage.krrr.party') > -1;
-  }
-
-  srcChanged(src) {
-    if (!src || !src.match(/^(http|https):\/\//)) return;
-    this._initQueue();
-    // process url
-    let oriSrc = src;
-    if (this.avatar && !src) {
-      src = 'https://storage.krrr.party/storage/klog-avatar/default_avatar.jpg';
-    } else if (this.content && src.indexOf('clouddn.com') > -1 && !src.indexOf(/\.svg$/)) {
-      src += '?imageView2/2/w/1440/q/85/interlace/1';
-    } else if (this._isKlogStorage(src)) {
-      src = this.encode(src);
-      oriSrc = src;
-      if (this.avatar) {
-        src += '?Magic/1/w/100/h/100/q/90';
-      } else if (this.timeline) {
-        src += '?Magic/1/w/320/h/180/q/75';
-      } else if (this.content) {
-        src += '?Magic/2/w/1440/q/90';
-      } else if (this.galleryCover) {
-        // src += '?Magic/1/w/584/h/584/q/75';
-        src += '?Magic/1/w/412/h/412/q/80';
-      } else if (this.gallery) {
-        // src += '?Magic/1/w/584/h/584/q/75';
-        src += '?Magic/1/w/274/h/274/q/75';
-      }
-      if (this.lazy) {
-        this.loadPlaceholder(oriSrc);
-      }
-    } else {
-      this._lazySrc = src;
-      return this.lazyload();
+    static get properties() {
+        return {
+            src: {
+                type: String,
+                reflectToAttribute: true
+            },
+            avatar: {
+                type: Boolean,
+                reflectToAttribute: true,
+            },
+            timeline: {
+                type: Boolean,
+                reflectToAttribute: true,
+            },
+            editor: {
+                type: Boolean,
+                reflectToAttribute: true,
+            },
+            content: {
+                type: Boolean,
+                reflectToAttribute: true,
+            },
+            content: {
+                type: Boolean,
+                reflectToAttribute: true,
+            },
+            gallery: {
+                type: Boolean,
+                reflectToAttribute: true
+            },
+            galleryCover: {
+                type: Boolean,
+                reflectToAttribute: true
+            },
+            theme: {
+                type: String
+            },
+            lazy: {
+                type: Boolean,
+                reflectToAttribute: true
+            },
+            fixed: {
+                type: Boolean,
+                value: false
+            }
+        };
     }
-    this._lazySrc = src;
-    if (this.lazy) {
-      this.wasLazy = true;
-    } else {
-      this._addToQueue(this.load());
+
+    static get observers() {
+        return [
+            'srcChanged(src)'
+        ];
     }
-  }
 
-  lazyload() {
-    setTimeout(() => {
-      this.lazy = false;
-      this.load()();
-      this.dispatchEvent(new CustomEvent('media-loading', { bubbles: true, composed: true }));
-    }, 1);
-  }
-
-  load() {
-    this.resolve();
-    const onload = () => {
-      this.$.bg.style.opacity = 0;
-      this.$.img.style.opacity = 1;
-      this.resolve();
-    };
-    const onerror = () => {
-      this._src = '';
-      this.$.img.removeEventListener('load', onload);
-      this.$.img.removeEventListener('error', onerror);
-      setTimeout(() => this._addToQueue(this.load()), 3000);
-      this.resolve();
-    };
-    return resolve => {
-      this._resolve = resolve;
-      this._src = this._lazySrc;
-      this.$.img.style.opacity = 0;
-      if (this.$.img.complete) {
-        onload();
-      } else {
-        this.$.img.addEventListener('load', onload);
-        this.$.img.addEventListener('error', onerror);
-      }
-    };
-  }
-
-  resolve() {
-    if (this._resolve) {
-      this._resolve();
-      this._resolve = undefined;
+    encode(url) {
+        let result = url.replace(/(\?.*)?$/, '').match(/(.*\/)(.*)$/);
+        return result[1] + encodeURIComponent(result[2]);
     }
-  }
 
-  _initQueue() {
-    if (!window._imageLoadingQueue) {
-      window._imageLoadingCount = 0;
-      window._imageLoadingQueue = [];
-      for (let i = 0; i < 8; i++) {
-        window._imageLoadingQueue.push(Promise.resolve());
-      }
+    _isKlogStorage(src) {
+        return src.indexOf('storage.krrr.party') > -1;
     }
-  }
 
-  _addToQueue(cb) {
-    const queue = window._imageLoadingQueue;
-    const count = window._imageLoadingCount;
-    queue[count] = queue[count].then(() => new Promise(cb));
-    window._imageLoadingCount = (window._imageLoadingCount + 1) % (queue.length - 1);
-  }
-
-  ready() {
-    super.ready();
-    //window resize
-    window.addEventListener('resize', () => {
-      if (this.wasLazy)
-        this.updatePlaceholder();
-    });
-  }
-
-  loadPlaceholder(url, headless = false) {
-    if (!this._isKlogStorage(url)) return { w: 1600, h: 900, stats: { entropy: 0 } };
-    url += '?Magic/6';
-    if (!this.fixed && !headless) {
-      this.$.bg.style.height = '300px';
-      this.$.bg.style.width = "1000px";
-    }
-    let req = new XMLHttpRequest();
-    this.placeHolderPromise = new Promise(resolve => {
-      req.addEventListener('load', () => {
-        try {
-          this.mediaInfo = JSON.parse(req.response);
-        } catch (error) {
-          console.log('placeholder error: ', url);
+    srcChanged(src) {
+        if (!src || !src.match(/^(http|https):\/\//)) return;
+        this._initQueue();
+        // process url
+        let oriSrc = src;
+        if (this.avatar && !src) {
+            src = 'https://storage.krrr.party/storage/klog-avatar/default_avatar.jpg';
+        } else if (this.content && src.indexOf('clouddn.com') > -1 && !src.indexOf(/\.svg$/)) {
+            src += '?imageView2/2/w/1440/q/85/interlace/1';
+        } else if (this._isKlogStorage(src)) {
+            src = this.encode(src);
+            oriSrc = src;
+            if (this.avatar) {
+                src += '?Magic/1/w/100/h/100/q/90';
+            } else if (this.timeline) {
+                src += '?Magic/1/w/320/h/180/q/75';
+            } else if (this.content) {
+                src += '?Magic/2/w/1440/q/90';
+            } else if (this.galleryCover) {
+                // src += '?Magic/1/w/584/h/584/q/75';
+                src += '?Magic/1/w/412/h/412/q/80';
+            } else if (this.gallery) {
+                // src += '?Magic/1/w/584/h/584/q/75';
+                src += '?Magic/1/w/274/h/274/q/75';
+            }
+            if (this.lazy) {
+                this.loadPlaceholder(oriSrc);
+            }
+        } else {
+            this._lazySrc = src;
+            return this.lazyload();
         }
-        this.savePlaceholderData(url, this.mediaInfo);
-        if (!headless) {
-          this.updatePlaceholder();
+        this._lazySrc = src;
+        if (this.lazy) {
+            this.wasLazy = true;
+        } else {
+            this._addToQueue(this.load());
         }
-        this.dispatchEvent(new CustomEvent('media-info-updated', { bubbles: true, composed: true, detail: { mediaInfo: this.mediaInfo } }));
-        setTimeout(() => resolve(this.mediaInfo), 1);
-      });
-      req.open('get', url, true);
-      req.send();
-    });
-    return this.placeHolderPromise;
-  }
+    }
 
-  savePlaceholderData(url, data) {
+    lazyload() {
+        setTimeout(() => {
+            this.lazy = false;
+            this.load()();
+            this.dispatchEvent(new CustomEvent('media-loading', { bubbles: true, composed: true }));
+        }, 1);
+    }
+
+    load() {
+        this.resolve();
+        const onload = () => {
+            this.$.bg.style.opacity = 0;
+            this.$.img.style.opacity = 1;
+            this.resolve();
+        };
+        const onerror = () => {
+            this._src = '';
+            this.$.img.removeEventListener('load', onload);
+            this.$.img.removeEventListener('error', onerror);
+            setTimeout(() => this._addToQueue(this.load()), 3000);
+            this.resolve();
+        };
+        return resolve => {
+            this._resolve = resolve;
+            this._src = this._lazySrc;
+            this.$.img.style.opacity = 0;
+            if (this.$.img.complete) {
+                onload();
+            } else {
+                this.$.img.addEventListener('load', onload);
+                this.$.img.addEventListener('error', onerror);
+            }
+        };
+    }
+
+    resolve() {
+        if (this._resolve) {
+            this._resolve();
+            this._resolve = undefined;
+        }
+    }
+
+    _initQueue() {
+        if (!window._imageLoadingQueue) {
+            window._imageLoadingCount = 0;
+            window._imageLoadingQueue = [];
+            for (let i = 0; i < 8; i++) {
+                window._imageLoadingQueue.push(Promise.resolve());
+            }
+        }
+    }
+
+    _addToQueue(cb) {
+        const queue = window._imageLoadingQueue;
+        const count = window._imageLoadingCount;
+        queue[count] = queue[count].then(() => new Promise(cb));
+        window._imageLoadingCount = (window._imageLoadingCount + 1) % (queue.length - 1);
+    }
+
+    ready() {
+        super.ready();
+        //window resize
+        window.addEventListener('resize', () => {
+            if (this.wasLazy)
+                this.updatePlaceholder();
+        });
+    }
+
+    async loadPlaceholder(url, headless = false) {
+        if (!this._isKlogStorage(url)) return { w: 1600, h: 900, stats: { entropy: 0 } };
+        url += '?Magic/6';
+        if (!this.fixed && !headless) {
+            this.$.bg.style.height = '300px';
+            this.$.bg.style.width = '1000px';
+        }
+        let req = new XMLHttpRequest();
+        return await new Promise(resolve => {
+            req.addEventListener('load', () => {
+                this.mediaInfo = JSON.parse(req.response);
+                this.savePlaceholderData(url, this.mediaInfo);
+                if (!headless) {
+                    this.updatePlaceholder();
+                }
+                this.dispatchEvent(new CustomEvent('media-info-updated', { bubbles: true, composed: true, detail: { mediaInfo: this.mediaInfo } }));
+                setTimeout(() => resolve(this.mediaInfo), 1);
+            });
+            req.open('get', url, true);
+            req.send();
+        });
+    }
+
+    savePlaceholderData(url, data) {
     // disabled
-    return;
-    window.placeholders = window.placeholders || {};
-    window.placeholders[url.replace(/[^0-9a-zA-Z_$]/g, '')] = data;
-  }
+        return;
+        window.placeholders = window.placeholders || {};
+        window.placeholders[url.replace(/[^0-9a-zA-Z_$]/g, '')] = data;
+    }
 
-  updatePlaceholder() {
-    let data = this.mediaInfo;
-    if (!this.fixed) {
-      let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
-      let maxWidth = parseInt(mediaWidth);
-      let w, h;
-      if (!mediaWidth) {
-        if (!this.offsetWidth) {
-          setTimeout(() => this.updatePlaceholder(), 10);
-          return;
+    updatePlaceholder() {
+        let data = this.mediaInfo;
+        if (!this.fixed) {
+            let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
+            let maxWidth = parseInt(mediaWidth);
+            let w, h;
+            if (!mediaWidth) {
+                if (!this.offsetWidth) {
+                    setTimeout(() => this.updatePlaceholder(), 10);
+                    return;
+                }
+                w = Math.min(this.offsetWidth, data.w);
+            } else {
+                w = Math.min(maxWidth, data.w);
+            }
+            h = w / data.w * data.h;
+            this.$.bg.style.width = `${w}px`;
+            this.$.bg.style.height = `${h}px`;
+        } else if (this.gallery) {
+            this.$.bg.style.width = '100%';
+            this.$.bg.style.height = '0';
+        } else {
+            this.$.bg.style.width = '100%';
+            this.$.bg.style.height = '100%';
         }
-        w = Math.min(this.offsetWidth, data.w);
-      } else {
-        w = Math.min(maxWidth, data.w);
-      }
-      h = w / data.w * data.h;
-      this.$.bg.style.width = `${w}px`;
-      this.$.bg.style.height = `${h}px`;
-    } else if (this.gallery) {
-      this.$.bg.style.width = '100%';
-      this.$.bg.style.height = '0';
-    } else {
-      this.$.bg.style.width = '100%';
-      this.$.bg.style.height = '100%';
+        this.$.img.style.position = 'absolute';
+        if ('palette' in data) {
+            let c = this.theme == 'light' ? data.palette.LightVibrant.rgb : data.palette.DarkVibrant.rgb;
+            this.$.bg.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
+            this.$.img.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
+        }
     }
-    this.$.img.style.position = 'absolute';
-    if ('palette' in data) {
-      let c = this.theme == 'light' ? data.palette.LightVibrant.rgb : data.palette.DarkVibrant.rgb;
-      this.$.bg.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
-      this.$.img.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
-    }
-  }
 }
 
 window.customElements.define(KlogImage.is, KlogImage);

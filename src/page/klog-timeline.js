@@ -534,13 +534,13 @@ class KlogTimeline extends PolymerElement {
         ]);
     }
 
-    _refreshAllItems() {
+    async _refreshAllItems() {
         const promises = [];
         for (let item of this.$.timelineContainer.querySelectorAll('.item')) {
             item.removeAttribute('style');
             promises.push(item.refresh());
         }
-        return Promise.all(promises);
+        await Promise.all(promises);
     }
 
     _clearLazyState() {

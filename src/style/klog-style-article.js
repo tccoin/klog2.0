@@ -40,6 +40,18 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       @apply(--shadow-elevation-2dp);
     }
 
+    .article-container::after{
+      @apply --overlay-style;
+      background: var(--klog-article-background);
+      opacity: 0.08;
+      z-index: 0;
+    }
+
+    .article-container > *{
+      z-index: 1;
+      position: relative;
+    }
+
     .article-container,
     .comment-container {
       transition: opacity .3s ease, transform .2s ease-out;
