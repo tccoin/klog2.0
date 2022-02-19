@@ -28,8 +28,9 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         margin: 64px 0 0;
         position: fixed;
         z-index: 101;
-        border-radius: 5px;
+        border-radius: 16px;
         transition: all .3s ease;
+        transform-origin: right top;
         @apply --shadow-elevation-2dp;
       }
       .info-container:hover{
@@ -96,13 +97,13 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
           flex-direction: column;
         }
         .info-container{
-          width: 100vw;
+          width: calc(90vw - 32px);
           height: auto;
-          margin: 64px 0 0 0;
+          margin: 64px auto 0 auto;
           position: relative;
           z-index: 1;
           bottom: auto;
-          border-radius: 0;
+          transform-origin: center top;
           transition: border-radius 50ms ease,transform .1s ease;
           @apply --shadow-elevation-16dp;
         }
@@ -249,17 +250,33 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
         // scroll
         this._superScrollHandler = this._scrollHandler;
+        this._lastY = 0;
         this._scrollHandler = e => {
             if (!this.$.scrollTarget) return;
             let y = this.$.scrollTarget.scrollTop;
-            let progress = y / this.$.info.clientHeight;
+            let speed = y - this._lastY;
+            let h = this.$.info.clientHeight;
+            let progress = y / h;
             if (this.mobile) {
                 this.$.info.style.transform = `scale(${Math.max(0.95, 1 - progress * 0.1 * 3)})`;
-                this.$.info.style.borderRadius = `${Math.min(10, progress * 10 * 3)}px`;
+                const marginTop = 32;
+                const headerHeight = 64;
+                const fast = 2;
+                let speedUp = Math.max(Math.min(y * (fast - 1), (h + marginTop) / fast * (fast - 1)), 0);
+                let slowDown = 0;
+                this.$.info.style.marginTop = `${marginTop + headerHeight - speedUp + slowDown}px`;
             } else {
-                this.$.info.style.transform = `translateY(-${Math.min(48, y)}px)`;
+                this.$.info.style.borderRadius = '';
+                this.$.info.style.marginTop = '122px';
+                if (speed > 20) {
+                    this.$.info.style.transform = `translateY(-${Math.min(48, y)}px)scale(0.9)`;
+                }
+                if (speed < -20 || y < 48) {
+                    this.$.info.style.transform = 'translateY(0px)scale(1)';
+                }
             }
             this._superScrollHandler(e);
+            this._lastY = y;
         };
 
         // data
