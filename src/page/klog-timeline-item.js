@@ -312,7 +312,7 @@ class KlogTimelineItem extends PolymerElement {
             return `rgb(${mix(color[0], tone)},${mix(color[1], tone)},${mix(color[2], tone)})`;
         };
         this.$.link.style.setProperty('--klog-timeline-item-background', getRGBValue(themeColor, 0.5));
-        this.$.link.querySelector('.card-title').style.color = getRGBValue(fontColor, isLight ? 0.2 : 0.9);
+        this.$.link.querySelector('.card-title').style.color = getRGBValue(fontColor, isLight ? 0.25 : 0.9);
     }
 
     async _waitForElement(query) {

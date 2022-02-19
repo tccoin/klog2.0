@@ -80,7 +80,9 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         width: 100%;
         color: var(--primary-text-color);
         font-weight: normal;
-        font-size: 20px;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 18px;
         border: none;
         background: none;
         outline: none;

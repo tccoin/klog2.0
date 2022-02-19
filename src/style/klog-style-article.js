@@ -163,6 +163,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       font-weight: 400;
       line-height: 1;
       margin: 0.1em 0 0.5em;
+      word-break: break-word;
     }
 
     .dot-divider {
@@ -188,9 +189,10 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
     .klog-author .author-info{
       font-size: 1.1em;
-      padding-top: 8px;
+      flex-direction: column;
       align-items: start;
       letter-spacing: 0.05em;
+      width: 100%;
     }
 
     .klog-author .author-avatar,

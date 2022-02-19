@@ -39,7 +39,7 @@ class KlogArticle extends PolymerElement {
       <div class="text">
         <div class="author-info">
           <span class="author-name" on-click="openZone">{{article.author.displayName}}</span>
-          <template is="dom-if" if="{{article.author.introduction}}">,&nbsp;
+          <template is="dom-if" if="{{article.author.introduction}}">
             <span class="author-intro divider">{{article.author.introduction}}</span>
           </template>
         </div>

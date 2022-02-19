@@ -74,7 +74,6 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
         flex-shrink: 0;
         white-space: nowrap;
         text-overflow: ellipsis;
-        margin-left: 2px;
       }
 
       .klog-author .author-avatar{
@@ -86,6 +85,10 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
       .klog-author .author-avatar,
       .klog-author .author-name{
         cursor: pointer;
+      }
+
+      .klog-author .author-name{
+        margin-right: 5px;
       }
 
       .klog-author .author-name:hover{
@@ -151,9 +154,7 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
       <div class="text">
         <div class="author-info">
           <!--<span class="author-name">{{userinfo.displayName}}</span>-->
-          <span class="author-action">
-            {{_inputIndicator}}
-          </span>
+          <span class="author-action">{{_inputIndicator}}</span>
           <div class="actions" hidden="{{_calcCancelButtonDisabled(_inputMethod)}}">
             <div class="dot-divider"></div>
             <a on-click="resetInput">取消</a>

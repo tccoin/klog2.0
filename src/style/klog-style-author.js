@@ -25,6 +25,7 @@ containerKlogStyleAuthor.innerHTML = `<dom-module id="klog-style-author">
 
       .klog-author .text {
         display: flex;
+        width: calc(100% - 66px);
         flex-direction: column;
         flex: 1;
         color: var(--secondary-text-color);
@@ -40,6 +41,7 @@ containerKlogStyleAuthor.innerHTML = `<dom-module id="klog-style-author">
 
       .klog-author .author-info .dot-divider {
         display: inline-block;
+        flex-shrink: 0;
         margin: 0 5px;
         width: 4px;
         height: 4px;
@@ -51,6 +53,10 @@ containerKlogStyleAuthor.innerHTML = `<dom-module id="klog-style-author">
       .klog-author .author-name {
         color: var(--primary-text-color);
         font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
       }
 
       .klog-author .author-intro {
@@ -58,6 +64,7 @@ containerKlogStyleAuthor.innerHTML = `<dom-module id="klog-style-author">
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        max-width: 100%;
       }
     </style>
   </template>
