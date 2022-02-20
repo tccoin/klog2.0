@@ -169,7 +169,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
 
     <!-- Data -->
     <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
-    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" tokens="{{tokens}}" title="{{title}}" path="{{path}}" license="{{license}}" random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}" markdown="{{markdown}}" private="{{private}}" fileinfo="{{fileinfo}}" error="{{err}}" current-line="{{currentLine}}" word-count="{{wordCount}}">
+    <klog-data-editor id="data" userinfo="{{userinfo}}" article-id="{{articleId}}" tokens="{{tokens}}" title="{{title}}" path="{{path}}" license="{{license}}" random-path="{{randomPath}}" attachments="{{attachments}}" previews="{{previews}}" collection="{{collection}}" tags="{{tags}}" markdown="{{markdown}}" private="{{private}}" fileinfo="{{fileinfo}}" error="{{err}}" current-line="{{currentLine}}" word-count="{{wordCount}}">
     </klog-data-editor>
 
     <!-- Backdrop -->

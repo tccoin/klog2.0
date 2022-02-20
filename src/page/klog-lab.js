@@ -47,7 +47,6 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
     </style>
     <app-localstorage-document key="masterKey" data="{{masterKey}}"></app-localstorage-document>
     <app-localstorage-document key="articleId" data="{{articleId}}"></app-localstorage-document>
-    <!-- <klog-data-editor id="data" markdown="{{markdown}}" quiet data="{{article}}"></klog-data-editor> -->
     <klog-data-list id="list" last-response="{{list}}" limit="1000"></klog-data-list>
     <div class="card-container">
       <div class="klog-card lab-card list">
@@ -64,7 +63,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         <paper-button on-click="loadNext">打开下一篇文章</paper-button>
         <paper-button on-click="saveNext">更新下一篇文章</paper-button>
         <paper-button on-click="saveList">更新所有文章</paper-button>
-        <paper-button on-click="updateImageInfo">更新所有图片信息</paper-button>
+        <paper-toggle-button checked="{{quiet}}">不更新timeline</paper-toggle-button>
       </div>
       <div class="klog-card lab-card list">
         <paper-progress value="[[listProgress]]"></paper-progress>
@@ -73,7 +72,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
       </div>
       <div class="klog-card lab-card list">
         {{article.updatedAt}}:{{listProgressDelta}}
-        <klog-markdown id="markdown" markdown="{{markdown}}"></klog-markdown>
+        <klog-markdown id="markdown" markdown="{{markdown}}" no-media></klog-markdown>
       </div>
       <div class="klog-card lab-card list">
         <textarea value="{{markdown::input}}"></textarea>
@@ -92,6 +91,11 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
 
     static get properties() {
         return {
+            quiet: {
+                type: Boolean,
+                value: true,
+                observer: '_quiteChanged'
+            },
             layout: {
                 type: Object,
                 value: {
@@ -134,7 +138,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         AV.masterKey = this.masterKey;
     }
 
-    async loadArticle() {
+    async loadArticle(render = true) {
         this._editor.articleId = this.articleId;
         await this._editor.load();
         this.article = this._editor.data;
@@ -185,41 +189,18 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
 
     _createEditor() {
         const editor = document.createElement('klog-data-editor');
-        editor.quiet = true;
+        editor.quiet = this.quiet;
+        editor.headless = true;
         return editor;
     }
 
-    updateImageInfo() {
-        for (let i = 0; i < 4; i++) {
-            this._updateImageInfo(i);
-        }
-    }
-
-    async _updateImageInfo(i) {
-        const editor = this._createEditor();
-        while (this.list && this.list.length > 0) {
-            if (this.stop) return;
-            let article = this.pop('list');
-            if (article.attachments.length == 0) continue;
-            for (let image of article.attachments.filter(x => x.image)) {
-                let req = new XMLHttpRequest();
-                await this.$.image.loadPlaceholder(this.$.image.encode(image.url), true);
-            }
-            editor.articleId = article.objectId;
-            await editor.load();
-            this.article = editor.data;
-            this.markdown = editor.markdown;
-            await editor.save();
-        }
-    }
-
-    saveList() {
-        const editor = this._createEditor();
+    async saveList() {
         if (this.stop) return;
         if (this.list.length > 0) {
             this.articleId = this.pop('list').objectId;
-            // this.loadArticle().then(() => true).then(() => this.saveList());
-            this.loadArticle().then(() => this.saveArticle()).then(() => this.saveList());
+            await this.loadArticle(false);
+            await this.saveArticle();
+            await this.saveList();
         }
         this.listProgress += this.listProgressDelta;
     }
@@ -227,6 +208,11 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
     async sendGlobalMessage() {
         await this.createMessage('text', '5ea323e42f040b00087e42ae', ['channel-default'], { 'text': this.globalMessage });
         this.openToast('发送成功');
+    }
+
+    _quiteChanged(quiet) {
+        if (!this._editor) return;
+        this._editor.quiet = quiet;
     }
 
 }
