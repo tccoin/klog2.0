@@ -103,7 +103,7 @@ class KlogNote extends PolymerElement {
             if (this.selected == 0) {
                 this.article = {};
             }
-            this.$.backdrop.closest();
+            this.$.backdrop.close();
         });
         this.addEventListener('note-share', (e) => {
             this.share(e.detail.path);
@@ -251,7 +251,7 @@ class KlogNote extends PolymerElement {
             if (!this.mobile) this.$.list.$.search.focus();
         }
         if (path == this.path) return;
-        if (path || path == '') {
+        if (path || path === '') {
             this.path = path;
             this.loadArticle(path);
         } else {

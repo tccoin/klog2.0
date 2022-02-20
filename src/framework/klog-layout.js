@@ -155,7 +155,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         <klog-apps name="apps"></klog-apps>
         <klog-note id="note" name="note" theme="[[theme]]" mobile="{{mobile}}"> </klog-note>
         <klog-message id="message" name="message" theme="[[theme]]" mobile="{{mobile}}"> </klog-message>
-        <klog-zone name="zone" theme="[[theme]]" mobile="{{mobile}}"></klog-zone>
+        <klog-zone name="zone" mobile="{{mobile}}" tablet="{{tablet}}" desktop="{{desktop}}" theme="{{theme}}"></klog-zone>
         <!--testing-->
         <klog-drive name="drive"></klog-drive>
         <klog-lab name="lab"></klog-lab>
@@ -314,6 +314,9 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
             this.loading = false;
             await this._loadPage(page); // animation...
             await this._checkInterrupt(page);
+        } else {
+            await this._updatePage(page, userLoadPromise, subroute); // update data, set init state...
+            await this._loadPage(page); // animation...
         }
         await this._checkInterrupt(page);
         return this._getPage(page);

@@ -221,7 +221,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
             <paper-ripple></paper-ripple>
           </div>
           <div class="divider"></div>
-          <paper-icon-button on-click="showSearchToolbar" icon="search" mobile></paper-icon-button>
+          <paper-icon-button on-click="showSearchToolbar" icon="search" hidden-on-desktop></paper-icon-button>
         </app-toolbar>`
             }
         }));

@@ -227,17 +227,17 @@ class KlogTimeline extends PolymerElement {
 
     _searchInput(e) {
         let keyword = e.target.value;
-        const cb = () => {
+        const callback = () => {
             this.keyword = keyword;
             this.updateTimeline(false, true);
         };
         if (e.key == 'Enter') {
-            cb();
+            callback();
         } else {
             if (this._keywordInputTimeout) {
                 clearTimeout(this._keywordInputTimeout);
             }
-            this._keywordInputTimeout = setTimeout(cb, 1000);
+            this._keywordInputTimeout = setTimeout(callback, 1000);
         }
     }
 
@@ -483,10 +483,11 @@ class KlogTimeline extends PolymerElement {
             cards = cards.filter(x => {
                 const attrs = ['title', 'text', 'collection', 'tags'];
                 let hasKeyword = false;
+                let re = new RegExp(this.keyword.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'i');
                 for (let attr of attrs) {
                     if (x[attr]) {
                         let value = typeof (x[attr]) === 'string' ? x[attr] : x[attr].toString();
-                        hasKeyword |= value.indexOf(this.keyword) > -1;
+                        hasKeyword |= re.test(value);
                     }
                 }
                 return hasKeyword;
