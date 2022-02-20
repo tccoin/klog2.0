@@ -146,7 +146,14 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
     }
 
     saveArticle() {
-        return this._editor.save();
+        let labels = [];
+        if (this.quiet) {
+            labels = ['keep-article-time', 'keep-timeline-time'];
+        }
+        // add test here
+        // labels.push('force-time-reset');
+        console.log('saving with label', labels);
+        return this._editor.save(labels);
     }
 
     async update(userLoadPromise, route) {
@@ -189,7 +196,6 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
 
     _createEditor() {
         const editor = document.createElement('klog-data-editor');
-        editor.quiet = this.quiet;
         editor.headless = true;
         return editor;
     }
@@ -208,11 +214,6 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
     async sendGlobalMessage() {
         await this.createMessage('text', '5ea323e42f040b00087e42ae', ['channel-default'], { 'text': this.globalMessage });
         this.openToast('发送成功');
-    }
-
-    _quiteChanged(quiet) {
-        if (!this._editor) return;
-        this._editor.quiet = quiet;
     }
 
 }

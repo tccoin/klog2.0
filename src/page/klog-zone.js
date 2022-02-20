@@ -121,7 +121,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
     static get contentTemplate() {
         return html `
-    <klog-data-list id="data" type="timeline" last-response="{{list}}" keyword="{{keyword}}" key="date"></klog-data-list>
+    <klog-data-list id="data" type="timeline" last-response="{{list}}" keyword="{{keyword}}" key="updatedTime"></klog-data-list>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="info-container klog-card" id="info">
       <klog-image class="author-avatar" id="avatar" src="{{authorPublic.avatarUrl}}" theme="{{theme}}" lazy content></klog-image>
@@ -280,7 +280,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         };
 
         // data
-        this.$.data.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'date', 'attachments', 'collection', 'tags'];
+        this.$.data.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'updatedTime', 'attachments', 'collection', 'tags'];
         this.$.data.include = ['author', 'topic'];
     }
 
@@ -290,6 +290,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
     async update(userLoadPromise, subroute) {
         // author publicinfo
+        let authorPublic;
         if (subroute.prefix === '/zone') {
             this.authorPublicId = subroute.path.replace(/[\/\\]/, '');
             this.cardBackTo = 'zone/' + this.authorPublicId;
@@ -320,11 +321,23 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
                 await this.refresh();
             }
         }
+        this.updateTitle(this.authorPublic.displayName);
         await new Promise(resolve=>setTimeout(resolve, 100));
     }
 
     back() {
         this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
+    }
+
+    updateTitle(title) {
+        if (!title) return;
+        this.dispatchEvent(new CustomEvent('layout-update', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                documentTitle: title + ' - Klog'
+            }
+        }));
     }
 
     async loadAuthorPublic(key, value) {
@@ -338,6 +351,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
             authorPublic.introduction = 'PLACEHOLDER_FOR_THOSE_LAZY_PEOPLE_WHO_DO_NOT_WRITE_ANYTHING_DESCRIBING_THEMSELVES';
         }
         this.authorPublic = authorPublic;
+        return authorPublic;
     }
 }
 

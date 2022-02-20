@@ -82,7 +82,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
             },
             wordCount: {
                 type: Number
-            },
+            }
         };
     }
 
@@ -157,7 +157,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
     async _updateHeadlessly(markdown) {
         let parser = this._generateMarkdownParser();
         this._parser = parser;
-        let tokens = await parser.render(markdown, true);
+        let tokens = await parser.render(this.markdown, true);
         this.collection = parser.collection;
         this.tags = parser.tags;
         await this._tokensChanged(tokens);
@@ -354,8 +354,8 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
             });
     }
 
-    async save() {
-    // create or update
+    async save(labels = []) {
+        // create or update
         let article;
         if (this.wordCount == 0 && this.attachments.length == 0) {
             return Promise.reject(new Error('empty'));
@@ -364,6 +364,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
             article = AV.Object.createWithoutData('Article', this.articleId);
         } else {
             article = new AV.Object('Article');
+            let author = AV.Object.createWithoutData('UserPublic', this.userinfo.publicinfo.id);
             article.set('author', author);
         }
         // pointer
@@ -383,7 +384,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
         }
         // headless mode (attachments, collection)
         if (this.headless) {
-            await this._updateHeadlessly(this.markdown);
+            await this._updateHeadlessly();
         }
         // set attributes
         article.set('title', this.title);
@@ -400,8 +401,9 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
         article.set('topic', topic);
         if (this.quiet) {
             console.log('Updated in quite mode.');
+            labels.push('keep-timeline-time');
         }
-        article.set('updateTimeline', this.quiet);
+        article.set('label', labels.join(','));
         // save article
         article = await article.save();
         // send message

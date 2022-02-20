@@ -25,7 +25,7 @@ class KlogArticle extends PolymerElement {
   <div class="section">
     <!--article header-->
     <div class="article-category" hidden="{{!article.title}}" on-click="_searchTimeline">
-      <klog-render-timestamp time-stamp="{{parseDate(article.createdAt)}}"></klog-render-timestamp>
+      <klog-render-timestamp time-stamp="{{article.createdTime}}"></klog-render-timestamp>
       <span class="article-collection">{{article.collection}}</span>
       <template is="dom-repeat" items="{{article.tags}}">
         <span class="article-tag">#{{item}}</span>
@@ -52,7 +52,7 @@ class KlogArticle extends PolymerElement {
   </div>
   <!--update info-->
   <div class="section article-update-info">
-  <klog-render-timestamp time-stamp="{{parseDate(article.updatedAt)}}">最后更新于</klog-render-timestamp>。<br>
+  <klog-render-timestamp time-stamp="{{article.updatedTime}}">最后更新于</klog-render-timestamp>。<br>
     <klog-render-license license="{{article.license}}" default-license="{{article.author.license}}"></klog-render-license>
   </div>
 </div>
@@ -241,10 +241,6 @@ class KlogArticle extends PolymerElement {
 
     handleError() {
         this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '404' } }));
-    }
-
-    parseDate(date) {
-        return Date.parse(date);
     }
 
     updateTitle(title) {

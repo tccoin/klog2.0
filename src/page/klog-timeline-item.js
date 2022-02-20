@@ -64,6 +64,11 @@ class KlogTimelineItem extends PolymerElement {
         text-decoration: underline;
       }
 
+      .content-text klog-render-timestamp {
+        font-weight: bolder;
+        margin-right:8px;
+      }
+
       .gallery-item {
         flex-basis: calc(33.33% - 1px);
       }
@@ -121,7 +126,7 @@ class KlogTimelineItem extends PolymerElement {
             <div class="meta-title">{{data.author.displayName}}</div>
           </div>
           <div class="meta-date">
-            <klog-render-timestamp time-stamp="{{data.date}}"></klog-render-timestamp>
+            <klog-render-timestamp time-stamp="{{data.updatedTime}}"></klog-render-timestamp>
           </div>
         </div>
 
@@ -133,13 +138,16 @@ class KlogTimelineItem extends PolymerElement {
         <div class="card-subtitle" hidden\$="{{!data.title}}">
           <span class="card-collection">{{data.collection}}</span>
           <div class="dot-divider" hidden$="{{!authorHidden}}"></div>
-          <klog-render-timestamp time-stamp="{{data.date}}" hidden$="{{!authorHidden}}"></klog-render-timestamp>
+          <klog-render-timestamp time-stamp="{{data.updatedTime}}" hidden$="{{!authorHidden}}"></klog-render-timestamp>
         </div>
         <h1 class="card-title" hidden\$="{{!data.title}}">{{data.title}}</h1>
 
         <!--content-->
         <div class="card-content" hidden\$="{{!data._text}}">
-          <p class="content-text" id="text">{{data._text}}</p>
+          <p class="content-text" id="text">
+            <klog-render-timestamp time-stamp="{{data.updatedTime}}" hidden\$="{{has(data.title)}}" hidden\$="{{data.title}}"></klog-render-timestamp>
+            {{data._text}}
+          </p>
           <template is="dom-if" if="{{view.thumbnail}}">
             <klog-image class="content-thumbnail" src="{{data.image.url}}" theme="{{theme}}" lazy="" fixed="" timeline="">
             </klog-image>
