@@ -518,7 +518,7 @@ class KlogMarkdown extends PolymerElement {
         }));
     }
 
-    render(markdown, headless = false) {
+    async render(markdown, headless = false) {
         markdown = markdown || this.markdown;
         // load renderer
         if (!this.option) {
@@ -538,12 +538,14 @@ class KlogMarkdown extends PolymerElement {
         this._initCategory = false;
         // no markdown
         if (!markdown) {
-            this.$.scroller.reset();
+            if (!headless) {
+                this.$.scroller.reset();
+            }
             this._updateWordCount();
             return;
         }
         // translate markdown
-        return new Promise(resolve => {
+        return await new Promise(resolve => {
             marked(markdown, this.options, (err, out, tokens) => {
                 if (err) throw err;
                 this.tokens = tokens;
@@ -564,7 +566,7 @@ class KlogMarkdown extends PolymerElement {
                 Han(this.$.article, this.$.article).render();
                 setTimeout(() => this.dispatchEvent(new CustomEvent('markdown-rendered', { bubbles: true, composed: true })), 1);
                 // scroller
-                if (this.$.scroller.query) {
+                if (this.$.scroller && this.$.scroller.query) {
                     this.waitPlaceholders().then(() => this.$.scroller.scroll());
                 }
                 // lazy load image

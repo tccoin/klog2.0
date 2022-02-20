@@ -247,7 +247,7 @@ class KlogImage extends PolymerElement {
             req.addEventListener('load', () => {
                 try {
                     this.mediaInfo = JSON.parse(req.response);
-                } catch {
+                } catch (error) {
                     resolve(emptyMediaInfo);
                 }
                 this.savePlaceholderData(url, this.mediaInfo);
