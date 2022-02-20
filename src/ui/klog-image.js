@@ -243,15 +243,21 @@ class KlogImage extends PolymerElement {
         }
         let req = new XMLHttpRequest();
         return await new Promise(resolve => {
+            const emptyMediaInfo = { stats: { entropy: 0 } };
             req.addEventListener('load', () => {
-                this.mediaInfo = JSON.parse(req.response);
+                try {
+                    this.mediaInfo = JSON.parse(req.response);
+                } catch {
+                    resolve(emptyMediaInfo);
+                }
                 this.savePlaceholderData(url, this.mediaInfo);
                 if (!headless) {
                     this.updatePlaceholder();
                 }
                 this.dispatchEvent(new CustomEvent('media-info-updated', { bubbles: true, composed: true, detail: { mediaInfo: this.mediaInfo } }));
-                setTimeout(() => resolve(this.mediaInfo), 1);
+                resolve(this.mediaInfo);
             });
+            req.addEventListener('error', () =>resolve(emptyMediaInfo));
             req.open('get', url, true);
             req.send();
         });
@@ -290,7 +296,7 @@ class KlogImage extends PolymerElement {
             this.$.bg.style.height = '100%';
         }
         this.$.img.style.position = 'absolute';
-        if ('palette' in data) {
+        if (data && 'palette' in data) {
             let c = this.theme == 'light' ? data.palette.LightVibrant.rgb : data.palette.DarkVibrant.rgb;
             this.$.bg.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
             this.$.img.style.backgroundColor = `rgb(${c[0]},${c[1]},${c[2]})`;
