@@ -11,7 +11,7 @@ export class KlogDynamicTheme {
         }
         let colors = await materialDynamicColors(source);
         let schemes = variant == 'light' ? colors.light : colors.dark;
-        console.log(variant, schemes);
+        // console.log(variant, schemes);
         for (let token in schemes) {
             const styleVariableName = '--' + token.replace(/[A-Z]/g, (match, offset) => (offset > 0 ? '-' : '') + match.toLowerCase());
             element.style.setProperty(styleVariableName, schemes[token]);

@@ -127,7 +127,7 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         position: relative;
         color: var(--primary);
         text-decoration: none;
-        border-bottom: 1px solid var(--tertiary);
+        border-bottom: 1px solid var(--secondary);
       }
 
       .klog-article-content a:visited {
@@ -422,7 +422,8 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
       }
 
       ::selection {
-        background: var(--klog-markdown-selection-background);
+        color: var(--on-tertiary);
+        background: var(--tertiary);
       }
     </style>
   </template>
