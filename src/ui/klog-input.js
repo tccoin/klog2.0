@@ -3,12 +3,17 @@ import '@polymer/paper-input/paper-input.js';
 import '../style/klog-style.js';
 
 class KlogInput extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style>
       :host {
         display: block;
         margin: 4px 0 16px 0;
+        color: var(--on-surface);
+        --primary-text-color: var(--on-surface);
+        --secondary-text-color: var(--on-surface);
+        --paper-input-container-color: var(--on-surface);
+        --paper-input-container-focus-color: var(--primary);
       }
 
       :host([hidden]) {
@@ -49,7 +54,7 @@ class KlogInput extends PolymerElement {
         height: 24px;
         background: none;
         padding: 16px 14px 16px;
-        border: var(--outlined-border-width) solid var(--outline-color);
+        border: var(--outlined-border-width) solid var(--outline);
         border-radius: 4px;
         transition: border-color .2s ease;
 
@@ -63,7 +68,7 @@ class KlogInput extends PolymerElement {
           width: auto;
           padding: 0 8px;
           left: -8px;
-          background: var(--klog-input-background-color, var(--primary-background-color));
+          background: var(--klog-input-background-color, var(--surface));
         }
 
         --paper-input-container-underline: {
@@ -80,35 +85,35 @@ class KlogInput extends PolymerElement {
       }
 
       :host([outlined]) paper-input[focused] {
-        border-color: var(--primary-color);
+        border-color: var(--primary);
       }
     </style>
     <paper-input label="{{label}}" placeholder="{{placeholder}}" value="{{value}}" disabled="{{disabled}}" type="{{type}}" name="{{name}}" readonly="{{readonly}}">
       <div slot="suffix"><slot name="suffix"></slot></div>
     </paper-input>
 `;
-  }
-
-  static get is() { return 'klog-input'; }
-
-  static get properties() {
-    return {
-      label: {
-        type: String
-      },
-      value: {
-        type: String,
-        notify: true
-      },
-      type: {
-        type: String
-      },
-      readonly: {
-        type: Boolean,
-        value: false
-      }
     }
-  }
+
+    static get is() { return 'klog-input'; }
+
+    static get properties() {
+        return {
+            label: {
+                type: String
+            },
+            value: {
+                type: String,
+                notify: true
+            },
+            type: {
+                type: String
+            },
+            readonly: {
+                type: Boolean,
+                value: false
+            }
+        };
+    }
 }
 
 window.customElements.define(KlogInput.is, KlogInput);

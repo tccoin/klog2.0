@@ -33,7 +33,7 @@ class KlogVideo extends PolymerElement {
       }
 
       paper-ripple {
-        color: var(--primary-color);
+        color: var(--primary);
         z-index: 3;
       }
 

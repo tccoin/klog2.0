@@ -27,6 +27,8 @@ class KlogNoteSearch extends PolymerElement {
 
       .container .bg {
         @apply --overlay-style;
+        background: var(--primary);
+        opacity: 0.08;
         transform-origin: left top;
         transition-property: opacity transform;
         z-index: 1;
@@ -38,7 +40,7 @@ class KlogNoteSearch extends PolymerElement {
         @apply --fit-layout;
         z-index: 1;
         padding: 16px;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
         cursor: default;
         user-select: none;
         -webkit-user-select: none;
@@ -49,7 +51,7 @@ class KlogNoteSearch extends PolymerElement {
         z-index: 1;
         height: 100%;
         left: 8px;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
         cursor: pointer;
         z-index: 10;
         -webkit-tap-highlight-color: transparent;
@@ -62,7 +64,7 @@ class KlogNoteSearch extends PolymerElement {
         outline: none;
         border: none;
         width: 100%;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         background: transparent;
         box-sizing: border-box;
         font-size: 15px;
@@ -73,6 +75,11 @@ class KlogNoteSearch extends PolymerElement {
 
       .hidden {
         display: none;
+      }
+      
+      ::placeholder {
+        color: var(--on-surface);
+        opacity: 0.5;
       }
     </style>
 

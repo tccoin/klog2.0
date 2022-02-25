@@ -35,7 +35,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       padding: calc(64px + var(--safe-area-inset-top)) 0 72px;
       position: relative;
       top: calc(-1 * var(--safe-area-inset-top));
-      background: var(--primary-background-color);
+      background: var(--surface);
       min-height: calc(100vh - 350px);
       @apply(--shadow-elevation-2dp);
     }
@@ -73,20 +73,11 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       bottom: 32px;
       right: auto;
       width: 96px;
-      background-color: transparent;
-      color: var(--primary-text-color);
-      -webkit-backdrop-filter: saturate(180%) blur(10px);
-      backdrop-filter: saturate(180%) blur(10px);
       overflow: hidden;
+      background-color: var(--primary-container);
+      color: var(--on-primary-container);
       transform: translateX(-100%);
       transition: transform 0.2s ease 0s, box-shadow 0.2s ease 0s, opacity 0.2s ease 0s;
-    }
-
-    klog-fab::after{
-      @apply(--overlay-style);
-      z-index: -1;
-      background-color: var(--primary-background-color);
-      opacity: 0.7;
     }
 
     .article-update-info{
@@ -95,7 +86,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       bottom: 24px;
       left: 0;
       right: 0;
-      color: var(--secondary-text-color);
+      color: var(--on-background);
       cursor: default;
       user-select: none;
     }
@@ -103,7 +94,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     .article-footer {
       padding: 0 16px 32px;
       font-size: 20px;
-      color: var(--primary-text-color);
+      color: var(--on-surface);
       opacity: 0.15;
       text-align: center;
       cursor: default;
@@ -135,7 +126,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       padding: 0 16px;
       font-size: 1.1em;
       letter-spacing: 0.1em;
-      color: var(--secondary-text-color);
+      color: var(--on-background);
     }
 
     .article-category klog-render-timestamp,
@@ -179,7 +170,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       display: flex;
       padding: 0 16px;
       flex-direction: row;
-      color: var(--secondary-text-color)
+      color: var(--on-background)
     }
 
     .article-author {

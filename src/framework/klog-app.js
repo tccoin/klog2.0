@@ -1,5 +1,6 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { KlogUiMixin } from './klog-ui-mixin.js';
+import { KlogDynamicTheme } from './klog-dynamic-theme.js';
 import '@polymer/paper-styles/paper-styles.js';
 import '@polymer/paper-spinner/paper-spinner.js';
 import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
@@ -46,13 +47,13 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
       .spinner-container .spinner-text {
         font-size: 1.5em;
         margin-left: 24px;
-        color: var(--primary-color);
+        color: var(--primary);
         user-select: none;
         -webkit-user-select: none;
       }
 
       .spinner-container .spinner-text a {
-        color: var(--primary-color);
+        color: var(--primary);
         text-decoration: none;
         border-bottom: 1px solid currentColor;
         margin: 0 2px;
@@ -108,7 +109,8 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     static get observers() {
         return [
             'load(routeData.page)',
-            '_updatePreference(userinfo.preference)'
+            '_updatePreference(userinfo.preference)',
+            'updateTheme(theme)'
         ];
     }
 
@@ -306,8 +308,30 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         }
     }
 
-    _updateTheme(themeStrategy) {
-    // 主题更新策略
+    updateTheme(themeVariant, themeColor = '#3f51b5') {
+        if (!themeVariant) return;
+        // 更新动态色彩
+        let dynamicTheme = new KlogDynamicTheme();
+        dynamicTheme.apply(this, themeColor, themeVariant);
+        this.dynamicTheme = dynamicTheme;
+
+        // 更新主题
+        let htmlTheme = document.querySelector('html').getAttribute('theme');
+        if (htmlTheme && htmlTheme.indexOf('custom') > -1) {
+            document.querySelector('html').setAttribute('theme', themeVariant + ' custom');
+            return;
+        }
+        document.querySelector('html').setAttribute('theme', themeVariant);
+        document.querySelector('html').style.background = themeVariant == 'light' ? '#e0e0e0' : '#000000';
+        let metaThemeColor = document.querySelector('meta[name=theme-color]');
+        metaThemeColor.setAttribute('content', themeVariant == 'light' ? '#e0e0e0' : '#000000');
+    }
+
+    _updatePreference(preference) {
+        if (!preference) return;
+        this.preference = preference || this.preference;
+        // theme
+        let themeStrategy = preference.theme;
         let theme = themeStrategy;
         if (themeStrategy == 'system') {
             if (window.matchMedia('(prefers-color-scheme)').media) {
@@ -316,41 +340,14 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             } else {
                 themeStrategy = 'time';
             }
-        }
-        if (themeStrategy == 'time') {
+        } else if (themeStrategy == 'time') {
             let d = new Date();
             let h = d.getHours();
             theme = (h > 19 || h < 7) ? 'dark' : 'light';
         }
         this.theme = theme;
-
-        // 更新主题
-        let htmlTheme = document.querySelector('html').getAttribute('theme');
-        if (htmlTheme && htmlTheme.indexOf('custom') > -1) {
-            document.querySelector('html').setAttribute('theme', theme + ' custom');
-            return;
-        }
-        document.querySelector('html').setAttribute('theme', theme);
-        document.querySelector('html').style.background = theme == 'light' ? '#e0e0e0' : '#000000';
-        let metaThemeColor = document.querySelector('meta[name=theme-color]');
-        metaThemeColor.setAttribute('content', theme == 'light' ? '#e0e0e0' : '#000000');
-    // const statusBar = document.querySelector('#statusbarFix');
-    // const statusBarBackground = document.querySelector('#statusbarFixBackground');
-    // window.ShadyCSS && window.ShadyCSS.styleSubtree(statusBarBackground, {
-    //   '--klog-statusbar-opacity': 0.8,
-    //   '--klog-statusbar-color': theme == 'light' ? '#e0e0e0' : '#000000'
-    // });
-    // statusBar.style.backdropFilter = 'initial';
-    // statusBar.style.webkitBackdropFilter = 'initial';
-    }
-
-    _updatePreference(preference) {
-        if (!preference) return;
-        this.preference = preference || this.preference;
-        // theme
-        this._updateTheme(preference.theme);
-        if (this._updateThemeInterval) clearInterval(this._updateThemeInterval);
-        this._updateThemeInterval = setInterval(() => this._updateTheme(preference.theme), 5 * 60 * 1000);
+        if (this.updateThemeInterval) clearInterval(this.updateThemeInterval);
+        this.updateThemeInterval = setInterval(() => this.updateTheme(preference.theme), 5 * 60 * 1000);
         if (this._waitingToLoadDefaultPage) {
             this._loadDefaultPage();
         }

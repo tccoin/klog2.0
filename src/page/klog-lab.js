@@ -105,7 +105,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
                     sidebar: 'off',
                     styles: {
                         '--klog-header-background': 'translate',
-                        '--klog-header-text-color': 'var(--primary-text-color)',
+                        '--klog-header-text-color': 'var(--on-surface)',
                     },
                     header: {
                         fixed: false,

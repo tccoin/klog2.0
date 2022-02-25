@@ -87,7 +87,8 @@ class KlogSignup extends PolymerElement {
                         shadow: 'off',
                     },
                     styles: {
-                        '--klog-layout-background': 'var(--primary-background-color)',
+                        '--klog-page-background': 'var(--surface)',
+                        '--klog-header-opacity': 0.8
                     },
                     toolbar: html `
               <app-toolbar>

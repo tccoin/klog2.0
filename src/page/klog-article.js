@@ -160,9 +160,10 @@ class KlogArticle extends PolymerElement {
             this.fabExtended = !this.mobile;
             let fab = this.isOwner ? this.$.fabEdit : this.$.fabComment;
             let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
-            if (this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top + 24 - 2 * safeareaTop <= window.innerHeight * 0.9) {
+            let top = this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top;
+            if (top != 0 && top - safeareaTop <= window.innerHeight - 32 - 28) {
                 fab.style.position = 'absolute';
-                fab.style.bottom = `${this.fabExtended ? (-24 + safeareaTop) : (-28 + safeareaTop)}px`;
+                fab.style.bottom = `${(-28 + safeareaTop)}px`;
             } else {
                 fab.style.position = 'fixed';
                 fab.style.bottom = '32px';

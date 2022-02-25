@@ -14,7 +14,7 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         z-index: 100;
         padding-top: var(--safe-area-inset-top);
         height: var(--klog-header-height, 64px);
-        color: var(--klog-header-text-color, var(--secondary-text-color));
+        color: var(--klog-header-text-color, var(--on-background));
         overflow: hidden;
         transition: box-shadow .25s ease, opacity .2s ease, width .2s cubic-bezier(0.4, 0, 0.2, 1) !important;
       }
@@ -39,7 +39,7 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
       app-toolbar::after {
         @apply --overlay-style;
         z-index: -1;
-        background: var(--klog-header-background, var(--primary-background-color));
+        background: var(--klog-header-background, var(--klog-page-background));
         opacity: var(--klog-header-opacity, 1);
         transition: all .2s ease;
       }
@@ -114,7 +114,7 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
       app-toolbar paper-icon-button[minimum]::after{
         @apply(--overlay-style);
         z-index: -1;
-        background-color: var(--primary-background-color);
+        background-color: var(--surface);
         opacity: 0.7;
       }
 
@@ -148,7 +148,7 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         width: 100%;
         z-index: 100;
         transition: all 300ms ease;
-        --paper-progress-active-color: var(--primary-color);
+        --paper-progress-active-color: var(--primary);
         --paper-progress-container-color: transparent;
       }
 
@@ -164,7 +164,7 @@ containerKlogStyleToolbar.innerHTML = `<dom-module id="klog-style-toolbar">
         width: calc(100% - 72px);
         padding: 0 8px;
         margin: 0 8px;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         font-weight: normal;
         font-size: 20px;
         border: none;

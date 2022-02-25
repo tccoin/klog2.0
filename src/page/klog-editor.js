@@ -52,13 +52,13 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         align-content: center;
 
         --klog-backdrop-back: {
-          --accent-color: var(--secondary-background-color);
+          --secondary: var(--on-secondary-container);
         }
       }
 
       klog-backdrop klog-pages {
         --klog-pages-width: calc(100vw - var(--klog-layout-margin-left));
-        background-color: var(--primary-background-color);
+        background-color: var(--surface);
       }
 
       klog-editor-backdrop-pages {
@@ -86,12 +86,12 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
 
       klog-editor-textarea {
         width: calc(50vw - var(--klog-layout-margin-left) / 2);
-        border-right: 1px solid var(--divider-color);
+        border-right: 1px solid var(--divider);
       }
 
       klog-markdown {
         width: calc(50vw - var(--klog-layout-margin-left) / 2);
-        background: var(--primary-background-color);
+        background: var(--surface);
       }
 
       klog-markdown .info {
@@ -100,7 +100,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         cursor: default;
         user-select: none;
         -webkit-user-select: none;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
       }
 
       /* floating toolbar */
@@ -110,8 +110,8 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         top: 0;
         z-index: 100;
         border-radius: 4px;
-        background: var(--primary-background-color);
-        color: var(--primary-text-color);
+        background: var(--surface);
+        color: var(--on-surface);
         @apply --shadow-elevation-4dp;
       }
 

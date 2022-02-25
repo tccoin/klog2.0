@@ -14,8 +14,8 @@ containerKlogStyleLayout.innerHTML = `<dom-module id="klog-style-layout">
         position: fixed;
         right: 8vw;
         bottom: 8vh;
-        background-color: var(--primary-background-color);
-        color: var(--primary-color);
+        background-color: var(--surface);
+        color: var(--primary);
         z-index: 99;
       }
 

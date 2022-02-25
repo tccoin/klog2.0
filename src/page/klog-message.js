@@ -37,7 +37,7 @@ class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
                     },
                     styles: {
                         '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
-                        '--klog-header-text-color': 'var(--primary-text-color)',
+                        '--klog-header-text-color': 'var(--on-surface)',
                         '--klog-header-opacity': 0.8
                     },
                     customMenu: [{

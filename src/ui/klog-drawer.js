@@ -9,7 +9,7 @@ class KlogDrawer extends PolymerElement {
     <style>
       :host {
         display: block;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
       }
 
       app-drawer {
@@ -19,7 +19,7 @@ class KlogDrawer extends PolymerElement {
         --app-drawer-width: 272px;
 
         --app-drawer-content-container: {
-          background: var(--primary-background-color);
+          background: var(--surface);
           @apply --shadow-elevation-16dp;
         }
       }

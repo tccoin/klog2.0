@@ -15,7 +15,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         padding: 0 0 8px;
         font-size: 0.9em;
         box-sizing: border-box;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
       }
 
       .klog-card {
@@ -23,7 +23,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         margin: auto;
         box-sizing: border-box;
         border-radius: 5px;
-        background: var(--primary-background-color);
+        background: var(--surface);
         transition: box-shadow .3s ease;
         overflow: hidden;
         -webkit-tap-highlight-color: transparent;
@@ -47,7 +47,16 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
 
       .klog-card.list{
         border-radius: 0px;
-        border-bottom: 1px solid var(--border-color);
+      }
+
+      .klog-card.list:not(:last-of-type)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 1px;
+        background: var(--on-surface-variant);
+        opacity: 0.08;
       }
 
       .klog-card-label+.klog-card.list,
@@ -59,7 +68,6 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
       .klog-card.list:last-of-type {
         border-bottom-right-radius: 5px;
         border-bottom-left-radius: 5px;
-        border-bottom: none;
       }
 
       /*card-meta*/
@@ -70,7 +78,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         font-size: 0.9em;
         line-height: 1.3;
         margin: calc(var(--klog-card-padding) * 2);
-        color: var(--secondary-text-color);
+        color: var(--on-background);
       }
 
       .klog-card .card-meta .meta-avatar {
@@ -87,7 +95,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
       .klog-card .card-meta .meta-title {
         display: inline;
         font-weight: bold;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         font-size: var(--klog-card-primary-font-size);
       }
 
@@ -107,7 +115,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         margin: 0 6px;
         border-radius: 2px;
         vertical-align: middle;
-        background: var(--border-color);
+        background: var(--outline);
       }
 
 
@@ -123,7 +131,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
       .klog-card .card-subtitle {
         margin: calc(var(--klog-card-padding) * 3) calc(var(--klog-card-padding) * 2) 0;
         line-height: 1;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
         font-weight: bold;
       }
 
@@ -135,7 +143,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         font-size: 1.4em;
         line-height: 1.3;
         margin: var(--klog-card-padding) calc(var(--klog-card-padding) * 2) calc(var(--klog-card-padding) * 2);
-        color: var(--primary-text-color);
+        color: var(--on-surface);
       }
 
       .klog-card .card-subtitle+.card-title {
@@ -154,7 +162,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         flex: 1;
         margin: 0;
         font-size: var(--klog-card-primary-font-size);
-        color: var(--klog-card-content-color, var(--primary-text-color));
+        color: var(--klog-card-content-color, var(--on-surface));
       }
 
       .klog-card .content-thumbnail {
@@ -174,7 +182,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         flex: 1;
         margin: calc(var(--klog-card-padding) * 2);
         font-size: var(--klog-card-secondary-font-size);
-        color: var(--klog-card-content-color, var(--primary-text-color));
+        color: var(--klog-card-content-color, var(--on-surface));
       }
 
       .klog-card .gallery-container {
@@ -232,7 +240,7 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         display: flex;
         flex-wrap: wrap;
         margin: calc(var(--klog-card-padding) * 2) calc(var(--klog-card-padding) * 2) calc(var(--klog-card-padding) * 2 - 4px);
-        color: var(--secondary-text-color);
+        color: var(--on-background);
         overflow: hidden;
       }
 

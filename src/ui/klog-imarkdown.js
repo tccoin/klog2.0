@@ -46,7 +46,7 @@ class KlogIMarkdown extends KlogMarkdown {
         width: 100%;
         border-radius: 5px;
         overflow: hidden;
-        background: var(--primary-background-color);
+        background: var(--surface);
         transition: .1s opacity .1s ease;
       }
 
@@ -63,7 +63,7 @@ class KlogIMarkdown extends KlogMarkdown {
       }
 
       #confirm {
-        color: var(--primary-color);
+        color: var(--primary);
         position: absolute;
         right: 0px;
         top: 0;

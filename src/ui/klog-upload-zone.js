@@ -4,8 +4,8 @@ import './klog-icons.js';
 import '../data/klog-data-uploader.js';
 
 class KlogUploadZone extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style>
       :host {
         display: block;
@@ -39,20 +39,20 @@ class KlogUploadZone extends PolymerElement {
         width: 48px;
         padding: 8px;
         border-radius: 50%;
-        color: var(--primary-color);
+        color: var(--primary);
         transition: box-shadow .3s ease, color .2s ease;
       }
 
       :host([state=dropover]) iron-icon,
       :host([state=uploading]) iron-icon {
-        color: var(--dark-primary-color);
+        color: var(--primary);
       }
 
       .state {
         position: absolute;
         left: 0;
         right: 0;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
         transition: opacity .25s ease;
       }
 
@@ -86,94 +86,94 @@ class KlogUploadZone extends PolymerElement {
     </div>
     <paper-ripple></paper-ripple>
 `;
-  }
-
-  static get is() { return 'klog-upload-zone'; }
-
-  static get properties() {
-    return {
-      fileinfo: {
-        type: Object,
-        notify: true
-      },
-      state: {
-        type: String,
-        value: 'idle',
-        observer: '_stateChanged',
-        reflectToAttribute: true
-      },
-      bucketname: {
-        type: String,
-        value: 'klog2'
-      },
-      remainingNumber: {
-        type: Number,
-      },
-      uploading: {
-        type: Boolean,
-        observer: '_uploadingChanged',
-      }
     }
-  }
 
-  ready() {
-    super.ready();
-    this.addEventListener('dragover', e => this.dragover(e), false);
-    this.addEventListener('dragleave', e => this.dragleave(e), false);
-    this.addEventListener('drop', e => this.drop(e), false);
+    static get is() { return 'klog-upload-zone'; }
+
+    static get properties() {
+        return {
+            fileinfo: {
+                type: Object,
+                notify: true
+            },
+            state: {
+                type: String,
+                value: 'idle',
+                observer: '_stateChanged',
+                reflectToAttribute: true
+            },
+            bucketname: {
+                type: String,
+                value: 'klog2'
+            },
+            remainingNumber: {
+                type: Number,
+            },
+            uploading: {
+                type: Boolean,
+                observer: '_uploadingChanged',
+            }
+        };
+    }
+
+    ready() {
+        super.ready();
+        this.addEventListener('dragover', e => this.dragover(e), false);
+        this.addEventListener('dragleave', e => this.dragleave(e), false);
+        this.addEventListener('drop', e => this.drop(e), false);
     //this.addEventListener('click', e=>this.click(e), false);
     //this.$.info.addEventListener('click', e=>this.click(e), false);
-  }
-
-  dragover(e) {
-    this.state = 'dropover';
-  }
-
-  dragleave(e) {
-    if (this.state == 'dropover') this.state = 'idle';
-  }
-
-  drop(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    let files = e.dataTransfer.files;
-    this._updateFiles(files);
-    this.state = 'uploading';
-  }
-
-  click(e) {
-    e.stopPropagation();
-    console.log(e);
-    this.$.input.value = '';
-    this.$.input.click();
-  }
-
-  inputChange() {
-    let files = this.$.input.files;
-    this.state = 'uploading';
-    this._updateFiles(files);
-  }
-
-  _updateFiles(files) {
-    for (let file of files) {
-      this.$.uploader.upload(file);
     }
-  }
 
-  _uploadingChanged(uploading) {
-    if (!uploading && this.state != 'dropover') this.state = 'idle'
-  }
+    dragover(e) {
+        this.state = 'dropover';
+    }
 
-  _stateChanged(state, oldState) {
-    let oldStateElement = this.shadowRoot.querySelector(`.state[name=${oldState}]`);
-    let newStateElement = this.shadowRoot.querySelector(`.state[name=${state}]`);
-    if (oldState && oldStateElement) oldStateElement.classList.add('hidden');
-    if (newStateElement) newStateElement.classList.remove('hidden');
-  }
+    dragleave(e) {
+        if (this.state == 'dropover') this.state = 'idle';
+    }
 
-  stylishProgress(progress) {
-    return progress.toFixed(6)
-  }
+    drop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        let files = e.dataTransfer.files;
+        this._updateFiles(files);
+        this.state = 'uploading';
+    }
+
+    click(e) {
+        e.stopPropagation();
+        console.log(e);
+        this.$.input.value = '';
+        this.$.input.click();
+    }
+
+    inputChange() {
+        let files = this.$.input.files;
+        this.state = 'uploading';
+        this._updateFiles(files);
+    }
+
+    _updateFiles(files) {
+        for (let file of files) {
+            this.$.uploader.upload(file);
+        }
+    }
+
+    _uploadingChanged(uploading) {
+        if (!uploading && this.state != 'dropover') this.state = 'idle';
+    }
+
+    _stateChanged(state, oldState) {
+        let oldStateElement = this.shadowRoot.querySelector(`.state[name=${oldState}]`);
+        let newStateElement = this.shadowRoot.querySelector(`.state[name=${state}]`);
+        if (oldState && oldStateElement) oldStateElement.classList.add('hidden');
+        if (newStateElement) newStateElement.classList.remove('hidden');
+    }
+
+    stylishProgress(progress) {
+        return progress.toFixed(6);
+    }
 }
 
 window.customElements.define(KlogUploadZone.is, KlogUploadZone);

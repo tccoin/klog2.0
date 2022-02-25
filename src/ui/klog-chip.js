@@ -39,7 +39,7 @@ class KlogChip extends PolymerElement {
         width: 0;
         height: 24px;
         vertical-align: middle;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         -webkit-transition: width .15s cubic-bezier(.4, 0, .2, 1);
         -o-transition: width .15s cubic-bezier(.4, 0, .2, 1);
         transition: width .15s cubic-bezier(.4, 0, .2, 1);
@@ -56,12 +56,12 @@ class KlogChip extends PolymerElement {
         stroke-width: 2px;
         stroke-dashoffset: 29.78334;
         stroke-dasharray: 29.78334;
-        stroke: var(--klog-chip-text-color, --primary-text-color);
+        stroke: var(--klog-chip-text-color, --on-surface);
       }
 
       :host([active]) .checkmark path {
         stroke-dashoffset: 0;
-        stroke: var(--primary-color);
+        stroke: var(--primary);
       }
 
       .checkmark[hidden] {
@@ -84,7 +84,7 @@ class KlogChip extends PolymerElement {
         font-size: 18px;
         margin: 0;
         min-width: auto;
-        color: var(--klog-chip-text-color, --primary-text-color);
+        color: var(--klog-chip-text-color, --on-surface);
         overflow: hidden;
         text-transform: none;
         background: transparent;
@@ -106,7 +106,7 @@ class KlogChip extends PolymerElement {
       }
 
       :host([active]) paper-button {
-        color: var(--primary-color);
+        color: var(--primary);
       }
 
       :host([active]) paper-button::after {
@@ -114,7 +114,7 @@ class KlogChip extends PolymerElement {
       }
 
       :host([outlined]) paper-button {
-        border: var(--outlined-border-width) solid var(--border-color, --divider-color);
+        border: var(--outlined-border-width) solid var(--outline, --divider-color);
       }
 
       :host([outlined]) paper-button::after {
@@ -122,7 +122,7 @@ class KlogChip extends PolymerElement {
       }
 
       :host([outlined][active]) paper-button {
-        border: var(--outlined-border-width) solid var(--primary-color);
+        border: var(--outlined-border-width) solid var(--primary);
       }
     </style>
 

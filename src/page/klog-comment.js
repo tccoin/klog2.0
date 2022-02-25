@@ -36,7 +36,7 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
       .klog-author .comment-content {
         padding: 16px;
         margin: 0 0 20px;
-        background: var(--primary-background-color);
+        background: var(--surface);
         border-radius: 5px;
         width: fit-content;
         max-width: 100%;
@@ -115,7 +115,7 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
       }
 
       .klog-author .actions a:hover{
-        color: var(--primary-text-color);
+        color: var(--on-surface);
       }
 
       .klog-author.input-container .actions,

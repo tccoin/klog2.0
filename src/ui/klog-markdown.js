@@ -115,6 +115,7 @@ class KlogMarkdown extends PolymerElement {
 
     _initScroller() {
         this._scrollHandler = () => {
+            if (!this.$.scrollTarget) return;
             let y = this.$.scrollTarget.scrollTop;
             // calculate intersecting list
             let intersectinglist = [];

@@ -4,6 +4,7 @@ containerKlogStyleForm.innerHTML = `<dom-module id="klog-style-form">
   <template>
     <style>
       .form-item {
+        --hover-outline-color: var(--on-surface);
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -21,25 +22,25 @@ containerKlogStyleForm.innerHTML = `<dom-module id="klog-style-form">
       }
 
       .form-item .title {
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         font-weight: bold;
       }
 
       .form-item .description {
-        color: var(--secondary-text-color);
+        color: var(--on-background);
       }
 
       .form-item paper-button {
         padding: 6px 8px;
         font-weight: bold;
-        color: var(--secondary-text-color);
-        border: var(--outlined-border-width) solid var(--outline-color);
+        color: var(--on-background);
+        border: var(--outlined-border-width) solid var(--outline);
         border-radius: 4px;
         transition: all .2s ease;
       }
 
       .form-item paper-button:hover {
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         border-color: var(--hover-outline-color);
       }
 
@@ -51,7 +52,7 @@ containerKlogStyleForm.innerHTML = `<dom-module id="klog-style-form">
         max-width: 352px;
         width: calc(100vw - 16px);
         --paper-tabs-selection-bar-color: transparent;
-        --paper-tab-ink: var(--primary-color);
+        --paper-tab-ink: var(--primary);
       }
     </style>
   </template>

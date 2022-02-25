@@ -28,7 +28,7 @@ class KlogEditorHeader extends PolymerElement {
         position: fixed;
         left: 0;
         top: 0!important;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         background: transparent;
       }
 
@@ -42,8 +42,8 @@ class KlogEditorHeader extends PolymerElement {
 
       app-toolbar paper-button {
         font-size: 14px;
-        color: var(--primary-text-color);
-        background-color: var(--accent-color);
+        color: var(--on-surface);
+        background-color: var(--secondary);
       }
 
       app-toolbar paper-button iron-icon {
@@ -57,7 +57,7 @@ class KlogEditorHeader extends PolymerElement {
         top: 0;
         bottom: auto;
         width: 100%;
-        --paper-progress-active-color: var(--primary-color);
+        --paper-progress-active-color: var(--primary);
         --paper-progress-container-color: transparent;
       }
 

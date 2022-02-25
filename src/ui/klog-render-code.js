@@ -3,8 +3,8 @@ import '../style/klog-style-scrollbar.js';
 import '../lib/prism.js';
 import '../lib/prism-style.js';
 class KlogRenderCode extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style include="klog-style-scrollbar"></style>
     <style include="prism-style"></style>
     <style>
@@ -31,8 +31,18 @@ class KlogRenderCode extends PolymerElement {
         -moz-tab-size: 4;
         -o-tab-size: 4;
         tab-size: 4;
+      }
+
+      pre > *{
+        z-index: 1;
+      }
+
+      pre::after {
+        @apply --overlay-style;
+        background: var(--primary);
+        opacity: 0.08;
         border-radius: 5px;
-        background: var(--klog-markdown-block-color);
+        z-index: 0;
       }
 
       pre code {
@@ -65,20 +75,17 @@ class KlogRenderCode extends PolymerElement {
       }
 
       .meta .code-lang {
-        z-index: 10;
-      }
-
-      .meta>* {
         padding: 2px 10px;
         border-radius: 5px;
-        font-size: 0.875em;
-        background: var(--primary-color);
-        color: var(--klog-markdown-block-color);
+        font-size: 0.875em;;
+        background: var(--primary);
+        color: var(--on-primary);
         user-select: none;
         -webkit-user-select: none;
         cursor: default;
         position: absolute;
         top: -12px;
+        z-index: 10;
         @apply(--shadow-elevation-2dp);
       }
 
@@ -90,50 +97,50 @@ class KlogRenderCode extends PolymerElement {
       <pre id="pre"><template is="dom-if" if="{{lang}}"><div class="meta"><span class="code-lang">{{lang}}</span></div></template><code id="code"></code></pre>
     </div>
 `;
-  }
-
-  static get is() { return 'klog-render-code'; }
-
-  static get properties() {
-    return {
-      lang: {
-        type: String,
-        value: ''
-      },
-      code: {
-        type: String,
-        value: ''
-      },
-      theme: {
-        type: String,
-        value: 'dark',
-        reflectToAttribute: true,
-      }
     }
-  }
 
-  ready() {
-    super.ready();
-    if (Prism) {
-      this.placeHolderPromise = this.update();
-    } else {
-      console.error('Prism not found');
-      this.placeHolderPromise = Promise.resolve();
+    static get is() { return 'klog-render-code'; }
+
+    static get properties() {
+        return {
+            lang: {
+                type: String,
+                value: ''
+            },
+            code: {
+                type: String,
+                value: ''
+            },
+            theme: {
+                type: String,
+                value: 'dark',
+                reflectToAttribute: true,
+            }
+        };
     }
-  }
 
-  update() {
-    return new Promise(resolve => {
-      this.lang = this.lang.replace(/cpp/i, 'c++').toUpperCase();
-      let highlightLang = this.lang in Prism.languages ? lang : 'clike';
-      let grammar = Prism.languages[highlightLang];
-      this.highlightCode = Prism.highlight(unescape(this.code), grammar, highlightLang) || '';
-      this.$.container.setAttribute('theme', this.theme);
-      this.$.pre.classList.add(`language-${this.lang}`);
-      this.$.code.innerHTML = this.highlightCode;
-      setTimeout(resolve, 1);
-    });
-  }
+    ready() {
+        super.ready();
+        if (Prism) {
+            this.placeHolderPromise = this.update();
+        } else {
+            console.error('Prism not found');
+            this.placeHolderPromise = Promise.resolve();
+        }
+    }
+
+    update() {
+        return new Promise(resolve => {
+            this.lang = this.lang.replace(/cpp/i, 'c++').toUpperCase();
+            let highlightLang = this.lang in Prism.languages ? lang : 'clike';
+            let grammar = Prism.languages[highlightLang];
+            this.highlightCode = Prism.highlight(unescape(this.code), grammar, highlightLang) || '';
+            this.$.container.setAttribute('theme', this.theme);
+            this.$.pre.classList.add(`language-${this.lang}`);
+            this.$.code.innerHTML = this.highlightCode;
+            setTimeout(resolve, 1);
+        });
+    }
 }
 
 window.customElements.define(KlogRenderCode.is, KlogRenderCode);

@@ -8,7 +8,7 @@ class KlogEditorTextarea extends PolymerElement {
     <style>
       :host {
         display: block;
-        background-color: var(--primary-background-color);
+        background-color: var(--surface);
       }
 
       .textarea {
@@ -19,7 +19,7 @@ class KlogEditorTextarea extends PolymerElement {
         width: 100%;
 
         --iron-autogrow-textarea: {
-          color: var(--primary-text-color);
+          color: var(--on-surface);
           padding: var(--textarea-padding, 24px);
           font-size: var(--textarea-font-size, 14px);
           word-break: break-all;

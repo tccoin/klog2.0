@@ -35,12 +35,12 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         font-size: 32px;
         font-weight: bolder;
         margin-right: 16px;
-        color: var(--primary-text-color);
+        color: var(--on-background-variant);
       }
 
       .page-header-subtitle{
         margin-bottom: 16px;
-        color: var(--secondary-text-color);
+        color: var(--on-background-variant);
       }
 
       :host([mobile]) .main-container{
@@ -59,8 +59,8 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
       klog-chip {
         margin: 0 4px;
         vertical-align: middle;
-        --klog-chip-text-color: var(--secondary-text-color);
-        --divider-color: var(--secondary-text-color);
+        --klog-chip-text-color: var(--on-background);
+        --divider-color: var(--on-background);
         --klog-chip-style: {
           font-size: 1.1em;
           font-weight: bold;
@@ -71,14 +71,14 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
       }
 
       klog-chip[active] {
-        --klog-chip-background-color: var(--primary-background-color);
+        --klog-chip-background-color: var(--surface);
         --klog-chip-background-opacity: 1;
         @apply(--shadow-elevation-2dp);
       }
 
       klog-chip[name=search] input {
         width: 100%;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         font-weight: normal;
         font-size: 16px;
         font-weight: bold;
@@ -95,15 +95,15 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
       }
 
       klog-chip[name=daily] {
-        --primary-color: var(--paper-amber-900);
+        --primary: var(--paper-amber-900);
       }
 
       klog-chip[name=note] {
-        --primary-color: var(--paper-green-700);
+        --primary: var(--paper-green-700);
       }
 
       klog-chip[name=gallery] {
-        --primary-color: var(--paper-blue-grey-500);
+        --primary: var(--paper-blue-grey-500);
       }
 
       .item {
@@ -133,8 +133,8 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
 
       /*fab*/
       klog-fab {
-        background-color: var(--primary-color);
-        color: var(--on-primary-color);
+        background-color: var(--primary);
+        color: var(--on-primary);
       }
 
       /*animation*/

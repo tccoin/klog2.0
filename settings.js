@@ -1,6 +1,6 @@
 const path = require('path');
-const local = process.env.NODE_ENV == 'development';
-const serveBuild = true;
+const local = true;
+const serveBuild = false;
 
 exports.appId = 'nna3GjtCul4qbfaIofuhDtE8-MdYXbMMI';
 exports.appKey = 'L37rInrbeo0nVMtwFqG9yC50';

@@ -62,7 +62,7 @@ containerKlogStyleNote.innerHTML = `<dom-module id="klog-style-note">
         border-radius: 12px 12px 0 0;
         overflow: hidden;
         @apply(--shadow-elevation-4dp);
-        background-color: var(--primary-background-color);
+        background-color: var(--surface);
       }
 
       klog-pages.backdrop-front>* {

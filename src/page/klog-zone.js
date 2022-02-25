@@ -29,6 +29,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         position: fixed;
         z-index: 101;
         border-radius: 16px;
+        background: var(--surface-variant);
         transition: all .3s ease;
         transform-origin: right top;
         @apply --shadow-elevation-2dp;
@@ -56,12 +57,12 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       .info-container paper-button{
         width: calc(100% - 8px);
         font-size: 15px;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
         overflow: hidden;
       }
       .info-container paper-button::after{
         @apply --overlay-style;
-        background: var(--primary-text-color);
+        background: var(--on-surface);
         opacity:0.1;
       }
       .info-container paper-button iron-icon{
@@ -82,7 +83,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     }
       .author-introduction{
         word-break: break-word;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
         margin: 0 16px calc(var(--klog-card-padding) * 3);
       }
 
@@ -211,7 +212,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
                 },
                 styles: {
                     '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
-                    '--klog-header-text-color': 'var(--primary-text-color)',
+                    '--klog-header-text-color': 'var(--on-surface)',
                     '--klog-header-opacity': 0.8
                 },
                 toolbar: html `

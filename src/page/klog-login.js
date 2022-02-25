@@ -71,7 +71,7 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
                         shadow: 'scroll',
                     },
                     styles: {
-                        '--klog-layout-background': 'var(--primary-background-color)',
+                        '--klog-page-background': 'var(--surface)',
                         '--klog-header-opacity': 0.8
                     },
                     toolbar: html `

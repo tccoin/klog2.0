@@ -22,8 +22,8 @@ class KlogAppsKdoc extends PolymerElement {
         min-height: var(--klog-layout-page-height);
         padding: 64px 0 32px;
         background-color: var(--klog-page-background);
-        --primary-color: var(--paper-indigo-500);
-        --accent-color: #FFF;
+        --primary: var(--paper-indigo-500);
+        --secondary: #FFF;
       }
 
       [page-title] {
@@ -37,7 +37,7 @@ class KlogAppsKdoc extends PolymerElement {
       }
 
       paper-button[primary] {
-        color: var(--primary-color);
+        color: var(--primary);
       }
 
       paper-button iron-icon {

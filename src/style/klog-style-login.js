@@ -63,9 +63,9 @@ containerKlogStyleLogin.innerHTML = `<dom-module id="klog-style-login">
       }
 
       .login-card .actions [primary] {
-        background-color: var(--primary-color);
+        background-color: var(--primary);
         border-radius: 20px;
-        color: #FFF;
+        color: var(--on-primary);
         width: 72px;
       }
 
@@ -79,7 +79,7 @@ containerKlogStyleLogin.innerHTML = `<dom-module id="klog-style-login">
       }
 
       paper-dialog paper-button[primary] {
-        color: var(--primary-color);
+        color: var(--primary);
       }
 
       :host([exit]) .login-card {

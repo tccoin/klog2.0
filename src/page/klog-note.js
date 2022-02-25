@@ -79,7 +79,7 @@ class KlogNote extends PolymerElement {
                     },
                     styles: {
                         '--klog-header-background': 'var(--klog-page-background)',
-                        '--klog-header-text-color': 'var(--primary-text-color)',
+                        '--klog-header-text-color': 'var(--on-surface)',
                     },
                     toolbar: html ``
                 }

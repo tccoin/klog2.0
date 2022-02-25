@@ -55,7 +55,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
         margin: 0 auto 32px;
         border-radius: 5px;
         box-sizing: border-box;
-        background-color: var(--primary-background-color);
+        background-color: var(--surface);
         transition: all .15s ease-out;
         @apply --shadow-elevation-2dp;
       }
@@ -71,7 +71,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
       }
 
       .klog-card .card-meta.header paper-icon-button {
-        color: var(--primary-color);
+        color: var(--primary);
       }
 
       .form>* {
@@ -92,7 +92,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
       }
 
       span.primary{
-        color: var(--primary-color);
+        color: var(--primary);
         font-weight: bolder;
       }
 
@@ -289,7 +289,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
                     },
                     styles: {
                         '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
-                        '--klog-header-text-color': 'var(--primary-text-color)',
+                        '--klog-header-text-color': 'var(--on-surface)',
                         '--klog-header-opacity': 0.8
                     },
                     customMenu: [{

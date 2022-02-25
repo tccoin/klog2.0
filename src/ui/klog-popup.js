@@ -24,17 +24,17 @@ class KlogPopup extends mixinBehaviors(IronOverlayBehavior, PolymerElement) {
         border-radius: 4px;
         z-index: 10;
         cursor: default;
-        color: var(--primary-text-color);
-        background: var(--primary-background-color);
+        color: var(--on-surface);
+        background: var(--surface);
         box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.3), 0 0 1px 1px rgba(0, 0, 0, 0.05);
       }
 
       :host([theme~=dark]) #container {
-        background: var(--secondary-background-color);
+        background: var(--on-secondary-container);
       }
 
       :host([tooltip]) #container {
-        background: var(--secondary-background-color);
+        background: var(--on-secondary-container);
       }
 
       #arrow {
@@ -56,12 +56,12 @@ class KlogPopup extends mixinBehaviors(IronOverlayBehavior, PolymerElement) {
         position: absolute;
         border: 6px solid transparent;
         border-top: 0;
-        border-bottom: 8px solid var(--primary-background-color);
+        border-bottom: 8px solid var(--surface);
         transform: translate(8px, -70%);
       }
 
       :host([theme~=dark]) #arrow::after{
-        border-bottom: 8px solid var(--secondary-background-color);
+        border-bottom: 8px solid var(--on-secondary-container);
       }
     </style>
     <!--<div id="arrow"></div>-->

@@ -11,7 +11,8 @@ containerKlogStyleListbox.innerHTML = `<dom-module id="klog-style-listbox">
       }
 
       paper-listbox {
-        background: var(--secondary-background-color);
+        background: var(--surface);
+        --paper-listbox-color: var(--on-surface);
       }
     </style>
   </template>

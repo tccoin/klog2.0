@@ -51,6 +51,7 @@
     "fastify-compress": "^0.10.0",
     "fastify-multipart": "^0.8.1",
     "fastify-static": "^2.4.0",
+    "material-dynamic-colors": "^0.0.9",
     "md5-file": "^4.0.0",
     "mime-types": "^2.1.18",
     "node-vibrant": "^3.2.0-alpha",

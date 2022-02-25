@@ -28,7 +28,7 @@ containerKlogStyleAuthor.innerHTML = `<dom-module id="klog-style-author">
         width: calc(100% - 66px);
         flex-direction: column;
         flex: 1;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
       }
 
       .klog-author .author-info {
@@ -51,7 +51,7 @@ containerKlogStyleAuthor.innerHTML = `<dom-module id="klog-style-author">
       }
 
       .klog-author .author-name {
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         font-weight: bold;
         white-space: nowrap;
         overflow: hidden;

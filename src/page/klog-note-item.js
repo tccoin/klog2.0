@@ -27,17 +27,17 @@ class KlogNoteItem extends PolymerElement {
 
       .title {
         font-size: 16px;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
       }
 
       .secondary {
         max-height: 56.5px;
         font-size: 12px;
-        color: var(--secondary-text-color);
+        color: var(--on-background);
       }
 
       klog-render-timestamp {
-        color: var(--primary-color);
+        color: var(--primary);
         padding-right: 4px;
       }
 
@@ -46,7 +46,7 @@ class KlogNoteItem extends PolymerElement {
         height: 12px;
         padding-right: 4px;
         vertical-align: text-top;
-        color: var(--primary-color);
+        color: var(--primary);
       }
     </style>
     <div class="title">

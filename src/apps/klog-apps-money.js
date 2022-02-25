@@ -24,10 +24,10 @@ class KlogAppsMoney extends PolymerElement {
       }
 
       app-header {
-        --primary-text-color: #FFF;
-        --secondary-text-color: #FFF;
-        --primary-background-color: var(--paper-indigo-700);
-        --secondary-background-color: var(--paper-indigo-500);
+        --on-surface: #FFF;
+        --on-background: #FFF;
+        --surface: var(--paper-indigo-700);
+        --on-secondary-container: var(--paper-indigo-500);
         --header-text-color: #FFF;
         overflow: hidden;
         box-shadow: 0 4px 4px rgba(0, 0, 0, .3);

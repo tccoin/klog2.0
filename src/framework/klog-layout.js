@@ -28,11 +28,11 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         display: block;
         padding: 0;
         min-height: 100%;
-        background: var(--klog-layout-background, var(--klog-page-background));
-        color: var(--primary-text-color);
+        background: var(--klog-page-background);
+        color: var(--on-surface);
         position: relative;
         overscroll-behavior: none;
-        --paper-toggle-button-unchecked-button-color: var(--accent-color);
+        --paper-toggle-button-unchecked-button-color: var(--secondary);
         --klog-layout-margin-left: 240px;
         --klog-layout-page-height: 100vh;
         transition: all .3s ease, background .5s ease-out;
@@ -165,7 +165,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.18.2<br>2017-2021<br>Powered by Kr with Love.</p>
+      <p>v2.19.0<br>2017-2021<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -389,7 +389,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     }
 
     updateLayout(layout = {}, useDefault = true) {
-    // resolve
+        // resolve
         layout = this._updateCompleteLayout(layout, useDefault);
         layout = this._updateDynamicLayout(layout);
         layout.header = this._updateDynamicLayout(layout.header);
@@ -434,15 +434,15 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
                     blur: false,
                     shadow: 'off', // on off scroll
                     background: 'transparent',
-                    color: 'var(--secondary-text-color)',
+                    color: 'var(--on-background)',
                 },
                 drawerHeading: '记录未来',
                 customMenu: [],
                 mainMenu: false,
                 styles: {
-                    '--klog-layout-background': 'var(--klog-page-background)',
-                    '--klog-header-background': 'var(--primary-background-color)',
-                    '--klog-header-text-color': 'var(--secondary-text-color)',
+                    '--klog-page-background': '',
+                    '--klog-header-background': 'var(--klog-page-background)',
+                    '--klog-header-text-color': 'var(--on-surface)',
                     '--klog-header-short-width': '80px',
                     '--klog-header-height': '64px',
                     '--klog-header-opacity': 1,

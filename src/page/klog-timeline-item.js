@@ -20,7 +20,7 @@ class KlogTimelineItem extends PolymerElement {
         align-items: center;
         cursor: default;
         width: 100%;
-        color: var(--primary-text-color);
+        color: var(--on-surface);
         --primary-font-size: 14px;
         --secondary-font-size: 12px;
         --klog-media-transition-time: .2s;
@@ -33,7 +33,8 @@ class KlogTimelineItem extends PolymerElement {
         text-decoration: none;
         width: 100%;
         display: block;
-        color: inherit -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        color: inherit;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         -webkit-tap-highlight-color: transparent;
       }
 
