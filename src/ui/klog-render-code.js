@@ -34,6 +34,7 @@ class KlogRenderCode extends PolymerElement {
       }
 
       pre > *{
+        position: relative;
         z-index: 1;
       }
 

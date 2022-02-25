@@ -11,8 +11,8 @@ import '../style/klog-style-dialog.js';
 import '../style/klog-style-media.js';
 
 class KlogEditorHeader extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-dialog"></style>
     <style include="klog-style-media"></style>
@@ -42,8 +42,8 @@ class KlogEditorHeader extends PolymerElement {
 
       app-toolbar paper-button {
         font-size: 14px;
-        color: var(--on-surface);
-        background-color: var(--secondary);
+        color: var(--on-primary);
+        background-color: var(--primary);
       }
 
       app-toolbar paper-button iron-icon {
@@ -87,67 +87,67 @@ class KlogEditorHeader extends PolymerElement {
       </app-toolbar>
     </iron-pages>
 `;
-  }
-
-  static get is() { return 'klog-editor-header'; }
-
-  static get properties() {
-    return {
-      articleId: {
-        type: String,
-        notify: true
-      },
-      title: {
-        type: String,
-        notify: true
-      },
-      selected: {
-        type: Number,
-        notify: true
-      },
-      preview: {
-        type: Boolean,
-        value: false,
-        observer: '_updateSelected'
-      },
     }
-  }
 
-  ready() {
-    super.ready();
-  }
+    static get is() { return 'klog-editor-header'; }
 
-  insert() {
-    this.dispatchEvent(new CustomEvent('open-insert-drawer', { bubbles: true, composed: true }));
-  }
+    static get properties() {
+        return {
+            articleId: {
+                type: String,
+                notify: true
+            },
+            title: {
+                type: String,
+                notify: true
+            },
+            selected: {
+                type: Number,
+                notify: true
+            },
+            preview: {
+                type: Boolean,
+                value: false,
+                observer: '_updateSelected'
+            },
+        };
+    }
 
-  back() {
-    this.dispatchEvent(new CustomEvent('editor-back', { bubbles: true, composed: true }));
-  }
+    ready() {
+        super.ready();
+    }
 
-  publish() {
-    this.dispatchEvent(new CustomEvent('editor-save', { bubbles: true, composed: true, detail: { quiet: false } }));
-  }
+    insert() {
+        this.dispatchEvent(new CustomEvent('open-insert-drawer', { bubbles: true, composed: true }));
+    }
 
-  upload(e) {
-    this.dispatchEvent(new CustomEvent('editor-upload', { bubbles: true, composed: true }));
-  }
+    back() {
+        this.dispatchEvent(new CustomEvent('editor-back', { bubbles: true, composed: true }));
+    }
 
-  toggleBackdrop(e) {
-    let selected = (e.target.tagName == 'IRON-ICON' ? e.target.parentNode : e.target).getAttribute('for');
-    this.dispatchEvent(new CustomEvent('editor-toggle-backdrop', { bubbles: true, composed: true, detail: { selected } }));
-  }
+    publish() {
+        this.dispatchEvent(new CustomEvent('editor-save', { bubbles: true, composed: true, detail: { quiet: false } }));
+    }
 
-  closeBackdrop() {
-    this.dispatchEvent(new CustomEvent('editor-close-backdrop', { bubbles: true, composed: true }));
-  }
+    upload(e) {
+        this.dispatchEvent(new CustomEvent('editor-upload', { bubbles: true, composed: true }));
+    }
 
-  _is(val) {
-    return Boolean(val)
-  }
+    toggleBackdrop(e) {
+        let selected = (e.target.tagName == 'IRON-ICON' ? e.target.parentNode : e.target).getAttribute('for');
+        this.dispatchEvent(new CustomEvent('editor-toggle-backdrop', { bubbles: true, composed: true, detail: { selected } }));
+    }
 
-  _updateSelected(preview) {
-    this.selected = preview ? 1 : 0;
-  }
+    closeBackdrop() {
+        this.dispatchEvent(new CustomEvent('editor-close-backdrop', { bubbles: true, composed: true }));
+    }
+
+    _is(val) {
+        return Boolean(val);
+    }
+
+    _updateSelected(preview) {
+        this.selected = preview ? 1 : 0;
+    }
 }
 window.customElements.define(KlogEditorHeader.is, KlogEditorHeader);

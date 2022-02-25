@@ -34,7 +34,6 @@ containerKlogStyle.innerHTML = `<custom-style>
         left: 0;
         right: 0;
       }
-
     }
 
     html[theme~=light],

@@ -164,6 +164,9 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         this.addEventListener('userinfo-updated', (e) => {
             this._updateUserinfo(e.detail.result);
         });
+        this.addEventListener('theme-color-updated', (e) => {
+            this.updateTheme(this.theme, e.detail.themeColor);
+        });
         this.addEventListener('timeline-set-filter', (e) => {
             const callback = (pages) => {
                 pages.timeline.$.keywordInput.value = e.detail.keyword;

@@ -5,6 +5,8 @@ containerKlogStyleDialog.innerHTML = `<dom-module id="klog-style-dialog">
     <style>
       paper-dialog {
         border-radius: 5px;
+        --paper-dialog-background-color: var(--surface-variant);
+        --paper-dialog-color: var(--on-surface-variant);
       }
 
       paper-dialog h2:first-child {

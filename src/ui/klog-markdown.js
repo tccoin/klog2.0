@@ -167,7 +167,7 @@ class KlogMarkdown extends PolymerElement {
         renderer.image = (href, text) => {
             if (this.noMedia) return '';
             let mediaType = 'image';
-            if (href.match(/\.mp4$/i)) {
+            if (href.match(/\.mp4|.webm$/i)) {
                 mediaType = 'video';
             }
             let out = `<klog-${mediaType}  content

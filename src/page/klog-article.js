@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogDynamicTheme } from '../framework/klog-dynamic-theme.js';
 
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -189,7 +190,19 @@ class KlogArticle extends PolymerElement {
             if (this.$.data.isPathNew(path)) {
                 this.path = path;
                 await new Promise(resolve=>this.$.data.addEventListener('success', resolve, { once: true }));
-
+                let dynamicTheme = new KlogDynamicTheme();
+                let themeColor = '#3f51b5';
+                if (this.article.image && 'url' in this.article.image && this.article.image.url.indexOf('https://storage.krrr.party/storage/klog2/') > -1) {
+                    if ('themeColor' in this.article.image) {
+                        themeColor = this.article.image.themeColor;
+                    } else {
+                        console.log(this.article.image, this.article.image.url + '?Magic/6');
+                        let response = await fetch(this.article.image.url + '?Magic/6');
+                        let mediaInfo = await response.json();
+                        themeColor = this.theme == 'light' ? mediaInfo.palette.LightVibrant.rgb : mediaInfo.palette.DarkVibrant.rgb;
+                    }
+                }
+                dynamicTheme.apply(this, themeColor, this.theme);
                 this.$.avatar.lazyload();
                 this._scrollHandler();
             }

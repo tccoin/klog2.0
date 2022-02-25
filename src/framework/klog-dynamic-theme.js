@@ -5,9 +5,11 @@ export class KlogDynamicTheme {
     async apply(element, source, variant) {
         //source: #ffffff, url, input.files[0], blob, img element
         if (typeof (source) == 'object' && source.tagName == 'IMG') {
-            source = this.img2blob(source);
+            source = this._img2blob(source);
         } else if (typeof (source) == 'object' && source.tagName == 'KLOG-IMAGE') {
-            source = this.img2blob(source.$.img);
+            source = this._img2blob(source.$.img);
+        } else if (Array.isArray(source)) {
+            source = this._rgb2hex(source);
         }
         let colors = await materialDynamicColors(source);
         let schemes = variant == 'light' ? colors.light : colors.dark;
@@ -18,8 +20,14 @@ export class KlogDynamicTheme {
         }
         return schemes;
     }
+    
+    _rgb2hex(rgb) {
+        let [red, green, blue] = rgb;
+        const val = (red << 16) | (green << 8) | (blue << 0);
+        return '#' + (0x1000000 + val).toString(16).slice(1);
+    }
 
-    img2blob(img) {
+    _img2blob(img) {
         let c = document.createElement('canvas');
         let ctx = c.getContext('2d');
         const maxSize = 512;

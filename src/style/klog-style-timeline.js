@@ -35,12 +35,12 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         font-size: 32px;
         font-weight: bolder;
         margin-right: 16px;
-        color: var(--on-background-variant);
+        color: var(--on-surface);
       }
 
       .page-header-subtitle{
         margin-bottom: 16px;
-        color: var(--on-background-variant);
+        color: var(--on-surface);
       }
 
       :host([mobile]) .main-container{
@@ -60,7 +60,7 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         margin: 0 4px;
         vertical-align: middle;
         --klog-chip-text-color: var(--on-background);
-        --divider-color: var(--on-background);
+        --divider: var(--on-background);
         --klog-chip-style: {
           font-size: 1.1em;
           font-weight: bold;
@@ -120,8 +120,8 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         box-sizing: border-box;
         text-align: center;
         border-radius: 16px;
-        color: var(--klog-theme-on-background);
-        background: var(--primary-overlay-color);
+        color: var(--on-surface);
+        background: var(--surface);
         user-select: none;
         -webkit-user-select: none;
       }

@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogDynamicTheme } from '../framework/klog-dynamic-theme.js';
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-ripple/paper-ripple.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -40,6 +41,7 @@ class KlogTimelineItem extends PolymerElement {
 
       .card {
         width: calc(100% - 16px);
+        background: var(--surface);
         cursor: pointer;
         transition: transform .05s ease, box-shadow .2s ease;
       }
@@ -50,8 +52,8 @@ class KlogTimelineItem extends PolymerElement {
 
       .card::after{
         @apply --overlay-style;
-        background: var(--klog-timeline-item-background);
-        opacity: 0.08;
+        background: var(--primary);
+        opacity: 0;
         z-index: 0;
       }
 
@@ -63,6 +65,10 @@ class KlogTimelineItem extends PolymerElement {
       .card-subtitle .card-collection:hover,
       .card-meta .meta-title:hover {
         text-decoration: underline;
+      }
+
+      .card-subtitle .card-collection {
+        color: var(--secondary);
       }
 
       .content-text klog-render-timestamp {
@@ -315,13 +321,8 @@ class KlogTimelineItem extends PolymerElement {
         }
         let isLight = this.theme == 'light';
         let themeColor = isLight ? mediaInfo.palette.LightVibrant.rgb : mediaInfo.palette.DarkVibrant.rgb;
-        let fontColor = isLight ? mediaInfo.palette.DarkVibrant.rgb : mediaInfo.palette.LightVibrant.rgb;
-        const getRGBValue = (color, tone) => {
-            const mix = (color, tone) => tone > 0.5 ? ((tone - 0.5) / 0.5 * (255 - color) + color) : (tone / 0.5 * color); 
-            return `rgb(${mix(color[0], tone)},${mix(color[1], tone)},${mix(color[2], tone)})`;
-        };
-        this.$.link.style.setProperty('--klog-timeline-item-background', getRGBValue(themeColor, 0.5));
-        this.$.link.querySelector('.card-title').style.color = getRGBValue(fontColor, isLight ? 0.25 : 0.9);
+        let dynamicTheme = new KlogDynamicTheme();
+        dynamicTheme.apply(this, themeColor, this.theme);
     }
 
     async _waitForElement(query) {

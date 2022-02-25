@@ -5,8 +5,8 @@ import './klog-icons.js';
 import '../style/klog-style.js';
 
 class KlogChip extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style>
       :host {
         display: inline-block;
@@ -114,7 +114,7 @@ class KlogChip extends PolymerElement {
       }
 
       :host([outlined]) paper-button {
-        border: var(--outlined-border-width) solid var(--outline, --divider-color);
+        border: var(--outlined-border-width) solid var(--outline, --divider);
       }
 
       :host([outlined]) paper-button::after {
@@ -143,47 +143,47 @@ class KlogChip extends PolymerElement {
       </div>
     </paper-button>
 `;
-  }
-
-  static get is() { return 'klog-chip'; }
-
-  static get properties() {
-    return {
-      active: {
-        type: Boolean,
-        reflectToAttribute: true
-      },
-      disabled: {
-        type: Boolean,
-        reflectToAttribute: true
-      },
-      checkmarkAnimationDisabled: {
-        type: Boolean,
-        value: false
-      },
-      icon: {
-        type: String
-      },
-      label: {
-        type: String,
-        reflectToAttribute: true
-      },
-      href: {
-        type: String
-      },
     }
-  }
 
-  ready() {
-    super.ready();
-    this.addEventListener('click', e => {
-      if (this.href) {
-        e.stopPropagation();
-        e.preventDefault();
-        window.open(this.href);
-      }
-    });
-  }
+    static get is() { return 'klog-chip'; }
+
+    static get properties() {
+        return {
+            active: {
+                type: Boolean,
+                reflectToAttribute: true
+            },
+            disabled: {
+                type: Boolean,
+                reflectToAttribute: true
+            },
+            checkmarkAnimationDisabled: {
+                type: Boolean,
+                value: false
+            },
+            icon: {
+                type: String
+            },
+            label: {
+                type: String,
+                reflectToAttribute: true
+            },
+            href: {
+                type: String
+            },
+        };
+    }
+
+    ready() {
+        super.ready();
+        this.addEventListener('click', e => {
+            if (this.href) {
+                e.stopPropagation();
+                e.preventDefault();
+                window.open(this.href);
+            }
+        });
+    }
 }
 
 window.customElements.define(KlogChip.is, KlogChip);

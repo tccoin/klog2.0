@@ -36,6 +36,10 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         --klog-editor-padding: 24px;
         --klog-markdown-padding: var(--klog-editor-padding);
         --textarea-padding: var(--klog-editor-padding);
+        --paper-toggle-button-unchecked-button-color: var(--secondary);
+        --paper-toggle-button-unchecked-bar-color: var(--secondary);
+        --paper-toggle-button-checked-button-color: var(--primary);
+        --paper-toggle-button-checked-bar-color: var(--primary);
       }
 
       .layout {

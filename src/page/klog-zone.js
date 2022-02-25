@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogDynamicTheme } from '../framework/klog-dynamic-theme.js';
 import { KlogTimeline } from './klog-timeline.js';
 import { KlogDataUserPublicMixin } from '../data/klog-data-user-public-mixin.js';
 import '../ui/klog-image.js';
@@ -30,6 +31,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         z-index: 101;
         border-radius: 16px;
         background: var(--surface-variant);
+        color: var(--on-surface-variant);
         transition: all .3s ease;
         transform-origin: right top;
         @apply --shadow-elevation-2dp;
@@ -83,7 +85,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     }
       .author-introduction{
         word-break: break-word;
-        color: var(--on-background);
         margin: 0 16px calc(var(--klog-card-padding) * 3);
       }
 
@@ -233,9 +234,11 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
         // avatar
         this.$.avatar.addEventListener('media-info-updated', (e) => {
-            // const mediaInfo = e.detail.mediaInfo.palette;
-            // const color = this.theme == 'light' ? mediaInfo.LightVibrant.rgb : mediaInfo.DarkVibrant.rgb;
-            // this.$.info.style.backgroundColor = `rgb(${color.join()})`;
+            const mediaInfo = e.detail.mediaInfo.palette;
+            const themeColor = this.theme == 'light' ? mediaInfo.LightVibrant.rgb : mediaInfo.DarkVibrant.rgb;
+            let dynamicTheme = new KlogDynamicTheme();
+            dynamicTheme.apply(this, themeColor, this.theme);
+            console.log(themeColor, dynamicTheme._rgb2hex(themeColor));
             this.$.avatar.lazyload();
         });
         // this.$.avatar.addEventListener('media-loading', (e) => {
@@ -287,6 +290,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
     async unload() {
         await super.unload();
+        this.$.avatar.lazy = true;
     }
 
     async update(userLoadPromise, subroute) {

@@ -22,7 +22,7 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
       }
 
       .klog-article-content hr {
-        border: 2px solid var(--divider-color);
+        border: 2px solid var(--divider);
         margin: 4em auto;
         width: 3em;
         border-radius: 2px;
@@ -72,7 +72,7 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
       }
 
       .klog-article-content em {
-        box-shadow: 0 -0.5em 0px var(--tertiary) inset;
+        box-shadow: 0 -0.5em 0px var(--tertiary-container) inset;
         padding: 0 2px;
         font-style: normal;
         -moz-text-emphasis: none !important;
@@ -142,8 +142,8 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         border-radius: 4px;
         vertical-align: baseline;
         cursor: pointer;
-        background: var(--primary-container);
-        color: var(--on-primary-container);
+        background: var(--secondary-container);
+        color: var(--on-secondary-container);
         border-bottom: 0;
       }
 
@@ -194,7 +194,7 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         width: 8px;
         height: 8px;
         margin: 0 8px 0 0;
-        background: var(--divider-color);
+        background: var(--on-surface);
         clip-path: polygon(45% 0, 55% 0, 100% 80%, 0 80%);
         border-radius: 50%;
         transition: clip-path .3s ease;
@@ -229,6 +229,7 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
 
       .klog-article-content table > *{
         z-index: 1;
+        position: relative;
       }
 
       .klog-article-content td {
@@ -250,6 +251,7 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
 
       .klog-article-content .toc > *{
         z-index: 1;
+        position: relative;
       }
 
       .klog-article-content .toc-icon-container {
@@ -346,7 +348,7 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         left: -10px;
         top: 4px;
         bottom: 0;
-        background-color: var(--outline);
+        background-color: var(--divider);
       }
       .klog-article-content .toc ol>li>ol::after {
         left: calc(var(--klog-markdown-font-size, 14px) / 4);

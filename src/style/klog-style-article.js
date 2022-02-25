@@ -162,7 +162,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       margin: 0 6px;
       width: 5px;
       height: 5px;
-      background: var(--divider-color);
+      background: var(--divider);
       border-radius: 50%;
     }
 
