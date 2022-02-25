@@ -65,6 +65,7 @@ const sendStream = (request, reply, filePath) => {
 const sendImage = async (request, reply, filePath, query) => {
     // old method
     // let params = query.match(/View2\/([0-9])\/w\/([^\/]*)(?:\/h\/([^\/]*))?(?:\/q\/([^\/]*));
+    // mode: <=5: return image, >5: return info
 
     // resolve the params
     let srcParams = query.match(/(?:View2|Magic)\/([0-9])(.*)/);
@@ -77,13 +78,13 @@ const sendImage = async (request, reply, filePath, query) => {
     let params = {};
     const [min, max] = [Math.min, Math.max];
     optParams = optParams.filter(n => { return n; });
-    for (i = 0; i < Math.floor(optParams.length / 2); i++) {
+    for (let i = 0; i < Math.floor(optParams.length / 2); i++) {
         let key = optParams[2 * i];
         let value = optParams[2 * i + 1];
         if (key == 'w' || key == 'h') {
             params[key] = max(parseInt(value), 0);
         } else if (key == 'q') {
-            if (mode != 6) params[key] = min(max(parseInt(value), 0), 100);
+            if (mode >= 5) params[key] = min(max(parseInt(value), 0), 100);
             else params[key] = max(parseInt(value), 0);
         }
     }
@@ -103,7 +104,7 @@ const sendImage = async (request, reply, filePath, query) => {
     } else {
         if (mode == 1) outputFormat = 'jpeg';
     }
-    if (mode == 6) outputFormat = 'json';
+    if (mode > 5) outputFormat = 'json';
 
     // cache
     let cachePath = filePath.replace(/\\/g, '/').replace(/pan\/(.*)\/(.*)\.([^\.]*)$/, `pan\/cache\/$1.$2.${mode}${params['w']}${params['h']}${params['q']}.${outputFormat}`);
@@ -115,73 +116,76 @@ const sendImage = async (request, reply, filePath, query) => {
         }
     }
 
-    // mode6
-    if (mode == 6) {
+    if (mode > 5) {
+        // info mode
         params['q'] = params['q'] || 64;
         let samplePath = filePath.replace(/\\/g, '/').replace(/pan\/(.*)\/(.*)\.([^\.]*)$/, `pan\/cache\/$1.$2.vibrantsample${params['q']}.jpg`);
         let sample = image.resize(params['q']);
         await sample.toFile(samplePath);
         let stats = await sample.stats();
-        console.log('LOG Generating palette...');
-        let vibrant = new Vibrant(samplePath, { maxDimension: 64 });
-        let palette = await vibrant.getPalette();
-        let result = JSON.stringify({
-            w: _w,
-            h: _h,
-            palette: palette,
-            stats: {
-                stdev: stats.channels.map(x => x.stdev).reduce((a, b) => a + b),
-                entropy: stats.entropy,
-                isOpaque: stats.isOpaque
-            }
+        if (mode == 6) {
+            console.log('LOG Generating palette[old]...');
+            let vibrant = new Vibrant(samplePath, { maxDimension: 64 });
+            let palette = await vibrant.getPalette();
+            let result = JSON.stringify({
+                w: _w,
+                h: _h,
+                palette: palette,
+                stats: {
+                    stdev: stats.channels.map(x => x.stdev).reduce((a, b) => a + b),
+                    entropy: stats.entropy,
+                    isOpaque: stats.isOpaque
+                }
+            });
+            reply.header('content-type', 'text/plain');
+            reply.header('Access-Control-Allow-Origin', '*');
+            reply.send(result);
+            fs.writeFileSync(cachePath, result);
+        }
+    } else {
+        // image mode
+        if (mode == 1) {
+            image = image.resize(params['w'], params['h'], {
+                fit: 'cover',
+                position: 'entropy'
+            });
+        } else if (mode == 2) {
+            image = image.resize(params['w'], 10000, {
+                fit: 'inside',
+                withoutEnlargement: true
+            });
+        } else if (mode == 3) {
+            image = sharp(await image.resize(params['q']).toBuffer())
+                .resize(params['w'], null, { kernel: 'nearest' });
+        }
+
+        //convert
+        let outputStream = new stream.PassThrough();
+        if (outputFormat == 'webp') {
+            image = image.webp({ quality: params['q'] });
+            outputStream.end(await image.toBuffer());
+        } else if (outputFormat == 'jpeg') {
+            image = image.jpeg({ quality: params['q'] });
+            outputStream.end(await image.toBuffer());
+        } else if (outputFormat == 'png') {
+            let sourceStream = new stream.PassThrough();
+            let optimizer = new OptiPng(['-o1']);
+            sourceStream.end(await image.png().toBuffer());
+            console.log('LOG OptiPng running...');
+            sourceStream.pipe(optimizer).pipe(outputStream);
+        }
+        // save to cache
+        let cacheStream = fs.createWriteStream(cachePath);
+        let promise = new Promise(resolve => cacheStream.on('finish', resolve));
+        promise.then(() => {
+        //send
+            sendStream(request, reply, cachePath);
         });
-        reply.header('content-type', 'text/plain');
-        reply.header('Access-Control-Allow-Origin', '*');
-        reply.send(result);
-        fs.writeFileSync(cachePath, result);
-        return;
+        outputStream.pipe(cacheStream);
     }
 
-    // resize according to mode
-    if (mode == 1) {
-        image = image.resize(params['w'], params['h'], {
-            fit: 'cover',
-            position: 'entropy'
-        });
-    } else if (mode == 2) {
-        image = image.resize(params['w'], 10000, {
-            fit: 'inside',
-            withoutEnlargement: true
-        });
-    } else if (mode == 3) {
-        image = sharp(await image.resize(params['q']).toBuffer())
-            .resize(params['w'], null, { kernel: 'nearest' });
-    }
-
-    //convert
-    let outputStream = new stream.PassThrough();
-    if (outputFormat == 'webp') {
-        image = image.webp({ quality: params['q'] });
-        outputStream.end(await image.toBuffer());
-    } else if (outputFormat == 'jpeg') {
-        image = image.jpeg({ quality: params['q'] });
-        outputStream.end(await image.toBuffer());
-    } else if (outputFormat == 'png') {
-        let sourceStream = new stream.PassThrough();
-        let optimizer = new OptiPng(['-o1']);
-        sourceStream.end(await image.png().toBuffer());
-        console.log('LOG OptiPng running...');
-        sourceStream.pipe(optimizer).pipe(outputStream);
-    }
-    // save to cache
-    let cacheStream = fs.createWriteStream(cachePath);
-    let promise = new Promise(resolve => cacheStream.on('finish', resolve));
-    promise.then(() => {
-    //send
-        sendStream(request, reply, cachePath);
-    });
-    outputStream.pipe(cacheStream);
 };
+
 
 const unicode2utf8 = str => {
     let result = '';
