@@ -351,7 +351,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         }
         this.theme = theme;
         if (this.updateThemeInterval) clearInterval(this.updateThemeInterval);
-        this.updateThemeInterval = setInterval(() => this.updateTheme(preference.theme), 5 * 60 * 1000);
+        this.updateThemeInterval = setInterval(() => this._updatePreference(this.theme), 10000);
         if (this._waitingToLoadDefaultPage) {
             this._loadDefaultPage();
         }
