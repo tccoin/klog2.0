@@ -1,61 +1,15 @@
 /**
  * upload
  */
-const path = require('path');
-const fs = require('fs');
 const md5File = require('md5-file');
+const uploader = require('huge-uploader-nodejs');
+const fs = require('fs');
 const mime = require('mime-types');
-const pump = require('pump');
- 
-async function merge(bucketname, name, total, rename) {
-    let filePath = `pan/${bucketname}/${name}`;
-    // merge the parts
-    let writeStream = fs.createWriteStream(filePath);
-    for (let i = 0; i < total; i++) {
-        let partPath = `pan/${bucketname}/${name}.${i}`;
-        console.log('LOG merging: ', partPath);
-        await (new Promise((resolve, reject) => {
-            let readStream = fs.createReadStream(partPath, { highWaterMark: 1024 * 50 });
-            readStream.on('error', err => console.log('ERROR read part:', err));
-            readStream.pipe(writeStream, { end: false });
-            try {
-                readStream.on('end', resolve);
-            } catch (err) {
-                console.log('ERROR merge file:', err);
-            }
-        }));
-        fs.unlink(partPath, (err) => {
-            if (err) console.log('ERROR remove part:', err);
-        });
-    }
-    writeStream.end();
-    // rename by md5
-    let key = name;
-    if (rename) {
-        let hash = md5File.sync(filePath);
-        if (name.indexOf('.') > -1) key = name.replace(/(.*\.)/, `$1${hash}.`);
-        else key = name + '.' + hash;
-    }
-    let newPath = `pan/${bucketname}/${key}`;
-    await (new Promise((resolve) => {
-        fs.rename(filePath, newPath, (err) => {
-            if (err) console.log('ERROR rename part:', err);
-            resolve();
-        });
-    }));
-    return new Promise((resolve) => {
-        var mimeType = mime.lookup(filePath) || 'unknown';
-        resolve({
-            key: key,
-            fname: name,
-            mimeType: mimeType
-        });
-    });
-}
- 
-// receive parts
-let _uploadedPart = 0;
- 
+
+// upload params
+const maxFileSize = 100;
+const maxChunkSize = 20;
+
 module.exports = function(app, opts, next) {
     // upload test
     app.get('/test', (request, reply, next) => {
@@ -66,44 +20,59 @@ module.exports = function(app, opts, next) {
  
     app.options('/', (request, reply, next) => {
         reply.header('Access-Control-Allow-Origin', '*');
+        reply.header('Access-Control-Allow-Methods', 'POST,OPTIONS');
+        reply.header('Access-Control-Allow-Headers', 'uploader-chunk-number,uploader-chunks-total,uploader-file-id');
+        reply.header('Access-Control-Max-Age', '86400');
         reply.send('');
     });
- 
-    app.post('/', (request, reply, next) => {
+     
+    app.post('/', async (request, reply, next) => {
         reply.header('Access-Control-Allow-Origin', '*');
- 
-        request.query.bucketname = request.query.bucketname || 'drive';
-        request.query.total = request.query.total || 1;
-        request.query.index = request.query.index || 0;
-        request.query.name = request.query.name || 'test';
-        request.query.rename = request.query.rename == 'off' ? false : true;
- 
-        const uploadDir = 'pan/' + request.query.bucketname;
- 
-        const mp = request.multipart(handler, function(err) {
-            console.log('LOG upload completed');
-        });
- 
-        mp.on('field', function(key, value) {
-            console.log('form-data', key, value);
-        });
- 
-        async function handler(field, file, filename, encoding, mimetype) {
-            request.query.name = decodeURIComponent(request.query.name).replace(/[\(\)]/g, '');
-            let key = request.query.name + '.' + request.query.index;
-            let finPath = path.join(uploadDir, key);
-            console.log('LOG upload file', finPath);
-            await pump(file, fs.createWriteStream(finPath, { highWaterMark: 1024 * 50 }));
-            _uploadedPart++;
-            if (_uploadedPart == request.query.total) {
-                _uploadedPart = 0;
-                let result = await merge(request.query.bucketname, request.query.name, request.query.total, request.query.rename);
-                reply.send(JSON.stringify([result]));
+        reply.header('Access-Control-Allow-Methods', 'POST,OPTIONS');
+        reply.header('Access-Control-Allow-Headers', 'uploader-chunk-number,uploader-chunks-total,uploader-file-id');
+        reply.header('Access-Control-Max-Age', '86400');
+
+        // process file name
+        try {
+            let tmpPath = 'pan/upload_tmp';
+            // request.pipe = target=>target.send(request.raw);
+            let assembleChunks = await uploader(request.raw, tmpPath, maxFileSize, maxChunkSize);
+            if (assembleChunks) {
+                assembleChunks()
+                    .then(data =>{
+                        // { filePath: 'tmp/1528932277257', postParams: { email: 'upload@corp.com', name: 'Mr Smith' } }
+                        // change file name
+                        let bucketname = data.postParams.bucketname || 'drive';
+                        let filename = data.postParams.name || 'test';
+                        let key = decodeURIComponent(filename).replace(/[\(\)]/g, '');
+                        let hash = md5File.sync(data.filePath);
+                        let newPath = `pan/${bucketname}/${hash}/`;
+                        if (!fs.existsSync(newPath)) {
+                            fs.mkdirSync(newPath);
+                        }
+                        console.log('LOG upload success:', data.filePath, '->', newPath + key);
+                        fs.renameSync(data.filePath, newPath + key);
+                        let mimeType = mime.lookup(newPath + key) || 'unknown';
+                        let result = {
+                            key: `${hash}/${key}`,
+                            fname: key,
+                            mimeType: mimeType
+                        };
+                        reply.code(200);
+                        reply.send(JSON.stringify([result]));
+                    })
+                    .catch(err => console.log(err));
             } else {
-                reply.send('[]');
+                reply.code(200);
+                reply.send('');
             }
+        } catch (error) {
+            console.log(error);
+            reply.code(500);
+            reply.send(error.message);
         }
+     
     });
- 
+     
     next();
 };

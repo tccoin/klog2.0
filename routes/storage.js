@@ -203,8 +203,8 @@ const unicode2utf8 = str => {
 };
 
 const router = function (app, opts, next) {
-    app.get('/:bucketname/:key', function (request, reply, next) {
-        let filePath = path.join('pan', request.params.bucketname, unicode2utf8(request.params.key));
+    const storageRouter = (request, reply, next) => {
+        let filePath = path.join('pan', request.params.bucketname, request.params.hash || '', unicode2utf8(request.params.key));
         console.log('LOG download file ', filePath);
         if (fs.existsSync(filePath)) {
             let mimeType = mime.lookup(filePath) || 'unknown';
@@ -225,7 +225,9 @@ const router = function (app, opts, next) {
         } else {
             reply.redirect('/#/404');
         }
-    });
+    };
+    app.get('/:bucketname/:key', storageRouter);
+    app.get('/:bucketname/:hash/:key', storageRouter);
     next();
 };
 
