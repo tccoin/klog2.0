@@ -47,6 +47,9 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         width: calc(100vw - 332px);
         margin: 0 8px 16px 16px;
       }
+      .info-container.hidden{
+        display: none;
+      }
       .info-container-header{
         display: flex;
         align-items: center;
@@ -108,9 +111,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
           transform-origin: center top;
           transition: border-radius 50ms ease,transform .1s ease;
           @apply --shadow-elevation-16dp;
-        }
-        .main-container{
-          padding: 32px 0 32px!important;
         }
         klog-timeline-item.item{
           width: 100vw!important;
@@ -201,6 +201,10 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     }
 
     showDefaultToolbar() {
+        this.keyword = '';
+        this.updateTimeline(false, true);
+        this.$.filter.hidden = false;
+        if (this.$.info) this.$.info.classList.remove('hidden');
         this.dispatchEvent(new CustomEvent('layout-update', {
             bubbles: true,
             composed: true,
@@ -238,7 +242,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
             const themeColor = this.theme == 'light' ? mediaInfo.LightVibrant.rgb : mediaInfo.DarkVibrant.rgb;
             let dynamicTheme = new KlogDynamicTheme();
             dynamicTheme.apply(this, themeColor, this.theme);
-            console.log(themeColor, dynamicTheme._rgb2hex(themeColor));
             this.$.avatar.lazyload();
         });
         // this.$.avatar.addEventListener('media-loading', (e) => {

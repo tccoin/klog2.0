@@ -8,8 +8,8 @@ import '../style/klog-style-media.js';
 import { KlogDataLicenseMixin } from '../data/klog-data-license-mixin.js';
 
 class KlogEditorBackdropPages extends KlogUiMixin(KlogDataLicenseMixin(PolymerElement)) {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style include="klog-style-form"></style>
     <style include="klog-style-media"></style>
     <style>
@@ -98,128 +98,128 @@ class KlogEditorBackdropPages extends KlogUiMixin(KlogDataLicenseMixin(PolymerEl
       </iron-pages>
     </div>
 `;
-  }
-
-  static get is() { return 'klog-editor-backdrop-pages'; }
-
-  static get properties() {
-    return {
-      title: {
-        type: String,
-        notify: true
-      },
-      path: {
-        type: String,
-        notify: true
-      },
-      markdown: {
-        type: String,
-        notify: true
-      },
-      private: {
-        type: Boolean,
-        notify: true,
-      },
-      license: {
-        type: String,
-        notify: true,
-        observer: '_updateLicenseAbbreviation',
-      },
-      loading: {
-        type: Boolean,
-        observer: '_resetCountdown',
-      },
-      deleteCountdown: {
-        type: Number,
-        value: 3,
-      },
-      deleteLock: {
-        type: Boolean,
-        value: false,
-      },
-      folded: {
-        type: Boolean,
-        value: false,
-      },
-      icon: {
-        type: String,
-        value: 'keyboard-arrow-up'
-      },
-      collection: {
-        type: String
-      },
-      tags: {
-        type: Array,
-        observer: '_updateTagsString'
-      },
-      articleId: {
-        type: String,
-        observer: 'articleIdChanged'
-      }
     }
-  }
 
-  articleIdChanged() {
-    this.dispatchEvent(new CustomEvent('klog-backdrop-update', { bubbles: true, composed: true }));
-  }
+    static get is() { return 'klog-editor-backdrop-pages'; }
 
-  save() {
-    this.dispatchEvent(new CustomEvent('editor-save', { bubbles: true, composed: true, detail: { quiet: true } }));
-  }
-
-  openLicenseDrawer(e) {
-    e.preventDefault();
-    this.openDrawer('版权协议', [{ name: 'license', items: this.getLicenseMenu(this.fullLicenseList) }]);
-  }
-
-  _updateLicenseAbbreviation(license) {
-    this.licenseAbbreviation = this.fullLicenseList.find(x => x['name'] == license)['abbreviation'];
-  }
-
-  openBackdrop(e) {
-    let selected = (e.target.tagName == 'IRON-ICON' ? e.target.parentNode : e.target).getAttribute('for');
-    this.dispatchEvent(new CustomEvent('editor-open-backdrop', { bubbles: true, composed: true, detail: { selected } }));
-  }
-
-  delete() {
-    if (this.deleteCountdown > 0) {
-      if (this.deleteLock) return
-      this.deleteLock = true;
-      setTimeout(() => {
-        this.deleteLock = false;
-        this.deleteCountdown--;
-      }, 200);
-      return
+    static get properties() {
+        return {
+            title: {
+                type: String,
+                notify: true
+            },
+            path: {
+                type: String,
+                notify: true
+            },
+            markdown: {
+                type: String,
+                notify: true
+            },
+            private: {
+                type: Boolean,
+                notify: true,
+            },
+            license: {
+                type: String,
+                notify: true,
+                observer: '_updateLicenseAbbreviation',
+            },
+            loading: {
+                type: Boolean,
+                observer: '_resetCountdown',
+            },
+            deleteCountdown: {
+                type: Number,
+                value: 3,
+            },
+            deleteLock: {
+                type: Boolean,
+                value: false,
+            },
+            folded: {
+                type: Boolean,
+                value: false,
+            },
+            icon: {
+                type: String,
+                value: 'keyboard-arrow-up'
+            },
+            collection: {
+                type: String
+            },
+            tags: {
+                type: Array,
+                observer: '_updateTagsString'
+            },
+            articleId: {
+                type: String,
+                observer: 'articleIdChanged'
+            }
+        };
     }
-    this.dispatchEvent(new CustomEvent('editor-delete', { bubbles: true, composed: true }));
-    this.dispatchEvent(new CustomEvent('klog-backdrop-toggle', { bubbles: true, composed: true }));
-  }
 
-  _resetCountdown() {
-    if (!this.loading) this.deleteCountdown = 3;
-  }
-
-  _calcSaveButtonDisabled() {
-    return !this.articleId || this.private || this.loading;
-  }
-
-  _calcDeleteButtonDisabled() {
-    return !this.articleId || this.loading;
-  }
-
-  _updateTagsString() {
-    this.tagsString = this.tags.join(',');
-  }
-
-  _updateCategory() {
-    let categoryReg = /(^|\n)@\((\S*?)\)(\[(\S*?)\])?/g;
-    let categoryMarkdown = `@(${this.collection})[${this.tagsString}]`;
-    if (categoryReg.test(this.markdown)) {
-      this.markdown = this.markdown.replace(categoryReg, '');
+    articleIdChanged() {
+        this.dispatchEvent(new CustomEvent('klog-backdrop-update', { bubbles: true, composed: true }));
     }
-    this.markdown = categoryMarkdown + this.markdown;
-    this.markdown.replace();
-  }
+
+    save() {
+        this.dispatchEvent(new CustomEvent('editor-save', { bubbles: true, composed: true, detail: { quiet: true } }));
+    }
+
+    openLicenseDrawer(e) {
+        e.preventDefault();
+        this.openDrawer('版权协议', [{ name: 'license', items: this.getLicenseMenu(this.fullLicenseList) }]);
+    }
+
+    _updateLicenseAbbreviation(license) {
+        this.licenseAbbreviation = this.fullLicenseList.find(x => x['name'] == license)['abbreviation'];
+    }
+
+    openBackdrop(e) {
+        let selected = (e.target.tagName == 'IRON-ICON' ? e.target.parentNode : e.target).getAttribute('for');
+        this.dispatchEvent(new CustomEvent('editor-open-backdrop', { bubbles: true, composed: true, detail: { selected } }));
+    }
+
+    delete() {
+        if (this.deleteCountdown > 0) {
+            if (this.deleteLock) return;
+            this.deleteLock = true;
+            setTimeout(() => {
+                this.deleteLock = false;
+                this.deleteCountdown--;
+            }, 200);
+            return;
+        }
+        this.dispatchEvent(new CustomEvent('editor-delete', { bubbles: true, composed: true }));
+        this.dispatchEvent(new CustomEvent('klog-backdrop-toggle', { bubbles: true, composed: true }));
+    }
+
+    _resetCountdown() {
+        if (!this.loading) this.deleteCountdown = 3;
+    }
+
+    _calcSaveButtonDisabled() {
+        return !this.articleId || this.private || this.loading;
+    }
+
+    _calcDeleteButtonDisabled() {
+        return !this.articleId || this.loading;
+    }
+
+    _updateTagsString() {
+        this.tagsString = this.tags.join(',');
+    }
+
+    _updateCategory() {
+        let categoryReg = /(^|\n)@\((\S*?)\)(\[(\S*?)\])?/g;
+        let categoryMarkdown = `@(${this.collection})[${this.tagsString}]`;
+        if (categoryReg.test(this.markdown)) {
+            this.markdown = this.markdown.replace(categoryReg, '');
+        }
+        this.markdown = categoryMarkdown + this.markdown;
+        this.markdown.replace();
+    }
 }
 
 window.customElements.define(KlogEditorBackdropPages.is, KlogEditorBackdropPages);

@@ -306,16 +306,6 @@ class KlogTimeline extends PolymerElement {
         };
     }
 
-    _mobileSearch() {
-        this.dispatchEvent(new CustomEvent('page-set-top', { bubbles: true, composed: true }));
-        this.setFilter({
-            detail: {
-                filterName: 'search'
-            }
-        });
-        this.$.filter.hidden = true;
-    }
-
     _mobileSearchClose() {
         this.dispatchEvent(new CustomEvent('page-unset-top', { bubbles: true, composed: true }));
         this.setFilter({
@@ -379,6 +369,7 @@ class KlogTimeline extends PolymerElement {
         this.updateTimeline(false, true);
         this.$.filter.hidden = false;
         this.$.pageHeader.hidden = false;
+        if (this.$.info) this.$.info.classList.remove('hidden');
         this.dispatchEvent(new CustomEvent('layout-update', {
             bubbles: true,
             composed: true,
@@ -415,6 +406,7 @@ class KlogTimeline extends PolymerElement {
     showSearchToolbar() {
         this.$.filter.hidden = true;
         this.$.pageHeader.hidden = true;
+        if (this.$.info) this.$.info.classList.add('hidden');
         this.dispatchEvent(new CustomEvent('layout-update', {
             bubbles: true,
             composed: true,
@@ -510,7 +502,7 @@ class KlogTimeline extends PolymerElement {
             detail: {
                 backTo: window.location.hash,
                 preset: {
-                    markdown: '@(日常)[]',
+                    markdown: '@(日常)[]\n',
                     private: false
                 }
             }

@@ -61,7 +61,7 @@ class KlogMenu extends PolymerElement {
         line-height: 32px;
         padding: 6px 8px;
         margin: 4px 8px;
-        border-radius: 5px;
+        border-radius: 8px;
         box-sizing: border-box;
         overflow: hidden;
         font-size: 14px;

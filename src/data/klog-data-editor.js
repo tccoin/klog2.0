@@ -318,7 +318,7 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
     }
 
     reset(requestNewPath = false) {
-        this.markdown = '@(笔记)[]';
+        this.markdown = '@(笔记)[]\n';
         this.title = null;
         this.path = '';
         this.previews = [];

@@ -3,8 +3,8 @@ import '@polymer/app-layout/app-drawer/app-drawer.js';
 import '../style/klog-style-scrollbar.js';
 
 class KlogDrawer extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style include="klog-style-scrollbar"></style>
     <style>
       :host {
@@ -15,18 +15,25 @@ class KlogDrawer extends PolymerElement {
       app-drawer {
         z-index: 10000;
         user-select: none;
+        top: 0;
+        bottom: 0;
         -webkit-user-select: none;
         --app-drawer-width: 272px;
 
         --app-drawer-content-container: {
-          background: var(--surface);
+          top: calc(var(--safe-area-inset-top) + 8px);
+          bottom: calc(var(--safe-area-inset-bottom) + 8px);
+          left: 8px;
+          padding: 0;
+          border-radius: 16px;
+          background: var(--surface-variant);
+          color: var(--on-surface-variant);
           @apply --shadow-elevation-16dp;
         }
       }
 
       .container {
-        padding-top: var(--safe-area-inset-top);
-        height: var(--klog-layout-page-height);
+        height: calc(var(--klog-layout-page-height) - 16px);
         overflow: auto;
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
@@ -52,42 +59,42 @@ class KlogDrawer extends PolymerElement {
       </div>
     </app-drawer>
 `;
-  }
-
-  static get is() { return 'klog-drawer'; }
-
-  static get properties() {
-    return {
-      heading: {
-        type: String
-      },
-      disabled: {
-        type: Boolean,
-        value: false
-      },
-      opened: {
-        type: Boolean
-      }
     }
-  }
 
-  ready() {
-    super.ready();
-    this.addEventListener('menu-select', () => this.close());
-    this.addEventListener('collection-select', () => this.close());
-  }
+    static get is() { return 'klog-drawer'; }
 
-  toggle() {
-    this.$.drawer.toggle();
-  }
+    static get properties() {
+        return {
+            heading: {
+                type: String
+            },
+            disabled: {
+                type: Boolean,
+                value: false
+            },
+            opened: {
+                type: Boolean
+            }
+        };
+    }
 
-  open() {
-    this.$.drawer.open();
-  }
+    ready() {
+        super.ready();
+        this.addEventListener('menu-select', () => this.close());
+        this.addEventListener('collection-select', () => this.close());
+    }
 
-  close() {
-    this.$.drawer.close();
-  }
+    toggle() {
+        this.$.drawer.toggle();
+    }
+
+    open() {
+        this.$.drawer.open();
+    }
+
+    close() {
+        this.$.drawer.close();
+    }
 }
 
 window.customElements.define(KlogDrawer.is, KlogDrawer);

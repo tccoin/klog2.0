@@ -626,7 +626,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
                 name: 'user',
                 items: [
                     { subtitle: true, text: '用户' },
-                    { name: 'login', text: '登录', icon: 'account_circle', path: 'login', raised: true },
+                    { name: 'login', text: '登录', icon: 'account_circle', path: 'login' },
                     { name: 'signup', text: '注册', icon: 'account_box', path: 'signup' },
                     { name: 'console', text: '控制台', icon: 'console' }
                 ]

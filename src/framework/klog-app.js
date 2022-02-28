@@ -17,6 +17,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
       :host {
         display: block;
         --safe-area-inset-top: env(safe-area-inset-top);
+        --safe-area-inset-bottom: env(safe-area-inset-bottom);
       }
 
       .page-container {

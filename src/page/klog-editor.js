@@ -315,7 +315,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         this._initFloatingToolbar();
         // preset
         this._defaultPreset = {
-            markdown: '@(笔记)[]',
+            markdown: '@(笔记)[]\n',
             private: true
         };
         // bind
@@ -343,6 +343,10 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         this.addEventListener('upload-success', (e) => {
             e.stopPropagation();
             this._uploadSuccessHandle(e.detail.fileinfo);
+        });
+        this.addEventListener('upload-error', (e) => {
+            e.stopPropagation();
+            this._uploadErrorHandle();
         });
         this.addEventListener('editor-save', (e) => this.save(e.detail.quiet));
         this.addEventListener('editor-delete', () => this.delete());
@@ -546,6 +550,12 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         }
     }
 
+    _uploadErrorHandle() {
+        if (this.$.backdropPages.$.uploadzone.remainingNumber == 1 && !this.mobile) {
+            this.closeBackdrop();
+        }
+    }
+    
     _textareaInputHandle(info) {
         const selection = info.selection;
         const position = info.caretPosition;

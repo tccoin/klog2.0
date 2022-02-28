@@ -5,6 +5,11 @@ containerKlogStyle.innerHTML = `<custom-style>
     html,
     :host([theme]),
     [theme] {
+      --primary-text-color: var(--on-surface);
+      --secondary-text-color: var(--on-surface);
+      --primary-color: var(--primary);
+      --accent-color: var(--secondary);
+      
       --outlined-border-width: 2px;
 
       --overlay-style: {
