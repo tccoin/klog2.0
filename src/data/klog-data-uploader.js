@@ -1,118 +1,124 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import HugeUploader from 'huge-uploader';
 class KlogUploader extends PolymerElement {
 
-  static get is() { return 'klog-data-uploader'; }
+    static get is() { return 'klog-data-uploader'; }
 
-  static get properties() {
-    return {
-      fileinfo: {
-        type: Object,
-        notify: true
-      },
-      bucketname: {
-        type: String,
-        value: 'klog2'
-      },
-      remainingNumber: {
-        type: Number,
-        notify: true
-      },
-      files: {
-        type: Array,
-        value: []
-      },
-      uploading: {
-        type: Boolean,
-        value: false,
-        notify: true
-      },
-      progress: {
-        type: Number,
-        value: 0,
-        notify: true
-      },
-      host: {
-        type: String,
-        value: ''
-      },
-      shardSize: {
-        type: Number,
-        value: 20 * 1024 * 1024
-      }
+    static get properties() {
+        return {
+            fileinfo: {
+                type: Object,
+                notify: true
+            },
+            bucketname: {
+                type: String,
+                value: 'klog2'
+            },
+            remainingNumber: {
+                type: Number,
+                notify: true
+            },
+            files: {
+                type: Array,
+                value: []
+            },
+            uploading: {
+                type: Boolean,
+                value: false,
+                notify: true
+            },
+            progress: {
+                type: Number,
+                value: 0,
+                notify: true
+            },
+            host: {
+                type: String,
+                value: ''
+            },
+            chunkSize: {
+                type: Number,
+                value: 1
+            },
+            maxSize: {
+                type: Number,
+                value: 100
+            }
+        };
     }
-  }
 
-  _onResponse(response) {
-    //update fileinfo
-    let fileinfo = response[0];
-    fileinfo.host = 'https://storage.krrr.party/storage/' + this.bucketname;
-    if (fileinfo) {
-      fileinfo.remaining = this.files.length != 1;
-      fileinfo.timestamp = Date.parse(new Date());
-      this.set('fileinfo', fileinfo);
+    test() {
+        // instanciate the module with a settings object
+
+        // subscribe to events
     }
-    //fire
-    this.dispatchEvent(new CustomEvent('upload-success', { bubbles: true, composed: true, detail: { fileinfo: this.fileinfo } }));
-    //upload next file
-    this.shift('files');
-    this._filesChanged();
-    if (this.files.length > 0) {
-      this._uploadToServer(this.files[0]);
-    } else {
-      this.uploading = false;
+
+    upload(file) {
+        if (!file) return;
+        this.push('files', file);
+        this._updateUI();
+        if (!this.uploading) {
+            this._upload(this.files[0]);
+        }
     }
-  }
 
-  upload(file) {
-    if (!file) return
-    this.push('files', file);
-    this._filesChanged();
-    if (!this.uploading) {
-      this._uploadToServer(this.files[0]);
+    _upload(file) {
+        if (!file) return;
+        this.uploading = true;
+        let size = file.size;
+        if (size > this.maxSize * 1024 * 1024) {
+            this.dispatchEvent(new CustomEvent('upload-error', { bubbles: true, composed: true, detail: { message: 'file too large' } }));
+            this._uploadNext();
+        }
+
+        const uploader = new HugeUploader({
+            endpoint: `${this.host}/upload`,
+            file,
+            chunkSize: this.chunkSize,
+            postParams: {
+                bucketname: this.bucketname,
+                name: encodeURIComponent(file.name)
+            }
+        });
+
+        uploader.on('error', (e) => {
+            this.dispatchEvent(new CustomEvent('upload-error', { bubbles: true, composed: true, detail: { message: e.detail } }));
+            this._uploadNext();
+        });
+
+        uploader.on('progress', (e) => {
+            this.progress = e.detail;
+        });
+
+        uploader.on('finish', (body) => {
+            try {
+                let fileinfo = JSON.parse(body.detail)[0];
+                fileinfo.host = 'https://storage.krrr.party/storage/' + this.bucketname;
+                fileinfo.remaining = this.files.length != 1;
+                fileinfo.timestamp = Date.parse(new Date());
+                this.set('fileinfo', fileinfo);
+                this.dispatchEvent(new CustomEvent('upload-success', { bubbles: true, composed: true, detail: { fileinfo: this.fileinfo } }));
+            } catch (error) {
+                console.log(error);
+                this.dispatchEvent(new CustomEvent('upload-error', { bubbles: true, composed: true, detail: { message: error.message } }));
+            }
+            this._uploadNext();
+        });
     }
-  }
 
-  _uploadToServer(file) {
-    if (!file) return
-    this.uploading = true;
-    let size = file.size;
-    let name = encodeURIComponent(file.name);
-    let shardCount = Math.ceil(size / this.shardSize);
-    let start = 0;
-    for (let i = 0; i < shardCount; i++) {
-      let stop = start + this.shardSize + i;
-      let part = file.slice(start, Math.min(size, stop));
-      start = stop;
-      this._uploadPart(part, name, shardCount, i);
+    _uploadNext() {
+        this.shift('files');
+        this._updateUI();
+        if (this.files.length > 0) {
+            this._upload(this.files[0]);
+        } else {
+            this.uploading = false;
+        }
     }
-  }
 
-  _uploadPart(part, name, total, index) {
-    let request = new XMLHttpRequest();
-    let data = new FormData();
-    data.append('file', part);
-    request.addEventListener('load', () => {
-      if (request.response.length) {
-        this._onResponse(request.response);
-      }
-    });
-
-    this._progresses = new Array(total);
-    request.upload.addEventListener('progress', (e) => {
-      let progresses = this._progresses;
-      let i = e.total - this.shardSize - 192;
-      if (i < 0) i = total - 1;
-      progresses[i] = e.loaded / e.total;
-      this.progress = progresses.reduce((x, y) => x + y) / progresses.length;
-    });
-    request.responseType = 'json';
-    request.open('POST', `${this.host}/upload?bucketname=${this.bucketname}&name=${name}&total=${total}&index=${index}`);
-    request.send(data);
-  }
-
-  _filesChanged() {
-    this.remainingNumber = this.files.length;
-  }
+    _updateUI() {
+        this.remainingNumber = this.files.length;
+    }
 
 }
 

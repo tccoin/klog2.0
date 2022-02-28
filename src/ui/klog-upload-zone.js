@@ -1,9 +1,11 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
+import '@polymer/paper-progress/paper-progress.js';
 import '@polymer/paper-ripple/paper-ripple.js';
 import './klog-icons.js';
 import '../data/klog-data-uploader.js';
 
-class KlogUploadZone extends PolymerElement {
+class KlogUploadZone extends KlogUiMixin(PolymerElement) {
     static get template() {
         return html `
     <style>
@@ -11,6 +13,7 @@ class KlogUploadZone extends PolymerElement {
         display: block;
         position: relative;
         min-width: 208px;
+        border-radius: 16px;
         cursor: default;
         user-select: none;
         -webkit-user-select: none;
@@ -60,6 +63,17 @@ class KlogUploadZone extends PolymerElement {
         opacity: 0;
       }
 
+      paper-progress {
+        margin: 8px auto 0;
+        border-radius: 3px;
+        --paper-progress-height: 6px;
+        --paper-progress-container-color: var(--surface-variant);
+        --paper-progress-active-color: var(--on-surface-variant);
+        --paper-progress-transition-duration: 0.5s;
+        --paper-progress-transition-timing-function: ease-out;
+        --paper-progress-transition-delay: 0s;
+      }
+
       @media (min-width: 768px) {
         .moblie-only {
           display: none;
@@ -81,8 +95,9 @@ class KlogUploadZone extends PolymerElement {
         <div class="pc-only">单击或拖拽至此上传</div>
       </div>
       <div class="state hidden" name="dropover">松手上传</div>
-      <div class="state hidden" name="uploading">上传至β时间线…
-        <br>{{stylishProgress(progress)}} / {{remainingNumber}}
+      <div class="state hidden" name="uploading">上传文件至β时间线…（还剩{{remainingNumber}}个）<br>
+        <paper-progress value="{{scaleProgress(progress,1000)}}" min="0" max="1000" class="transiting"></paper-progress>
+      </div>
     </div>
     <paper-ripple></paper-ripple>
 `;
@@ -121,8 +136,7 @@ class KlogUploadZone extends PolymerElement {
         this.addEventListener('dragover', e => this.dragover(e), false);
         this.addEventListener('dragleave', e => this.dragleave(e), false);
         this.addEventListener('drop', e => this.drop(e), false);
-    //this.addEventListener('click', e=>this.click(e), false);
-    //this.$.info.addEventListener('click', e=>this.click(e), false);
+        this.$.uploader.addEventListener('upload-error', e=>this.openToast('文件上传不成功：' + e.detail.message));
     }
 
     dragover(e) {
@@ -171,8 +185,8 @@ class KlogUploadZone extends PolymerElement {
         if (newStateElement) newStateElement.classList.remove('hidden');
     }
 
-    stylishProgress(progress) {
-        return progress.toFixed(6);
+    scaleProgress(progress, scale) {
+        return progress * scale;
     }
 }
 
