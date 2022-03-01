@@ -51,6 +51,20 @@ const UiMixin = (superClass) => class extends superClass {
         return pageNames.filter(pageName=>hash.indexOf(pageName) == 0).length > 0;
     }
 
+    copy(value) {
+        const input = document.createElement('input');
+        input.style.position = 'fixed';
+        input.style.top = 0;
+        input.style.opacity = 0;
+        input.setAttribute('readonly', 'readonly');
+        input.setAttribute('value', value);
+        document.body.appendChild(input);
+        input.setSelectionRange(0, 9999);
+        input.focus();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+    }
+
 };
 
 export const KlogUiMixin = dedupingMixin(UiMixin);

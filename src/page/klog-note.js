@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-dialog/paper-dialog.js';
@@ -12,7 +13,7 @@ import './klog-note-list.js';
 import './klog-note-content.js';
 import '../data/klog-data-collection.js';
 
-class KlogNote extends PolymerElement {
+class KlogNote extends KlogUiMixin(PolymerElement) {
     static get template() {
         return html `
     <style include="klog-style-toolbar"></style>
@@ -39,10 +40,6 @@ class KlogNote extends PolymerElement {
         </klog-note-content>
       </klog-pages>
     </klog-backdrop>
-    <paper-dialog id="shareDialog" class="share-dialog" with-backdrop="">
-      <h2>这个链接，通向光明</h2>
-      <p>https://klog.app/#/article/{{shareDialogPath}}</p>
-    </paper-dialog>
 `;
     }
 
@@ -113,13 +110,6 @@ class KlogNote extends PolymerElement {
         this.addEventListener('note-update-path', (e) => {
             this.path = e.detail.path;
         });
-        this.$.shareDialog.addEventListener('opened-changed', e => {
-            this.dispatchEvent(new CustomEvent('editor-backdrop-opened-changed', {
-                bubbles: true,
-                composed: true,
-                detail: { value: e.detail.value }
-            }));
-        });
     }
 
     updateScrollerQuery(hash) {
@@ -159,6 +149,10 @@ class KlogNote extends PolymerElement {
                 if (!this.mobile) this.$.list.$.search.focus();
             }
         }
+        if (params.length >= 3 && params[2]) {
+            let share = params[2];
+            this.updateScrollerQuery(share);
+        }
         let path = '';
         if (params.length >= 2 && params[1]) {
             path = params[1];
@@ -166,16 +160,8 @@ class KlogNote extends PolymerElement {
         } else {
             this.selected = 0;
         }
-        setTimeout(async ()=>{
-            this.path = path;
-            this.loadArticle(path);
-            await new Promise(resolve=>this.$.content.$.data.addEventListener('success', resolve, { once: true }));
-            if (params.length >= 3 && params[2]) {
-                let share = params[2];
-                this.updateScrollerQuery(share);
-            }
-        }, 1);
-
+        this.path = path;
+        this.loadArticle(path);
     }
 
     refresh() {
@@ -258,25 +244,9 @@ class KlogNote extends PolymerElement {
     }
 
     share(path) {
-        this.shareDialogPath = path || this.path;
-        this.$.shareDialog.open();
-    }
-
-    routeChanged(collection, path) {
-        if (window.location.href.indexOf('#/note') == -1) return;
-        collection = collection || this.collection || 'all';
-        if (this.collection != collection) {
-            this.collection = collection;
-            this.$.list.keyword = '';
-            if (!this.mobile) this.$.list.$.search.focus();
-        }
-        if (path == this.path) return;
-        if (path || path === '') {
-            this.path = path;
-            this.loadArticle(path);
-        } else {
-            this.selected = 0;
-        }
+        let url = `https://klog.app/#/article/${path || this.path}`;
+        this.copy(url);
+        this.openToast('已复制分享链接，快去为这个世界带去光明吧！');
     }
 
     loadArticle(path, force = false) {

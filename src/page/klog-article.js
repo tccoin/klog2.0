@@ -192,6 +192,10 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         // data
         this.loading = true;
         let params = route.path.split('/').splice(1);
+        if (params.length >= 2 && params[1]) {
+            let share = params[1];
+            this.updateScrollerQuery(share);
+        }
         if (params.length >= 1 && params[0]) {
             let path = params[0];
             if (this.$.data.isPathNew(path)) {
@@ -211,10 +215,6 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                 dynamicTheme.apply(this, themeColor, this.theme);
                 this.$.avatar.lazyload();
                 this._scrollHandler();
-            }
-            if (params.length >= 2 && params[1]) {
-                let share = params[1];
-                this.updateScrollerQuery(share);
             }
         }
     }
