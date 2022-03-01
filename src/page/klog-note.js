@@ -19,9 +19,6 @@ class KlogNote extends PolymerElement {
     <style include="klog-style-dialog"></style>
     <style include="klog-style-note"></style>
     <klog-data-collection id="collection" disabled=""></klog-data-collection>
-    <app-route route="{{route}}" pattern="/:collection" data="{{routeData}}" tail="{{subroute0}}"></app-route>
-    <app-route route="{{subroute0}}" pattern="/:path" data="{{pathData}}" tail="{{subroute1}}"></app-route>
-    <app-route route="{{subroute1}}" pattern="/:share" data="{{shareData}}"></app-route>
     <klog-backdrop id="backdrop" class="layout" gesture-disabled="true" moving="{{moving}}" front-switch-disabled="">
       <app-toolbar class="backdrop-back-toolbar" slot="back" id="toolbar">
         <paper-icon-button icon="menu" on-click="openKlogDrawer" hidden-on-desktop></paper-icon-button>
@@ -89,8 +86,6 @@ class KlogNote extends PolymerElement {
 
     static get observers() {
         return [
-            'routeChanged(routeData.collection, pathData.path)',
-            'updateScrollerQuery(shareData.share)',
             'loadPreference(userinfo.preference)',
             'articleError(error)'
         ];
@@ -155,7 +150,32 @@ class KlogNote extends PolymerElement {
             this._loadCollection(result);
         }
         // data
-        this.route = route;
+        let params = route.path.split('/').splice(1);
+        if (params.length >= 1 && params[0]) {
+            let collection = params[0];
+            if (collection != this.collection) {
+                this.collection = collection;
+                this.$.list.keyword = '';
+                if (!this.mobile) this.$.list.$.search.focus();
+            }
+        }
+        let path = '';
+        if (params.length >= 2 && params[1]) {
+            path = params[1];
+            this.selected = 1;
+        } else {
+            this.selected = 0;
+        }
+        setTimeout(async ()=>{
+            this.path = path;
+            this.loadArticle(path);
+            await new Promise(resolve=>this.$.content.$.data.addEventListener('success', resolve, { once: true }));
+            if (params.length >= 3 && params[2]) {
+                let share = params[2];
+                this.updateScrollerQuery(share);
+            }
+        }, 1);
+
     }
 
     refresh() {

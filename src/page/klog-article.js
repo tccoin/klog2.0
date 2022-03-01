@@ -127,7 +127,6 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
     static get observers() {
         return [
             'handleError(error)',
-            'loadArticle(routeData.path)',
             'updateTitle(article.title)'
         ];
     }
@@ -152,12 +151,6 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
 
     openZone() {
         this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.article.author.username || 'zone/' + this.article.author.objectId } }));
-    }
-
-    loadArticle(path) {
-        if (window.location.hash.indexOf('#/article') == -1) return;
-        if (!path || this.path == path) return;
-        this.path = path;
     }
 
     ready() {
@@ -190,7 +183,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         }, 1);
     }
 
-    async update(userLoadPromise, subroute) {
+    async update(userLoadPromise, route) {
         // user
         const result = await userLoadPromise;
         this.$.data.userinfo = result.userinfo;
@@ -198,7 +191,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         this.login = result.login;
         // data
         this.loading = true;
-        let params = subroute.path.split('/').splice(1);
+        let params = route.path.split('/').splice(1);
         if (params.length >= 1 && params[0]) {
             let path = params[0];
             if (this.$.data.isPathNew(path)) {
