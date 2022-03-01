@@ -496,7 +496,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
 
     _updateBackTo() {
         let backTo;
-        if (!this._inHash(this.lastHash, ['editor'])) {
+        if (this.lastHash && !this._inHash(this.lastHash, ['editor'])) {
             backTo = this.lastHash;
         } else if (this._inHash(this.from, ['timeline', 'zone'])) {
             backTo = this.articleId ? `article/${this.path}` : this.from;
@@ -508,6 +508,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
             backTo = this.articleId ? `article/${this.path}` : 'timeline';
         }
         this.backTo = backTo;
+        console.log(this.lastHash, this.from, backTo);
         return backTo;
     }
 

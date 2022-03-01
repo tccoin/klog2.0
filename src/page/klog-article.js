@@ -134,7 +134,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
 
     _updateBackTo() {
         let backTo;
-        if (!this._inHash(this.lastHash, ['article', 'editor'])) {
+        if (this.lastHash && !this._inHash(this.lastHash, ['article', 'editor'])) {
             backTo = this.lastHash;
         } else if (this.from) {
             backTo = this.from;
