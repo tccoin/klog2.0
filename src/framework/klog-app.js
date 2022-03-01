@@ -150,10 +150,11 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             this._serviceWorkerInit = true;
             this._installServiceWorker();
         }
-        if (ui.page == 'zone') {
-            this.lastHash = 'zone/' + window.location.hash.substring(2);
+        let hash = window.location.hash.substring(2);
+        if (ui.page == 'zone' && hash.substring(5) != 'zone/') {
+            this.lastHash = 'zone/username/' + hash;
         } else {
-            this.lastHash = window.location.hash.substring(2);
+            this.lastHash = hash;
         }
     }
 
@@ -167,8 +168,8 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     _initGlobalEvent() {
         this.addEventListener('app-load', (e) => {
             if (e.detail.page) {
-                if (e.detail.page.substring(0, 5) == 'zone/') {
-                    e.detail.page = e.detail.page.substring(5);
+                if (e.detail.page.substring(0, 14) == 'zone/username/') {
+                    e.detail.page = e.detail.page.substring(14);
                 }
                 window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
             }
