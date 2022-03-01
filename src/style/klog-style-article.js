@@ -122,11 +122,12 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     .article-category {
-      line-height: 1.5;
+      line-height: 2;
       padding: 0 16px;
-      font-size: 1.1em;
+      font-size: 1.05em;
       letter-spacing: 0.1em;
       color: var(--on-background);
+      opacity: 0.5;
     }
 
     .article-category klog-render-timestamp,
@@ -150,11 +151,13 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     .article-title h1 {
+      display: inline;
       font-size: 2.5em;
       font-weight: 400;
       line-height: 1;
       margin: 0.1em 0 0.5em;
       word-break: break-word;
+      box-shadow: 0 -0.2em 0px var(--surface-variant) inset;
     }
 
     .dot-divider {

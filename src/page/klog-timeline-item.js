@@ -62,6 +62,12 @@ class KlogTimelineItem extends PolymerElement {
         position: relative;
       }
 
+      .klog-card .card-title h1 {
+        display: inline;
+        font-size: inherit;
+        box-shadow: 0 -0.5em 0px var(--surface-variant) inset;
+      }
+
       .card-subtitle .card-collection:hover,
       .card-meta .meta-title:hover {
         text-decoration: underline;
@@ -147,7 +153,9 @@ class KlogTimelineItem extends PolymerElement {
           <div class="dot-divider" hidden$="{{!authorHidden}}"></div>
           <klog-render-timestamp time-stamp="{{data.updatedTime}}" hidden$="{{!authorHidden}}"></klog-render-timestamp>
         </div>
-        <h1 class="card-title" hidden\$="{{!data.title}}">{{data.title}}</h1>
+        <div class="card-title" hidden\$="{{!data.title}}">
+          <h1>{{data.title}}</h1>
+        </div>
 
         <!--content-->
         <div class="card-content" hidden\$="{{!data._text}}">
