@@ -33,7 +33,7 @@ class KlogDrawer extends PolymerElement {
       }
 
       .container {
-        height: calc(var(--klog-layout-page-height) - 16px);
+        height: 100%;
         overflow: auto;
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
