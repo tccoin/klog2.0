@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 import { KlogDynamicTheme } from '../framework/klog-dynamic-theme.js';
 
 import '@polymer/app-layout/app-layout.js';
@@ -15,7 +16,7 @@ import '../ui/klog-render-timestamp.js';
 import '../ui/klog-render-license.js';
 import './klog-comment.js';
 
-class KlogArticle extends PolymerElement {
+class KlogArticle extends KlogUiMixin(PolymerElement) {
     static get template() {
         return html `
 <style include="klog-style-article"></style>
@@ -93,9 +94,8 @@ class KlogArticle extends PolymerElement {
                 value: true,
                 reflectToAttribute: true,
             },
-            backTo: {
-                type: String,
-                value: 'timeline'
+            from: {
+                type: String
             },
             layout: {
                 type: Object,
@@ -132,8 +132,22 @@ class KlogArticle extends PolymerElement {
         ];
     }
 
+    _updateBackTo() {
+        let backTo;
+        if (!this._inHash(this.lastHash, ['article', 'editor'])) {
+            backTo = this.lastHash;
+        } else if (this.from) {
+            backTo = this.from;
+        } else {
+            backTo = 'timeline';
+        } 
+        this.backTo = backTo;
+        return backTo;
+    }
+
     back() {
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || 'timeline', now: false } }));
+        this._updateBackTo();
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo } }));
     }
 
     openZone() {
@@ -196,7 +210,6 @@ class KlogArticle extends PolymerElement {
                     if ('themeColor' in this.article.image) {
                         themeColor = this.article.image.themeColor;
                     } else {
-                        console.log(this.article.image, this.article.image.url + '?Magic/6');
                         let response = await fetch(this.article.image.url + '?Magic/6');
                         let mediaInfo = await response.json();
                         themeColor = this.theme == 'light' ? mediaInfo.palette.LightVibrant.rgb : mediaInfo.palette.DarkVibrant.rgb;
@@ -247,8 +260,7 @@ class KlogArticle extends PolymerElement {
             bubbles: true,
             composed: true,
             detail: {
-                articleId: this.article.objectId,
-                backTo: window.location.hash
+                articleId: this.article.objectId
             }
         }));
     }

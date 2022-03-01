@@ -47,6 +47,9 @@ const UiMixin = (superClass) => class extends superClass {
         this.dispatchEvent(new CustomEvent('drawer-open', { bubbles: true, composed: true, detail: { heading, menu, option } }));
     }
 
+    _inHash(hash, pageNames) {
+        return pageNames.filter(pageName=>hash.indexOf(pageName) == 0).length > 0;
+    }
 
 };
 

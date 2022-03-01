@@ -217,11 +217,7 @@ class KlogTimelineItem extends PolymerElement {
                 type: Boolean,
                 value: false,
                 reflectToAttribute: true
-            },
-            backTo: {
-                type: String,
-                value: ''
-            },
+            }
         };
     }
 
@@ -243,7 +239,7 @@ class KlogTimelineItem extends PolymerElement {
         this.$.link.addEventListener('click', e => {
             e.preventDefault();
             const page = 'article/' + this.data.path;
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page, backTo } }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
         });
     }
 
@@ -261,8 +257,7 @@ class KlogTimelineItem extends PolymerElement {
             this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
         } else {
             const page = 'article/' + this.data.path;
-            const backTo = this.backTo || 'timeline';
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page, backTo } }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
         }
     }
 

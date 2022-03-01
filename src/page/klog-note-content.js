@@ -239,8 +239,7 @@ class KlogNoteContent extends PolymerElement {
             bubbles: true,
             composed: true,
             detail: {
-                articleId: this.article.objectId,
-                backTo: window.location.hash
+                articleId: this.article.objectId
             }
         }));
     }

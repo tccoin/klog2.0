@@ -143,7 +143,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       </div>
       <div class="timeline-container" id="timelineContainer">
         <template is="dom-repeat" items="{{cards}}">
-          <klog-timeline-item class="item" back-to="{{cardBackTo}}" data="{{item}}" mobile="{{mobile}}" theme="{{theme}}" author-hidden on-click="_setBackTo"></klog-timeline-item>
+          <klog-timeline-item class="item" back-to="{{cardBackTo}}" data="{{item}}" mobile="{{mobile}}" theme="{{theme}}" author-hidden></klog-timeline-item>
         </template>
         <div class="eof" hidden="{{!_eof}}">Klog 奇点</div>
       </div>

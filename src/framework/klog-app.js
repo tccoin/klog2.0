@@ -90,6 +90,11 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
                 value: 'dark',
                 reflectToAttribute: true
             },
+            themeColor: {
+                type: String,
+                value: '#3f51b5',
+                reflectToAttribute: true
+            },
             loading: {
                 type: Boolean,
                 value: true
@@ -97,13 +102,11 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             loadingTimeoutPrompt: {
                 type: Boolean,
                 value: false
+            },
+            lastHash: {
+                type: String,
+                value: ''
             }
-        };
-    }
-
-    static get listeners() {
-        return {
-            '': ''
         };
     }
 
@@ -111,7 +114,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         return [
             'load(routeData.page)',
             '_updatePreference(userinfo.preference)',
-            'updateTheme(theme)'
+            'updateTheme(theme, themeColor)'
         ];
     }
 
@@ -135,7 +138,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             const pageName = await this._calcPage(this.routeData.page);
             const subroute = this._calcSubroute(this.subroute);
             const page = await ui.load(pageName, subroute, userLoadPromise);
-            this._setPageBackTo(page);
+            this._setPageHistory(page);
         } catch (err) {
             if (err.message == '404') {
                 window.location.hash = '#/404/';
@@ -146,6 +149,11 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         if (!this._serviceWorkerInit) {
             this._serviceWorkerInit = true;
             this._installServiceWorker();
+        }
+        if (ui.page == 'zone') {
+            this.lastHash = 'zone/' + window.location.hash.substring(2);
+        } else {
+            this.lastHash = window.location.hash.substring(2);
         }
     }
 
@@ -158,15 +166,19 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
 
     _initGlobalEvent() {
         this.addEventListener('app-load', (e) => {
-            if (e.detail.backTo != undefined) this._backTo = e.detail.backTo;
-            if (e.detail.page) window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
+            if (e.detail.page) {
+                if (e.detail.page.substring(0, 5) == 'zone/') {
+                    e.detail.page = e.detail.page.substring(5);
+                }
+                window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
+            }
         });
         this.addEventListener('app-reload', (e) => this.reload());
         this.addEventListener('userinfo-updated', (e) => {
             this._updateUserinfo(e.detail.result);
         });
         this.addEventListener('theme-color-updated', (e) => {
-            this.updateTheme(this.theme, e.detail.themeColor);
+            this.themeColor = e.detail.themeColor;
         });
         this.addEventListener('timeline-set-filter', (e) => {
             const callback = (pages) => {
@@ -196,12 +208,13 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         });
         this.addEventListener('editor-open', (e) => {
             const editorLoaded = () => {
-                this.$.layout.$.editor.backTo = e.detail.backTo || '';
                 this.$.layout.$.editor.preset = e.detail.preset || {};
                 this.removeEventListener('editor-loaded', editorLoaded);
             };
             this.addEventListener('editor-loaded', editorLoaded);
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'editor/' + (e.detail.articleId || ''), now: false } }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: {
+                page: 'editor/' + (e.detail.articleId || '')
+            } }));
         });
         window.addEventListener('online', (e) => this._notifyNetworkStatus(e));
         window.addEventListener('offline', (e) => this._notifyNetworkStatus(e));
@@ -212,13 +225,12 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         });
     }
 
-    _setPageBackTo(page) {
-        if (this._backTo != undefined) {
-            page.backTo = this._backTo;
-            this._backTo = null;
-        } else {
-            page.backTo = undefined;
+    _setPageHistory(page) {
+        page.lastHash = this.lastHash;
+        if (this._inHash(this.lastHash, ['timeline', 'zone', 'note'])) {
+            this.from = this.lastHash;
         }
+        page.from = this.from || '';
     }
 
     _installServiceWorker() {
@@ -312,8 +324,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         }
     }
 
-    updateTheme(themeVariant, themeColor = '#3f51b5') {
-        if (!themeVariant) return;
+    updateTheme(themeVariant, themeColor) {
         // 更新动态色彩
         let dynamicTheme = new KlogDynamicTheme();
         dynamicTheme.apply(this, themeColor, themeVariant);
@@ -351,7 +362,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         }
         this.theme = theme;
         if (this.updateThemeInterval) clearInterval(this.updateThemeInterval);
-        this.updateThemeInterval = setInterval(() => this._updatePreference(this.theme), 10000);
+        this.updateThemeInterval = setInterval(() => this._updatePreference(this.preference), 5 * 60 * 1000);
         if (this._waitingToLoadDefaultPage) {
             this._loadDefaultPage();
         }

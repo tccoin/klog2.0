@@ -179,7 +179,7 @@ class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
             this.dispatchEvent(new CustomEvent('app-load', {
                 bubbles: true,
                 composed: true,
-                detail: { page: link, backTo: 'message' }
+                detail: { page: link }
             }));
         }
     }

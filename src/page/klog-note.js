@@ -275,7 +275,6 @@ class KlogNote extends PolymerElement {
             bubbles: true,
             composed: true,
             detail: {
-                backTo: window.location.hash,
                 preset: {
                     markdown: '@(' + collection + ')[]',
                     private: true

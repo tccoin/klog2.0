@@ -500,7 +500,6 @@ class KlogTimeline extends PolymerElement {
             bubbles: true,
             composed: true,
             detail: {
-                backTo: window.location.hash,
                 preset: {
                     markdown: '@(日常)[]\n',
                     private: false

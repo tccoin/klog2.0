@@ -180,7 +180,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
     <klog-backdrop id="backdrop">
 
       <!-- header -->
-      <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" mobile="{{mobile}}" userinfo="[[userinfo]]" back-to="{{backTo}}" selected="{{selected}}">
+      <klog-editor-header slot="back" id="header" loading="{{loading}}" article-id="{{articleId}}" title="{{title}}" mobile="{{mobile}}" userinfo="[[userinfo]]" selected="{{selected}}">
       </klog-editor-header>
 
       <!-- back -->
@@ -242,8 +242,10 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
                 reflectToAttribute: true
             },
             backTo: {
-                type: String,
-                value: ''
+                type: String
+            },
+            from: {
+                type: String
             },
             preset: {
                 type: Object,
@@ -254,8 +256,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
                 value: 'default'
             },
             path: {
-                type: String,
-                observer: '_pathChanged'
+                type: String
             },
             layout: {
                 type: Object,
@@ -493,14 +494,26 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         }
     }
 
-    back() {
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo || '/' } }));
+    _updateBackTo() {
+        let backTo;
+        if (!this._inHash(this.lastHash, ['editor'])) {
+            backTo = this.lastHash;
+        } else if (this._inHash(this.from, ['timeline', 'zone'])) {
+            backTo = this.articleId ? `article/${this.path}` : this.from;
+        } else if (this._inHash(this.from, ['note'])) {
+            backTo = this.articleId ? `note/all/${this.path}` : this.from;
+        } else if (this.private) {
+            backTo = this.articleId ? `note/all/${this.path}` : 'note/all/';
+        } else if (!this.private) {
+            backTo = this.articleId ? `article/${this.path}` : 'timeline';
+        }
+        this.backTo = backTo;
+        return backTo;
     }
 
-    _pathChanged(path) {
-        if (path) {
-            this.backTo = (/#\/(article|timeline)/.test(this.backTo) ? '#/article/' : '#/note/all/') + path;
-        }
+    back() {
+        this._updateBackTo();
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo } }));
     }
 
     upload() {
@@ -595,8 +608,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
             this.dispatchEvent(new CustomEvent('require-update', { bubbles: true, composed: true, detail: { page: 'note' } }));
             //ui
             this.loading = false;
-            this._pathChanged();
-            this.openToast('已保存', { title: '查看', href: this.backTo });
+            this.openToast('已保存', { title: '查看', href: this._updateBackTo() });
         }, err => {
             this.set('err', err);
             this.loading = false;
@@ -615,10 +627,7 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
             this.loading = false;
             this.openToast('已删除', undefined, { duration: 500, noCancelOnOutsideClick: false });
             //route
-            this.backTo = /#\/(article|timeline)/.test(this.backTo) ? '#/timeline' : '#/note/all/';
-            setTimeout(() => {
-                this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo } }));
-            }, 500);
+            setTimeout(()=>this.back(), 500);
         }, (err) => {
             this.set('err', err);
             this.loading = false;
