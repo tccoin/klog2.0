@@ -16,17 +16,17 @@ class KlogSignup extends PolymerElement {
         return html `
     <style include="klog-style-login"></style>
     <style include="klog-style-dialog"></style>
-    <paper-dialog id="dialog" with-backdrop="">
+    <paper-dialog id="dialog">
       <h2>注册之前…</h2>
       <p>
         请放心，您的密码将不会被明文保存。
         <br><br>
-        此外，您的所有个人信息均不会与第三方共享。
+        此外，您的所有个人信息均不会与第三方共享，您的文章和评论和图片和头像的著作权都属于您。没错，这里很*文明*。
         <br><br>
         热忱地欢迎您。
       </p>
       <div class="actions">
-        <paper-button primary="" dialog-confirm="">了解</paper-button>
+        <paper-button primary="" dialog-confirm>了解</paper-button>
       </div>
     </paper-dialog>
     <div class="login-card">
@@ -127,7 +127,7 @@ class KlogSignup extends PolymerElement {
     load() {
         this.title = 'welcome';
         this.continue = this.continue || '#/timeline';
-        setTimeout(() => this.$.dialog.open(), 500);
+        setTimeout(() => this.$.dialog.open(), 1000);
     }
 
     async update(userLoadPromise, route) {
