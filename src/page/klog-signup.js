@@ -16,12 +16,19 @@ class KlogSignup extends PolymerElement {
         return html `
     <style include="klog-style-login"></style>
     <style include="klog-style-dialog"></style>
+    <style>
+      paper-dialog {
+          max-width: 400px;
+      }
+    </style>
     <paper-dialog id="dialog">
       <h2>注册之前…</h2>
       <p>
         请放心，您的密码将不会被明文保存。
         <br><br>
-        此外，您的所有个人信息均不会与第三方共享，您的文章和评论和图片和头像的著作权都属于您。没错，这里很*文明*。
+        此外，您的所有个人信息均不会与第三方共享，还有您的文章和评论和图片和头像的著作权都属于您。
+        <br><br>
+        没错，这里很*文明*。
         <br><br>
         热忱地欢迎您。
       </p>
