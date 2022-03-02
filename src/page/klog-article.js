@@ -162,6 +162,8 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                 this.edit();
             }
         });
+        
+        this.$.image = document.createElement('klog-image');
 
         this._scrollHandler = () => {
             this.fabExtended = !this.mobile;
@@ -201,7 +203,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                 this.path = path;
                 await new Promise(resolve=>this.$.data.addEventListener('success', resolve, { once: true }));
                 let themeColor = '#3f51b5';
-                if (this.article.image && 'url' in this.article.image && this.article.image.url.indexOf('https://storage.krrr.party/storage/klog2/') > -1) {
+                if (this.article.image && 'url' in this.article.image && this.$.image.isKlogStorage(this.article.image.url)) {
                     if ('themeColor' in this.article.image) {
                         themeColor = this.article.image.themeColor;
                     } else {

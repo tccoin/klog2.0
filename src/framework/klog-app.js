@@ -159,9 +159,9 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     }
 
     ready() {
+        super.ready();
         this._initGlobalEvent();
         this.initUiEvent();
-        super.ready();
         this._loadLayout();
     }
 

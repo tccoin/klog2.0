@@ -49,16 +49,6 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         border-radius: 0px;
       }
 
-      .klog-card.list:not(:last-of-type)::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 1px;
-        background: var(--on-surface-variant);
-        opacity: 0.08;
-      }
-
       .klog-card-label+.klog-card.list,
       .klog-card.list:first-of-type {
         border-top-left-radius: 5px;

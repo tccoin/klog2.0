@@ -54,7 +54,7 @@
     "fastify-static": "^4.5.0",
     "huge-uploader": "https://github.com/tccoin/huge-uploader",
     "huge-uploader-nodejs": "^1.2.1",
-    "material-dynamic-colors": "^0.0.9",
+    "material-dynamic-colors": "https://github.com/tccoin/material-dynamic-colors.git",
     "md5-file": "^4.0.0",
     "mime-types": "^2.1.18",
     "node-vibrant": "^3.2.0-alpha",

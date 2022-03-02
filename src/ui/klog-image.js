@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { materialDynamicColors, index_seedFromImage, intFromRgb } from 'material-dynamic-colors/index.mjs';
 
 class KlogImage extends PolymerElement {
     static get template() {
@@ -17,6 +18,7 @@ class KlogImage extends PolymerElement {
         width: var(--klog-media-override-width, auto);
         border-radius: var(--klog-media-border-radius, 0px);
         z-index: 1;
+        background: var(--primary);
       }
 
       :host #bg {
@@ -28,6 +30,7 @@ class KlogImage extends PolymerElement {
         border-radius: var(--klog-media-border-radius, 0px);
         transition: opacity var(--klog-media-transition-time, 1s) ease;
         z-index: 2;
+        background: var(--primary);
       }
 
       :host([gallery]) img {
@@ -122,7 +125,7 @@ class KlogImage extends PolymerElement {
         return result[1] + encodeURIComponent(result[2]);
     }
 
-    _isKlogStorage(src) {
+    isKlogStorage(src) {
         return src.indexOf('storage.krrr.party') > -1;
     }
 
@@ -135,7 +138,7 @@ class KlogImage extends PolymerElement {
             src = 'https://storage.krrr.party/storage/klog-avatar/default_avatar.jpg';
         } else if (this.content && src.indexOf('clouddn.com') > -1 && !src.indexOf(/\.svg$/)) {
             src += '?imageView2/2/w/1440/q/85/interlace/1';
-        } else if (this._isKlogStorage(src)) {
+        } else if (this.isKlogStorage(src)) {
             src = this.encode(src);
             oriSrc = src;
             if (this.avatar) {
@@ -235,7 +238,7 @@ class KlogImage extends PolymerElement {
     }
 
     async loadPlaceholder(url, headless = false) {
-        if (!this._isKlogStorage(url)) return { w: 1600, h: 900, stats: { entropy: 0 } };
+        if (!this.isKlogStorage(url)) return { w: 1600, h: 900, stats: { entropy: 0 } };
         url += '?Magic/6';
         if (!this.fixed && !headless) {
             this.$.bg.style.height = '300px';
@@ -264,10 +267,10 @@ class KlogImage extends PolymerElement {
     }
 
     savePlaceholderData(url, data) {
-    // disabled
+        // disabled
+        // window.placeholders = window.placeholders || {};
+        // window.placeholders[url.replace(/[^0-9a-zA-Z_$]/g, '')] = data;
         return;
-        window.placeholders = window.placeholders || {};
-        window.placeholders[url.replace(/[^0-9a-zA-Z_$]/g, '')] = data;
     }
 
     updatePlaceholder() {

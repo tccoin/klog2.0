@@ -322,8 +322,7 @@ class KlogTimelineItem extends PolymerElement {
             mediaInfo = await new Promise(resolve=>coverImage.addEventListener('media-info-updated', e=>resolve(e.detail.mediaInfo)));
             this._mediaInfo = mediaInfo;
         }
-        let isLight = this.theme == 'light';
-        let themeColor = isLight ? mediaInfo.palette.LightVibrant.rgb : mediaInfo.palette.DarkVibrant.rgb;
+        let themeColor = this.theme == 'light' ? mediaInfo.palette.LightVibrant.rgb : mediaInfo.palette.DarkVibrant.rgb;
         let dynamicTheme = new KlogDynamicTheme();
         dynamicTheme.apply(this, themeColor, this.theme);
     }

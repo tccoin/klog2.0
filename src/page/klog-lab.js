@@ -36,6 +36,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         margin: 0 auto;
         padding: 16px;
         overflow: auto;
+        box-sizing: border-box;
       }
 
       textarea {
@@ -63,6 +64,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         <paper-button on-click="loadNext">打开下一篇文章</paper-button>
         <paper-button on-click="saveNext">更新下一篇文章</paper-button>
         <paper-button on-click="saveList">更新所有文章</paper-button>
+        <paper-button on-click="updateAllImages">更新所有图片</paper-button>
         <paper-toggle-button checked="{{quiet}}">不更新timeline</paper-toggle-button>
       </div>
       <div class="klog-card lab-card list">
@@ -101,8 +103,8 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
                 value: {
                     documentTitle: '实验室 - Klog',
                     drawer: 'off',
-                    mainMenu: false,
-                    sidebar: 'off',
+                    mainMenu: true,
+                    sidebar: 'on',
                     styles: {
                         '--klog-header-background': 'translate',
                         '--klog-header-text-color': 'var(--on-surface)',
@@ -114,7 +116,12 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
                     },
                     toolbar: html `
       <app-toolbar>
-        <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
+        <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
+        <div class="title">
+            <div main-title><iron-icon icon="klog"></iron-icon></div>
+            <div class="divider"></div>
+            <div page-title>控制台</div>
+        </div>
       </app-toolbar>`
                 }
             }
@@ -160,21 +167,18 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         // user
         const result = await userLoadPromise;
         if (!result.login) {
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
+            console.log(result);
+            this.parentElement.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
         }
     }
 
-    back() {
-        this.parentElement.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
-    }
-
-    loadList() {
+    async loadList() {
         this.$.list.select = ['title', 'text', 'path', 'collection', 'keywords', 'attachments'];
-        this.$.list.load().then(() => {
-            this.listProgressDelta = 100 / this.list.length;
-            this.listProgress = 0;
-            console.log(this.listProgressDelta, this.list.length);
-        });
+        await this.$.list.load();
+        this.listProgressDelta = 100 / this.list.length;
+        this.listProgress = 0;
+        console.log(this.listProgressDelta, this.list.length);
+        this.list.reverse();
     }
 
     loadNext() {
@@ -191,6 +195,31 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         }
     }
 
+    async updateAllImages() {
+        if (this.stop) return;
+        if (this.list.length > 0) {
+            this.articleId = this.pop('list').objectId;
+            await this.loadArticle(false);
+            for (let image of this.article.attachments.filter(x=>x.image)) {
+                if (this.$.image.isKlogStorage(image.url)) {
+                    let retry = 0;
+                    while (retry < 3) {
+                        try {
+                            await fetch(image.url + '?Magic/6');
+                            break;
+                        } catch (error) {
+                            retry += 1;
+                            console.log(error);
+                            await new Promise(resolve=>setTimeout(resolve, 500));
+                        }
+                    }
+                }
+            }
+            this.listProgress += this.listProgressDelta;
+            this.updateAllImages();
+        }
+    }
+
     _createEditor() {
         const editor = document.createElement('klog-data-editor');
         editor.headless = true;
@@ -203,9 +232,9 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
             this.articleId = this.pop('list').objectId;
             await this.loadArticle(false);
             await this.saveArticle();
-            await this.saveList();
+            this.listProgress += this.listProgressDelta;
+            this.saveList();
         }
-        this.listProgress += this.listProgressDelta;
     }
 
     async sendGlobalMessage() {
