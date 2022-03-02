@@ -1,6 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
-import { KlogDynamicTheme } from '../framework/klog-dynamic-theme.js';
 
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -201,7 +200,6 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             if (this.$.data.isPathNew(path)) {
                 this.path = path;
                 await new Promise(resolve=>this.$.data.addEventListener('success', resolve, { once: true }));
-                let dynamicTheme = new KlogDynamicTheme();
                 let themeColor = '#3f51b5';
                 if (this.article.image && 'url' in this.article.image && this.article.image.url.indexOf('https://storage.krrr.party/storage/klog2/') > -1) {
                     if ('themeColor' in this.article.image) {
@@ -212,7 +210,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                         themeColor = this.theme == 'light' ? mediaInfo.palette.LightVibrant.rgb : mediaInfo.palette.DarkVibrant.rgb;
                     }
                 }
-                dynamicTheme.apply(this, themeColor, this.theme);
+                this.dispatchEvent(new CustomEvent('layout-update', { bubbles: true, composed: true, detail: { themeColor } }));
                 this.$.avatar.lazyload();
                 this._scrollHandler();
             }

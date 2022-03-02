@@ -1,5 +1,4 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
-import { KlogDynamicTheme } from '../framework/klog-dynamic-theme.js';
 import { KlogTimeline } from './klog-timeline.js';
 import { KlogDataUserPublicMixin } from '../data/klog-data-user-public-mixin.js';
 import '../ui/klog-image.js';
@@ -235,19 +234,6 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
 
     ready() {
         super.ready();
-
-        // avatar
-        this.$.avatar.addEventListener('media-info-updated', (e) => {
-            const mediaInfo = e.detail.mediaInfo.palette;
-            const themeColor = this.theme == 'light' ? mediaInfo.LightVibrant.rgb : mediaInfo.DarkVibrant.rgb;
-            let dynamicTheme = new KlogDynamicTheme();
-            dynamicTheme.apply(this, themeColor, this.theme);
-            this.$.avatar.lazyload();
-        });
-        // this.$.avatar.addEventListener('media-loading', (e) => {
-        //   this.style.setProperty('--klog-header-background', `url('${this.$.avatar.$.img.src}')`);
-        // });
-
         // filter
         this.addEventListener('timeline-set-filter', (e) => {
             e.stopPropagation();
@@ -291,14 +277,12 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         this.$.data.include = ['author', 'topic'];
     }
 
-    async unload() {
-        await super.unload();
-        this.$.avatar.lazy = true;
-    }
-
     async update(userLoadPromise, subroute) {
+        // listen to avatar image for themeColor
+        let lastAvaterSrc = this.$.avatar.src;
+        this.$.avatar.lazy = true;
+        let mediaInfoUpdate = new Promise(resolve=>this.$.avatar.addEventListener('media-info-updated', e=>resolve(e), { once: true }));
         // author publicinfo
-        let authorPublic;
         if (subroute.prefix === '/zone') {
             this.authorPublicId = subroute.path.replace(/[\/\\]/, '');
             this.cardBackTo = 'zone/' + this.authorPublicId;
@@ -309,7 +293,15 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
             await this.loadAuthorPublic('username', this.authorUsername);
             this.authorPublicId = this.authorPublic.objectId;
         }
-        this.$.avatar.lazy = true;
+        // update themeColor
+        let palette;
+        if (lastAvaterSrc != this.$.avatar.src) {
+            await mediaInfoUpdate;
+        }
+        palette = this.$.avatar.mediaInfo.palette;
+        const themeColor = this.theme == 'light' ? palette.LightVibrant.rgb : palette.DarkVibrant.rgb;
+        this.dispatchEvent(new CustomEvent('layout-update', { bubbles: true, composed: true, detail: { themeColor } }));
+        this.$.avatar.lazyload();
         // timeline
         let needRefresh = this.$.data.userPublicId != this.authorPublicId;
         this.$.data.userPublicId = this.authorPublicId;

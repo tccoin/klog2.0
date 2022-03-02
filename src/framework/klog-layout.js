@@ -235,6 +235,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
             '_updateSidebar(sidebar,undefined,desktop)',
             '_updateDrawer(drawer,undefined,desktop)',
             '_updateDocumentTitle(documentTitle)',
+            '_updateThemeColor(themeColor)',
             '_updateStyles(styles)',
             '_updateHeader(header)',
             '_updateToolbar(toolbar)',
@@ -424,6 +425,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         if (useDefault) {
             const defaultLayout = {
                 documentTitle: 'Klog',
+                themeColor: '#3f51b5',
                 collections: [],
                 scrollToTop: true,
                 drawer: 'on', // on off auto
@@ -497,6 +499,10 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
 
     _updateDocumentTitle(documentTitle) {
         document.title = documentTitle;
+    }
+
+    _updateThemeColor(themeColor) {
+        this.dispatchEvent(new CustomEvent('theme-color-updated', { bubbles: true, composed: true, detail: { themeColor } }));
     }
 
     _updateStyles(styles) {
