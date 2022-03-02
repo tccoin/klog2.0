@@ -95,20 +95,18 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
         this.$.passwordInput.addEventListener('keyup', (e) => {
             if (e.keyCode == 13) this.login();
         });
-        this.$.go.addEventListener('mousedown', function() {
-            this.shadowRoot.querySelector('#ink').classList.remove('circle');
-        });
     }
 
-    load() {
-        this.title = 'welcome';
-        this.continue = this.continue || '#/timeline';
+    unload() {
+        this.password = '';
     }
 
-    async update(userLoadPromise, route) {
+    async update(userLoadPromise) {
         // user
         const result = await userLoadPromise;
         this.user = result.user;
+        this.title = 'welcome';
+        setTimeout(() => console.log(this.lastHash), 1000);
     }
 
     anonymousLogin() {
@@ -135,22 +133,26 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
         this.title = 'loading';
         this.user.login(this.email, this.password).then(() => {
             this.title = 'success';
-            setTimeout(() => {
-                this.continue = this.continue || '#/';
-                window.location = '/#/';
-                this.password = '';
-            }, 200);
+            setTimeout(()=>this.back(), 200);
         }, () => {
             this.title = 'error';
         });
     }
 
+    back() {
+        if (!this._inHash(this.lastHash, ['login', 'signup'])) {
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true,
+                detail: { page: this.lastHash }
+            }));
+        } else {
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true,
+                detail: { page: 'timeline' }
+            }));
+        }
+    }
+
     signup() {
-        this.dispatchEvent(new CustomEvent('user-signup-page-open', {
-            bubbles: true,
-            composed: true,
-            detail: { continue: this.continue }
-        }));
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'signup', keepLastHash: this.lastHash } }));
     }
 
     _titleChanged(title) {

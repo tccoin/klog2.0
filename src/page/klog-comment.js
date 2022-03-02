@@ -391,10 +391,7 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
 
     _checkUserLogin() {
         if (!this.login) {
-            this.dispatchEvent(new CustomEvent('user-login-page-open', {
-                bubbles: true,
-                composed: true
-            }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
         }
     }
 

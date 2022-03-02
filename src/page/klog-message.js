@@ -159,10 +159,7 @@ class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         // user
         const result = await userLoadPromise;
         if (!result.login) {
-            this.dispatchEvent(new CustomEvent('user-login-page-open', {
-                bubbles: true,
-                composed: true
-            }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
             return Promise.reject(new Error('Not Login.'));
         } else {
             this.userinfo = result.userinfo;

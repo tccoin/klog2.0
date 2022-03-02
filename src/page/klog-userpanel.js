@@ -339,10 +339,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
         const result = await userLoadPromise;
         this._hasUsername = true;
         if (!result.login) {
-            this.dispatchEvent(new CustomEvent('user-login-page-open', {
-                bubbles: true,
-                composed: true
-            }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
             return Promise.reject(new Error('Not Login.'));
         } else {
             this.preference = result.userinfo.preference;

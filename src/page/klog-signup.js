@@ -1,4 +1,5 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -11,7 +12,7 @@ import '../style/klog-style-login.js';
 import '../style/klog-style-dialog.js';
 import '../ui/klog-input.js';
 
-class KlogSignup extends PolymerElement {
+class KlogSignup extends KlogUiMixin(PolymerElement) {
     static get template() {
         return html `
     <style include="klog-style-login"></style>
@@ -116,31 +117,18 @@ class KlogSignup extends PolymerElement {
     ready() {
         super.ready();
         this.$.passwordInput.addEventListener('keyup', (e) => {
-            if (e.keyCode == 13) this.login();
+            if (e.keyCode == 13) this.signup();
         });
-        this.$.go.addEventListener('mousedown', function() {
-            this.shadowRoot.querySelector('#ink').classList.remove('circle');
-        });
-        this.$.dialog.addEventListener('opened-changed', e => {
-            this.dispatchEvent(new CustomEvent('editor-backdrop-opened-changed', {
-                bubbles: true,
-                composed: true,
-                detail: { value: e.detail.value }
-            }));
-        });
-    }
-
-
-    load() {
-        this.title = 'welcome';
-        this.continue = this.continue || '#/timeline';
-        setTimeout(() => this.$.dialog.open(), 1000);
     }
 
     async update(userLoadPromise, route) {
         // user
         const result = await userLoadPromise;
         this.user = result.user;
+        this.title = 'welcome';
+        setTimeout(() => this.$.dialog.open(), 1000);
+        setTimeout(() => console.log(this.lastHash), 1000);
+        
     }
 
     signup() {
@@ -151,9 +139,7 @@ class KlogSignup extends PolymerElement {
         }
         this.user.signup(this.email, this.password).then(() => {
             this.title = 'success';
-            setTimeout(() => {
-                this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.continue } }));
-            }, 1000);
+            setTimeout(()=>this.back(), 200);
         }, err => {
             window.err = err;
             console.log(err, err.code);
@@ -172,12 +158,20 @@ class KlogSignup extends PolymerElement {
         });
     }
 
+    back() {
+        if (!this._inHash(this.lastHash, ['login', 'signup'])) {
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true,
+                detail: { page: this.lastHash }
+            }));
+        } else {
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true,
+                detail: { page: 'timeline' }
+            }));
+        }
+    }
+
     login() {
-        this.dispatchEvent(new CustomEvent('user-login-page-open', {
-            bubbles: true,
-            composed: true,
-            detail: { continue: this.continue }
-        }));
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login', keepLastHash: this.lastHash } }));
     }
 
     _titleChanged(title) {

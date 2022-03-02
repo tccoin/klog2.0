@@ -171,6 +171,9 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
                 if (e.detail.page.substring(0, 14) == 'zone/username/') {
                     e.detail.page = e.detail.page.substring(14);
                 }
+                if (e.detail.keepLastHash) {
+                    this.lastHash = e.detail.keepLastHash;
+                }
                 window.location.hash = '#/' + e.detail.page.replace(/^#\//, '');
             }
         });
@@ -198,14 +201,6 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
                 }
             }));
             window.location.hash = '#/timeline';
-        });
-        this.addEventListener('user-login-page-open', (e) => {
-            this.$.layout.$.login.continue = e.detail ? e.detail.continue : window.location.hash;
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
-        });
-        this.addEventListener('user-signup-page-open', (e) => {
-            this.$.layout.$.signup.continue = e.detail ? e.detail.continue : window.location.hash;
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'signup', now: true } }));
         });
         this.addEventListener('editor-open', (e) => {
             const editorLoaded = () => {
