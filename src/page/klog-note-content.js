@@ -121,7 +121,7 @@ class KlogNoteContent extends PolymerElement {
 
         .main-container {
           padding-top: 64px;
-          height: calc(var(--klog-layout-page-height) - 64px);
+          height: calc(var(--klog-pages-height) - 64px - var(--safe-area-inset-top));
         }
       }
     </style>

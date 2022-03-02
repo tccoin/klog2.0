@@ -1,4 +1,4 @@
-import { materialDynamicColors, index_seedFromImage, intFromRgb } from 'material-dynamic-colors/index.mjs';
+import 'material-dynamic-colors/dist/cdn/material-dynamic-colors.min.js';
 
 export class KlogDynamicTheme {
 

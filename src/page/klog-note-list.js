@@ -163,10 +163,6 @@ class KlogNoteList extends PolymerElement {
         display: none;
       }
 
-      .items .item {
-        scroll-snap-align: start;
-      }
-
       @media (max-width: 767px) {
         .header-container {
           width: 100%;
@@ -183,7 +179,7 @@ class KlogNoteList extends PolymerElement {
         }
 
         .main-container {
-          max-height: calc(var(--klog-pages-height) - 118px);
+          max-height: calc(var(--klog-pages-height) - 118px - var(--safe-area-inset-top));
         }
 
         .items {

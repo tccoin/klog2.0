@@ -1,5 +1,4 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
-import { materialDynamicColors, index_seedFromImage, intFromRgb } from 'material-dynamic-colors/index.mjs';
 
 class KlogImage extends PolymerElement {
     static get template() {
