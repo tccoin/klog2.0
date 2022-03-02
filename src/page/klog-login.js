@@ -106,7 +106,6 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
         const result = await userLoadPromise;
         this.user = result.user;
         this.title = 'welcome';
-        setTimeout(() => console.log(this.lastHash), 1000);
     }
 
     anonymousLogin() {

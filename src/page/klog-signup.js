@@ -127,8 +127,6 @@ class KlogSignup extends KlogUiMixin(PolymerElement) {
         this.user = result.user;
         this.title = 'welcome';
         setTimeout(() => this.$.dialog.open(), 1000);
-        setTimeout(() => console.log(this.lastHash), 1000);
-        
     }
 
     signup() {

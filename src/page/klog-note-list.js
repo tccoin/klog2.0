@@ -183,7 +183,7 @@ class KlogNoteList extends PolymerElement {
         }
 
         .main-container {
-          max-height: calc(var(--klog-pages-height) - 64px);
+          max-height: calc(var(--klog-pages-height) - 118px);
         }
 
         .items {
