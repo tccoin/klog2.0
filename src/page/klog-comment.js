@@ -363,7 +363,12 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
     }
 
     async _deleteComment(e) {
-        let commentId = this._inputData.objectId;
+        let commentId;
+        if (this._inputData) {
+            commentId = this._inputData.objectId;
+        } else {
+            commentId = this._getCommentData(e.target).objectId;
+        }
         this.openToast('确定要删除这条评论吗？', {
             title: '确认删除',
             onclick: async() => {
