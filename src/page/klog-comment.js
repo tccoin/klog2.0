@@ -158,6 +158,7 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
           <div class="actions" hidden="{{_calcCancelButtonDisabled(_inputMethod)}}">
             <div class="dot-divider"></div>
             <a on-click="resetInput">取消</a>
+            <a on-click="_deleteComment" hidden="{{_calcMobileDeleteButtonDisabled(_inputMethod, mobile)}}">删除</a>
           </div>
         </div>
         <div class="comment-content" on-click="focus">
@@ -314,28 +315,33 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
         const data = this._inputData;
         if (this.$.input.value.length == 0) {
             this.openToast('什么话都不说，这是坠好的！');
-            return;
-        } else if (method == 'create') {
-            const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            this.openToast('评论已发送');
-        } else if (method == 'edit') {
-            await this.updateComment(data.objectId, this.$.input.value);
-            this.openToast('评论已修改');
-        } else if (method == 'reply') {
-            const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
-            this.openToast('回复已发送');
+        } else {
+            this.$.replyButton.disabled = true;
+            if (method == 'create') {
+                const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                this.openToast('评论已发送');
+            } else if (method == 'edit') {
+                await this.updateComment(data.objectId, this.$.input.value);
+                this.openToast('评论已修改');
+            } else if (method == 'reply') {
+                const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
+                this.openToast('回复已发送');
+            }
+            await this.refresh();
+            this.resetInput();
+            this.$.replyButton.disabled = false;
         }
-        await this.refresh();
-        this.resetInput();
     }
 
     _editComment(e) {
+        this.resetInput();
         this.updateInput('edit', this._getCommentData(e.target));
         this.focus();
     }
 
     _replyComment(e) {
+        this.resetInput();
         const currentComment = this._getCommentData(e.target);
         const primaryComment = this._getCommentData(e.target, true);
         this.updateInput('reply', {
@@ -357,12 +363,13 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
     }
 
     async _deleteComment(e) {
-        let commentId = this._getCommentData(e.target).objectId;
+        let commentId = this._inputData.objectId;
         this.openToast('确定要删除这条评论吗？', {
             title: '确认删除',
             onclick: async() => {
                 await this.deleteComment(commentId);
                 await this.refresh();
+                this.resetInput();
                 this.openToast('评论已删除');
             }
         });
@@ -370,6 +377,10 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
 
     _calcCancelButtonDisabled(method) {
         return method == 'create';
+    }
+
+    _calcMobileDeleteButtonDisabled(method, mobile) {
+        return method != 'edit' || !mobile;
     }
 
     _getCommentData(container, primary = false) {

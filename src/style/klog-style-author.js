@@ -45,7 +45,7 @@ containerKlogStyleAuthor.innerHTML = `<dom-module id="klog-style-author">
         margin: 0 5px;
         width: 4px;
         height: 4px;
-        background: var(--secondary-overlay-color);
+        background: var(--divider);
         border-radius: 50%;
         vertical-align: middle;
       }
