@@ -24,7 +24,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         width: fit-content;
       }
       .info-container{
-        width: 300px;
+        width: 280px;
         margin: 64px 0 0;
         position: fixed;
         z-index: 101;
