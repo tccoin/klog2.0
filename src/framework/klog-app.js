@@ -92,7 +92,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             },
             themeColor: {
                 type: String,
-                value: '#3f51b5',
+                value: 'default',
                 reflectToAttribute: true
             },
             loading: {
@@ -320,22 +320,22 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         }
     }
 
-    updateTheme(themeVariant, themeColor) {
+    updateTheme() {
+        if (!this.theme || !this.themeColor) return;
         // 更新动态色彩
         let dynamicTheme = new KlogDynamicTheme();
-        dynamicTheme.apply(this, themeColor, themeVariant);
-        this.dynamicTheme = dynamicTheme;
+        dynamicTheme.apply(this, this.themeColor == 'default' ? '#3f51b5' : this.themeColor, this.theme);
 
         // 更新主题
         let htmlTheme = document.querySelector('html').getAttribute('theme');
         if (htmlTheme && htmlTheme.indexOf('custom') > -1) {
-            document.querySelector('html').setAttribute('theme', themeVariant + ' custom');
+            document.querySelector('html').setAttribute('theme', this.theme + ' custom');
             return;
         }
-        document.querySelector('html').setAttribute('theme', themeVariant);
-        document.querySelector('html').style.background = themeVariant == 'light' ? '#e0e0e0' : '#000000';
+        document.querySelector('html').setAttribute('theme', this.theme);
+        document.querySelector('html').style.background = this.theme == 'light' ? '#e0e0e0' : '#000000';
         let metaThemeColor = document.querySelector('meta[name=theme-color]');
-        metaThemeColor.setAttribute('content', themeVariant == 'light' ? '#e0e0e0' : '#000000');
+        metaThemeColor.setAttribute('content', this.theme == 'light' ? '#e0e0e0' : '#000000');
     }
 
     _updatePreference(preference) {
@@ -357,6 +357,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             theme = (h > 19 || h < 7) ? 'dark' : 'light';
         }
         this.theme = theme;
+        this.themeColor = preference.themeColor;
         if (this.updateThemeInterval) clearInterval(this.updateThemeInterval);
         this.updateThemeInterval = setInterval(() => this._updatePreference(this.preference), 5 * 60 * 1000);
         if (this._waitingToLoadDefaultPage) {

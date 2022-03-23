@@ -31,6 +31,10 @@ class KlogUploadZone extends KlogUiMixin(PolymerElement) {
       }
 
       .info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
         padding: 16px 16px 40px;
         text-align: center;
         min-height: 168px;
@@ -52,15 +56,12 @@ class KlogUploadZone extends KlogUiMixin(PolymerElement) {
       }
 
       .state {
-        position: absolute;
-        left: 0;
-        right: 0;
         color: var(--on-background);
         transition: opacity .25s ease;
       }
 
       .state.hidden {
-        opacity: 0;
+        display: none;
       }
 
       paper-progress {

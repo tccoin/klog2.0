@@ -101,10 +101,6 @@ class KlogNoteContent extends PolymerElement {
         @apply(--shadow-elevation-4dp);
       }
 
-      .note-toolbar.raised {
-        @apply(--shadow-elevation-2dp);
-      }
-
       @media (min-width: 768px) {
         :host {
           --klog-markdown-media: {

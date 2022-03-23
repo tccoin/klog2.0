@@ -505,7 +505,6 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
             backTo = this.articleId ? `article/${this.path}` : 'timeline';
         }
         this.backTo = backTo;
-        console.log(this.lastHash, this.from, backTo);
         return backTo;
     }
 

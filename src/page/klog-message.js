@@ -97,10 +97,9 @@ class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         width: 100%;
       }
 
-      .message-card{
-        cursor: pointer;
-        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-        -webkit-tap-highlight-color: transparent;
+      
+      .klog-card .card-meta .meta-title {
+        color: var(--secondary);
       }
 
       /*animation*/ {
@@ -125,7 +124,7 @@ class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         <div class="group-container">
           <div class="klog-card-label">{{group.name}}</div>
           <template is="dom-repeat" items="{{group.items}}" as="item">
-            <div class="klog-card message-card list" on-click="view" link="{{item.link}}">
+            <div class="klog-card klog-card-interactive message-card list" on-click="view" link="{{item.link}}">
                 <!--meta-->
                 <div class="card-meta">
                   <div class="meta-container">

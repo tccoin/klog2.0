@@ -51,7 +51,7 @@ class KlogNoteSearch extends PolymerElement {
         z-index: 1;
         height: 100%;
         left: 8px;
-        color: var(--on-background);
+        color: var(--primary);
         cursor: pointer;
         z-index: 10;
         -webkit-tap-highlight-color: transparent;

@@ -294,12 +294,16 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
             this.authorPublicId = this.authorPublic.objectId;
         }
         // update themeColor
-        let palette;
-        if (lastAvaterSrc != this.$.avatar.src) {
-            await mediaInfoUpdate;
+        let themeColor;
+        if (this.authorPublic.zoneThemeColor != 'default') {
+            themeColor = this.authorPublic.zoneThemeColor;
+        } else {
+            if (lastAvaterSrc != this.$.avatar.src) {
+                await mediaInfoUpdate;
+            }
+            let palette = this.$.avatar.mediaInfo.palette;
+            themeColor = this.theme == 'light' ? palette.LightVibrant.rgb : palette.DarkVibrant.rgb;
         }
-        palette = this.$.avatar.mediaInfo.palette;
-        const themeColor = this.theme == 'light' ? palette.LightVibrant.rgb : palette.DarkVibrant.rgb;
         this.dispatchEvent(new CustomEvent('layout-update', { bubbles: true, composed: true, detail: { themeColor } }));
         this.$.avatar.lazyload();
         // timeline

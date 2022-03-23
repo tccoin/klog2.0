@@ -19,6 +19,7 @@ class KlogEditorBackdropPages extends KlogUiMixin(KlogDataLicenseMixin(PolymerEl
         overflow: auto;
         justify-content: center;
         --klog-input-background-color: var(--klog-page-background);
+        --klog-input-outline-color: var(--outline);
       }
 
       iron-pages {

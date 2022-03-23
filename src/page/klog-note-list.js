@@ -67,6 +67,7 @@ class KlogNoteList extends PolymerElement {
         transition: all .15s ease;
         cursor: default;
         border-radius: 12px 0 0 0;
+        background-color: var(--surface);
         @apply(--shadow-none);
       }
 
@@ -78,14 +79,20 @@ class KlogNoteList extends PolymerElement {
         top: 0;
         bottom: 0;
         z-index: -1;
-        background-color: var(--surface);
+        background-color: var(--primary);
         border-radius: 12px 0 0 0;
-        opacity: var(--klog-header-opacity, 1);
+        opacity: 0;
+        transition: opacity .4s ease;
       }
 
       .header-container.raised {
         border-bottom: none;
         @apply(--shadow-elevation-2dp);
+      }
+
+      
+      .header-container.raised::after {
+        opacity: 0.05;
       }
 
       .header-container .title {

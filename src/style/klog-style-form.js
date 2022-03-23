@@ -3,8 +3,11 @@ const containerKlogStyleForm = document.createElement('template');
 containerKlogStyleForm.innerHTML = `<dom-module id="klog-style-form">
   <template>
     <style>
+      :host {
+        --klog-input-outline-color: var(--surface-variant);
+      }
+
       .form-item {
-        --hover-outline-color: var(--on-surface);
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -34,14 +37,26 @@ containerKlogStyleForm.innerHTML = `<dom-module id="klog-style-form">
         padding: 6px 8px;
         font-weight: bold;
         color: var(--on-background);
-        border: var(--outlined-border-width) solid var(--outline);
+        border: var(--outlined-border-width) solid var(--klog-input-outline-color);
         border-radius: 4px;
         transition: all .2s ease;
+      }
+      
+      .form-item paper-swatch-picker {
+        --paper-swatch-picker-icon:{
+          display: none;
+        }
+        --paper-listbox-background-color: var(--surface);
+        --paper-swatch-picker-color-size: 24px;
+      }
+
+      .form-item .paper-color-picker-icon {
+        color: var(--primary);
       }
 
       .form-item paper-button:hover {
         color: var(--on-surface);
-        border-color: var(--hover-outline-color);
+        border-color: var(--on-surface);
       }
 
       .form-item paper-button[disabled] {

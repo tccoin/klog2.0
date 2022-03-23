@@ -30,8 +30,26 @@ containerKlogStyleCard.innerHTML = `<dom-module id="klog-style-card">
         @apply --shadow-elevation-2dp;
       }
 
-      .klog-card[raised] {
+      .klog-card-interactive {
+        background: var(--surface);
+        cursor: pointer;
+        transition: transform .05s ease, box-shadow .2s ease;
+      }
+
+      .klog-card-interactive:hover {
         @apply --shadow-elevation-8dp;
+      }
+
+      .klog-card-interactive::after{
+        @apply --overlay-style;
+        background: var(--primary);
+        opacity: 0;
+        z-index: 0;
+        transition: opacity .4s ease;
+      }
+
+      .klog-card-interactive:hover::after {
+        opacity: 0.03;
       }
 
       .klog-card>* {

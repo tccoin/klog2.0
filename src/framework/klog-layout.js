@@ -165,7 +165,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     <!--about-->
     <paper-dialog id="about" with-backdrop="">
       <h2>&gt; klog -V</h2>
-      <p>v2.20.4<br>2017-2021<br>Powered by Kr with Love.</p>
+      <p>v2.21.0<br>2017-2021<br>Powered by Kr with Love.</p>
       <div class="actions" column="">
         <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
         <paper-button on-click="aboutLog">&gt; klog log</paper-button>
@@ -425,7 +425,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         if (useDefault) {
             const defaultLayout = {
                 documentTitle: 'Klog',
-                themeColor: '#3f51b5',
+                themeColor: (this.preference && 'themeColor' in this.preference) ? this.preference.themeColor : 'default',
                 collections: [],
                 scrollToTop: true,
                 drawer: 'on', // on off auto

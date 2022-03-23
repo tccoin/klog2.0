@@ -41,20 +41,6 @@ class KlogTimelineItem extends PolymerElement {
 
       .card {
         width: calc(100% - 16px);
-        background: var(--surface);
-        cursor: pointer;
-        transition: transform .05s ease, box-shadow .2s ease;
-      }
-
-      .card:hover {
-        @apply --shadow-elevation-8dp;
-      }
-
-      .card::after{
-        @apply --overlay-style;
-        background: var(--primary);
-        opacity: 0;
-        z-index: 0;
       }
 
       .card > *{
@@ -129,7 +115,7 @@ class KlogTimelineItem extends PolymerElement {
     </style>
     <!--header-->
     <a href="{{server}}#/article/{{data.path}}" id="link">
-      <div class="card klog-card" raised\$="{{expended}}" on-click="read" mobile\$="{{mobile}}">
+      <div class="card klog-card klog-card-interactive" raised\$="{{expended}}" on-click="read" mobile\$="{{mobile}}">
 
         <!--meta-->
         <div class="card-meta" hidden$="{{authorHidden}}">
@@ -325,6 +311,9 @@ class KlogTimelineItem extends PolymerElement {
         let themeColor = this.theme == 'light' ? mediaInfo.palette.LightVibrant.rgb : mediaInfo.palette.DarkVibrant.rgb;
         let dynamicTheme = new KlogDynamicTheme();
         dynamicTheme.apply(this, themeColor, this.theme);
+        await new Promise(resolve=>setTimeout(resolve, 1));
+        // this.style.removeProperty('--surface');
+        // this.style.removeProperty('--on-surface');
     }
 
     async _waitForElement(query) {

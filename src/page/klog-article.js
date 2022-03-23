@@ -202,7 +202,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             if (this.$.data.isPathNew(path)) {
                 this.path = path;
                 await new Promise(resolve=>this.$.data.addEventListener('success', resolve, { once: true }));
-                let themeColor = '#3f51b5';
+                let themeColor = 'default';
                 if (this.article.image && 'url' in this.article.image && this.$.image.isKlogStorage(this.article.image.url)) {
                     if ('themeColor' in this.article.image) {
                         themeColor = this.article.image.themeColor;

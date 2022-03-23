@@ -1848,7 +1848,7 @@
     "@polymer/paper-styles" "^3.0.0-pre.26"
     "@polymer/polymer" "^3.0.0"
 
-"@polymer/paper-item@^3.0.1":
+"@polymer/paper-item@^3.0.0-pre.26", "@polymer/paper-item@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@polymer/paper-item/-/paper-item-3.0.1.tgz#05b3543483e556cd5532431cd1751a84343989b5"
   integrity sha512-KTk2N+GsYiI/HuubL3sxebZ6tteQbBOAp4QVLAnbjSPmwl+mJSDWk+omuadesU0bpkCwaWVs3fHuQsmXxy4pkw==
@@ -1858,7 +1858,7 @@
     "@polymer/paper-styles" "^3.0.0-pre.26"
     "@polymer/polymer" "^3.0.0"
 
-"@polymer/paper-listbox@^3.0.1":
+"@polymer/paper-listbox@^3.0.0-pre.26", "@polymer/paper-listbox@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@polymer/paper-listbox/-/paper-listbox-3.0.1.tgz#fe05094781b359e4afbc5bec89a07758a303a957"
   integrity sha512-vMLWFpYcggAPmEDBmK+96fFefacOG3GLB1EguTn8+ZkqI+328hNfw1MzHjH68rgCIIUtjmm+9qgB1Sy/MN0a/A==
@@ -1880,7 +1880,7 @@
     "@polymer/paper-styles" "^3.0.0-pre.26"
     "@polymer/polymer" "^3.0.0"
 
-"@polymer/paper-menu-button@^3.1.0":
+"@polymer/paper-menu-button@^3.0.0-pre.26", "@polymer/paper-menu-button@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@polymer/paper-menu-button/-/paper-menu-button-3.1.0.tgz#3eb2fb88ba3cdaa4c39be6ae3530efa40b1eccf3"
   integrity sha512-q0G0/rvYD/FFmIBMGCQWjfXzRqwFw9+WHSYV4uOQzM1Ln8LMXSAd+2CENsbVwtMh6fmBePj15ZlU8SM2dt1WDQ==
@@ -1962,6 +1962,19 @@
   dependencies:
     "@polymer/font-roboto" "^3.0.1"
     "@polymer/iron-flex-layout" "^3.0.0-pre.26"
+    "@polymer/polymer" "^3.0.0"
+
+"@polymer/paper-swatch-picker@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@polymer/paper-swatch-picker/-/paper-swatch-picker-3.0.1.tgz#cc970ee288329ddf0734bff238b53b7e51e7371b"
+  integrity sha512-LFuzQf/NOI/nM1oR/BUFbeQ7UXo/KWQ/wxMI692z60FyCmSK24WaEaRjVJeLCj07KFpCHvcae0lmiyNVYEfOeg==
+  dependencies:
+    "@polymer/iron-flex-layout" "^3.0.0-pre.26"
+    "@polymer/iron-iconset-svg" "^3.0.0-pre.26"
+    "@polymer/paper-icon-button" "^3.0.0-pre.26"
+    "@polymer/paper-item" "^3.0.0-pre.26"
+    "@polymer/paper-listbox" "^3.0.0-pre.26"
+    "@polymer/paper-menu-button" "^3.0.0-pre.26"
     "@polymer/polymer" "^3.0.0"
 
 "@polymer/paper-tabs@^3.0.1":
@@ -10068,9 +10081,10 @@ matcher@^1.1.0:
   dependencies:
     escape-string-regexp "^1.0.4"
 
-"material-dynamic-colors@https://github.com/tccoin/material-dynamic-colors.git":
+material-dynamic-colors@^0.0.9:
   version "0.0.9"
-  resolved "https://github.com/tccoin/material-dynamic-colors.git#62e8ca16b41c8940a15fe85c4a93408144e57ba2"
+  resolved "https://registry.yarnpkg.com/material-dynamic-colors/-/material-dynamic-colors-0.0.9.tgz#4886541b34d97c99b7f25caf83a540c0bde8d0ce"
+  integrity sha512-rrkfb54mYrkNGEx8FbcJIjwsfdzahkNknSLJLDmqqZcmayhLXh8nodLgSy16S+Uybz/psLjIrm5L6rbOermPWQ==
 
 math-random@^1.0.1:
   version "1.0.4"

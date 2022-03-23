@@ -54,7 +54,7 @@ class KlogInput extends PolymerElement {
         height: 24px;
         background: none;
         padding: 16px 14px 16px;
-        border: var(--outlined-border-width) solid var(--outline);
+        border: var(--outlined-border-width) solid var(--klog-input-outline-color, var(--surface-variant));
         border-radius: 4px;
         transition: border-color .2s ease;
 
@@ -81,7 +81,7 @@ class KlogInput extends PolymerElement {
       }
 
       :host([outlined]) paper-input:hover {
-        border-color: var(--hover-outline-color);
+        border-color: var(--on-surface);
       }
 
       :host([outlined]) paper-input[focused] {

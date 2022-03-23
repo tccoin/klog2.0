@@ -10,6 +10,7 @@ import '@polymer/paper-radio-group/paper-radio-group.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-tabs/paper-tabs.js';
+import '@polymer/paper-swatch-picker/paper-swatch-picker.js';
 import '../ui/klog-icons.js';
 import '../style/klog-style-card.js';
 import '../style/klog-style-toolbar.js';
@@ -64,6 +65,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
         font-weight: bold;
         margin-bottom: calc(var(--klog-card-padding) * 3);
         font-size: 1.1em;
+        color: var(--secondary);
       }
 
       .klog-card:last-child {
@@ -194,8 +196,19 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
               <paper-tab name="time">根据时间</paper-tab>
             </paper-tabs>
           </klog-dropdown-menu>
-  
-          <!-- <div class="form-item">
+
+          <div class="form-item">
+            <div class="text-container">
+              <span class="title">主题颜色</span><br>
+              <span class="description">给你的主界面和个人页面增光添彩</span>
+            </div>
+            <paper-swatch-picker id="colorPicker" column-count="5"></paper-swatch-picker>
+            <paper-button on-click="pickColor">
+              <iron-icon icon="swatch:format-color-fill" class="paper-color-picker-icon"></iron-icon>
+            </paper-button>
+          </div>
+          <!--
+          <div class="form-item">
             <div class="text-container">
               <span class="title">毛玻璃效果</span><br>
               <span class="description">实验性</span>
@@ -306,7 +319,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
                   <div main-title><iron-icon icon="klog"></iron-icon></div>
                 </div>
               <div class="divider"></div>
-              <paper-button on-click="logout" mobile>
+              <paper-button on-click="logout" hidden-on-desktop>
                 <iron-icon icon="power_settings_new"></iron-icon>注销
               </paper-button>
             </app-toolbar>`
@@ -319,7 +332,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
         return [
             '_updateLicenseAbbreviation(userinfo.license)',
             'updateAvatarUrl(avatarinfo)',
-            'updatePreference(preference.theme,preference.defaultPage,preference.backdropBlurEnabled,preference.markdown.numberedHeading,preference.markdown.centeredHeading,preference.markdown.overflowCode)',
+            'updatePreference(preference.theme,preference.themeColor,preference.defaultPage,preference.backdropBlurEnabled,preference.markdown.numberedHeading,preference.markdown.centeredHeading,preference.markdown.overflowCode)',
         ];
     }
 
@@ -332,6 +345,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
                 detail: { value: e.detail.value }
             }));
         });
+        this._initColorPicker();
     }
 
     async update(userLoadPromise, route) {
@@ -342,7 +356,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
             this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
             return Promise.reject(new Error('Not Login.'));
         } else {
-            this.preference = result.userinfo.preference;
+            this.preference = Object.assign({}, result.userinfo.preference);
             this.userinfo = result.userinfo;
             this.login = result.login;
             this._hasUsername = Boolean(this.userinfo.username);
@@ -444,9 +458,12 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
     }
 
     _updateUserinfo(info, toast = true) {
+        if (!this.userinfo) return;
         let klogUser = this.userinfo.klogUser;
+        const toastBackground = this.userinfo.preference.themeColor != this.preference.themeColor;
         return klogUser.update(info).then(() => {
-            if (toast) this.openToast('已更新账户');
+            const options = { colorful: toastBackground };
+            if (toast) this.openToast('已更新账户', null, options);
             klogUser.updateUserinfo();
         });
     }
@@ -480,12 +497,35 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
             this._preferenceInit = true;
             return;
         }
-        this.userinfo.preference = this.preference;
         this._updateUserinfo({
             preference: {
                 value: this.preference
+            },
+            zoneThemeColor: {
+                publicRead: true,
+                value: this.preference.themeColor
             }
+        }, true);
+        this.userinfo.preference = Object.assign({}, this.preference);
+    }
+
+    _initColorPicker() {
+        const colorPicker = this.$.colorPicker;
+        const menuButton = colorPicker.shadowRoot.querySelector('paper-menu-button');
+        const dropdownContent = menuButton.shadowRoot.querySelector('.dropdown-content');
+        menuButton.style.padding = '0';
+        dropdownContent.style.border = '4px solid var(--surface)';
+        colorPicker.colorList = ['#3f51b5', '#65a5f2', '#83be54', '#3b8638', '#f0d551', '#d7be48', '#e5943c', '#cf712e', '#a96ddb', '#6f4196'];
+        colorPicker.addEventListener('color-picker-selected', e=>{
+            this.set('preference.themeColor', e.detail.color);
+            menuButton.close();
         });
+    }
+
+    pickColor() {
+        const colorPicker = this.$.colorPicker;
+        const menuButton = colorPicker.shadowRoot.querySelector('paper-menu-button');
+        menuButton.open();
     }
 }
 

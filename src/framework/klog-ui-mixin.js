@@ -10,7 +10,13 @@ const UiMixin = (superClass) => class extends superClass {
 
     _openToast(text, link, option = {}) {
         const toast = document.createElement('paper-toast');
-        Object.assign(toast, { text: text, duration: 2000, withBackdrop: false }, option);
+        Object.assign(toast, { text: text, duration: 2000, withBackdrop: false, colorful: false }, option);
+        
+        if (option.colorful) {
+            setTimeout(()=>toast.style.transition = 'all .3s ease', 10);
+            toast.style.setProperty('--paper-toast-background-color', 'var(--primary)');
+            toast.style.setProperty('--paper-toast-color', 'var(--on-primary)');
+        }
         if (link) {
             toast.innerHTML = `<a ${link.href ? 'href=' + link.href : ''}>${link.title}</a>`;
             toast.querySelector('a').addEventListener('click', e => link.onclick(e));
