@@ -337,7 +337,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             return;
         }
         document.querySelector('html').setAttribute('theme', this.theme);
-        document.querySelector('html').style.background = this.theme == 'light' ? '#e0e0e0' : '#000000';
+        document.querySelector('html').style.background = window.getComputedStyle(this).getPropertyValue('--klog-page-background');
         let metaThemeColor = document.querySelector('meta[name=theme-color]');
         metaThemeColor.setAttribute('content', this.theme == 'light' ? '#e0e0e0' : '#000000');
     }
