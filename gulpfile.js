@@ -1,5 +1,6 @@
 'use strict';
 
+const process = require('process');
 const del = require('del');
 const path = require('path');
 const fs = require('fs');
@@ -20,11 +21,21 @@ function waitFor(stream) {
 }
 
 function build() {
-  return run('call scripts/build.bat', { verbosity: 3 }).exec();
+  const isWin = process.platform === "win32";
+  if (isWin) {
+    return run('call scripts/build.bat', { verbosity: 3 }).exec();
+  } else {
+    return run('bash scripts/build.sh', { verbosity: 3 }).exec();
+  }
 };
 
 function pushOTA() {
-  return run('call scripts/push_ota.bat', { verbosity: 3 }).exec();
+  const isWin = process.platform === "win32";
+  if (isWin) {
+    return run('call scripts/push_ota.bat', { verbosity: 3 }).exec();
+  } else {
+    return run('bash scripts/push_ota.sh', { verbosity: 3 }).exec();
+  }
 };
 
 function insertVariable() {
