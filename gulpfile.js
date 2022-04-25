@@ -62,6 +62,24 @@ function insertVariable() {
   return Promise.all(promises);
 };
 
+function insertVersion() {
+  let promises = [];
+  let builds = fs.readdirSync(settings.buildDirectory);
+  for (let name of builds) {
+    let buildPath = path.join(settings.buildDirectory, name);
+    let stat = fs.statSync(buildPath);
+    if (stat.isDirectory()) {
+      let filepath = path.join(buildPath, 'src', 'page');
+      console.log(path.join(filepath, 'klog-userpanel.js'));
+      let promise = gulp.src(path.join(filepath, 'klog-userpanel.js'))
+        .pipe(replace('{{GLOBAL_VERSION}}', settings.version))
+        .pipe(gulp.dest(filepath));
+      promises.push(promise);
+    }
+  }
+  return Promise.all(promises);
+}
+
 function byeGoogleFont() {
   const files = [
     settings.buildDirectory + '/**/bower_components/font-roboto/roboto.html',
@@ -104,7 +122,8 @@ async function workerBuild() {
 
 exports.build = build;
 exports.insert = insertVariable;
+exports.version = insertVersion;
 exports.google = byeGoogleFont;
 exports.sw = workerBuild;
 exports.push = pushOTA;
-exports.default = gulp.series(build, insertVariable, byeGoogleFont, workerBuild, pushOTA);
+exports.default = gulp.series(build, insertVariable, insertVersion, byeGoogleFont, workerBuild, pushOTA);
