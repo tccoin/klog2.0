@@ -44,7 +44,8 @@ containerKlogStyle.innerHTML = `<custom-style>
     html[theme~=light],
     :host([theme~=light]),
     [theme~=light] {
-      --klog-page-background: var(--paper-grey-300);
+      --klog-page-background: var(--surface-variant);
+      --on-klog-page-background: var(--on-surface-variant);
       --klog-markdown-title-color: var(--on-surface);
       --klog-markdown-text-color: var(--on-surface);
       --klog-markdown-secondary-text-color: var(--on-background);
@@ -62,6 +63,7 @@ containerKlogStyle.innerHTML = `<custom-style>
     :host([theme~=dark]),
     [theme~=dark] {
       --klog-page-background: #131313;
+      --on-klog-page-background: #919191;
       --klog-markdown-title-color: #FFF;
       --klog-markdown-text-color: #c8c8c8;
       --klog-markdown-secondary-text-color: #919191;

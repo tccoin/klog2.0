@@ -111,49 +111,54 @@ containerKlogFab.innerHTML = `<dom-module id="klog-fab">
 document.head.appendChild(containerKlogFab.content);
 class KlogFab extends PolymerElement {
 
-    static get is() { return 'klog-fab'; }
+  static get is() { return 'klog-fab'; }
 
-    static get properties() {
-        return {
-            icon: {
-                type: String,
-                value: ''
-            },
-            label: {
-                type: String
-            },
-            extended: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            },
-            hidden: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            }
-        };
-    }
+  static get properties() {
+    return {
+      icon: {
+        type: String,
+        value: ''
+      },
+      label: {
+        type: String
+      },
+      extended: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+      hidden: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+      disabled: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+    };
+  }
 
-    static get observers() {
-        return [
-            '_updateStyle(extended,label,hidden)'
-        ];
-    }
+  static get observers() {
+    return [
+      '_updateStyle(extended,label,hidden)'
+    ];
+  }
 
-    _updateStyle() {
-        let width;
-        if (this.extended) {
-            this._labelWidth = this.$.label.offsetWidth || this._labelWidth;
-            if (!this._labelWidth && this.label && !this.hidden) {
-                setTimeout(() => this._updateStyle(), 10);
-                return;
-            }
-            width = 68 + this._labelWidth;
-        } else {
-            width = 56;
-        }
-        this.style.width = width + 'px';
+  _updateStyle() {
+    let width;
+    if (this.extended) {
+      this._labelWidth = this.$.label.offsetWidth || this._labelWidth;
+      if (!this._labelWidth && this.label && !this.hidden) {
+        setTimeout(() => this._updateStyle(), 10);
+        return;
+      }
+      width = 68 + this._labelWidth;
+    } else {
+      width = 56;
     }
+    this.style.width = width + 'px';
+  }
 }
 window.customElements.define(KlogFab.is, KlogFab);

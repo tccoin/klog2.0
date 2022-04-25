@@ -15,6 +15,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       outline: none;
       padding: 0;
       font-size: var(--klog-markdown-font-size);
+      --klog-markdown-title-color: var(--primary);
     }
 
     .section {
@@ -37,7 +38,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       top: calc(-1 * var(--safe-area-inset-top));
       background: var(--surface);
       min-height: calc(100vh - 350px);
-      @apply(--shadow-elevation-2dp);
     }
 
     .article-container::after{
@@ -50,6 +50,10 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     .article-container > *{
       z-index: 1;
       position: relative;
+    }
+
+    .comment-container {
+      background: linear-gradient(to bottom, var(--surface), transparent);
     }
 
     .article-container,
@@ -77,7 +81,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       background-color: var(--primary-container);
       color: var(--on-primary-container);
       transform: translateX(-100%);
-      transition: transform 0.2s ease 0s, box-shadow 0.2s ease 0s, opacity 0.2s ease 0s;
+      transition: box-shadow 0.2s ease 0s, opacity 0.2s ease 0s;
     }
 
     .article-update-info{
@@ -94,8 +98,8 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     .article-footer {
       padding: 0 16px 32px;
       font-size: 20px;
-      color: var(--on-surface);
-      opacity: 0.15;
+      color: var(--primary);
+      opacity: 0.5;
       text-align: center;
       cursor: default;
     }
@@ -157,7 +161,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       line-height: 1;
       margin: 0.1em 0 0.5em;
       word-break: break-word;
-      box-shadow: 0 -0.2em 0px var(--surface-variant) inset;
+      color: var(--primary);
     }
 
     .dot-divider {

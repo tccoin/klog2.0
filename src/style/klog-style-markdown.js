@@ -366,8 +366,11 @@ containerKlogStyleMarkdown.innerHTML = `<dom-module id="klog-style-markdown">
         white-space: nowrap;
         overflow: hidden;
         font-size: 14px;
+        letter-spacing: 0.1em;
         margin-bottom: 14px;
         text-overflow: ellipsis;
+        color: var(--on-background);
+        opacity: 0.5;
         cursor: default;
         user-select: none;
         -webkit-user-select: none;

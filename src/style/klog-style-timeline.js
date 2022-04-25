@@ -35,12 +35,12 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         font-size: 32px;
         font-weight: bolder;
         margin-right: 16px;
-        color: var(--on-surface);
+        color: var(--primary);
       }
 
       .page-header-subtitle{
         margin-bottom: 16px;
-        color: var(--on-surface);
+        color: var(--on-klog-page-background);
       }
 
       :host([mobile]) .main-container{
@@ -54,12 +54,12 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
         position: relative;
         left: -46px;
         box-sizing: border-box;
+        --on-surface: var(--on-klog-page-background);
       }
 
       klog-chip {
         margin: 0 4px;
         vertical-align: middle;
-        --klog-chip-text-color: var(--on-background);
         --divider: var(--on-background);
         --klog-chip-style: {
           font-size: 1.1em;

@@ -11,7 +11,7 @@ import './klog-layout.js';
 
 class KlogApp extends KlogUiMixin(PolymerElement) {
     static get template() {
-        return html `
+        return html`
     <style include="klog-style-toast"></style>
     <style>
       :host {
@@ -124,7 +124,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             this.loadingTimeoutPrompt = true;
         }, 5000);
         await
-        import ('./klog-layout.js');
+            import('./klog-layout.js');
         this.loading = false;
         clearTimeout(this._loadingTimeout);
     }
@@ -142,7 +142,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         } catch (err) {
             if (err.message == '404') {
                 window.location.hash = '#/404/';
-            } else if (err.message == 'Loading interrupted' || err.message == 'Redirect') {} else {
+            } else if (err.message == 'Loading interrupted' || err.message == 'Redirect') { } else {
                 console.error(err);
             }
         }
@@ -208,15 +208,17 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
                 this.removeEventListener('editor-loaded', editorLoaded);
             };
             this.addEventListener('editor-loaded', editorLoaded);
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: {
-                page: 'editor/' + (e.detail.articleId || '')
-            } }));
+            this.dispatchEvent(new CustomEvent('app-load', {
+                bubbles: true, composed: true, detail: {
+                    page: 'editor/' + (e.detail.articleId || '')
+                }
+            }));
         });
         window.addEventListener('online', (e) => this._notifyNetworkStatus(e));
         window.addEventListener('offline', (e) => this._notifyNetworkStatus(e));
         this._notifyNetworkStatus();
         this.addEventListener('update-service-worker', (e) => {
-            let callback = e.detail && e.detail.callback ? e.detail.callback : function() {};
+            let callback = e.detail && e.detail.callback ? e.detail.callback : function () { };
             this._updateServiceWorker(callback);
         });
     }
@@ -237,7 +239,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     }
 
     _updateServiceWorker(callback) {
-        callback = callback || function() {};
+        callback = callback || function () { };
         if ('serviceWorker' in navigator) {
             if (this._swUpdateFound) {
                 this._updateFound();
@@ -324,7 +326,9 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         if (!this.theme || !this.themeColor) return;
         // 更新动态色彩
         let dynamicTheme = new KlogDynamicTheme();
-        dynamicTheme.apply(this, this.themeColor == 'default' ? '#3f51b5' : this.themeColor, this.theme);
+        console.log();
+        const defaultThemeColor = (this.preference && 'themeColor' in this.preference) ? this.preference.themeColor : '#3f51b5';
+        dynamicTheme.apply(this, this.themeColor == 'default' ? defaultThemeColor : this.themeColor, this.theme);
 
         // 更新主题
         let htmlTheme = document.querySelector('html').getAttribute('theme');

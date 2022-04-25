@@ -11,7 +11,7 @@ import '../ui/klog-markdown.js';
 
 class KlogNoteContent extends PolymerElement {
     static get template() {
-        return html `
+        return html`
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-media"></style>
@@ -20,6 +20,7 @@ class KlogNoteContent extends PolymerElement {
         flex: 1;
         height: calc(var(--klog-layout-page-height) - 64px);
         outline: none;
+        --klog-markdown-title-color: var(--primary);
       }
 
       /*container*/
@@ -85,8 +86,8 @@ class KlogNoteContent extends PolymerElement {
         height: 36px;
         padding: 0 4px;
         border-radius: 18px;
-        color: var(--on-primary-container);
-        background: var(--primary-container);
+        color: var(--on-secondary-container);
+        background: var(--secondary-container);
       }
 
       .note-toolbar paper-icon-button {
@@ -149,7 +150,7 @@ class KlogNoteContent extends PolymerElement {
 
     <div class="main-container" id="scrollTarget">
       <div class="body">
-        <klog-markdown class="markdown" id="markdown" markdown="{{article.markdown}}" link-prefix="article/{{path}}" theme="{{theme}}" scroll-bias="{{_getBias(mobile)}}" mobile="{{mobile}}" preference="{{userinfo.preference.markdown}}" breadcrumbs="" heading-actions="">
+        <klog-markdown class="markdown" id="markdown" markdown="{{article.markdown}}" link-prefix="article/{{path}}" theme="{{theme}}" scroll-bias="{{_getBias(mobile)}}" mobile="{{mobile}}" preference="{{userinfo.preference.markdown}}" lazy breadcrumbs heading-actions>
         </klog-markdown>
       </div>
     </div>

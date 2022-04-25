@@ -8,22 +8,23 @@ import '../style/klog-style-author.js';
 import './klog-editor-textarea.js';
 
 class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
-    static get template() {
-        return html `
+  static get template() {
+    return html`
     <style include="klog-style-author"></style>
     ${this.styleTemplate}
     <klog-data-comment id="data"></klog-data-comment>
     ${this.inputTemplate}
     ${this.commentTemplate}
 `;
-    }
+  }
 
-    static get styleTemplate() {
-        return html `
+  static get styleTemplate() {
+    return html`
     <style>
       :host {
         display: block;
         padding: 56px 16px 0;
+        font-size: 14px;
         --klog-markdown-padding: 0px;
         --klog-markdown-font-size: 14px;
         --textarea-padding: 0;
@@ -145,10 +146,10 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
         }
       }
     </style>`;
-    }
+  }
 
-    static get inputTemplate() {
-        return html `
+  static get inputTemplate() {
+    return html`
     <div class="klog-author input-container">
       <klog-image class="author-avatar" src="{{_userAvatarUrl}}" avatar></klog-image>
       <div class="text">
@@ -167,17 +168,17 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
             <klog-emoticon-selector>
               <paper-icon-button icon="insert_emoticon"></paper-icon-button>
             </klog-emoticon-selector>
-            <paper-button on-click="_submitComment" id="replyButton"><iron-icon icon="save_alt"></iron-icon>评论</paper-button>
+            <paper-button on-click="_submitComment" id="replyButton"><iron-icon icon="save_alt"></iron-icon>发表评论</paper-button>
           </div>
         </div>
       </div>
     </div>`;
-    }
+  }
 
-    static get commentTemplate() {
-        const generateComments = (isPrimary, slot = '') => {
-            const item = isPrimary ? 'primary' : 'secondary';
-            return `
+  static get commentTemplate() {
+    const generateComments = (isPrimary, slot = '') => {
+      const item = isPrimary ? 'primary' : 'secondary';
+      return `
         <template is="dom-repeat" items="{{${isPrimary ? 'data' : 'primary.secondary'}}}" as="${item}">
           <div class="klog-author klog-author-${item}" comment-data="{{${item}}}" on-click="_tapHandle">
             <klog-image class="author-avatar" on-click="openZone" src="{{${item}.author.avatarUrl}}" ${!isPrimary ? 'hidden' : ''} avatar></klog-image>
@@ -203,225 +204,225 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
             </div>
           </div>
         </template>`;
-        };
-        return html([generateComments(true, generateComments(false))]);
+    };
+    return html([generateComments(true, generateComments(false))]);
+  }
+
+  static get is() { return 'klog-comment'; }
+
+  static get properties() {
+    return {
+      articleId: {
+        type: String
+      },
+      articleAuthorId: {
+        type: String
+      },
+      data: {
+        type: Array
+      },
+      theme: {
+        type: String
+      },
+      mobile: {
+        type: Boolean
+      },
+      login: {
+        type: Boolean
+      },
+    };
+  }
+
+  static get observers() {
+    return [
+      'refresh(articleId)',
+      '_updateUserinfo(login)'
+    ];
+  }
+
+  ready() {
+    super.ready();
+    this.updateInput('create');
+    this.$.input.addEventListener('input', () => this._checkUserLogin());
+    this.addEventListener('emoticon-select', e => this.$.input.insert(e.detail.emoticon));
+  }
+
+  lazyload() {
+    this.refresh();
+  }
+
+  async refresh() {
+    if (!this.articleId) return;
+    this.data = await this.loadComments(this.articleId);
+    setTimeout(() => {
+      this._updateMarkdownScroller();
+    }, 1);
+  }
+
+  updateScrollTarget(scrollTarget) {
+    this.$.scrollTarget = scrollTarget;
+    this._updateMarkdownScroller();
+  }
+
+  updateInput(method, data = null) {
+    this._inputMethod = method;
+    this._inputData = data;
+    if (method == 'create') {
+      this._inputIndicator = '评论文章';
+    } else {
+      if (method == 'edit') {
+        this._inputIndicator = '修改评论';
+        this.$.input.value = data.markdown;
+      } else if (method == 'reply' && this._isAuthor(data)) {
+        this._inputIndicator = '回复自己';
+      } else if (method == 'reply') {
+        this._inputIndicator = '回复' + data.author.displayName;
+      }
     }
+  }
 
-    static get is() { return 'klog-comment'; }
+  resetInput() {
+    this.$.input.value = '';
+    this.updateInput('create');
+  }
 
-    static get properties() {
-        return {
-            articleId: {
-                type: String
-            },
-            articleAuthorId: {
-                type: String
-            },
-            data: {
-                type: Array
-            },
-            theme: {
-                type: String
-            },
-            mobile: {
-                type: Boolean
-            },
-            login: {
-                type: Boolean
-            },
-        };
+  focus() {
+    this.$.input.$.input.$.textarea.focus();
+  }
+
+  doNotFocus(e) {
+    e.stopPropagation();
+  }
+
+  _isAuthor(data) {
+    if (this.login) {
+      const userId = this.userinfo.publicinfo.id;
+      const replyToAuthorId = data.author.objectId;
+      return userId == replyToAuthorId;
+    } else {
+      return false;
     }
+  }
 
-    static get observers() {
-        return [
-            'refresh(articleId)',
-            '_updateUserinfo(login)'
-        ];
+  openZone(e) {
+    e.stopPropagation();
+    const commentData = this._getCommentData(e.target);
+    const page = commentData.author.username || 'zone/' + commentData.author.objectId;
+    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
+  }
+
+  async _submitComment() {
+    const method = this._inputMethod;
+    const data = this._inputData;
+    if (this.$.input.value.length == 0) {
+      this.openToast('什么话都不说，这是坠好的！');
+    } else {
+      this.$.replyButton.disabled = true;
+      if (method == 'create') {
+        const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        this.openToast('评论已发送');
+      } else if (method == 'edit') {
+        await this.updateComment(data.objectId, this.$.input.value);
+        this.openToast('评论已修改');
+      } else if (method == 'reply') {
+        const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
+        this.openToast('回复已发送');
+      }
+      await this.refresh();
+      this.resetInput();
+      this.$.replyButton.disabled = false;
     }
+  }
 
-    ready() {
-        super.ready();
-        this.updateInput('create');
-        this.$.input.addEventListener('input', () => this._checkUserLogin());
-        this.addEventListener('emoticon-select', e => this.$.input.insert(e.detail.emoticon));
+  _editComment(e) {
+    this.resetInput();
+    this.updateInput('edit', this._getCommentData(e.target));
+    this.focus();
+  }
+
+  _replyComment(e) {
+    this.resetInput();
+    const currentComment = this._getCommentData(e.target);
+    const primaryComment = this._getCommentData(e.target, true);
+    this.updateInput('reply', {
+      author: currentComment.author,
+      objectId: primaryComment.objectId
+    });
+    this.focus();
+  }
+
+  _tapHandle(e) {
+    if (this.mobile) {
+      const currentComment = this._getCommentData(e.target);
+      if (this._isAuthor(currentComment)) {
+        this._editComment(e);
+      } else {
+        this._replyComment(e);
+      }
     }
+  }
 
-    lazyload() {
-        this.refresh();
+  async _deleteComment(e) {
+    let commentId;
+    if (this._inputData) {
+      commentId = this._inputData.objectId;
+    } else {
+      commentId = this._getCommentData(e.target).objectId;
     }
-
-    async refresh() {
-        if (!this.articleId) return;
-        this.data = await this.loadComments(this.articleId);
-        setTimeout(() => {
-            this._updateMarkdownScroller();
-        }, 1);
-    }
-
-    updateScrollTarget(scrollTarget) {
-        this.$.scrollTarget = scrollTarget;
-        this._updateMarkdownScroller();
-    }
-
-    updateInput(method, data = null) {
-        this._inputMethod = method;
-        this._inputData = data;
-        if (method == 'create') {
-            this._inputIndicator = '评论文章';
-        } else {
-            if (method == 'edit') {
-                this._inputIndicator = '修改评论';
-                this.$.input.value = data.markdown;
-            } else if (method == 'reply' && this._isAuthor(data)) {
-                this._inputIndicator = '回复自己';
-            } else if (method == 'reply') {
-                this._inputIndicator = '回复' + data.author.displayName;
-            }
-        }
-    }
-
-    resetInput() {
-        this.$.input.value = '';
-        this.updateInput('create');
-    }
-
-    focus() {
-        this.$.input.$.input.$.textarea.focus();
-    }
-
-    doNotFocus(e) {
-        e.stopPropagation();
-    }
-
-    _isAuthor(data) {
-        if (this.login) {
-            const userId = this.userinfo.publicinfo.id;
-            const replyToAuthorId = data.author.objectId;
-            return userId == replyToAuthorId;
-        } else {
-            return false;
-        }
-    }
-
-    openZone(e) {
-        e.stopPropagation();
-        const commentData = this._getCommentData(e.target);
-        const page = commentData.author.username || 'zone/' + commentData.author.objectId;
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page } }));
-    }
-
-    async _submitComment() {
-        const method = this._inputMethod;
-        const data = this._inputData;
-        if (this.$.input.value.length == 0) {
-            this.openToast('什么话都不说，这是坠好的！');
-        } else {
-            this.$.replyButton.disabled = true;
-            if (method == 'create') {
-                const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                this.openToast('评论已发送');
-            } else if (method == 'edit') {
-                await this.updateComment(data.objectId, this.$.input.value);
-                this.openToast('评论已修改');
-            } else if (method == 'reply') {
-                const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
-                this.openToast('回复已发送');
-            }
-            await this.refresh();
-            this.resetInput();
-            this.$.replyButton.disabled = false;
-        }
-    }
-
-    _editComment(e) {
+    this.openToast('确定要删除这条评论吗？', {
+      title: '确认删除',
+      onclick: async () => {
+        await this.deleteComment(commentId);
+        await this.refresh();
         this.resetInput();
-        this.updateInput('edit', this._getCommentData(e.target));
-        this.focus();
-    }
+        this.openToast('评论已删除');
+      }
+    });
+  }
 
-    _replyComment(e) {
-        this.resetInput();
-        const currentComment = this._getCommentData(e.target);
-        const primaryComment = this._getCommentData(e.target, true);
-        this.updateInput('reply', {
-            author: currentComment.author,
-            objectId: primaryComment.objectId
-        });
-        this.focus();
-    }
+  _calcCancelButtonDisabled(method) {
+    return method == 'create';
+  }
 
-    _tapHandle(e) {
-        if (this.mobile) {
-            const currentComment = this._getCommentData(e.target);
-            if (this._isAuthor(currentComment)) {
-                this._editComment(e);
-            } else {
-                this._replyComment(e);
-            }
-        }
-    }
+  _calcMobileDeleteButtonDisabled(method, mobile) {
+    return method != 'edit' || !mobile;
+  }
 
-    async _deleteComment(e) {
-        let commentId;
-        if (this._inputData) {
-            commentId = this._inputData.objectId;
-        } else {
-            commentId = this._getCommentData(e.target).objectId;
-        }
-        this.openToast('确定要删除这条评论吗？', {
-            title: '确认删除',
-            onclick: async() => {
-                await this.deleteComment(commentId);
-                await this.refresh();
-                this.resetInput();
-                this.openToast('评论已删除');
-            }
-        });
+  _getCommentData(container, primary = false) {
+    while (container && container.className.indexOf('klog-author' + (primary ? '-primary' : '')) == -1) {
+      container = container.parentNode;
     }
+    if (!container) return null;
+    else return container.commentData;
+  }
 
-    _calcCancelButtonDisabled(method) {
-        return method == 'create';
+  _updateMarkdownScroller() {
+    if (!this.$.scrollTarget) return;
+    const items = this.shadowRoot.querySelectorAll('klog-markdown[lazy-init]');
+    for (let item of items) {
+      item.updateScrollTarget(this.$.scrollTarget);
+      item.removeAttribute('lazy-init');
     }
+  }
 
-    _calcMobileDeleteButtonDisabled(method, mobile) {
-        return method != 'edit' || !mobile;
+  _checkUserLogin() {
+    if (!this.login) {
+      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
     }
+  }
 
-    _getCommentData(container, primary = false) {
-        while (container && container.className.indexOf('klog-author' + (primary ? '-primary' : '')) == -1) {
-            container = container.parentNode;
-        }
-        if (!container) return null;
-        else return container.commentData;
+  _updateUserinfo(login) {
+    if (!login) {
+      this._userAvatarUrl = 'https://storage.krrr.party/storage/klog-avatar/default_avatar.jpg';
+    } else {
+      this._userAvatarUrl = this.userinfo.publicinfo.attributes.avatarUrl;
     }
+  }
 
-    _updateMarkdownScroller() {
-        if (!this.$.scrollTarget) return;
-        const items = this.shadowRoot.querySelectorAll('klog-markdown[lazy-init]');
-        for (let item of items) {
-            item.updateScrollTarget(this.$.scrollTarget);
-            item.removeAttribute('lazy-init');
-        }
-    }
-
-    _checkUserLogin() {
-        if (!this.login) {
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
-        }
-    }
-
-    _updateUserinfo(login) {
-        if (!login) {
-            this._userAvatarUrl = 'https://storage.krrr.party/storage/klog-avatar/default_avatar.jpg';
-        } else {
-            this._userAvatarUrl = this.userinfo.publicinfo.attributes.avatarUrl;
-        }
-    }
-
-    _parseDate(date) {
-        return Date.parse(date);
-    }
+  _parseDate(date) {
+    return Date.parse(date);
+  }
 }
 
 window.customElements.define(KlogComment.is, KlogComment);

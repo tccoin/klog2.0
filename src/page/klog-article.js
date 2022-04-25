@@ -17,7 +17,7 @@ import './klog-comment.js';
 
 class KlogArticle extends KlogUiMixin(PolymerElement) {
     static get template() {
-        return html `
+        return html`
 <style include="klog-style-article"></style>
 <klog-data-article id="data" path="{{path}}" last-response="{{article}}" last-error="{{error}}" is-owner="{{isOwner}}">
 </klog-data-article>
@@ -36,7 +36,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
       <h1>{{article.title}}</h1>
     </div>
     <div class="article-author klog-author" theme\$="{{theme}}">
-      <klog-image id="avatar" class="author-avatar" on-click="openZone" src="{{article.author.avatarUrl}}" avatar="" lazy=""></klog-image>
+      <klog-image id="avatar" class="author-avatar" on-click="openZone" src="{{article.author.avatarUrl}}" avatar lazy></klog-image>
       <div class="text">
         <div class="author-info">
           <span class="author-name" on-click="openZone">{{article.author.displayName}}</span>
@@ -112,7 +112,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                         '--klog-header-background': 'transparent',
                         '--klog-header-opacity': 0
                     },
-                    toolbar: html `
+                    toolbar: html`
             <app-toolbar>
               <paper-icon-button class="navigation" icon="arrow_back" on-click="back" hidden-on-mobile hidden-on-tablet></paper-icon-button>
               <div class="divider"></div>
@@ -138,7 +138,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             backTo = this.from;
         } else {
             backTo = 'timeline';
-        } 
+        }
         this.backTo = backTo;
         return backTo;
     }
@@ -162,7 +162,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                 this.edit();
             }
         });
-        
+
         this.$.image = document.createElement('klog-image');
 
         this._scrollHandler = () => {
@@ -171,9 +171,11 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
             let top = this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top;
             if (top != 0 && top - safeareaTop <= window.innerHeight - 32 - 28) {
-                fab.style.position = 'absolute';
-                fab.style.bottom = `${(-28 + safeareaTop)}px`;
+                fab.style.opacity = 0;
+                fab.style.zIndex = -1;
             } else {
+                fab.style.zIndex = '';
+                fab.style.opacity = 1;
                 fab.style.position = 'fixed';
                 fab.style.bottom = '32px';
             }
@@ -201,7 +203,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             let path = params[0];
             if (this.$.data.isPathNew(path)) {
                 this.path = path;
-                await new Promise(resolve=>this.$.data.addEventListener('success', resolve, { once: true }));
+                await new Promise(resolve => this.$.data.addEventListener('success', resolve, { once: true }));
                 let themeColor = 'default';
                 if (this.article.image && 'url' in this.article.image && this.$.image.isKlogStorage(this.article.image.url)) {
                     if ('themeColor' in this.article.image) {

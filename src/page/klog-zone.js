@@ -5,16 +5,16 @@ import '../ui/klog-image.js';
 import '../style/klog-style-card.js';
 
 class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
-    static get template() {
-        return html `
+  static get template() {
+    return html`
     ${this.styleTemplate}
     ${this.zoneStyletemplate}
       ${this.contentTemplate}
     `;
-    }
+  }
 
-    static get zoneStyletemplate() {
-        return html `
+  static get zoneStyletemplate() {
+    return html`
     <style include="klog-style-card"></style>
     <style>
       :host{
@@ -29,8 +29,8 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         position: fixed;
         z-index: 101;
         border-radius: 16px;
-        background: var(--surface-variant);
-        color: var(--on-surface-variant);
+        background: var(--surface);
+        color: var(--on-surface);
         transition: all .3s ease;
         transform-origin: right top;
         @apply --shadow-elevation-2dp;
@@ -84,6 +84,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
         white-space: nowrap;
         max-width: 100%;
         font-weight: bolder;
+        color: var(--primary);
     }
       .author-introduction{
         word-break: break-word;
@@ -118,10 +119,10 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       }
     </style>
     `;
-    }
+  }
 
-    static get contentTemplate() {
-        return html `
+  static get contentTemplate() {
+    return html`
     <klog-data-list id="data" type="timeline" last-response="{{list}}" keyword="{{keyword}}" key="updatedTime"></klog-data-list>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="info-container klog-card" id="info">
@@ -148,78 +149,78 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
       </div>
     </div>
 `;
-    }
+  }
 
-    static get is() { return 'klog-zone'; }
+  static get is() { return 'klog-zone'; }
 
-    static get properties() {
-        return {
-            loading: {
-                type: Boolean,
-                value: true,
-                reflectToAttribute: true
-            },
-            list: {
-                type: Array
-            },
-            filterName: {
-                type: String,
-                value: 'default',
-                observer: '_filterNameUpdate'
-            },
-            keyword: {
-                type: String,
-                value: ''
-            },
-            view: {
-                type: String,
-                value: 'default'
-            },
-            updateButtonHidden: {
-                type: Boolean,
-                value: true
-            },
-            authorPublic: {
-                type: Object
-            },
-            mobile: {
-                type: Boolean,
-                reflectToAttribute: true
-            },
-            layout: {
-                type: Object,
-                value: {
-                    documentTitle: 'Klog',
-                    drawer: 'auto',
-                    mainMenu: false,
-                    sidebar: 'off',
-                    scrollToTop: false
-                }
-            },
-        };
-    }
+  static get properties() {
+    return {
+      loading: {
+        type: Boolean,
+        value: true,
+        reflectToAttribute: true
+      },
+      list: {
+        type: Array
+      },
+      filterName: {
+        type: String,
+        value: 'default',
+        observer: '_filterNameUpdate'
+      },
+      keyword: {
+        type: String,
+        value: ''
+      },
+      view: {
+        type: String,
+        value: 'default'
+      },
+      updateButtonHidden: {
+        type: Boolean,
+        value: true
+      },
+      authorPublic: {
+        type: Object
+      },
+      mobile: {
+        type: Boolean,
+        reflectToAttribute: true
+      },
+      layout: {
+        type: Object,
+        value: {
+          documentTitle: 'Klog',
+          drawer: 'auto',
+          mainMenu: false,
+          sidebar: 'off',
+          scrollToTop: false
+        }
+      },
+    };
+  }
 
-    showDefaultToolbar() {
-        this.keyword = '';
-        this.updateTimeline(false, true);
-        this.$.filter.hidden = false;
-        if (this.$.info) this.$.info.classList.remove('hidden');
-        this.dispatchEvent(new CustomEvent('layout-update', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                header: {
-                    fixed: true,
-                    short: false,
-                    blur: { mobile: true, desktop: false },
-                    shadow: { mobile: 'scroll', desktop: 'off' },
-                },
-                styles: {
-                    '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
-                    '--klog-header-text-color': 'var(--on-surface)',
-                    '--klog-header-opacity': 0.8
-                },
-                toolbar: html `
+  showDefaultToolbar() {
+    this.keyword = '';
+    this.updateTimeline(false, true);
+    this.$.filter.hidden = false;
+    if (this.$.info) this.$.info.classList.remove('hidden');
+    this.dispatchEvent(new CustomEvent('layout-update', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        header: {
+          fixed: true,
+          short: false,
+          blur: { mobile: true, desktop: false },
+          shadow: { mobile: 'scroll', desktop: 'off' },
+        },
+        styles: {
+          '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
+          '--klog-header-text-color': 'var(--on-surface)',
+          '--klog-header-opacity': 0.8
+        },
+        toolbar: html`
         <app-toolbar>
           <div class="title" on-click="back">
             <div main-title><iron-icon icon="klog"></iron-icon></div>
@@ -228,135 +229,135 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
           <div class="divider"></div>
           <paper-icon-button on-click="showSearchToolbar" icon="search" hidden-on-desktop></paper-icon-button>
         </app-toolbar>`
-            }
-        }));
-    }
+      }
+    }));
+  }
 
-    ready() {
-        super.ready();
-        // filter
-        this.addEventListener('timeline-set-filter', (e) => {
-            e.stopPropagation();
-            this.$.keywordInput.value = e.detail.keyword;
-            this.setFilter(e);
-        });
+  ready() {
+    super.ready();
+    // filter
+    this.addEventListener('timeline-set-filter', (e) => {
+      e.stopPropagation();
+      this.$.keywordInput.value = e.detail.keyword;
+      this.setFilter(e);
+    });
 
-        // scroll
-        this._superScrollHandler = this._scrollHandler;
-        this._lastY = 0;
-        this._scrollHandler = e => {
-            if (!this.$.scrollTarget) return;
-            let y = this.$.scrollTarget.scrollTop;
-            let speed = y - this._lastY;
-            let h = this.$.info.clientHeight;
-            let progress = y / h;
-            if (this.mobile) {
-                this.$.info.style.transform = `scale(${Math.max(0.95, 1 - progress * 0.1 * 3)})`;
-                const marginTop = 32;
-                const headerHeight = 64;
-                const fast = 2;
-                let speedUp = Math.max(Math.min(y * (fast - 1), (h + marginTop) / fast * (fast - 1)), 0);
-                let slowDown = 0;
-                this.$.info.style.marginTop = `${marginTop + headerHeight - speedUp + slowDown}px`;
-            } else {
-                this.$.info.style.borderRadius = '';
-                this.$.info.style.marginTop = '122px';
-                if (speed > 20) {
-                    this.$.info.style.transform = `translateY(-${Math.min(48, y)}px)scale(0.9)`;
-                }
-                if (speed < -20 || y < 48) {
-                    this.$.info.style.transform = 'translateY(0px)scale(1)';
-                }
-            }
-            this._superScrollHandler(e);
-            this._lastY = y;
-        };
-
-        // data
-        this.$.data.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'updatedTime', 'attachments', 'collection', 'tags'];
-        this.$.data.include = ['author', 'topic'];
-    }
-
-    async update(userLoadPromise, subroute) {
-        // listen to avatar image for themeColor
-        let lastAvaterSrc = this.$.avatar.src;
-        this.$.avatar.lazy = true;
-        let mediaInfoUpdate = new Promise(resolve=>this.$.avatar.addEventListener('media-info-updated', e=>resolve(e), { once: true }));
-        // author publicinfo
-        if (subroute.prefix === '/zone') {
-            this.authorPublicId = subroute.path.replace(/[\/\\]/, '');
-            this.cardBackTo = 'zone/' + this.authorPublicId;
-            await this.loadAuthorPublic('id', this.authorPublicId);
-        } else {
-            this.authorUsername = subroute.prefix.replace(/[\/\\]/, '');
-            this.cardBackTo = this.authorUsername + (subroute.path || '');
-            await this.loadAuthorPublic('username', this.authorUsername);
-            this.authorPublicId = this.authorPublic.objectId;
+    // scroll
+    this._superScrollHandler = this._scrollHandler;
+    this._lastY = 0;
+    this._scrollHandler = e => {
+      if (!this.$.scrollTarget) return;
+      let y = this.$.scrollTarget.scrollTop;
+      let speed = y - this._lastY;
+      let h = this.$.info.clientHeight;
+      let progress = y / h;
+      if (this.mobile) {
+        this.$.info.style.transform = `scale(${Math.max(0.95, 1 - progress * 0.1 * 3)})`;
+        const marginTop = 32;
+        const headerHeight = 64;
+        const fast = 2;
+        let speedUp = Math.max(Math.min(y * (fast - 1), (h + marginTop) / fast * (fast - 1)), 0);
+        let slowDown = 0;
+        this.$.info.style.marginTop = `${marginTop + headerHeight - speedUp + slowDown}px`;
+      } else {
+        this.$.info.style.borderRadius = '';
+        this.$.info.style.marginTop = '122px';
+        if (speed > 20) {
+          this.$.info.style.transform = `translateY(-${Math.min(48, y)}px)scale(0.9)`;
         }
-        // update themeColor
-        let themeColor;
-        if (this.authorPublic.zoneThemeColor != 'default') {
-            themeColor = this.authorPublic.zoneThemeColor;
-        } else {
-            if (lastAvaterSrc != this.$.avatar.src) {
-                await mediaInfoUpdate;
-            }
-            let palette = this.$.avatar.mediaInfo.palette;
-            themeColor = this.theme == 'light' ? palette.LightVibrant.rgb : palette.DarkVibrant.rgb;
+        if (speed < -20 || y < 48) {
+          this.$.info.style.transform = 'translateY(0px)scale(1)';
         }
-        this.dispatchEvent(new CustomEvent('layout-update', { bubbles: true, composed: true, detail: { themeColor } }));
-        this.$.avatar.lazyload();
-        // timeline
-        let needRefresh = this.$.data.userPublicId != this.authorPublicId;
-        this.$.data.userPublicId = this.authorPublicId;
-        if (!this.isTimelineInit) {
-            this.isTimelineInit = true;
-            this._scrollHandler();
-            this.$.scrollTarget.scrollTop = 0;
-            this.loading = true;
-            await this.refresh();
-        } else {
-            const y = this._lastScrollY || 0;
-            this.$.scrollTarget.scrollTop = y;
-            this._scrollHandler();
-            await this._refreshAllItems();
-            if (needRefresh) {
-                this.loading = true;
-                await this.refresh();
-            }
-        }
-        this.updateTitle(this.authorPublic.displayName);
-        await new Promise(resolve=>setTimeout(resolve, 100));
-    }
+      }
+      this._superScrollHandler(e);
+      this._lastY = y;
+    };
 
-    back() {
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
-    }
+    // data
+    this.$.data.select = ['type', 'detail', 'referTo', 'author', 'title', 'text', 'createTime', 'markdown', 'type', 'image', 'topic', 'path', 'collection', 'updatedTime', 'attachments', 'collection', 'tags'];
+    this.$.data.include = ['author', 'topic'];
+  }
 
-    updateTitle(title) {
-        if (!title) return;
-        this.dispatchEvent(new CustomEvent('layout-update', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                documentTitle: title + ' - Klog'
-            }
-        }));
+  async update(userLoadPromise, subroute) {
+    // listen to avatar image for themeColor
+    let lastAvaterSrc = this.$.avatar.src;
+    this.$.avatar.lazy = true;
+    let mediaInfoUpdate = new Promise(resolve => this.$.avatar.addEventListener('media-info-updated', e => resolve(e), { once: true }));
+    // author publicinfo
+    if (subroute.prefix === '/zone') {
+      this.authorPublicId = subroute.path.replace(/[\/\\]/, '');
+      this.cardBackTo = 'zone/' + this.authorPublicId;
+      await this.loadAuthorPublic('id', this.authorPublicId);
+    } else {
+      this.authorUsername = subroute.prefix.replace(/[\/\\]/, '');
+      this.cardBackTo = this.authorUsername + (subroute.path || '');
+      await this.loadAuthorPublic('username', this.authorUsername);
+      this.authorPublicId = this.authorPublic.objectId;
     }
+    // update themeColor
+    let themeColor;
+    if (this.authorPublic.zoneThemeColor != 'default') {
+      themeColor = this.authorPublic.zoneThemeColor;
+    } else {
+      if (lastAvaterSrc != this.$.avatar.src) {
+        await mediaInfoUpdate;
+      }
+      let palette = this.$.avatar.mediaInfo.palette;
+      themeColor = this.theme == 'light' ? palette.LightVibrant.rgb : palette.DarkVibrant.rgb;
+    }
+    this.dispatchEvent(new CustomEvent('layout-update', { bubbles: true, composed: true, detail: { themeColor } }));
+    this.$.avatar.lazyload();
+    // timeline
+    let needRefresh = this.$.data.userPublicId != this.authorPublicId;
+    this.$.data.userPublicId = this.authorPublicId;
+    if (!this.isTimelineInit) {
+      this.isTimelineInit = true;
+      this._scrollHandler();
+      this.$.scrollTarget.scrollTop = 0;
+      this.loading = true;
+      await this.refresh();
+    } else {
+      const y = this._lastScrollY || 0;
+      this.$.scrollTarget.scrollTop = y;
+      this._scrollHandler();
+      await this._refreshAllItems();
+      if (needRefresh) {
+        this.loading = true;
+        await this.refresh();
+      }
+    }
+    this.updateTitle(this.authorPublic.displayName);
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
 
-    async loadAuthorPublic(key, value) {
-        let authorPublic;
-        if (key == 'id') {
-            authorPublic = await this.loadUserPublic(value);
-        } else if (key == 'username') {
-            authorPublic = await this.loadUserPublicByUsername(value);
-        }
-        if (!authorPublic.introduction) {
-            authorPublic.introduction = 'PLACEHOLDER_FOR_THOSE_LAZY_PEOPLE_WHO_DO_NOT_WRITE_ANYTHING_DESCRIBING_THEMSELVES';
-        }
-        this.authorPublic = authorPublic;
-        return authorPublic;
+  back() {
+    this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
+  }
+
+  updateTitle(title) {
+    if (!title) return;
+    this.dispatchEvent(new CustomEvent('layout-update', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        documentTitle: title + ' - Klog'
+      }
+    }));
+  }
+
+  async loadAuthorPublic(key, value) {
+    let authorPublic;
+    if (key == 'id') {
+      authorPublic = await this.loadUserPublic(value);
+    } else if (key == 'username') {
+      authorPublic = await this.loadUserPublicByUsername(value);
     }
+    if (!authorPublic.introduction) {
+      authorPublic.introduction = 'PLACEHOLDER_FOR_THOSE_LAZY_PEOPLE_WHO_DO_NOT_WRITE_ANYTHING_DESCRIBING_THEMSELVES';
+    }
+    this.authorPublic = authorPublic;
+    return authorPublic;
+  }
 }
 
 window.customElements.define(KlogZone.is, KlogZone);

@@ -19,7 +19,7 @@ import '../style/klog-style-layout.js';
 
 class KlogLayout extends KlogUiMixin(PolymerElement) {
     static get template() {
-        return html `
+        return html`
     <style include="klog-style-layout"></style>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-dialog"></style>
@@ -48,6 +48,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         height: var(--klog-layout-page-height);
         box-sizing: border-box;
         overflow-y: auto;
+        --on-surface: var(--on-klog-page-background);
       }
 
       .sidebar-container {
@@ -114,12 +115,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
       :host([sidebar-off]) .page-container {
         padding-left: 0;
       }
-
-      /* about */
-      paper-dialog {
-        max-width: 300px;
-        width: 100%;
-      }
     </style>
     <!-- Drawer -->
     <klog-drawer id="drawer" heading="{{drawerHeading}}">
@@ -161,18 +156,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         <klog-lab name="lab"></klog-lab>
       </iron-pages>
     </div>
-
-    <!--about-->
-    <paper-dialog id="about" with-backdrop="">
-      <h2>&gt; klog -V</h2>
-      <p>v2.21.0<br>2017-2021<br>Powered by Kr with Love.</p>
-      <div class="actions" column="">
-        <paper-button on-click="aboutHelp">&gt; klog help</paper-button>
-        <paper-button on-click="aboutLog">&gt; klog log</paper-button>
-        <paper-button on-click="aboutUpdate">&gt; klog update</paper-button>
-        <paper-button on-click="aboutGitHub">&gt; git clone klog</paper-button>
-      </div>
-    </paper-dialog>
 `;
     }
 
@@ -251,8 +234,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         window.addEventListener('resize', () => this.updateLayout(Object.assign(this._layout, { scrollToTop: false }), false));
         this.addEventListener('layout-update', e => this.updateLayout(e.detail, false));
         this.addEventListener('main-drawer-open', e => this.$.drawer.open());
-        this.addEventListener('about-help', e => this.aboutHelp());
-        this.addEventListener('about-log', e => this.aboutLog());
         this.addEventListener('page-scroll', e => this.scrollTo(e.detail.destination));
         this.addEventListener('page-set-top', () => {
             this.$.page.style.position = 'relative';
@@ -297,11 +278,11 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
                 page = 'zone';
             }
             let importPromise =
-        import (`../page/klog-${page}.js`);
+                import(`../page/klog-${page}.js`);
             let timeout;
             if (!this.loading) {
                 await this._unloadPage(oldPage);
-                timeout = setTimeout(()=>{
+                timeout = setTimeout(() => {
                     this.loading = true;
                 }, 300);
             }
@@ -449,7 +430,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
                     '--klog-header-height': '64px',
                     '--klog-header-opacity': 1,
                 },
-                toolbar: html ``
+                toolbar: html``
             };
             parent = defaultLayout;
         } else {
@@ -618,25 +599,15 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         }];
         let after = [];
         if (this.login) {
-            before[0].items.push({ name: 'message', text: '通知', icon: 'notifications', path: 'message' });
-            after.push({
-                name: 'user',
-                items: [
-                    { subtitle: true, text: '用户' },
-                    { name: 'userpanel', text: '我的', icon: 'account_circle', path: 'userpanel' },
-                    { name: 'console', text: '控制台', icon: 'console' }
-                ]
-            });
+            before[0].items = before[0].items.concat([
+                { name: 'message', text: '通知', icon: 'notifications', path: 'message' },
+                { name: 'userpanel', text: '设置', icon: 'account_circle', path: 'userpanel' }
+            ]);
         } else {
-            after.push({
-                name: 'user',
-                items: [
-                    { subtitle: true, text: '用户' },
-                    { name: 'login', text: '登录', icon: 'account_circle', path: 'login' },
-                    { name: 'signup', text: '注册', icon: 'account_box', path: 'signup' },
-                    { name: 'console', text: '控制台', icon: 'console' }
-                ]
-            });
+            before[0].items = before[0].items.concat([
+                { name: 'login', text: '登录', icon: 'account_circle', path: 'login' },
+                { name: 'signup', text: '注册', icon: 'account_box', path: 'signup' }
+            ]);
         }
         return before.concat(menu, after);
     }
@@ -650,7 +621,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
     }
 
     menuSelectHandle(category, item) {
-        if (item == 'console') this.$.about.open();
         let pageElement = this.$.page.querySelector(`[name='${this.page}']`);
         if (pageElement && pageElement.menuSelect) {
             return pageElement.menuSelect(category, item);
@@ -682,40 +652,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         } else {
             target && target.removeAttribute(attribute, value);
         }
-    }
-
-    aboutHelp(e) {
-        this.dispatchEvent(new CustomEvent('app-load', {
-            bubbles: true,
-            composed: true,
-            detail: { page: 'article/klog-help' }
-        }));
-    }
-
-    aboutLog(e) {
-        this.dispatchEvent(new CustomEvent('app-load', {
-            bubbles: true,
-            composed: true,
-            detail: { page: 'article/about-klog-2-0' }
-        }));
-    }
-
-    aboutUpdate() {
-        this.dispatchEvent(new CustomEvent('update-service-worker', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                callback: updateFound => {
-                    if (!updateFound) {
-                        this.openToast('Klog 已是最新版本');
-                    }
-                }
-            }
-        }));
-    }
-
-    aboutGitHub() {
-        window.open('https://github.com/tccoin/klog2.0');
     }
 
     scrollTo(destination, duration = 200, easing = 'easeInOut') {
