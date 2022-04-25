@@ -22,14 +22,14 @@ class KlogApps extends PolymerElement {
     ]
   }
 
-  update(route) {
-    this.route = route;
+  async update(userLoadPromise, subroute) {
+    this.route = subroute;
   }
 
   loadApp(appName) {
     if (!appName) return;
     this.dispatchEvent(new CustomEvent('drawer-disable', { bubbles: true, composed: true }));
-    import('./klog-apps-' + appName + '.js').then(() => {
+    import('../apps/klog-apps-' + appName + '.js').then(() => {
       let app = document.createElement('klog-apps-' + appName);
       this.shadowRoot.append(app);
       app.load();
