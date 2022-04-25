@@ -72,9 +72,8 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
 </div>
 <!--footer-->
 <div class="section article-footer">
-  <span class="logo">
+  <span class="logo" on-click="_logoClickHandle">
     <iron-icon icon="klog"></iron-icon>
-    <a href="#/timeline/"></a>
   </span>
 </div>
 `;
@@ -306,6 +305,10 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                 destination: this.$.commentContainer.offsetTop
             }
         }));
+    }
+
+    _logoClickHandle() {
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
     }
 }
 

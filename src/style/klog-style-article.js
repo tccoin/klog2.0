@@ -106,6 +106,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
     .article-footer .logo {
       position: relative;
+      cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
     }
@@ -113,11 +114,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     .article-footer .logo iron-icon{
       width: 51.14px;
       height: 51.14px;
-    }
-
-    .article-footer .logo a {
-      @apply --fit-layout;
-      z-index: 1;
     }
 
     /*Article*/
