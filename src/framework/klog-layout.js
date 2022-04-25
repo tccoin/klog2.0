@@ -45,14 +45,14 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
 
       .sidebar-container,
       .page-container {
-        height: var(--klog-layout-page-height);
         box-sizing: border-box;
-        overflow-y: auto;
         --on-surface: var(--on-klog-page-background);
       }
 
       .sidebar-container {
-        position: absolute;
+        position: fixed;
+        left: 0;
+        top: 0;
         width: var(--klog-layout-margin-left);
         box-sizing: border-box;
         padding: 80px 16px 16px 0;
@@ -60,7 +60,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
       }
 
       .page-container {
-        width: 100vw;
+        width: 100%;
         -webkit-overflow-scrolling: touch;
       }
 
@@ -229,7 +229,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
 
     ready() {
         super.ready();
-        this.$.scrollTarget = this.$.page;
+        this.$.scrollTarget = document.scrollingElement;
         this.$.scrollTarget.style.scrollBehavior = 'smooth';
         window.addEventListener('resize', () => this.updateLayout(Object.assign(this._layout, { scrollToTop: false }), false));
         this.addEventListener('layout-update', e => this.updateLayout(e.detail, false));
@@ -508,8 +508,14 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         this._setAttribute(this.$.header, 'short', !header.short);
         this._setAttribute(this.$.header, 'blur', !header.blur);
         this._setAttribute(this.$.header, 'collapsed', true);
-        this._bindEvent(this.$.scrollTarget, 'scroll', this._shortScrollHandle, !header.short);
-        this._bindEvent(this.$.scrollTarget, 'scroll', this._shadowScrollHandle, header.shadow != 'scroll');
+
+        if (this.$.scrollTarget == document.scrollingElement) {
+            this._bindEvent(document, 'scroll', this._shortScrollHandle, !header.short);
+            this._bindEvent(document, 'scroll', this._shadowScrollHandle, header.shadow != 'scroll');
+        } else {
+            this._bindEvent(this.$.scrollTarget, 'scroll', this._shortScrollHandle, !header.short);
+            this._bindEvent(this.$.scrollTarget, 'scroll', this._shadowScrollHandle, header.shadow != 'scroll');
+        }
         if (header.shadow == 'scroll') {
             header.shadow = this.$.scrollTarget.scrollTop == 0 ? 'off' : 'on';
         }

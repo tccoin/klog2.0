@@ -81,7 +81,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       background-color: var(--primary-container);
       color: var(--on-primary-container);
       transform: translateX(-100%);
-      transition: box-shadow 0.2s ease 0s, opacity 0.2s ease 0s;
+      transition: all 0.2s ease 0s;
     }
 
     .article-update-info{

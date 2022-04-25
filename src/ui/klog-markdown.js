@@ -14,7 +14,7 @@ import '../lib/clamp.js';
 import { getDefaultMarkdownPreference } from '../data/klog-data-preference.js';
 class KlogMarkdown extends PolymerElement {
     static get template() {
-        return html `
+        return html`
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-markdown"></style>
     <style include="han-style"></style>
@@ -110,7 +110,11 @@ class KlogMarkdown extends PolymerElement {
         }
         this.$.scrollTarget = scrollTarget;
         this.$.scroller.$.target = scrollTarget;
-        this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
+        if (this.$.scrollTarget == document.scrollingElement) {
+            document.addEventListener('scroll', this._scrollHandler);
+        } else {
+            this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
+        }
     }
 
     _initScroller() {
@@ -239,9 +243,9 @@ class KlogMarkdown extends PolymerElement {
           <div class="breadcrumbs" dont-count>
           <div class="collection">${cap[0] || '日常'}</div>
           ${cap[1]
-        ? `<div class="tags">${this.tags.map(t => `<span class="tag">${t}</span>`)}</div>`
-        : ''
-}
+                            ? `<div class="tags">${this.tags.map(t => `<span class="tag">${t}</span>`)}</div>`
+                            : ''
+                        }
           </div>`;
                 } else {
                     return `<!--collection:${cap[0]};tags:${this.tags}-->`;
@@ -461,7 +465,7 @@ class KlogMarkdown extends PolymerElement {
     }
 
     _updateLists() {
-    // secondary-text
+        // secondary-text
         let lists = this.$.content.querySelectorAll('li');
         for (let list of lists) {
             let children = list.children;
@@ -472,13 +476,13 @@ class KlogMarkdown extends PolymerElement {
                     continue;
                 }
                 if (hasbr &&
-          (child.tagName == 'SPAN'
-            || child.tagName == 'EM'
-            || child.tagName == 'DEL'
-            || child.tagName == 'STRONG'
-            || child.tagName == 'CODE'
-            || child.tagName == 'KLOG-RENDER-KATEX' && !child.hasAttribute('block')
-          )
+                    (child.tagName == 'SPAN'
+                        || child.tagName == 'EM'
+                        || child.tagName == 'DEL'
+                        || child.tagName == 'STRONG'
+                        || child.tagName == 'CODE'
+                        || child.tagName == 'KLOG-RENDER-KATEX' && !child.hasAttribute('block')
+                    )
                 ) {
                     child.setAttribute('secondary', '');
                 }

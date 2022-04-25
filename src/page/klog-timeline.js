@@ -16,14 +16,14 @@ import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
 class KlogTimeline extends PolymerElement {
     static get template() {
-        return html `
+        return html`
       ${this.styleTemplate}
       ${this.contentTemplate}
     `;
     }
 
     static get styleTemplate() {
-        return html `
+        return html`
     <style include="klog-style-layout"></style>
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-timeline"></style>
@@ -32,7 +32,7 @@ class KlogTimeline extends PolymerElement {
     }
 
     static get contentTemplate() {
-        return html `
+        return html`
     <klog-data-timeline id="data" last-response="{{list}}"></klog-data-timeline>
     <klog-fab icon="refresh" id="updateButton" label="立即刷新" on-click="timelineUpdated" hidden="{{updateButtonHidden}}" extended="{{updateButtonExtended}}"></klog-fab>
     <div class="main-container" id="container">
@@ -120,8 +120,13 @@ class KlogTimeline extends PolymerElement {
 
     async load() {
         this.$.scrollTarget.style.setProperty('scroll-behavior', '');
-        this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
-        this.$.scrollTarget.addEventListener('scroll', this._pageScrollHandler);
+        if (this.$.scrollTarget == document.scrollingElement) {
+            document.addEventListener('scroll', this._scrollHandler);
+            document.addEventListener('scroll', this._pageScrollHandler);
+        } else {
+            this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
+            this.$.scrollTarget.addEventListener('scroll', this._pageScrollHandler);
+        }
         this.showDefaultToolbar();
         this.loading = false;
         this.$.scrollTarget.scrollTop = this._lastScrollY || 0;
@@ -140,7 +145,7 @@ class KlogTimeline extends PolymerElement {
             await this._refreshAllItems();
             this.checkUpdate();
         }
-        await new Promise(resolve=>setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     async unload() {
@@ -180,7 +185,7 @@ class KlogTimeline extends PolymerElement {
     }
 
     async timelineUpdated(background = true) {
-    // 数据加载完成,更新UI
+        // 数据加载完成,更新UI
         window._imageLoadingQueue = undefined;
         if (background) {
             this.loading = true;
@@ -385,7 +390,7 @@ class KlogTimeline extends PolymerElement {
                     '--klog-header-text-color': 'var(--on-surface)',
                     '--klog-header-opacity': 0.8
                 },
-                toolbar: html `
+                toolbar: html`
           <app-toolbar>
             <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
             <div class="title" on-click="refresh">
@@ -422,7 +427,7 @@ class KlogTimeline extends PolymerElement {
                     '--klog-header-text-color': 'var(--on-surface)',
                     '--klog-header-opacity': 0.8
                 },
-                toolbar: html `
+                toolbar: html`
           <app-toolbar>
             <input id="keywordInputMobile" type="text" placeholder="搜索时间轴" on-keydown="_searchInput" on-input="_searchInput">
             <paper-icon-button icon="close" on-click="showDefaultToolbar"></paper-icon-button>
@@ -467,7 +472,7 @@ class KlogTimeline extends PolymerElement {
     }
 
     _calculateCards(list) {
-    // process the original article list with filter settings
+        // process the original article list with filter settings
         if (!list) return [];
         let cards = list;
         // filter

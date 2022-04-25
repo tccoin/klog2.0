@@ -170,11 +170,9 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
             let top = this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top;
             if (top != 0 && top - safeareaTop <= window.innerHeight - 32 - 28) {
-                fab.style.opacity = 0;
-                fab.style.zIndex = -1;
+                fab.style.transform = 'translateX(-100%) translateY(88px)';
             } else {
-                fab.style.zIndex = '';
-                fab.style.opacity = 1;
+                fab.style.transform = 'translateX(-100%)';
                 fab.style.position = 'fixed';
                 fab.style.bottom = '32px';
             }
@@ -223,7 +221,11 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
     async load() {
         this.loading = false;
         this.$.markdown.updateScrollTarget(this.$.scrollTarget);
-        this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
+        if (this.$.scrollTarget == document.scrollingElement) {
+            document.addEventListener('scroll', this._scrollHandler);
+        } else {
+            this.$.scrollTarget.addEventListener('scroll', this._scrollHandler);
+        }
     }
 
     async unload() {
