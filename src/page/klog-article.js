@@ -187,10 +187,6 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             }
         };
         window.addEventListener('resize', this._scrollHandler);
-        setTimeout(() => {
-            this.$.comment.updateScrollTarget(this.$.scrollTarget);
-            this.$.appBar.updateScrollTarget(this.$.scrollTarget);
-        }, 1);
     }
 
     async update(userLoadPromise, route) {
@@ -226,6 +222,9 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                 this._scrollHandler();
             }
         }
+        // scroller
+        this.$.comment.updateScrollTarget(this.$.scrollTarget);
+        this.$.appBar.updateScrollTarget(this.$.scrollTarget);
     }
 
     async load() {

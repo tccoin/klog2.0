@@ -323,10 +323,27 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     }
 
     updateTheme() {
-        if (!this.theme || !this.themeColor) return;
+        // 从preference中读取设置
+        if (!this.preference) return;
+        const preference = this.preference;
+        let themeStrategy = preference.theme;
+        let theme = themeStrategy;
+        if (themeStrategy == 'system') {
+            if (window.matchMedia('(prefers-color-scheme)').media) {
+                const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                theme = isSystemDark ? 'dark' : 'light';
+            } else {
+                themeStrategy = 'time';
+            }
+        } else if (themeStrategy == 'time') {
+            let d = new Date();
+            let h = d.getHours();
+            theme = (h > 19 || h < 7) ? 'dark' : 'light';
+        }
+        this.theme = theme;
+
         // 更新动态色彩
         let dynamicTheme = new KlogDynamicTheme();
-        console.log();
         const defaultThemeColor = (this.preference && 'themeColor' in this.preference) ? this.preference.themeColor : '#3f51b5';
         dynamicTheme.apply(this, this.themeColor == 'default' ? defaultThemeColor : this.themeColor, this.theme);
 
@@ -345,25 +362,10 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     _updatePreference(preference) {
         if (!preference) return;
         this.preference = preference || this.preference;
-        // theme
-        let themeStrategy = preference.theme;
-        let theme = themeStrategy;
-        if (themeStrategy == 'system') {
-            if (window.matchMedia('(prefers-color-scheme)').media) {
-                const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                theme = isSystemDark ? 'dark' : 'light';
-            } else {
-                themeStrategy = 'time';
-            }
-        } else if (themeStrategy == 'time') {
-            let d = new Date();
-            let h = d.getHours();
-            theme = (h > 19 || h < 7) ? 'dark' : 'light';
-        }
-        this.theme = theme;
         this.themeColor = preference.themeColor;
+        this.updateTheme();
         if (this.updateThemeInterval) clearInterval(this.updateThemeInterval);
-        this.updateThemeInterval = setInterval(() => this._updatePreference(this.preference), 5 * 60 * 1000);
+        this.updateThemeInterval = setInterval(() => this.updateTheme(), 15 * 1000);
         if (this._waitingToLoadDefaultPage) {
             this._loadDefaultPage();
         }

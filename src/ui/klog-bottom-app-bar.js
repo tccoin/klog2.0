@@ -144,7 +144,6 @@ class KlogBottomAppBar extends PolymerElement {
 
 
     updateScrollTarget(scrollTarget) {
-        if(this.disabled) return;
         if (this.$.scrollTarget) {
             this.$.scrollTarget.removeEventListener('scroll', this._scrollHandler);
         }
@@ -165,6 +164,7 @@ class KlogBottomAppBar extends PolymerElement {
 
     _initScroller() {
         this._scrollHandler = e => {
+            if(this.disabled) return;
             let y = this.$.scrollTarget.scrollTop;
             let speed = y - this._lastY;
             if(speed > 25) {
