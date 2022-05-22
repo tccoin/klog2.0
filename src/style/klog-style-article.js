@@ -186,6 +186,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     :host([loading]) klog-bottom-app-bar {
+      opacity: 0;
       transform: translateY(100%);
     }
 
