@@ -134,16 +134,16 @@ class KlogNoteContent extends PolymerElement {
       <paper-icon-button icon="arrow_back" on-click="back" mobile=""></paper-icon-button>
       <div class="divider"></div>
       <div class="actions">
-        <paper-icon-button icon="edit" on-click="edit"></paper-icon-button>
         <paper-icon-button icon="share" on-click="share"></paper-icon-button>
+        <paper-icon-button icon="edit" on-click="edit"></paper-icon-button>
         <paper-icon-button icon="{{bookmarksIcon}}" on-click="toggleBookmark"></paper-icon-button>
       </div>
     </app-toolbar>
 
     <div class="note-toolbar" hidden-on-mobile>
       <div class="actions">
-        <paper-icon-button icon="edit" on-click="edit"></paper-icon-button>
         <paper-icon-button icon="share" on-click="share"></paper-icon-button>
+        <paper-icon-button icon="edit" on-click="edit"></paper-icon-button>
         <paper-icon-button icon="{{bookmarksIcon}}" on-click="toggleBookmark"></paper-icon-button>
       </div>
     </div>
