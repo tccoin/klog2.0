@@ -9,6 +9,10 @@ class klogMarkdownScroller extends KlogUiMixin(PolymerElement) {
         return {
             linkPrefix: {
                 type: String
+            },
+            scrollBias: {
+                type: Number,
+                value: 0
             }
         };
     }
@@ -42,7 +46,7 @@ class klogMarkdownScroller extends KlogUiMixin(PolymerElement) {
             const scrollTarget = this.$.target;
             //html will move while scrolling
             const htmlFix = scrollTarget.tagName == 'HTML' ? 0 : scrollTarget.getBoundingClientRect().top;
-            const y = scrollTarget.scrollTop + element.getBoundingClientRect().top - htmlFix;
+            const y = scrollTarget.scrollTop + element.getBoundingClientRect().top - htmlFix + this.scrollBias;
             scrollTarget.scrollTop = y;
         }
     }

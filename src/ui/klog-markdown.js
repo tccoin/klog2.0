@@ -62,6 +62,10 @@ class KlogMarkdown extends PolymerElement {
                 type: Number,
                 notify: true
             },
+            scrollBias: {
+                type: Number,
+                value: 0
+            },
             lazy: {
                 type: Boolean,
                 value: false
@@ -94,6 +98,12 @@ class KlogMarkdown extends PolymerElement {
                 value: false
             },
         };
+    }
+
+    static get observers() {
+        return [
+            '_handleScrollBias(scrollBias)'
+        ];
     }
 
     ready() {
@@ -138,6 +148,10 @@ class KlogMarkdown extends PolymerElement {
                 item.lazyload();
             }
         };
+    }
+
+    _handleScrollBias(){
+        this.$.scroller.scrollBias = this.scrollBias;
     }
 
     updateTheme() {
@@ -222,7 +236,7 @@ class KlogMarkdown extends PolymerElement {
             },
             parse: () => {
                 this._hasToc = true;
-                return '<div class="toc"><div class="toc-icon-container"><iron-icon icon="bookmark" class="toc-icon"></iron-icon></div><ol class="toc-container"></ol></div>';
+                return '<div class="toc"><div class="toc-icon-container"><iron-icon icon="menu_book" class="toc-icon"></iron-icon></div><ol class="toc-container"></ol></div>';
             }
         };
 
