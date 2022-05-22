@@ -9,6 +9,7 @@ const getDefaultMarkdownPreference = () => {
 const getDefaultPreference = () => {
   return {
     theme: 'time',
+    themeColor: '#3f51b5',
     darkThemeDisabled: false,
     gestureDisabled: false,
     backdropBlurEnabled: false,

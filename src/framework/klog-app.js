@@ -113,7 +113,6 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     static get observers() {
         return [
             'load(routeData.page)',
-            '_updatePreference(userinfo.preference)',
             'updateTheme(theme, themeColor)'
         ];
     }
@@ -159,8 +158,8 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     }
 
     ready() {
-        super.ready();
         this._initGlobalEvent();
+        super.ready();
         this.initUiEvent();
         this._loadLayout();
     }
@@ -310,6 +309,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     _updateUserinfo(result) {
         this.userinfo = result.userinfo;
         this.login = result.login;
+        this._updatePreference(result.userinfo.preference);
     }
 
     _notifyNetworkStatus() {

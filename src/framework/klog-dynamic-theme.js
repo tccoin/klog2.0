@@ -8,6 +8,12 @@ export class KlogDynamicTheme {
             source = this._img2blob(source);
         } else if (typeof (source) == 'object' && source.tagName == 'KLOG-IMAGE') {
             source = this._img2blob(source.$.img);
+        } else if (typeof (source) == 'string') {
+            let matchResult = source.match(/\[(.*),(.*),(.*)\]/);
+            if(matchResult && matchResult.length==4){
+                source = [parseInt(matchResult[1]), parseInt(matchResult[2]), parseInt(matchResult[3])];
+            }
+            source = this._rgb2hex(source);
         } else if (Array.isArray(source)) {
             source = this._rgb2hex(source);
         }
