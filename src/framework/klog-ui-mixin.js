@@ -10,12 +10,15 @@ const UiMixin = (superClass) => class extends superClass {
 
     _openToast(text, link, option = {}) {
         const toast = document.createElement('paper-toast');
-        Object.assign(toast, { text: text, duration: 2000, withBackdrop: false, colorful: false }, option);
+        Object.assign(toast, { text: text, duration: 2000, withBackdrop: false, colorful: false, bottom: 0 }, option);
         
         if (option.colorful) {
             setTimeout(()=>toast.style.transition = 'all .3s ease', 10);
             toast.style.setProperty('--paper-toast-background-color', 'var(--primary)');
             toast.style.setProperty('--paper-toast-color', 'var(--on-primary)');
+        }
+        if(option.bottom != 0){
+            toast.verticalOffset = option.bottom;
         }
         if (link) {
             toast.innerHTML = `<a ${link.href ? 'href=' + link.href : ''}>${link.title}</a>`;
@@ -58,15 +61,13 @@ const UiMixin = (superClass) => class extends superClass {
     }
 
     copy(value) {
-        const input = document.createElement('input');
+        const input = document.createElement('textarea');
         input.style.position = 'fixed';
         input.style.top = 0;
         input.style.opacity = 0;
-        input.setAttribute('readonly', 'readonly');
-        input.setAttribute('value', value);
+        input.value = value;
         document.body.appendChild(input);
-        input.setSelectionRange(0, 9999);
-        input.focus();
+        input.select();
         document.execCommand('copy');
         document.body.removeChild(input);
     }
