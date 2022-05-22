@@ -241,8 +241,8 @@ class KlogNote extends KlogUiMixin(PolymerElement) {
     }
 
     share(path) {
-        let url = `https://klog.app/#/article/${path || this.path}`;
-        this.copy(url);
+        let copyInfo = `${this.$.content.article.title} - ${this.$.content.article.author.displayName}的文章 - Klog\nhttps://klog.app/#/article/${path || this.path}`;
+        this.copy(copyInfo);
         this.openToast('已复制分享链接，快去为这个世界带去光明吧！');
     }
 
