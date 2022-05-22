@@ -25,11 +25,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       max-width: calc(42 * var(--klog-markdown-font-size) + 32px);
     }
 
-    .fab-section{
-      max-width: calc(var(--klog-media-width) - 16px);
-      font-size: 16px;
-    }
-
     .article-container {
       width: 100%;
       margin: auto;
@@ -61,29 +56,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       transition: opacity .3s ease, transform .2s ease-out;
     }
 
-    :host([loading]) .article-container,
-    :host([loading]) .comment-container {
-      opacity: 0;
-    }
-
-    .fab-container{
-      position: absolute;
-      padding: 0 16px;
-      right: 0;
-    }
-
-    klog-fab{
-      position: fixed;
-      bottom: 32px;
-      right: auto;
-      width: 96px;
-      overflow: hidden;
-      background-color: var(--primary-container);
-      color: var(--on-primary-container);
-      transform: translateX(-100%);
-      transition: all 0.2s ease 0s;
-    }
-
     .article-update-info{
       padding: 0 16px;
       position: absolute;
@@ -96,7 +68,7 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
     }
 
     .article-footer {
-      padding: 0 16px 32px;
+      padding: 0 16px calc(14.5px + var(--safe-area-inset-bottom));
       font-size: 20px;
       color: var(--primary);
       opacity: 0.5;
@@ -200,6 +172,21 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
 
     [hidden] {
       display: none;
+    }
+
+    /* animation */
+
+    :host([loading]) .article-container,
+    :host([loading]) .comment-container {
+      opacity: 0;
+    }
+
+    klog-bottom-app-bar {
+      transition: all .3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    :host([loading]) klog-bottom-app-bar {
+      transform: translateY(100%);
     }
 
 
@@ -311,19 +298,6 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       :host(:hover)::-webkit-scrollbar-thumb {
         background-color: var(--scrollbar-thumb-active-color) !important;
       }
-    }
-
-    /*header*/
-    @media (max-width: 767px) {
-      .article-container {
-        padding: calc(40px + var(--safe-area-inset-top)) 0 72px;
-      }
-    }
-
-    /*animation*/
-
-    :host([exit]) klog-fab {
-      transform: scale(0);
     }
     </style>
   </template>

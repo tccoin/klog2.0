@@ -13,6 +13,7 @@ import '../ui/klog-image.js';
 import '../ui/klog-fab.js';
 import '../ui/klog-render-timestamp.js';
 import '../ui/klog-render-license.js';
+import '../ui/klog-bottom-app-bar.js';
 import './klog-comment.js';
 
 class KlogArticle extends KlogUiMixin(PolymerElement) {
@@ -21,6 +22,15 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
 <style include="klog-style-article"></style>
 <klog-data-article id="data" path="{{path}}" last-response="{{article}}" last-error="{{error}}" is-owner="{{isOwner}}">
 </klog-data-article>
+
+<!--app bar-->
+<klog-bottom-app-bar id="appBar" compact="{{!isOwner}}">
+    <paper-icon-button icon="share" on-click="_share"></paper-icon-button>
+    <paper-icon-button icon="comment" on-click="_scrollToComment"></paper-icon-button>
+    <paper-icon-button icon="menu_book" on-click="_scrollToToc" hidden="{{!hasToc}}"></paper-icon-button>
+    <klog-fab slot="fab" icon="edit" id="fab" label="编辑" on-click="edit" extended="{{fabExtended}}" hidden="{{!isOwner}}"></klog-fab>
+</klog-bottom-app-bar>
+
 <!--article-->
 <div class="article-container" id="content">
   <div class="section">
@@ -48,7 +58,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
       </div>
     </div>
     <!--article content-->
-    <klog-markdown class="article-main" id="markdown" markdown="{{article.markdown}}" link-prefix="article/{{path}}" hide-independent-title="true" theme="{{theme}}" preference="{{userinfo.preference.markdown}}" mobile="{{mobile}}" lazy heading-actions>
+    <klog-markdown class="article-main" id="markdown" markdown="{{article.markdown}}" link-prefix="article/{{path}}" hide-independent-title="true" theme="{{theme}}" preference="{{userinfo.preference.markdown}}" mobile="{{mobile}}" scroll-bias="-64" lazy heading-actions>
     </klog-markdown>
   </div>
   <!--update info-->
@@ -57,19 +67,14 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
     <klog-render-license license="{{article.license}}" default-license="{{article.author.license}}"></klog-render-license>
   </div>
 </div>
-<!--fab-->
-<div class="section fab-section">
-  <div class="fab-container">
-    <klog-fab icon="edit" id="fabEdit" label="编辑" on-click="edit" hidden="{{!isOwner}}" extended="{{fabExtended}}"></klog-fab>
-    <klog-fab icon="comment" id="fabComment" label="评论" on-click="_scrollToComment" hidden="{{isOwner}}" extended="{{fabExtended}}"></klog-fab>
-  </div>
-</div>
+
 <!--comment-->
 <div class="comment-container" id="commentContainer">
   <div class="section">
     <klog-comment id="comment" article-id="{{article.objectId}}" userinfo="{{userinfo}}" article-author-id="{{article.author.objectId}}" theme="{{theme}}" mobile="{{mobile}}" login="{{login}}"></klog-comment>
   </div>
 </div>
+
 <!--footer-->
 <div class="section article-footer">
   <span class="logo" on-click="_logoClickHandle">
@@ -84,6 +89,10 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
     static get properties() {
         return {
             isOwner: {
+                type: Boolean,
+                value: false
+            },
+            hasToc: {
                 type: Boolean,
                 value: false
             },
@@ -113,9 +122,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                     },
                     toolbar: html`
             <app-toolbar>
-              <paper-icon-button class="navigation" icon="arrow_back" on-click="back" hidden-on-mobile hidden-on-tablet></paper-icon-button>
-              <div class="divider"></div>
-              <paper-icon-button class="navigation" icon="close" on-click="back" hidden-on-desktop minimum></paper-icon-button>
+              <paper-icon-button class="navigation" icon="arrow_back" on-click="back"></paper-icon-button>
             </app-toolbar>`
                 }
             }
@@ -164,22 +171,25 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
 
         this.$.image = document.createElement('klog-image');
 
-        this._scrollHandler = () => {
-            this.fabExtended = !this.mobile;
-            let fab = this.isOwner ? this.$.fabEdit : this.$.fabComment;
+        this._lastY = 0;
+        this._scrollHandler = e => {
+            // fab
+            // this.fabExtended = !this.mobile;
             let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
             let top = this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top;
-            if (top != 0 && top - safeareaTop <= window.innerHeight - 32 - 28) {
-                fab.style.transform = 'translateX(-100%) translateY(88px)';
+            if (top != 0 && top+60-safeareaTop <= window.innerHeight) {
+                // fab.style.transform = 'translateY(88px)';
+                this.$.appBar.opened = false;
+                this.$.appBar.fabOpened = false;
+                this.$.appBar.disabled = true;
             } else {
-                fab.style.transform = 'translateX(-100%)';
-                fab.style.position = 'fixed';
-                fab.style.bottom = '32px';
+                this.$.appBar.disabled = false;
             }
         };
         window.addEventListener('resize', this._scrollHandler);
         setTimeout(() => {
             this.$.comment.updateScrollTarget(this.$.scrollTarget);
+            this.$.appBar.updateScrollTarget(this.$.scrollTarget);
         }, 1);
     }
 
@@ -220,6 +230,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
 
     async load() {
         this.loading = false;
+        this.hasToc = this.$.markdown.shadowRoot.querySelectorAll('.klog-article-content .toc').length>0;
         this.$.markdown.updateScrollTarget(this.$.scrollTarget);
         if (this.$.scrollTarget == document.scrollingElement) {
             document.addEventListener('scroll', this._scrollHandler);
@@ -234,6 +245,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         await this._timeout(new Promise(resolve => { this.$.content.addEventListener('transitionend', resolve); }), 500);
         this.path = '';
         this.isOwner = false;
+        this.$.appBar.reload();
         this.article = {
             markdown: ''
         };
@@ -307,6 +319,18 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                 destination: this.$.commentContainer.offsetTop
             }
         }));
+    }
+
+    _scrollToToc() {
+        console.log('123');
+        this.$.markdown.$.scroller.updateQueryByHash('class-toc');
+        this.$.markdown.$.scroller.scroll();
+    }
+
+    _share(){
+        let copyInfo = `${this.article.title} - ${this.article.author.displayName}的文章 - Klog\nhttps://klog.app/#/article/${this.path}`;
+        this.copy(copyInfo);
+        this.openToast('已复制分享链接到剪贴板',null, {bottom: document.body.clientWidth<1024?80:0});
     }
 
     _logoClickHandle() {
