@@ -133,8 +133,12 @@ containerKlogStyleTimeline.innerHTML = `<dom-module id="klog-style-timeline">
 
       /*fab*/
       klog-fab {
+        position: fixed;
+        right: 8vw;
+        bottom: 8vh;
         background-color: var(--primary);
         color: var(--on-primary);
+        z-index: 99;
       }
 
       /*animation*/

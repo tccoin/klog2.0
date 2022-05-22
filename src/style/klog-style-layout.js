@@ -10,15 +10,6 @@ containerKlogStyleLayout.innerHTML = `<dom-module id="klog-style-layout">
         padding: 64px 0 32px;
       }
 
-      klog-fab {
-        position: fixed;
-        right: 8vw;
-        bottom: 8vh;
-        background-color: var(--surface);
-        color: var(--primary);
-        z-index: 99;
-      }
-
       iron-pages {
         padding-top: var(--safe-area-inset-top);
       }

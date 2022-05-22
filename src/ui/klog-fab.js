@@ -136,7 +136,7 @@ class KlogFab extends PolymerElement {
         type: Boolean,
         value: false,
         reflectToAttribute: true
-      },
+      }
     };
   }
 
