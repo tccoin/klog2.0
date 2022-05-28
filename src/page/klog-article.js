@@ -327,9 +327,10 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
     }
 
     _share(){
+        let safeareaBottom = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-bottom')) || 0;
         let copyInfo = `${this.article.title} - ${this.article.author.displayName}的文章 - Klog\nhttps://klog.app/#/article/${this.path}`;
         this.copy(copyInfo);
-        this.openToast('已复制分享链接到剪贴板',null, {bottom: document.body.clientWidth<1024?80:0});
+        this.openToast('已复制分享链接到剪贴板',null, {bottom: document.body.clientWidth<1024 ? 80+safeareaBottom : 0});
     }
 
     _logoClickHandle() {
