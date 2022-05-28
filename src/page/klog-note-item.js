@@ -4,8 +4,8 @@ import '../ui/klog-render-timestamp.js';
 
 import '../lib/clamp.js';
 class KlogNoteItem extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style>
       :host {
         display: block;
@@ -59,31 +59,31 @@ class KlogNoteItem extends PolymerElement {
     </div>
     <paper-ripple></paper-ripple>
 `;
-  }
-
-  static get is() { return 'klog-note-item'; }
-
-  static get properties() {
-    return {
-      selected: {
-        type: Boolean,
-        notify: true
-      },
     }
-  }
 
-  ready() {
-    super.ready();
-    setTimeout(() => $clamp(this.$.text, { clamp: 2 }), 1);
-    this.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('note-select-page', { bubbles: true, composed: true, detail: { selected: 1 } }));
-      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' + this.data.path } }));
-    });
-  }
+    static get is() { return 'klog-note-item'; }
 
-  parseDate(date) {
-    return Date.parse(date)
-  }
+    static get properties() {
+        return {
+            selected: {
+                type: Boolean,
+                notify: true
+            },
+        };
+    }
+
+    ready() {
+        super.ready();
+        setTimeout(() => $clamp(this.$.text, { clamp: 2 }), 1);
+        this.addEventListener('click', () => {
+            this.dispatchEvent(new CustomEvent('note-select-page', { bubbles: true, composed: true, detail: { selected: 1 } }));
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'note/' + this.collection + '/' + this.data.path } }));
+        });
+    }
+
+    parseDate(date) {
+        return Date.parse(date);
+    }
 }
 
 window.customElements.define(KlogNoteItem.is, KlogNoteItem);

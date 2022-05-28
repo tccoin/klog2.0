@@ -26,8 +26,8 @@ import { KlogDataLicenseMixin } from '../data/klog-data-license-mixin.js';
 import { KlogDataUserPublicMixin } from '../data/klog-data-user-public-mixin.js';
 
 class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseMixin(PolymerElement))) {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style include="klog-style-card"></style>
     <style include="klog-style-toolbar"></style>
     <style include="klog-style-dialog"></style>
@@ -280,46 +280,46 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
       <klog-upload-zone bucketname="klog-avatar" fileinfo="{{avatarinfo}}"></klog-upload-zone>
     </paper-dialog>
 `;
-  }
+    }
 
-  static get is() {
-    return 'klog-userpanel';
-  }
+    static get is() {
+        return 'klog-userpanel';
+    }
 
-  static get properties() {
-    return {
-      mobile: {
-        type: Boolean,
-        reflectToAttribute: true
-      },
-      layout: {
-        type: Object,
-        value: {
-          documentTitle: '个人设置 - Klog',
-          drawer: 'auto',
-          mainMenu: true,
-          sidebar: 'auto',
-          scrollToTop: false,
-          header: {
-            fixed: true,
-            short: false,
-            blur: { mobile: true, desktop: false },
-            shadow: { mobile: 'scroll', desktop: 'off' },
-          },
-          styles: {
-            '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
-            '--klog-header-text-color': 'var(--on-surface)',
-            '--klog-header-opacity': 0.8
-          },
-          customMenu: [{
-            name: 'account',
-            items: [
-              { subtitle: true, text: '账户' },
-              { name: 'console', text: '控制台', icon: 'console' },
-              { name: 'logout', text: '退出账户', icon: 'power_settings_new' }
-            ]
-          }],
-          toolbar: html`
+    static get properties() {
+        return {
+            mobile: {
+                type: Boolean,
+                reflectToAttribute: true
+            },
+            layout: {
+                type: Object,
+                value: {
+                    documentTitle: '个人设置 - Klog',
+                    drawer: 'auto',
+                    mainMenu: true,
+                    sidebar: 'auto',
+                    scrollToTop: false,
+                    header: {
+                        fixed: true,
+                        short: false,
+                        blur: { mobile: true, desktop: false },
+                        shadow: { mobile: 'scroll', desktop: 'off' },
+                    },
+                    styles: {
+                        '--klog-header-background': { mobile: 'var(--klog-page-background)', desktop: 'transparent' },
+                        '--klog-header-text-color': 'var(--on-surface)',
+                        '--klog-header-opacity': 0.8
+                    },
+                    customMenu: [{
+                        name: 'account',
+                        items: [
+                            { subtitle: true, text: '账户' },
+                            { name: 'console', text: '控制台', icon: 'console' },
+                            { name: 'logout', text: '退出账户', icon: 'power_settings_new' }
+                        ]
+                    }],
+                    toolbar: html`
             <app-toolbar>
               <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                 <div class="title">
@@ -330,265 +330,265 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
                 <iron-icon icon="power_settings_new"></iron-icon>注销
               </paper-button>
             </app-toolbar>`
-        }
-      },
-    };
-  }
-
-  static get observers() {
-    return [
-      '_updateLicenseAbbreviation(userinfo.license)',
-      'updateAvatarUrl(avatarinfo)',
-      'updatePreference(preference.theme,preference.themeColor,preference.defaultPage,preference.backdropBlurEnabled,preference.markdown.numberedHeading,preference.markdown.centeredHeading,preference.markdown.overflowCode)',
-    ];
-  }
-
-  ready() {
-    super.ready();
-    this.$.uploadAvatarDialog.addEventListener('opened-changed', e => {
-      this.dispatchEvent(new CustomEvent('editor-backdrop-opened-changed', {
-        bubbles: true,
-        composed: true,
-        detail: { value: e.detail.value }
-      }));
-    });
-    this._initColorPicker();
-  }
-
-  async update(userdata, route) {
-    // set default value
-    this._hasUsername = true;
-
-    // detect whether to update
-    let sameUser = false;
-    let notUpdated = false;
-    if (this.userinfo) {
-      sameUser = userdata.userinfo.publicinfo.id == this.userinfo.publicinfo.id;
-      notUpdated = userdata.userinfo.publicinfo.updatedAt == this.userinfo.publicinfo.updatedAt;
-    }
-
-    if (!userdata.login) {
-      // redirection to login
-      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
-      return Promise.reject(new Error('Not Login.'));
-    } else if (!sameUser || !notUpdated) {
-      // update info
-      this.preference = Object.assign({}, userdata.userinfo.preference);
-      this.userinfo = userdata.userinfo;
-      this.login = userdata.login;
-      this._hasUsername = Boolean(this.userinfo.username);
-    }
-
-    // set router
-    this.route = route;
-  }
-
-  updateUsername() {
-    if (!/^[a-zA-Z]/.test(this.username)) {
-      return this.openToast('用户名第一位请使用字母');
-    } else if (this.username.length < 6) {
-      return this.openToast('用户名长度至少6位');
-    } else if (this.username.length > 20) {
-      return this.openToast('用户名长度至多20位');
-    }
-    this.validateUsername(this.username).then(isValid => {
-      if (isValid) {
-        let newInfo = {
-          username: {
-            publicRead: true,
-            value: this.username
-          }
+                }
+            },
         };
-        this._updateUserinfo(newInfo, false).then(() => {
-          this.openToast('用户名已保存');
-          this._hasUsername = true;
+    }
+
+    static get observers() {
+        return [
+            '_updateLicenseAbbreviation(userinfo.license)',
+            'updateAvatarUrl(avatarinfo)',
+            'updatePreference(preference.theme,preference.themeColor,preference.defaultPage,preference.backdropBlurEnabled,preference.markdown.numberedHeading,preference.markdown.centeredHeading,preference.markdown.overflowCode)',
+        ];
+    }
+
+    ready() {
+        super.ready();
+        this.$.uploadAvatarDialog.addEventListener('opened-changed', e => {
+            this.dispatchEvent(new CustomEvent('editor-backdrop-opened-changed', {
+                bubbles: true,
+                composed: true,
+                detail: { value: e.detail.value }
+            }));
         });
-      } else {
-        return this.openToast('用户名已被占用');
-      }
-    });
-  }
-
-  openLicenseDrawer() {
-    this.openDrawer('版权协议', [{ name: 'license', items: this.getLicenseMenu(this.licenseList) }]);
-  }
-
-  _updateLicenseAbbreviation(license) {
-    this.licenseAbbreviation = this.fullLicenseList.find(x => x['name'] == license)['abbreviation'];
-  }
-
-  menuSelect(category, item) {
-    if (item == 'console') this.$.about.open();
-    if (category == 'account' && item == 'logout') {
-      this.logout();
-    } else if (category == 'license') {
-      this.set('userinfo.license', item);
-      this.updatePublicinfo();
+        this._initColorPicker();
     }
-  }
 
-  openMainDrawer() {
-    this.dispatchEvent(new CustomEvent('main-drawer-open', {
-      bubbles: true,
-      composed: true
-    }));
-  }
+    async update(userdata, route) {
+    // set default value
+        this._hasUsername = true;
 
-  logout() {
-    this.userinfo.klogUser.logout();
-    window.location = '/#/';
-    setTimeout(() => window.location.reload(), 100);
-  }
-
-  newArticle() {
-    this.dispatchEvent(new CustomEvent('app-load', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        page: 'editor/'
-      }
-    }));
-  }
-
-  resetMarkdownPreference() {
-    this.set('preference.markdown', Object.assign({}, this.$.user.defaultPreference.markdown));
-    console.log(this.$.user.defaultPreference.markdown);
-  }
-
-  loadList() {
-    this.$.data.load();
-  }
-
-  parseDate(date) {
-    return Date.parse(date);
-  }
-
-  openUploadAvatarDialog() {
-    this.$.uploadAvatarDialog.open();
-  }
-
-  openLicenseChooser() {
-    window.open('https://chooser-beta.creativecommons.org/');
-  }
-
-  updateAvatarUrl(avatarinfo) {
-    this.userinfo.avatarUrl = avatarinfo.host + '/' + avatarinfo.key;
-    this.$.uploadAvatarDialog.close();
-    this.updatePublicinfo();
-  }
-
-  _updateUserinfo(info, toast = true) {
-    if (!this.userinfo) return;
-    let klogUser = this.userinfo.klogUser;
-    const toastBackground = this.userinfo.preference.themeColor != this.preference.themeColor;
-    return klogUser.update(info).then(() => {
-      const options = { colorful: toastBackground };
-      if (toast) this.openToast('已更新账户', null, options);
-      klogUser.updateUserinfo();
-    });
-  }
-
-  updatePublicinfo() {
-    setTimeout(() => {
-      let newInfo = {
-        displayName: {
-          publicRead: true,
-          value: this.userinfo.displayName
-        },
-        introduction: {
-          publicRead: true,
-          value: this.userinfo.introduction
-        },
-        avatarUrl: {
-          publicRead: true,
-          value: this.userinfo.avatarUrl
-        },
-        license: {
-          publicRead: true,
-          value: this.userinfo.license
-        },
-      };
-      this._updateUserinfo(newInfo);
-    }, 1);
-  }
-
-  updatePreference() {
-    if (!this._preferenceInit) {
-      this._preferenceInit = true;
-      return;
-    }
-    this._updateUserinfo({
-      preference: {
-        value: this.preference
-      },
-      zoneThemeColor: {
-        publicRead: true,
-        value: this.preference.themeColor
-      }
-    }, true);
-    this.userinfo.preference = Object.assign({}, this.preference);
-  }
-
-  _initColorPicker() {
-    const colorPicker = this.$.colorPicker;
-    const menuButton = colorPicker.shadowRoot.querySelector('paper-menu-button');
-    const dropdownContent = menuButton.shadowRoot.querySelector('.dropdown-content');
-    menuButton.style.padding = '0';
-    dropdownContent.style.border = '4px solid var(--surface)';
-    colorPicker.colorList = [
-      '#3f51b5', '#6f4196', '#65a5f2', '#00bcd4',
-      '#f44336', '#e5943c', '#f0d551', '#83be54'
-    ];
-    colorPicker.addEventListener('color-picker-selected', e => {
-      this.set('preference.themeColor', e.detail.color);
-      menuButton.close();
-    });
-  }
-
-  pickColor() {
-    const colorPicker = this.$.colorPicker;
-    const menuButton = colorPicker.shadowRoot.querySelector('paper-menu-button');
-    menuButton.open();
-  }
-
-
-  aboutHelp(e) {
-    this.dispatchEvent(new CustomEvent('app-load', {
-      bubbles: true,
-      composed: true,
-      detail: { page: 'article/klog-help' }
-    }));
-    this.$.about.close();
-  }
-
-  aboutLog(e) {
-    this.dispatchEvent(new CustomEvent('app-load', {
-      bubbles: true,
-      composed: true,
-      detail: { page: 'article/about-klog-2-0' }
-    }));
-    this.$.about.close();
-  }
-
-  aboutUpdate() {
-    this.dispatchEvent(new CustomEvent('update-service-worker', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        callback: updateFound => {
-          if (!updateFound) {
-            this.openToast('Klog 已是最新版本');
-          }
+        // detect whether to update
+        let sameUser = false;
+        let notUpdated = false;
+        if (this.userinfo) {
+            sameUser = userdata.userinfo.publicinfo.id == this.userinfo.publicinfo.id;
+            notUpdated = userdata.userinfo.publicinfo.updatedAt == this.userinfo.publicinfo.updatedAt;
         }
-      }
-    }));
-    this.$.about.close();
-  }
 
-  aboutGitHub() {
-    window.open('https://github.com/tccoin/klog2.0');
-    this.$.about.close();
-  }
+        if (!userdata.login) {
+            // redirection to login
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
+            return Promise.reject(new Error('Not Login.'));
+        } else if (!sameUser || !notUpdated) {
+            // update info
+            this.preference = Object.assign({}, userdata.userinfo.preference);
+            this.userinfo = userdata.userinfo;
+            this.login = userdata.login;
+            this._hasUsername = Boolean(this.userinfo.username);
+        }
+
+        // set router
+        this.route = route;
+    }
+
+    updateUsername() {
+        if (!/^[a-zA-Z]/.test(this.username)) {
+            return this.openToast('用户名第一位请使用字母');
+        } else if (this.username.length < 6) {
+            return this.openToast('用户名长度至少6位');
+        } else if (this.username.length > 20) {
+            return this.openToast('用户名长度至多20位');
+        }
+        this.validateUsername(this.username).then(isValid => {
+            if (isValid) {
+                let newInfo = {
+                    username: {
+                        publicRead: true,
+                        value: this.username
+                    }
+                };
+                this._updateUserinfo(newInfo, false).then(() => {
+                    this.openToast('用户名已保存');
+                    this._hasUsername = true;
+                });
+            } else {
+                return this.openToast('用户名已被占用');
+            }
+        });
+    }
+
+    openLicenseDrawer() {
+        this.openDrawer('版权协议', [{ name: 'license', items: this.getLicenseMenu(this.licenseList) }]);
+    }
+
+    _updateLicenseAbbreviation(license) {
+        this.licenseAbbreviation = this.fullLicenseList.find(x => x['name'] == license)['abbreviation'];
+    }
+
+    menuSelect(category, item) {
+        if (item == 'console') this.$.about.open();
+        if (category == 'account' && item == 'logout') {
+            this.logout();
+        } else if (category == 'license') {
+            this.set('userinfo.license', item);
+            this.updatePublicinfo();
+        }
+    }
+
+    openMainDrawer() {
+        this.dispatchEvent(new CustomEvent('main-drawer-open', {
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    logout() {
+        this.userinfo.klogUser.logout();
+        window.location = '/#/';
+        setTimeout(() => window.location.reload(), 100);
+    }
+
+    newArticle() {
+        this.dispatchEvent(new CustomEvent('app-load', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                page: 'editor/'
+            }
+        }));
+    }
+
+    resetMarkdownPreference() {
+        this.set('preference.markdown', Object.assign({}, this.$.user.defaultPreference.markdown));
+        console.log(this.$.user.defaultPreference.markdown);
+    }
+
+    loadList() {
+        this.$.data.load();
+    }
+
+    parseDate(date) {
+        return Date.parse(date);
+    }
+
+    openUploadAvatarDialog() {
+        this.$.uploadAvatarDialog.open();
+    }
+
+    openLicenseChooser() {
+        window.open('https://chooser-beta.creativecommons.org/');
+    }
+
+    updateAvatarUrl(avatarinfo) {
+        this.userinfo.avatarUrl = avatarinfo.host + '/' + avatarinfo.key;
+        this.$.uploadAvatarDialog.close();
+        this.updatePublicinfo();
+    }
+
+    _updateUserinfo(info, toast = true) {
+        if (!this.userinfo) return;
+        let klogUser = this.userinfo.klogUser;
+        const toastBackground = this.userinfo.preference.themeColor != this.preference.themeColor;
+        return klogUser.update(info).then(() => {
+            const options = { colorful: toastBackground };
+            if (toast) this.openToast('已更新账户', null, options);
+            klogUser.updateUserinfo();
+        });
+    }
+
+    updatePublicinfo() {
+        setTimeout(() => {
+            let newInfo = {
+                displayName: {
+                    publicRead: true,
+                    value: this.userinfo.displayName
+                },
+                introduction: {
+                    publicRead: true,
+                    value: this.userinfo.introduction
+                },
+                avatarUrl: {
+                    publicRead: true,
+                    value: this.userinfo.avatarUrl
+                },
+                license: {
+                    publicRead: true,
+                    value: this.userinfo.license
+                },
+            };
+            this._updateUserinfo(newInfo);
+        }, 1);
+    }
+
+    updatePreference() {
+        if (!this._preferenceInit) {
+            this._preferenceInit = true;
+            return;
+        }
+        this._updateUserinfo({
+            preference: {
+                value: this.preference
+            },
+            zoneThemeColor: {
+                publicRead: true,
+                value: this.preference.themeColor
+            }
+        }, true);
+        this.userinfo.preference = Object.assign({}, this.preference);
+    }
+
+    _initColorPicker() {
+        const colorPicker = this.$.colorPicker;
+        const menuButton = colorPicker.shadowRoot.querySelector('paper-menu-button');
+        const dropdownContent = menuButton.shadowRoot.querySelector('.dropdown-content');
+        menuButton.style.padding = '0';
+        dropdownContent.style.border = '4px solid var(--surface)';
+        colorPicker.colorList = [
+            '#3f51b5', '#6f4196', '#65a5f2', '#00bcd4',
+            '#f44336', '#e5943c', '#f0d551', '#83be54'
+        ];
+        colorPicker.addEventListener('color-picker-selected', e => {
+            this.set('preference.themeColor', e.detail.color);
+            menuButton.close();
+        });
+    }
+
+    pickColor() {
+        const colorPicker = this.$.colorPicker;
+        const menuButton = colorPicker.shadowRoot.querySelector('paper-menu-button');
+        menuButton.open();
+    }
+
+
+    aboutHelp(e) {
+        this.dispatchEvent(new CustomEvent('app-load', {
+            bubbles: true,
+            composed: true,
+            detail: { page: 'article/klog-help' }
+        }));
+        this.$.about.close();
+    }
+
+    aboutLog(e) {
+        this.dispatchEvent(new CustomEvent('app-load', {
+            bubbles: true,
+            composed: true,
+            detail: { page: 'article/about-klog-2-0' }
+        }));
+        this.$.about.close();
+    }
+
+    aboutUpdate() {
+        this.dispatchEvent(new CustomEvent('update-service-worker', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                callback: updateFound => {
+                    if (!updateFound) {
+                        this.openToast('Klog 已是最新版本');
+                    }
+                }
+            }
+        }));
+        this.$.about.close();
+    }
+
+    aboutGitHub() {
+        window.open('https://github.com/tccoin/klog2.0');
+        this.$.about.close();
+    }
 }
 
 window.customElements.define(KlogUserpanel.is, KlogUserpanel);

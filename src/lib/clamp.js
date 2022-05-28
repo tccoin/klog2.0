@@ -6,7 +6,7 @@
 * http://sam.zoy.org/wtfpl/
 */
 
-(function(){
+(function() {
     /**
      * Clamps a text node.
      * @param {HTMLElement} element. Element containing the text node to clamp.
@@ -18,18 +18,18 @@
         var self = this,
             win = window,
             opt = {
-                clamp:              options.clamp || 2,
-                useNativeClamp:     typeof(options.useNativeClamp) != 'undefined' ? options.useNativeClamp : true,
-                splitOnChars:       options.splitOnChars || ['.', '-', '–', '—', ' '], //Split on sentences (periods), hypens, en-dashes, em-dashes, and words (spaces).
-                animate:            options.animate || false,
-                truncationChar:     options.truncationChar || '…',
-                truncationHTML:     options.truncationHTML
+                clamp: options.clamp || 2,
+                useNativeClamp: typeof (options.useNativeClamp) != 'undefined' ? options.useNativeClamp : true,
+                splitOnChars: options.splitOnChars || ['.', '-', '–', '—', ' '], //Split on sentences (periods), hypens, en-dashes, em-dashes, and words (spaces).
+                animate: options.animate || false,
+                truncationChar: options.truncationChar || '…',
+                truncationHTML: options.truncationHTML
             },
 
             sty = element.style,
             originalText = element.innerHTML,
 
-            supportsNativeClamp = typeof(element.style.webkitLineClamp) != 'undefined',
+            supportsNativeClamp = typeof (element.style.webkitLineClamp) != 'undefined',
             clampValue = opt.clamp,
             isCSSValue = clampValue.indexOf && (clampValue.indexOf('px') > -1 || clampValue.indexOf('em') > -1),
             truncationHTMLContainer;
@@ -40,7 +40,7 @@
         }
 
 
-// UTILITY FUNCTIONS __________________________________________________________
+        // UTILITY FUNCTIONS __________________________________________________________
 
         /**
          * Return the current style for an element.
@@ -61,9 +61,9 @@
                             });
                         }
                         return el.currentStyle && el.currentStyle[prop] ? el.currentStyle[prop] : null;
-                    }
+                    };
                     return this;
-                }
+                };
             }
 
             return win.getComputedStyle(elem, null).getPropertyValue(prop);
@@ -77,7 +77,7 @@
             var availHeight = height || element.clientHeight,
                 lineHeight = getLineHeight(element);
 
-            return Math.max(Math.floor(availHeight/lineHeight), 0);
+            return Math.max(Math.floor(availHeight / lineHeight), 0);
         }
 
         /**
@@ -103,7 +103,7 @@
         }
 
 
-// MEAT AND POTATOES (MMMM, POTATOES...) ______________________________________
+        // MEAT AND POTATOES (MMMM, POTATOES...) ______________________________________
         var splitOnChars = opt.splitOnChars.slice(0),
             splitChar = splitOnChars[0],
             chunks,
@@ -223,7 +223,7 @@
         }
 
 
-// CONSTRUCTOR ________________________________________________________________
+        // CONSTRUCTOR ________________________________________________________________
 
         if (clampValue == 'auto') {
             clampValue = getMaxLines();
@@ -254,7 +254,7 @@
         return {
             'original': originalText,
             'clamped': clampedText
-        }
+        };
     }
 
     window.$clamp = clamp;

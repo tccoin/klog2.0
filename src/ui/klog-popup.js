@@ -4,8 +4,8 @@ import { IronOverlayBehavior } from '@polymer/iron-overlay-behavior/iron-overlay
 import { mixinBehaviors } from '@polymer/polymer/lib/legacy/class.js';
 
 class KlogPopup extends mixinBehaviors(IronOverlayBehavior, PolymerElement) {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style>
       :host{
         max-width: 300px;
@@ -69,41 +69,41 @@ class KlogPopup extends mixinBehaviors(IronOverlayBehavior, PolymerElement) {
       <slot></slot>
     </div>
     `;
-  }
-
-  static get is() { return 'klog-popup'; }
-
-  static get properties() {
-    return {
-      for: {
-        type: String
-      },
-      tooltip: {
-        type: Boolean,
-        reflectToAttribute: true,
-        value: false
-      }
     }
-  }
 
-  ready() {
-    super.ready();
-    this.noOverlap = true;
-    this.horizontalAlign = 'left';
-    this.verticalAlign = 'auto';
-    this.dynamicAlign = true;
-    this.addEvent();
-  }
+    static get is() { return 'klog-popup'; }
 
-  addEvent() {
-    if (this.parentElement) {
-      const trigger = this.parentElement.querySelector(`[id="${this.for}"]`);
-      if (trigger) {
-        trigger.addEventListener('mouseover', () => this.open());
-        this.parentElement.addEventListener('mouseleave', () => this.close());
-      }
+    static get properties() {
+        return {
+            for: {
+                type: String
+            },
+            tooltip: {
+                type: Boolean,
+                reflectToAttribute: true,
+                value: false
+            }
+        };
     }
-  }
+
+    ready() {
+        super.ready();
+        this.noOverlap = true;
+        this.horizontalAlign = 'left';
+        this.verticalAlign = 'auto';
+        this.dynamicAlign = true;
+        this.addEvent();
+    }
+
+    addEvent() {
+        if (this.parentElement) {
+            const trigger = this.parentElement.querySelector(`[id="${this.for}"]`);
+            if (trigger) {
+                trigger.addEventListener('mouseover', () => this.open());
+                this.parentElement.addEventListener('mouseleave', () => this.close());
+            }
+        }
+    }
 
 }
 

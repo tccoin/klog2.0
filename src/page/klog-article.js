@@ -177,7 +177,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             // this.fabExtended = !this.mobile;
             let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
             let top = this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top;
-            if (top != 0 && top+60-safeareaTop <= window.innerHeight) {
+            if (top != 0 && top + 60 - safeareaTop <= window.innerHeight) {
                 // fab.style.transform = 'translateY(88px)';
                 this.$.appBar.opened = false;
                 this.$.appBar.fabOpened = false;
@@ -228,7 +228,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
 
     async load() {
         this.loading = false;
-        this.hasToc = this.$.markdown.shadowRoot.querySelectorAll('.klog-article-content .toc').length>0;
+        this.hasToc = this.$.markdown.shadowRoot.querySelectorAll('.klog-article-content .toc').length > 0;
         this.$.markdown.updateScrollTarget(this.$.scrollTarget);
         if (this.$.scrollTarget == document.scrollingElement) {
             document.addEventListener('scroll', this._scrollHandler);
@@ -325,11 +325,11 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         this.$.markdown.$.scroller.scroll();
     }
 
-    _share(){
+    _share() {
         let safeareaBottom = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-bottom')) || 0;
         let copyInfo = `${this.article.title} - ${this.article.author.displayName}的文章 - Klog\nhttps://klog.app/#/article/${this.path}`;
         this.copy(copyInfo);
-        this.openToast('已复制分享链接到剪贴板',null, {bottom: document.body.clientWidth<1024 ? 80+safeareaBottom : 0});
+        this.openToast('已复制分享链接到剪贴板', null, { bottom: document.body.clientWidth < 1024 ? 80 + safeareaBottom : 0 });
     }
 
     _logoClickHandle() {

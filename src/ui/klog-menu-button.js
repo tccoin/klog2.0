@@ -3,8 +3,8 @@ import '@polymer/iron-dropdown/iron-dropdown.js';
 import '../style/klog-style-card.js';
 
 class KlogMenuButton extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
       <style include="klog-style-card"></style>
       <style>
         :host {
@@ -22,36 +22,36 @@ class KlogMenuButton extends PolymerElement {
         </div>
       </iron-dropdown>
     `;
-  }
-
-  static get is() { return 'klog-menu-button'; }
-
-  static get properties() {
-    return {
-      opened: {
-        type: Boolean,
-        value: false,
-        reflectToAttribute: true
-      }
     }
-  }
 
-  ready() {
-    super.ready();
-    this.positionTarget = this.$.container;
-    this.sizingTarget = this.$.container;
-  }
+    static get is() { return 'klog-menu-button'; }
 
-  toggle() {
-    this.opened = !this.opened;
-  }
+    static get properties() {
+        return {
+            opened: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            }
+        };
+    }
 
-  open() {
-    this.opened = true;
-  }
+    ready() {
+        super.ready();
+        this.positionTarget = this.$.container;
+        this.sizingTarget = this.$.container;
+    }
 
-  close() {
-    this.opened = false;
-  }
+    toggle() {
+        this.opened = !this.opened;
+    }
+
+    open() {
+        this.opened = true;
+    }
+
+    close() {
+        this.opened = false;
+    }
 }
 customElements.define(KlogMenuButton.is, KlogMenuButton);

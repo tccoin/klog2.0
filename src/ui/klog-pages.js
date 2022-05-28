@@ -2,8 +2,8 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-selector/iron-selectable.js';
 
 class KlogPages extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style>
       :host {
         display: flex;
@@ -45,69 +45,69 @@ class KlogPages extends PolymerElement {
     </style>
     <slot></slot>
 `;
-  }
-
-  static get is() { return 'klog-pages'; }
-
-  static get properties() {
-    return {
-      selected: {
-        type: Number,
-        value: 0,
-        observer: '_select',
-        reflectToAttribute: true
-      },
-      disabled: {
-        type: Boolean,
-        value: false,
-        reflectToAttribute: true,
-        observer: '_disable'
-      },
-      progress: {
-        type: Number,
-        value: 100,
-        observer: '_progressUpdate'
-      }
     }
-  }
 
-  _select() {
+    static get is() { return 'klog-pages'; }
+
+    static get properties() {
+        return {
+            selected: {
+                type: Number,
+                value: 0,
+                observer: '_select',
+                reflectToAttribute: true
+            },
+            disabled: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true,
+                observer: '_disable'
+            },
+            progress: {
+                type: Number,
+                value: 100,
+                observer: '_progressUpdate'
+            }
+        };
+    }
+
+    _select() {
     // trigger events
-    this.dispatchEvent(new CustomEvent('pages-select', { bubbles: true, composed: true }));
-    // index out of range
-    if (this.selected > this.children.length - 1) return
-    // update selected page
-    this.oldSelected = this.querySelector('.selected');
-    this.newSelected = this.children[this.selected];
-    // animation
-    this._progressUpdate();
-    // update classList
-    if (this.oldSelected) this.oldSelected.classList.remove('selected');
-    this.newSelected.classList.add('selected');
-  }
+        this.dispatchEvent(new CustomEvent('pages-select', { bubbles: true, composed: true }));
+        // index out of range
+        if (this.selected > this.children.length - 1) return;
+        // update selected page
+        this.oldSelected = this.querySelector('.selected');
+        this.newSelected = this.children[this.selected];
+        // animation
+        this._progressUpdate();
+        // update classList
+        if (this.oldSelected) this.oldSelected.classList.remove('selected');
+        this.newSelected.classList.add('selected');
+    }
 
-  _progressUpdate() {
+    _progressUpdate() {
     // no animation
-    if (!this.oldSelected) return;
-    // set classList
-    if (this.progress == 100) {
-      this.oldSelected.classList.remove('old-selected');
-    } else {
-      this.oldSelected.classList.add('old-selected');
+        if (!this.oldSelected) return;
+        // set classList
+        if (this.progress == 100) {
+            this.oldSelected.classList.remove('old-selected');
+        } else {
+            this.oldSelected.classList.add('old-selected');
+        }
+        // if disabled
+        if (this.disabled) return;
+        // set opacity
+        let percent = this.progress / 100;
+        this.oldSelected.style.opacity = 1 - percent;
+        this.newSelected.style.opacity = percent;
     }
-    // if disabled
-    if (this.disabled) return;
-    // set opacity
-    let percent = this.progress / 100;
-    this.oldSelected.style.opacity = 1 - percent;
-    this.newSelected.style.opacity = percent;
-  }
 
-  _disable() {
-    for (let child of this.children) {
-      child.style.opacity = 1;
+    _disable() {
+        for (let child of this.children) {
+            child.style.opacity = 1;
+        }
     }
-  }
 }
 
 window.customElements.define(KlogPages.is, KlogPages);

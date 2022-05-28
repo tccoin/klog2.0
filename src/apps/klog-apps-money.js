@@ -11,8 +11,8 @@ import '../style/klog-style-card.js';
 import '../ui/klog-icons.js';
 
 class KlogAppsMoney extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style include="klog-style-layout"></style>
     <style include="klog-style-card"></style>
     <style>
@@ -80,40 +80,40 @@ class KlogAppsMoney extends PolymerElement {
       <p>备注：{{messages}}</p>
     </paper-dialog>
 `;
-  }
-
-  static get is() { return 'klog-apps-money'; }
-
-  ready() {
-    super.ready();
-    this._int = setInterval(() => { this.updateTheme() }, 10000);
-  }
-
-  static get properties() {
-    return {
-      messages: {
-        type: String,
-        value: '我 可爱 打钱'
-      },
-    }
-  }
-
-  updateTheme() {
-    let htmlTheme = document.querySelector('html').getAttribute('theme');
-    if (htmlTheme) {
-      document.querySelector('html').setAttribute('theme', htmlTheme + ' custom');
-      document.querySelector('html').style.background = 'var(--paper-indigo-700)';
-    }
-  }
-
-  process() {
-    if (!this.number) {
-      this.$.numberErrorToast.open();
-    } else {
-      this.$.resultDialog.open();
     }
 
-  }
+    static get is() { return 'klog-apps-money'; }
+
+    ready() {
+        super.ready();
+        this._int = setInterval(() => { this.updateTheme(); }, 10000);
+    }
+
+    static get properties() {
+        return {
+            messages: {
+                type: String,
+                value: '我 可爱 打钱'
+            },
+        };
+    }
+
+    updateTheme() {
+        let htmlTheme = document.querySelector('html').getAttribute('theme');
+        if (htmlTheme) {
+            document.querySelector('html').setAttribute('theme', htmlTheme + ' custom');
+            document.querySelector('html').style.background = 'var(--paper-indigo-700)';
+        }
+    }
+
+    process() {
+        if (!this.number) {
+            this.$.numberErrorToast.open();
+        } else {
+            this.$.resultDialog.open();
+        }
+
+    }
 }
 
 window.customElements.define(KlogAppsMoney.is, KlogAppsMoney);

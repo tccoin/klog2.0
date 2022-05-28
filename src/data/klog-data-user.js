@@ -45,7 +45,7 @@ class KlogDataUser extends PolymerElement {
         this.defaultUserinfo = { preference: this.defaultPreference };
     }
 
-    async load(){
+    async load() {
         return this.updateUserinfo();
     }
 

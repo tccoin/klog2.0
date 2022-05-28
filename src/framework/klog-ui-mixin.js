@@ -17,7 +17,7 @@ const UiMixin = (superClass) => class extends superClass {
             toast.style.setProperty('--paper-toast-background-color', 'var(--primary)');
             toast.style.setProperty('--paper-toast-color', 'var(--on-primary)');
         }
-        if(option.bottom && option.bottom != 0){
+        if (option.bottom && option.bottom != 0) {
             toast.verticalOffset = option.bottom;
         }
         if (link) {

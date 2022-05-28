@@ -5,8 +5,8 @@ import '@polymer/paper-dialog/paper-dialog.js';
 import './klog-icons.js';
 
 class KlogMenu extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style include="klog-style-scrollbar"></style>
     <style>
       :host {
@@ -162,108 +162,108 @@ class KlogMenu extends PolymerElement {
       </template>
     </iron-selector>
 `;
-  }
-
-  static get is() { return 'klog-menu'; }
-
-  static get properties() {
-    return {
-      items: {
-        type: Object,
-        observer: '_calcMenu'
-      },
-      menu: {
-        type: Array,
-        value: []
-      }
-    };
-  }
-
-  _calcMenu(items) {
-    this._items = items;
-    const menu = [];
-    let hasRaised = false;
-    let classList = [];
-    for (let category of items) {
-      if (menu.length != 0) {
-        menu.push({
-          divider: true,
-          className: classList.concat(['divider']).join(' ')
-        });
-      }
-      classList = [];
-      if (category.desktop) { classList.push('desktop'); }
-      if (category.mobile) { classList.push('mobile'); }
-      for (let item of category.items) {
-        let itemClassList = [];
-        if (item.desktop) { itemClassList.push('desktop'); }
-        if (item.mobile) { itemClassList.push('mobile'); }
-        if (item.subtitle) {
-          menu.push({
-            subtitle: true,
-            text: item.text,
-            className: classList.concat(['subtitle'], itemClassList).join(' ')
-          });
-          continue;
-        }
-        itemClassList.push('item');
-        if (item.raised && !hasRaised) {
-          hasRaised = true;
-          itemClassList.push('raised');
-        }
-        menu.push({
-          item: true,
-          name: item.name,
-          text: item.text,
-          icon: item.icon,
-          category: category.name,
-          className: classList.concat(itemClassList).join(' '),
-          style: category.style || '',
-          path: item.path || ''
-        });
-      }
     }
-    this.set('menu', menu);
-  }
 
-  updatePage(e) {
-    const name = e.detail.item.getAttribute('name');
-    if (name) {
-      this.dispatchEvent(new CustomEvent('app-load', {
-        bubbles: true,
-        composed: true,
-        detail: { page: name }
-      }));
-      this.dispatchEvent(new CustomEvent('menu-select', { bubbles: true, composed: true }));
+    static get is() { return 'klog-menu'; }
+
+    static get properties() {
+        return {
+            items: {
+                type: Object,
+                observer: '_calcMenu'
+            },
+            menu: {
+                type: Array,
+                value: []
+            }
+        };
     }
-  }
 
-  itemsSelect(e) {
-    const item = e.detail.item;
-    const name = item.getAttribute('name');
-    const path = item.getAttribute('path');
-    const selectable = item.getAttribute('selectable');
-    if (name == 'idle') { return; } else { this.$.itemsSelector.selected = 'idle'; }
-    const category = item.getAttribute('category');
-    if (category && name) {
-      if (path) {
-        this.dispatchEvent(new CustomEvent('app-load', {
-          bubbles: true,
-          composed: true,
-          detail: { page: path }
-        }));
-      }
-      this.dispatchEvent(new CustomEvent('menu-select', {
-        bubbles: true,
-        composed: true,
-        detail: {
-          category: category,
-          item: name,
-          target: item
+    _calcMenu(items) {
+        this._items = items;
+        const menu = [];
+        let hasRaised = false;
+        let classList = [];
+        for (let category of items) {
+            if (menu.length != 0) {
+                menu.push({
+                    divider: true,
+                    className: classList.concat(['divider']).join(' ')
+                });
+            }
+            classList = [];
+            if (category.desktop) { classList.push('desktop'); }
+            if (category.mobile) { classList.push('mobile'); }
+            for (let item of category.items) {
+                let itemClassList = [];
+                if (item.desktop) { itemClassList.push('desktop'); }
+                if (item.mobile) { itemClassList.push('mobile'); }
+                if (item.subtitle) {
+                    menu.push({
+                        subtitle: true,
+                        text: item.text,
+                        className: classList.concat(['subtitle'], itemClassList).join(' ')
+                    });
+                    continue;
+                }
+                itemClassList.push('item');
+                if (item.raised && !hasRaised) {
+                    hasRaised = true;
+                    itemClassList.push('raised');
+                }
+                menu.push({
+                    item: true,
+                    name: item.name,
+                    text: item.text,
+                    icon: item.icon,
+                    category: category.name,
+                    className: classList.concat(itemClassList).join(' '),
+                    style: category.style || '',
+                    path: item.path || ''
+                });
+            }
         }
-      }));
+        this.set('menu', menu);
     }
-  }
+
+    updatePage(e) {
+        const name = e.detail.item.getAttribute('name');
+        if (name) {
+            this.dispatchEvent(new CustomEvent('app-load', {
+                bubbles: true,
+                composed: true,
+                detail: { page: name }
+            }));
+            this.dispatchEvent(new CustomEvent('menu-select', { bubbles: true, composed: true }));
+        }
+    }
+
+    itemsSelect(e) {
+        const item = e.detail.item;
+        const name = item.getAttribute('name');
+        const path = item.getAttribute('path');
+        const selectable = item.getAttribute('selectable');
+        if (name == 'idle') { return; } else { this.$.itemsSelector.selected = 'idle'; }
+        const category = item.getAttribute('category');
+        if (category && name) {
+            if (path) {
+                this.dispatchEvent(new CustomEvent('app-load', {
+                    bubbles: true,
+                    composed: true,
+                    detail: { page: path }
+                }));
+            }
+            this.dispatchEvent(new CustomEvent('menu-select', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    category: category,
+                    item: name,
+                    target: item
+                }
+            }));
+        }
+    }
 }
 
 window.customElements.define(KlogMenu.is, KlogMenu);

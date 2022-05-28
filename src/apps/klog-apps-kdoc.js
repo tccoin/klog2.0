@@ -12,8 +12,8 @@ import '../style/klog-style-card.js';
 import '../ui/klog-icons.js';
 
 class KlogAppsKdoc extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style include="klog-style-layout"></style>
     <style include="klog-style-card"></style>
     <style>
@@ -86,17 +86,17 @@ class KlogAppsKdoc extends PolymerElement {
       </paper-button>
     </div>
 `;
-  }
+    }
 
-  static get is() { return 'klog-apps-kdoc'; }
+    static get is() { return 'klog-apps-kdoc'; }
 
-  ready() {
-    super.ready();
-  }
+    ready() {
+        super.ready();
+    }
 
-  generate() {
-    console.log(123);
-  }
+    generate() {
+        console.log(123);
+    }
 }
 
 window.customElements.define(KlogAppsKdoc.is, KlogAppsKdoc);

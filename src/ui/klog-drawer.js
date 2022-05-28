@@ -3,8 +3,8 @@ import '@polymer/app-layout/app-drawer/app-drawer.js';
 import '../style/klog-style-scrollbar.js';
 
 class KlogDrawer extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style include="klog-style-scrollbar"></style>
     <style>
       :host {
@@ -59,42 +59,42 @@ class KlogDrawer extends PolymerElement {
       </div>
     </app-drawer>
 `;
-  }
+    }
 
-  static get is() { return 'klog-drawer'; }
+    static get is() { return 'klog-drawer'; }
 
-  static get properties() {
-    return {
-      heading: {
-        type: String
-      },
-      disabled: {
-        type: Boolean,
-        value: false
-      },
-      opened: {
-        type: Boolean
-      }
-    };
-  }
+    static get properties() {
+        return {
+            heading: {
+                type: String
+            },
+            disabled: {
+                type: Boolean,
+                value: false
+            },
+            opened: {
+                type: Boolean
+            }
+        };
+    }
 
-  ready() {
-    super.ready();
-    this.addEventListener('menu-select', () => this.close());
-    this.addEventListener('collection-select', () => this.close());
-  }
+    ready() {
+        super.ready();
+        this.addEventListener('menu-select', () => this.close());
+        this.addEventListener('collection-select', () => this.close());
+    }
 
-  toggle() {
-    this.$.drawer.toggle();
-  }
+    toggle() {
+        this.$.drawer.toggle();
+    }
 
-  open() {
-    this.$.drawer.open();
-  }
+    open() {
+        this.$.drawer.open();
+    }
 
-  close() {
-    this.$.drawer.close();
-  }
+    close() {
+        this.$.drawer.close();
+    }
 }
 
 window.customElements.define(KlogDrawer.is, KlogDrawer);

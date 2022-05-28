@@ -45,7 +45,7 @@ class KlogRenderKatex extends PolymerElement {
                 type: Boolean,
                 reflectToAttribute: true
             }
-        }
+        };
     }
 
     ready() {

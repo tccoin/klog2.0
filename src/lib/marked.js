@@ -4,7 +4,7 @@
  * https://github.com/chjj/marked
  */
 
-;
+
 (function () {
     'use strict';
 
@@ -19,7 +19,7 @@
         hr: /^ {0,3}((?:- *){3,}|(?:_ *){3,}|(?:\* *){3,})(?:\n+|$)/,
         heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
         nptable: noop,
-        blockquote: /^( {0,3}> ?(paragraph|[^\n]*)(?:\n{1,2}|$))+/,//custom
+        blockquote: /^( {0,3}> ?(paragraph|[^\n]*)(?:\n{1,2}|$))+/, //custom
         list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
         html: /^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,
         def: /^ {0,3}\[(label)\]: *\n? *<?([^\s>]+)>?(?:(?: +\n? *| *\n *)(title))? *(?:\n+|$)/,
@@ -32,21 +32,21 @@
     block._label = /(?:\\[\[\]]|[^\[\]])+/;
     block._title = /(?:"(?:\\"|[^"]|"[^"\n]*")*"|'\n?(?:[^'\n]+\n?)*'|\([^()]*\))/;
     block.def = replace(block.def)
-        ('label', block._label)
-        ('title', block._title)
-        ();
+    ('label', block._label)
+    ('title', block._title)
+    ();
 
     block.bullet = /(?:[*+-]|\d+\.)/;
     block.item = /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;
     block.item = replace(block.item, 'gm')
-        (/bull/g, block.bullet)
-        ();
+    (/bull/g, block.bullet)
+    ();
 
     block.list = replace(block.list)
-        (/bull/g, block.bullet)
-        ('hr', '\\n+(?=\\1?(?:(?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$))')
-        ('def', '\\n+(?=' + block.def.source + ')')
-        ();
+    (/bull/g, block.bullet)
+    ('hr', '\\n+(?=\\1?(?:(?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$))')
+    ('def', '\\n+(?=' + block.def.source + ')')
+    ();
 
     block._tag = '(?!(?:' +
         'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code' +
@@ -54,22 +54,22 @@
         '|span|br|wbr|ins|del|img)\\b)\\w+(?!:|[^\\w\\s@]*@)\\b';
 
     block.html = replace(block.html)
-        ('comment', /<!--[\s\S]*?-->/)
-        ('closed', /<(tag)[\s\S]+?<\/\1>/)
-        ('closing', /<tag(?:"[^"]*"|'[^']*'|\s[^'"\/>]*)*?\/?>/)
-        (/tag/g, block._tag)
-        ();
+    ('comment', /<!--[\s\S]*?-->/)
+    ('closed', /<(tag)[\s\S]+?<\/\1>/)
+    ('closing', /<tag(?:"[^"]*"|'[^']*'|\s[^'"\/>]*)*?\/?>/)
+    (/tag/g, block._tag)
+    ();
 
     block.paragraph = replace(block.paragraph)
-        ('hr', block.hr)
-        ('heading', block.heading)
-        ('lheading', block.lheading)
-        ('tag', '<' + block._tag)
-        ();
+    ('hr', block.hr)
+    ('heading', block.heading)
+    ('lheading', block.lheading)
+    ('tag', '<' + block._tag)
+    ();
 
     block.blockquote = replace(block.blockquote)
-        ('paragraph', block.paragraph)
-        ();
+    ('paragraph', block.paragraph)
+    ();
 
     /**
      * Normal Block Grammar
@@ -89,10 +89,10 @@
     });
 
     block.gfm.paragraph = replace(block.paragraph)
-        ('(?!', '(?!' +
+    ('(?!', '(?!' +
             block.gfm.fences.source.replace('\\1', '\\2') + '|' +
             block.list.source.replace('\\1', '\\3') + '|')
-        ();
+    ();
 
     /**
      * GFM + Tables Block Grammar
@@ -489,7 +489,7 @@
 
             if (src) {
                 throw new
-                    Error('Infinite loop on byte: ' + src.charCodeAt(0));
+                Error('Infinite loop on byte: ' + src.charCodeAt(0));
             }
         }
 
@@ -519,21 +519,21 @@
     inline._email = /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/;
 
     inline.autolink = replace(inline.autolink)
-        ('scheme', inline._scheme)
-        ('email', inline._email)
-        ()
+    ('scheme', inline._scheme)
+    ('email', inline._email)
+    ();
 
     inline._inside = /(?:\[[^\]]*\]|\\[\[\]]|[^\[\]]|\](?=[^\[]*\]))*/;
     inline._href = /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
 
     inline.link = replace(inline.link)
-        ('inside', inline._inside)
-        ('href', inline._href)
-        ();
+    ('inside', inline._inside)
+    ('href', inline._href)
+    ();
 
     inline.reflink = replace(inline.reflink)
-        ('inside', inline._inside)
-        ();
+    ('inside', inline._inside)
+    ();
 
     /**
      * Normal Inline Grammar
@@ -557,14 +557,14 @@
     inline.gfm = merge({}, inline.normal, {
         escape: replace(inline.escape)('])', '~|])')(),
         url: replace(/^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/)
-            ('email', inline._email)
-            (),
+        ('email', inline._email)
+        (),
         _backpedal: /(?:[^?!.,:;*_~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_~)]+(?!$))+/,
         del: /^~~(?=\S)([\s\S]*?\S)~~/,
         text: replace(inline.text)
-            (']|', '~]|')
-            ('|', '|https?://|ftp://|www\\.|[a-zA-Z0-9.!#$%&\'*+/=?^_`{\\|}~-]+@|')
-            ()
+        (']|', '~]|')
+        ('|', '|https?://|ftp://|www\\.|[a-zA-Z0-9.!#$%&\'*+/=?^_`{\\|}~-]+@|')
+        ()
     });
 
     /**
@@ -589,7 +589,7 @@
 
         if (!this.links) {
             throw new
-                Error('Tokens array requires a `links` property.');
+            Error('Tokens array requires a `links` property.');
         }
 
         if (this.options.gfm) {
@@ -690,7 +690,7 @@
                     this.options.sanitizer ?
                         this.options.sanitizer(cap[0]) :
                         escape(cap[0]) :
-                    cap[0]
+                    cap[0];
                 continue;
             }
 
@@ -789,7 +789,7 @@
 
             if (src) {
                 throw new
-                    Error('Infinite loop on byte: ' + src.charCodeAt(0));
+                Error('Infinite loop on byte: ' + src.charCodeAt(0));
             }
         }
 
@@ -816,7 +816,7 @@
             href: href,
             title: title,
             text: cap[1]
-        }
+        };
 
 
     };
@@ -1034,16 +1034,16 @@
         TextRenderer.prototype.del =
         TextRenderer.prototype.text = function (text) {
             return text;
-        }
+        };
 
     TextRenderer.prototype.link =
         TextRenderer.prototype.image = function (href, title, text) {
             return '' + text;
-        }
+        };
 
     TextRenderer.prototype.br = function () {
         return '';
-    }
+    };
 
     /**
      * Parsing & Compiling
@@ -1127,118 +1127,118 @@
 
     Parser.prototype.tok = function () {
         switch (this.token.type) {
-            case 'space':
-                {
-                    return '';
-                }
-            case 'anchor':
-                {
-                    return '<anchor index="' + this.token.index + '"></anchor>';
-                }
-            case 'hr':
-                {
-                    return this.renderer.hr();
-                }
-            case 'heading':
-                {
-                    //custom
-                    return this.renderer.heading(
-                        this.inline.output(this.token.text, this.token),
-                        this.token.depth,
-                        this.token.id);//custom:unescape(this.inlineText.output(this.token.text)));
-                }
-            case 'code':
-                {
-                    return this.renderer.code(this.token.text,
-                        this.token.lang,
-                        this.token.escaped);
-                }
-            case 'table':
-                {
-                    var header = '',
-                        body = '',
-                        i, row, cell, j;
+        case 'space':
+        {
+            return '';
+        }
+        case 'anchor':
+        {
+            return '<anchor index="' + this.token.index + '"></anchor>';
+        }
+        case 'hr':
+        {
+            return this.renderer.hr();
+        }
+        case 'heading':
+        {
+            //custom
+            return this.renderer.heading(
+                this.inline.output(this.token.text, this.token),
+                this.token.depth,
+                this.token.id);//custom:unescape(this.inlineText.output(this.token.text)));
+        }
+        case 'code':
+        {
+            return this.renderer.code(this.token.text,
+                this.token.lang,
+                this.token.escaped);
+        }
+        case 'table':
+        {
+            var header = '',
+                body = '',
+                i, row, cell, j;
 
-                    // header
-                    cell = '';
-                    for (i = 0; i < this.token.header.length; i++) {
-                        cell += this.renderer.tablecell(
-                            this.inline.output(this.token.header[i], this.token), { header: true, align: this.token.align[i] }
-                        );
-                    }
-                    header += this.renderer.tablerow(cell);
+            // header
+            cell = '';
+            for (i = 0; i < this.token.header.length; i++) {
+                cell += this.renderer.tablecell(
+                    this.inline.output(this.token.header[i], this.token), { header: true, align: this.token.align[i] }
+                );
+            }
+            header += this.renderer.tablerow(cell);
 
-                    for (i = 0; i < this.token.cells.length; i++) {
-                        row = this.token.cells[i];
+            for (i = 0; i < this.token.cells.length; i++) {
+                row = this.token.cells[i];
 
-                        cell = '';
-                        for (j = 0; j < row.length; j++) {
-                            cell += this.renderer.tablecell(
-                                this.inline.output(row[j], this.token), { header: false, align: this.token.align[j] }
-                            );
-                        }
-
-                        body += this.renderer.tablerow(cell);
-                    }
-                    return this.renderer.table(header, body);
+                cell = '';
+                for (j = 0; j < row.length; j++) {
+                    cell += this.renderer.tablecell(
+                        this.inline.output(row[j], this.token), { header: false, align: this.token.align[j] }
+                    );
                 }
-            case 'blockquote_start':
-                {
-                    var body = '';
 
-                    while (this.next().type !== 'blockquote_end') {
-                        body += this.tok();
-                    }
+                body += this.renderer.tablerow(cell);
+            }
+            return this.renderer.table(header, body);
+        }
+        case 'blockquote_start':
+        {
+            var body = '';
 
-                    return this.renderer.blockquote(body);
-                }
-            case 'list_start':
-                {
-                    var body = '',
-                        ordered = this.token.ordered;
+            while (this.next().type !== 'blockquote_end') {
+                body += this.tok();
+            }
 
-                    while (this.next().type !== 'list_end') {
-                        body += this.tok();
-                    }
+            return this.renderer.blockquote(body);
+        }
+        case 'list_start':
+        {
+            var body = '',
+                ordered = this.token.ordered;
 
-                    return this.renderer.list(body, ordered);
-                }
-            case 'list_item_start':
-                {
-                    var body = '';
+            while (this.next().type !== 'list_end') {
+                body += this.tok();
+            }
 
-                    while (this.next().type !== 'list_item_end') {
-                        body += this.token.type === 'text' ?
-                            this.parseText() :
-                            this.tok();
-                    }
+            return this.renderer.list(body, ordered);
+        }
+        case 'list_item_start':
+        {
+            var body = '';
 
-                    return this.renderer.listitem(body);
-                }
-            case 'loose_item_start':
-                {
-                    var body = '';
+            while (this.next().type !== 'list_item_end') {
+                body += this.token.type === 'text' ?
+                    this.parseText() :
+                    this.tok();
+            }
 
-                    while (this.next().type !== 'list_item_end') {
-                        body += this.tok();
-                    }
+            return this.renderer.listitem(body);
+        }
+        case 'loose_item_start':
+        {
+            var body = '';
 
-                    return this.renderer.listitem(body);
-                }
-            case 'html':
-                {
-                    var html = !this.token.pre && !this.options.pedantic ?
-                        this.inline.output(this.token.text, this.token) : this.token.text;
-                    return this.renderer.html(html);
-                }
-            case 'paragraph':
-                {
-                    return this.renderer.paragraph(this.inline.output(this.token.text, this.token));
-                }
-            case 'text':
-                {
-                    return this.renderer.paragraph(this.parseText());
-                }
+            while (this.next().type !== 'list_item_end') {
+                body += this.tok();
+            }
+
+            return this.renderer.listitem(body);
+        }
+        case 'html':
+        {
+            var html = !this.token.pre && !this.options.pedantic ?
+                this.inline.output(this.token.text, this.token) : this.token.text;
+            return this.renderer.html(html);
+        }
+        case 'paragraph':
+        {
+            return this.renderer.paragraph(this.inline.output(this.token.text, this.token));
+        }
+        case 'text':
+        {
+            return this.renderer.paragraph(this.parseText());
+        }
         }
 
         // custom
@@ -1354,7 +1354,7 @@
             tokens, pending, i = 0;
 
         try {
-            tokens = Lexer.lex(src, opt)
+            tokens = Lexer.lex(src, opt);
         } catch (e) {
             return callback(e);
         }

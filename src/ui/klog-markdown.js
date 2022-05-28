@@ -148,7 +148,7 @@ class KlogMarkdown extends PolymerElement {
         };
     }
 
-    _handleScrollBias(){
+    _handleScrollBias() {
         this.$.scroller.scrollBias = this.scrollBias;
     }
 
@@ -255,9 +255,9 @@ class KlogMarkdown extends PolymerElement {
           <div class="breadcrumbs" dont-count>
           <div class="collection">${cap[0] || '日常'}</div>
           ${cap[1]
-                            ? `<div class="tags">${this.tags.map(t => `<span class="tag">${t}</span>`)}</div>`
-                            : ''
-                        }
+        ? `<div class="tags">${this.tags.map(t => `<span class="tag">${t}</span>`)}</div>`
+        : ''
+}
           </div>`;
                 } else {
                     return `<!--collection:${cap[0]};tags:${this.tags}-->`;

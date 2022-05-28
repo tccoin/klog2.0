@@ -10,7 +10,7 @@ export class KlogDynamicTheme {
             source = this._img2blob(source.$.img);
         } else if (typeof (source) == 'string') {
             let matchResult = source.match(/\[(.*),(.*),(.*)\]/);
-            if(matchResult && matchResult.length==4){
+            if (matchResult && matchResult.length == 4) {
                 source = [parseInt(matchResult[1]), parseInt(matchResult[2]), parseInt(matchResult[3])];
                 source = this._rgb2hex(source);
             }

@@ -3,8 +3,8 @@ import '../style/klog-style-scrollbar.js';
 import '../lib/prism.js';
 import '../lib/prism-style.js';
 class KlogRenderCode extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style include="klog-style-scrollbar"></style>
     <style include="prism-style"></style>
     <style>
@@ -98,50 +98,50 @@ class KlogRenderCode extends PolymerElement {
       <pre id="pre"><template is="dom-if" if="{{lang}}"><div class="meta"><span class="code-lang">{{lang}}</span></div></template><code id="code"></code></pre>
     </div>
 `;
-  }
-
-  static get is() { return 'klog-render-code'; }
-
-  static get properties() {
-    return {
-      lang: {
-        type: String,
-        value: ''
-      },
-      code: {
-        type: String,
-        value: ''
-      },
-      theme: {
-        type: String,
-        value: 'dark',
-        reflectToAttribute: true,
-      }
-    };
-  }
-
-  ready() {
-    super.ready();
-    if (Prism) {
-      this.placeHolderPromise = this.update();
-    } else {
-      console.error('Prism not found');
-      this.placeHolderPromise = Promise.resolve();
     }
-  }
 
-  update() {
-    return new Promise(resolve => {
-      this.lang = this.lang.replace(/cpp/i, 'c++').toUpperCase();
-      let highlightLang = this.lang in Prism.languages ? lang : 'clike';
-      let grammar = Prism.languages[highlightLang];
-      this.highlightCode = Prism.highlight(unescape(this.code), grammar, highlightLang) || '';
-      this.$.container.setAttribute('theme', this.theme);
-      this.$.pre.classList.add(`language-${this.lang}`);
-      this.$.code.innerHTML = this.highlightCode;
-      setTimeout(resolve, 1);
-    });
-  }
+    static get is() { return 'klog-render-code'; }
+
+    static get properties() {
+        return {
+            lang: {
+                type: String,
+                value: ''
+            },
+            code: {
+                type: String,
+                value: ''
+            },
+            theme: {
+                type: String,
+                value: 'dark',
+                reflectToAttribute: true,
+            }
+        };
+    }
+
+    ready() {
+        super.ready();
+        if (Prism) {
+            this.placeHolderPromise = this.update();
+        } else {
+            console.error('Prism not found');
+            this.placeHolderPromise = Promise.resolve();
+        }
+    }
+
+    update() {
+        return new Promise(resolve => {
+            this.lang = this.lang.replace(/cpp/i, 'c++').toUpperCase();
+            let highlightLang = this.lang in Prism.languages ? lang : 'clike';
+            let grammar = Prism.languages[highlightLang];
+            this.highlightCode = Prism.highlight(unescape(this.code), grammar, highlightLang) || '';
+            this.$.container.setAttribute('theme', this.theme);
+            this.$.pre.classList.add(`language-${this.lang}`);
+            this.$.code.innerHTML = this.highlightCode;
+            setTimeout(resolve, 1);
+        });
+    }
 }
 
 window.customElements.define(KlogRenderCode.is, KlogRenderCode);

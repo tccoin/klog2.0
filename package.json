@@ -65,6 +65,7 @@
   },
   "devDependencies": {
     "es-dev-server": "^1.47.0",
+    "eslint": "^8.16.0",
     "gulp": "^4.0.2",
     "gulp-add": "^0.1.0",
     "gulp-if": "^2.0.0",

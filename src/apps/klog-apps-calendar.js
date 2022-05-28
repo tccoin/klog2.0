@@ -6,8 +6,8 @@ import '../style/klog-style-card.js';
 import '../ui/klog-icons.js';
 
 class KlogAppsCalendar extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style include="klog-style-layout"></style>
     <style include="klog-style-card"></style>
     <style>
@@ -50,70 +50,70 @@ class KlogAppsCalendar extends PolymerElement {
       <paper-toggle-button class="disabled-button" checked="{{!disabled}}"></paper-toggle-button>
     </div>
 `;
-  }
-
-  static get is() { return 'klog-apps-calendar'; }
-
-  static get properties() {
-    return {
-      minute: {
-        type: Number,
-      },
-      hour: {
-        type: Number,
-      },
-      disabled: {
-        type: Boolean,
-        value: false
-      },
-      autoFullscreenTime: {
-        type: Number,
-        value: 1000
-      },
     }
-  }
 
-  ready() {
-    super.ready();
-    this.ticktock();
-    setInterval(() => this.ticktock(), 1000);
-    this._moveTimeout = setTimeout(() => this.activate(), this.autoFullscreenTime);
-    // this.addEventListener('mousemove', () => this.moveHandle());
-    // this.addEventListener('click', () => this.deactivate());
-    this.addEventListener('click', () => this.moveHandle());
-  }
+    static get is() { return 'klog-apps-calendar'; }
 
-  moveHandle() {
-    if (this._moveTimeout) {
-      clearTimeout(this._moveTimeout);
+    static get properties() {
+        return {
+            minute: {
+                type: Number,
+            },
+            hour: {
+                type: Number,
+            },
+            disabled: {
+                type: Boolean,
+                value: false
+            },
+            autoFullscreenTime: {
+                type: Number,
+                value: 1000
+            },
+        };
     }
-    this._moveTimeout = setTimeout(() => this.activate(), this.autoFullscreenTime);
-  }
 
-  activate() {
-    if (!this.disabled) {
-      this.requestFullscreen();
-      this._deactivateDisabled = true;
-      this.removeEventListener('mousemove', () => this.moveHandle());
-      setTimeout(() => this._deactivateDisabled = false, 1000);
+    ready() {
+        super.ready();
+        this.ticktock();
+        setInterval(() => this.ticktock(), 1000);
+        this._moveTimeout = setTimeout(() => this.activate(), this.autoFullscreenTime);
+        // this.addEventListener('mousemove', () => this.moveHandle());
+        // this.addEventListener('click', () => this.deactivate());
+        this.addEventListener('click', () => this.moveHandle());
     }
-  }
 
-  deactivate() {
-    if (document.fullscreenElement && !this._deactivateDisabled) {
-      document.exitFullscreen();
+    moveHandle() {
+        if (this._moveTimeout) {
+            clearTimeout(this._moveTimeout);
+        }
+        this._moveTimeout = setTimeout(() => this.activate(), this.autoFullscreenTime);
     }
-  }
 
-  _makezero(number, totalLength) {
-    return '0'.repeat(totalLength - String(number).length) + String(number);
-  }
+    activate() {
+        if (!this.disabled) {
+            this.requestFullscreen();
+            this._deactivateDisabled = true;
+            this.removeEventListener('mousemove', () => this.moveHandle());
+            setTimeout(() => this._deactivateDisabled = false, 1000);
+        }
+    }
 
-  ticktock() {
-    const now = new Date();
-    this.hour = this._makezero(now.getHours(), 2);
-    this.minute = this._makezero(now.getMinutes(), 2);
-  }
+    deactivate() {
+        if (document.fullscreenElement && !this._deactivateDisabled) {
+            document.exitFullscreen();
+        }
+    }
+
+    _makezero(number, totalLength) {
+        return '0'.repeat(totalLength - String(number).length) + String(number);
+    }
+
+    ticktock() {
+        const now = new Date();
+        this.hour = this._makezero(now.getHours(), 2);
+        this.minute = this._makezero(now.getMinutes(), 2);
+    }
 }
 
 window.customElements.define(KlogAppsCalendar.is, KlogAppsCalendar);

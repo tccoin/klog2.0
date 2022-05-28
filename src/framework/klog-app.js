@@ -123,13 +123,13 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             this.loadingTimeoutPrompt = true;
         }, 5000);
         await
-            import('./klog-layout.js');
+        import('./klog-layout.js');
         this.loading = false;
         clearTimeout(this._loadingTimeout);
     }
 
     async load() {
-        if(!this._ready) { return; }
+        if (!this._ready) { return; }
         if (this._hash == window.location.hash) { return; }
         this._hash = window.location.hash;
         const ui = this.$.layout;
@@ -225,8 +225,8 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         });
     }
 
-    async _loadUserinfo(userdata){
-        if(!userdata) {
+    async _loadUserinfo(userdata) {
+        if (!userdata) {
             userdata = await this.$.user.load();
         }
         this.userdata = userdata;

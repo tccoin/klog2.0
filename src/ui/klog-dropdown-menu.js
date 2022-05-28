@@ -1,8 +1,8 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '../ui/klog-menu-button.js';
 class KlogDropdownMenu extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style>
     :host {
       display: block;
@@ -30,54 +30,54 @@ class KlogDropdownMenu extends PolymerElement {
     </klog-menu-button>
 
 `;
-  }
+    }
 
-  static get is() { return 'klog-dropdown-menu'; }
+    static get is() { return 'klog-dropdown-menu'; }
 
-  ready() {
-    super.ready();
-    for (let child of this.$.slot.assignedNodes()) {
-      child.addEventListener('selected-item-changed', (e) => {
-        let item = e.detail.value;
-        if (item) {
-          this._selected = this.value || item.innerText;
-          this.$.menuButton.close();
+    ready() {
+        super.ready();
+        for (let child of this.$.slot.assignedNodes()) {
+            child.addEventListener('selected-item-changed', (e) => {
+                let item = e.detail.value;
+                if (item) {
+                    this._selected = this.value || item.innerText;
+                    this.$.menuButton.close();
+                }
+            });
         }
-      });
+
     }
 
-  }
-
-  static get properties() {
-    return {
-      label: {
-        type: String
-      },
-      value: {
-        type: String
-      },
-      _selected: {
-        type: String
-      },
-      outlined: {
-        type: Boolean
-      },
-      verticalAlign: {
-        type: String,
-        value: 'top'
-      },
-      horizontalAlign: {
-        type: String,
-        value: 'left'
-      },
-      verticalOffset: {
-        type: Number
-      },
-      horizontalOffset: {
-        type: Number
-      }
+    static get properties() {
+        return {
+            label: {
+                type: String
+            },
+            value: {
+                type: String
+            },
+            _selected: {
+                type: String
+            },
+            outlined: {
+                type: Boolean
+            },
+            verticalAlign: {
+                type: String,
+                value: 'top'
+            },
+            horizontalAlign: {
+                type: String,
+                value: 'left'
+            },
+            verticalOffset: {
+                type: Number
+            },
+            horizontalOffset: {
+                type: Number
+            }
+        };
     }
-  }
 }
 
 window.customElements.define(KlogDropdownMenu.is, KlogDropdownMenu);

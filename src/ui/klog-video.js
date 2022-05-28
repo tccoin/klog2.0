@@ -2,8 +2,8 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-ripple/paper-ripple.js';
 
 class KlogVideo extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style>
       :host {
         display: block;
@@ -81,169 +81,169 @@ class KlogVideo extends PolymerElement {
     <paper-ripple></paper-ripple>
     <div id="bg"></div>
 `;
-  }
-
-  static get is() { return 'klog-video'; }
-
-  static get properties() {
-    return {
-      src: {
-        type: String,
-        reflectToAttribute: true
-      },
-      mobile: {
-        type: Boolean,
-        reflectToAttribute: true,
-        value: false
-      },
-      paused: {
-        type: Boolean,
-        reflectToAttribute: true,
-        value: true
-      },
-      playable: {
-        type: Boolean,
-        reflectToAttribute: true,
-        value: false
-      },
     }
-  }
 
-  static get observers() {
-    return [
-      'srcChanged(src)'
-    ]
-  }
+    static get is() { return 'klog-video'; }
 
-  ready() {
-    super.ready();
-    if (this.mobile) {
-      this.addEventListener('click', () => this.clickHandle());
-    } else {
-      this.$.video.volume = 0;
-      this.addEventListener('mouseover', () => this.play());
-      this.addEventListener('mouseout', () => this.pause());
+    static get properties() {
+        return {
+            src: {
+                type: String,
+                reflectToAttribute: true
+            },
+            mobile: {
+                type: Boolean,
+                reflectToAttribute: true,
+                value: false
+            },
+            paused: {
+                type: Boolean,
+                reflectToAttribute: true,
+                value: true
+            },
+            playable: {
+                type: Boolean,
+                reflectToAttribute: true,
+                value: false
+            },
+        };
     }
-    this.$.video.addEventListener('timeupdate', () => this.timeupdateHandle());
-    this.$.video.addEventListener('playing', () => this.updatePaused());
-    this.$.video.addEventListener('pause', () => this.updatePaused());
-    this.$.video.addEventListener('playing', () => this.playingHandle());
-    this.$.video.addEventListener('canplay', () => { this.playable = true; });
-    this.$.video.addEventListener('waiting', () => { this.playable = false; });
-    this.updatePlaceholder();
-    if (!this.lazy) {
-      this.lazyload();
+
+    static get observers() {
+        return [
+            'srcChanged(src)'
+        ];
     }
-    this._lock = 0;
-  }
 
-  updatePaused() {
-    this.paused = this.$.video.paused;
-  }
-
-  playingHandle() {
-    this.bath();
-  }
-
-  async play() {
-    this.$.video.play();
-  }
-
-  async pause() {
-    await this.dewater();
-    this.$.video.pause();
-  }
-
-  async bath(duration = 2000) {
-    const lock = (this._lock += 1);
-    let lastTime = Date.now();
-    let progress = this.$.video.volume;
-    while (progress < 1) {
-      if (lock != this._lock) return;
-      progress += (Date.now() - lastTime) / duration;
-      lastTime = Date.now();
-      progress = Math.min(progress, 1);
-      this.$.video.volume = parseInt(progress * 100) / 100;
-      await new Promise(resolve => setTimeout(resolve, 10));
-    }
-  }
-
-  async dewater(duration = 500) {
-    const lock = (this._lock += 1);
-    let lastTime = Date.now();
-    let progress = this.$.video.volume;
-    while (progress > 0) {
-      if (lock != this._lock) return;
-      progress -= (Date.now() - lastTime) / duration;
-      lastTime = Date.now();
-      progress = Math.max(progress, 0);
-      this.$.video.volume = parseInt(progress * 100) / 100;
-      await new Promise(resolve => setTimeout(resolve, 10));
-    }
-  }
-
-  timeupdateHandle() {
-    let timeRemained = (this.$.video.duration - this.$.video.currentTime) * 1000;
-    if (timeRemained < 1000) {
-      this.dewater(timeRemained);
-    }
-  }
-
-  clickHandle() {
-    const video = this.$.video;
-    if (this._clicking) {
-      if (this._singleClickTimeout) {
-        clearTimeout(this._singleClickTimeout);
-      }
-      video.muted = !video.muted;
-      this._clicking = false;
-    } else {
-      this._clicking = true;
-      this._singleClickTimeout = setTimeout(() => {
-        if (video.paused) {
-          this.play();
+    ready() {
+        super.ready();
+        if (this.mobile) {
+            this.addEventListener('click', () => this.clickHandle());
         } else {
-          this.pause();
+            this.$.video.volume = 0;
+            this.addEventListener('mouseover', () => this.play());
+            this.addEventListener('mouseout', () => this.pause());
         }
-        this._clicking = false;
-      }, 300);
+        this.$.video.addEventListener('timeupdate', () => this.timeupdateHandle());
+        this.$.video.addEventListener('playing', () => this.updatePaused());
+        this.$.video.addEventListener('pause', () => this.updatePaused());
+        this.$.video.addEventListener('playing', () => this.playingHandle());
+        this.$.video.addEventListener('canplay', () => { this.playable = true; });
+        this.$.video.addEventListener('waiting', () => { this.playable = false; });
+        this.updatePlaceholder();
+        if (!this.lazy) {
+            this.lazyload();
+        }
+        this._lock = 0;
     }
-  }
 
-
-
-  updatePlaceholder() {
-    let data = this.mediaInfo;
-    if (!this.fixed) {
-      let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
-      let maxWidth = parseInt(mediaWidth);
-      let w, h;
-      w = mediaWidth ? maxWidth : this.offsetWidth;
-      h = w / 16 * 9;
-      this.$.bg.style.width = `${w}px`;
-      this.$.bg.style.height = `${h}px`;
+    updatePaused() {
+        this.paused = this.$.video.paused;
     }
-    this.$.video.style.position = 'absolute';
-  }
 
-  srcChanged(src) {
-    if (!src) return;
-    this._src = src;
-  }
-
-  async lazyload() {
-    const loadHandle = () => {
-      this.$.bg.style.opacity = 0;
-      this.$.bg.style.width = 0;
-      this.$.bg.style.height = 0;
-      this.$.video.style.opacity = 1;
-      this.$.video.style.position = 'relative';
-    };
-    if (!this.playable) {
-      await new Promise(resolve => this.$.video.addEventListener('canplay', resolve, { once: true }))
+    playingHandle() {
+        this.bath();
     }
-    loadHandle();
-  }
+
+    async play() {
+        this.$.video.play();
+    }
+
+    async pause() {
+        await this.dewater();
+        this.$.video.pause();
+    }
+
+    async bath(duration = 2000) {
+        const lock = (this._lock += 1);
+        let lastTime = Date.now();
+        let progress = this.$.video.volume;
+        while (progress < 1) {
+            if (lock != this._lock) return;
+            progress += (Date.now() - lastTime) / duration;
+            lastTime = Date.now();
+            progress = Math.min(progress, 1);
+            this.$.video.volume = parseInt(progress * 100) / 100;
+            await new Promise(resolve => setTimeout(resolve, 10));
+        }
+    }
+
+    async dewater(duration = 500) {
+        const lock = (this._lock += 1);
+        let lastTime = Date.now();
+        let progress = this.$.video.volume;
+        while (progress > 0) {
+            if (lock != this._lock) return;
+            progress -= (Date.now() - lastTime) / duration;
+            lastTime = Date.now();
+            progress = Math.max(progress, 0);
+            this.$.video.volume = parseInt(progress * 100) / 100;
+            await new Promise(resolve => setTimeout(resolve, 10));
+        }
+    }
+
+    timeupdateHandle() {
+        let timeRemained = (this.$.video.duration - this.$.video.currentTime) * 1000;
+        if (timeRemained < 1000) {
+            this.dewater(timeRemained);
+        }
+    }
+
+    clickHandle() {
+        const video = this.$.video;
+        if (this._clicking) {
+            if (this._singleClickTimeout) {
+                clearTimeout(this._singleClickTimeout);
+            }
+            video.muted = !video.muted;
+            this._clicking = false;
+        } else {
+            this._clicking = true;
+            this._singleClickTimeout = setTimeout(() => {
+                if (video.paused) {
+                    this.play();
+                } else {
+                    this.pause();
+                }
+                this._clicking = false;
+            }, 300);
+        }
+    }
+
+
+
+    updatePlaceholder() {
+        let data = this.mediaInfo;
+        if (!this.fixed) {
+            let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
+            let maxWidth = parseInt(mediaWidth);
+            let w, h;
+            w = mediaWidth ? maxWidth : this.offsetWidth;
+            h = w / 16 * 9;
+            this.$.bg.style.width = `${w}px`;
+            this.$.bg.style.height = `${h}px`;
+        }
+        this.$.video.style.position = 'absolute';
+    }
+
+    srcChanged(src) {
+        if (!src) return;
+        this._src = src;
+    }
+
+    async lazyload() {
+        const loadHandle = () => {
+            this.$.bg.style.opacity = 0;
+            this.$.bg.style.width = 0;
+            this.$.bg.style.height = 0;
+            this.$.video.style.opacity = 1;
+            this.$.video.style.position = 'relative';
+        };
+        if (!this.playable) {
+            await new Promise(resolve => this.$.video.addEventListener('canplay', resolve, { once: true }));
+        }
+        loadHandle();
+    }
 }
 
 window.customElements.define(KlogVideo.is, KlogVideo);

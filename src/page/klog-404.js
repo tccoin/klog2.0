@@ -1,8 +1,8 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 
 class Klog404 extends PolymerElement {
-  static get template() {
-    return html`
+    static get template() {
+        return html`
     <style>
       :host {
         display: block;
@@ -66,16 +66,16 @@ class Klog404 extends PolymerElement {
       TO RETURN CLICK TO RETURN CLICK TO RETURN CLICK TO RETURN CLICK TO RETURN CLICK TO RETURN CLICK TO RETURN CLICK
       TO RETURN CLICK TO RETURN CLICK TO RETURN CLICK TO RETURN</div>
 `;
-  }
+    }
 
-  static get is() { return 'klog-404'; }
+    static get is() { return 'klog-404'; }
 
-  ready() {
-    super.ready();
-    this.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '/' } }));
-    });
-  }
+    ready() {
+        super.ready();
+        this.addEventListener('click', () => {
+            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: '/' } }));
+        });
+    }
 }
 
 window.customElements.define(Klog404.is, Klog404);

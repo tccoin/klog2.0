@@ -155,24 +155,24 @@ class KlogBottomAppBar extends PolymerElement {
         }
     }
 
-    _initButton(){
+    _initButton() {
         const buttons = Array.from(this.querySelectorAll('paper-icon-button:not([hidden])'));
-        for(let button of buttons.slice(0,-1)) {
+        for (let button of buttons.slice(0, -1)) {
             button.style.marginRight = '8px';
         }
     }
 
     _initScroller() {
         this._scrollHandler = e => {
-            if(this.disabled) return;
+            if (this.disabled) return;
             let y = this.$.scrollTarget.scrollTop;
             let speed = y - this._lastY;
-            if(speed > 25) {
+            if (speed > 25) {
                 this.opened = false;
-            } else if(speed < -15){
+            } else if (speed < -15) {
                 this.opened = true;
                 this.fabOpened = true;
-            } else if(y < 32){
+            } else if (y < 32) {
                 this.opened = true;
                 this.fabOpened = true;
             }
@@ -182,7 +182,7 @@ class KlogBottomAppBar extends PolymerElement {
 
     _handleOpened() {
         const container = this.$.actionContainer;
-        if(this.opened) {
+        if (this.opened) {
             container.classList.remove('hidden');
         } else {
             container.classList.add('hidden');
@@ -190,16 +190,16 @@ class KlogBottomAppBar extends PolymerElement {
     }
 
     _handleFabOpened() {
-        if(!this.querySelector('klog-fab')) return;
+        if (!this.querySelector('klog-fab')) return;
         const container = this.$.fabContainer;
-        if(this.fabOpened) {
+        if (this.fabOpened) {
             container.classList.remove('hidden');
         } else {
             container.classList.add('hidden');
         }
     }
 
-    reload(){
+    reload() {
         this.opened = true;
         this.fabOpened = true;
         this.disabled = false;

@@ -1,8 +1,8 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 
 class KlogBackdrop extends PolymerElement {
-  static get template() {
-    return html `
+    static get template() {
+        return html `
     <style>
       :host {
         display: block;
@@ -34,106 +34,106 @@ class KlogBackdrop extends PolymerElement {
       <slot name="front"></slot>
     </div>
 `;
-  }
-
-  static get is() { return 'klog-backdrop'; }
-
-  static get properties() {
-    return {
-      opened: {
-        type: Boolean,
-        value: false,
-        observer: 'update'
-      },
-      moving: {
-        type: Boolean,
-        value: false,
-        reflectToAttribute: true,
-        notify: true
-      },
-      frontSwitchDisabled: {
-        type: Boolean,
-        value: false
-      },
-      gestureDisabled: {
-        type: Boolean,
-        value: false
-      },
     }
-  }
 
-  ready() {
-    super.ready();
-    this.addEventListener('klog-backdrop-toggle', () => this.toggle());
-    this.addEventListener('klog-backdrop-update', () => this.update());
-    this.$.front.addEventListener('click', () =>
-      this.dispatchEvent(new CustomEvent('klog-backdrop-front-click', { bubbles: true, composed: true }))
-    );
-    this.$.front.addEventListener('klog-backdrop-touchstart', e => {
-      this.movestart(e.detail.touches[0].clientY);
-    });
-    this.$.front.addEventListener('touchmove', e => {
-      if (this.moving) e.preventDefault();
-      this.move(e.touches[0].clientY);
-    });
-    this.$.front.addEventListener('touchend', e => {
-      this.moveend();
-    });
-  }
+    static get is() { return 'klog-backdrop'; }
 
-  deactive() {
-    this.opened = false;
-    this.update();
-  }
+    static get properties() {
+        return {
+            opened: {
+                type: Boolean,
+                value: false,
+                observer: 'update'
+            },
+            moving: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true,
+                notify: true
+            },
+            frontSwitchDisabled: {
+                type: Boolean,
+                value: false
+            },
+            gestureDisabled: {
+                type: Boolean,
+                value: false
+            },
+        };
+    }
 
-  toggle() {
-    this.opened = !this.opened;
-  }
+    ready() {
+        super.ready();
+        this.addEventListener('klog-backdrop-toggle', () => this.toggle());
+        this.addEventListener('klog-backdrop-update', () => this.update());
+        this.$.front.addEventListener('click', () =>
+            this.dispatchEvent(new CustomEvent('klog-backdrop-front-click', { bubbles: true, composed: true }))
+        );
+        this.$.front.addEventListener('klog-backdrop-touchstart', e => {
+            this.movestart(e.detail.touches[0].clientY);
+        });
+        this.$.front.addEventListener('touchmove', e => {
+            if (this.moving) e.preventDefault();
+            this.move(e.touches[0].clientY);
+        });
+        this.$.front.addEventListener('touchend', e => {
+            this.moveend();
+        });
+    }
 
-  open() {
-    this.opened = true;
-  }
+    deactive() {
+        this.opened = false;
+        this.update();
+    }
 
-  close() {
-    this.opened = false;
-    return new Promise((resolve) => setTimeout(() => resolve(), 200));
-  }
+    toggle() {
+        this.opened = !this.opened;
+    }
 
-  movestart(clientY) {
-    if (this.gestureDisabled) return;
-    this.moving = true;
-    this._clientYStart = clientY;
-    this._transformYStart = this.$.front.getBoundingClientRect().top;
-    this.$.front.style.transition = "none";
-  }
+    open() {
+        this.opened = true;
+    }
 
-  move(clientY) {
-    if (this.gestureDisabled) return;
-    if (!this.moving) return;
-    let backHeight = this.$.back.scrollHeight;
-    let clientYDiff = clientY - this._clientYStart;
-    let transformY = Math.max(Math.min(clientYDiff + this._transformYStart, backHeight), 64)
-    this.$.front.style.transform = `translateY(${transformY}px)`;
-  }
+    close() {
+        this.opened = false;
+        return new Promise((resolve) => setTimeout(() => resolve(), 200));
+    }
 
-  moveend() {
-    if (this.gestureDisabled) return;
-    this.moving = false;
-    this.$.front.style.transition = "transform .2s ease";
-    let backHeight = this.$.back.scrollHeight;
-    let currentY = this.$.front.getBoundingClientRect().top;
-    this.opened = currentY > backHeight * 0.8;
-    this.update();
-  }
+    movestart(clientY) {
+        if (this.gestureDisabled) return;
+        this.moving = true;
+        this._clientYStart = clientY;
+        this._transformYStart = this.$.front.getBoundingClientRect().top;
+        this.$.front.style.transition = 'none';
+    }
 
-  update() {
+    move(clientY) {
+        if (this.gestureDisabled) return;
+        if (!this.moving) return;
+        let backHeight = this.$.back.scrollHeight;
+        let clientYDiff = clientY - this._clientYStart;
+        let transformY = Math.max(Math.min(clientYDiff + this._transformYStart, backHeight), 64);
+        this.$.front.style.transform = `translateY(${transformY}px)`;
+    }
+
+    moveend() {
+        if (this.gestureDisabled) return;
+        this.moving = false;
+        this.$.front.style.transition = 'transform .2s ease';
+        let backHeight = this.$.back.scrollHeight;
+        let currentY = this.$.front.getBoundingClientRect().top;
+        this.opened = currentY > backHeight * 0.8;
+        this.update();
+    }
+
+    update() {
     // event
-    this.dispatchEvent(new CustomEvent('opened-changed', { bubbles: true, composed: true, detail: { value: this.opened } }));
+        this.dispatchEvent(new CustomEvent('opened-changed', { bubbles: true, composed: true, detail: { value: this.opened } }));
 
-    // transform
-    let backHeight = this.$.back.scrollHeight;
-    this.$.front.style.transform = this.opened ? `translateY(${backHeight}px)` : 'translateY(var(--klog-backdrop-default-front-top))';
-  }
+        // transform
+        let backHeight = this.$.back.scrollHeight;
+        this.$.front.style.transform = this.opened ? `translateY(${backHeight}px)` : 'translateY(var(--klog-backdrop-default-front-top))';
+    }
 }
 
 window.customElements.define(KlogBackdrop.is, KlogBackdrop);
