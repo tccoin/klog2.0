@@ -116,7 +116,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
         transform: translateY(5vh);
       }
     </style>
-    <klog-data-user id="user" disabled=""></klog-data-user>
+    <klog-data-user id="user" disabled></klog-data-user>
 
 
 
@@ -192,6 +192,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
         </klog-input>
         <klog-input label="昵称" on-change="updatePublicinfo" value="{{userinfo.displayName}}" outlined></klog-input>
         <klog-input label="个人介绍" on-change="updatePublicinfo" value="{{userinfo.introduction}}" outlined></klog-input>
+        <!--<klog-input label="IP属地" value="{{userinfo.location}}" outlined disabled></klog-input>-->
 
         <div class="form-item">
           <div class="text-container">
@@ -354,10 +355,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
     this._initColorPicker();
   }
 
-  async update(userLoadPromise, route) {
-    // wait for login info
-    const result = await userLoadPromise;
-
+  async update(userdata, route) {
     // set default value
     this._hasUsername = true;
 
@@ -365,19 +363,19 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
     let sameUser = false;
     let notUpdated = false;
     if (this.userinfo) {
-      sameUser = result.userinfo.publicinfo.id == this.userinfo.publicinfo.id;
-      notUpdated = result.userinfo.publicinfo.updatedAt == this.userinfo.publicinfo.updatedAt;
+      sameUser = userdata.userinfo.publicinfo.id == this.userinfo.publicinfo.id;
+      notUpdated = userdata.userinfo.publicinfo.updatedAt == this.userinfo.publicinfo.updatedAt;
     }
 
-    if (!result.login) {
+    if (!userdata.login) {
       // redirection to login
       this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
       return Promise.reject(new Error('Not Login.'));
     } else if (!sameUser || !notUpdated) {
       // update info
-      this.preference = Object.assign({}, result.userinfo.preference);
-      this.userinfo = result.userinfo;
-      this.login = result.login;
+      this.preference = Object.assign({}, userdata.userinfo.preference);
+      this.userinfo = userdata.userinfo;
+      this.login = userdata.login;
       this._hasUsername = Boolean(this.userinfo.username);
     }
 
@@ -425,6 +423,7 @@ class KlogUserpanel extends KlogUiMixin(KlogDataUserPublicMixin(KlogDataLicenseM
       this.logout();
     } else if (category == 'license') {
       this.set('userinfo.license', item);
+      this.updatePublicinfo();
     }
   }
 
