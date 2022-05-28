@@ -249,8 +249,10 @@ class KlogTimeline extends PolymerElement {
     menuSelect(category, item) {
         if (category == 'timeline' && item == 'add') {
             this.add();
-        } else {
-            this.dispatchEvent(new CustomEvent('about-' + item, { bubbles: true, composed: true }));
+        } else if (category == 'timeline' && item == 'help') {
+            this.dispatchEvent(new CustomEvent('app-load', {detail: { page: 'article/klog-help' }, bubbles: true, composed: true}));
+        } else if (category == 'timeline' && item == 'log') {
+            this.dispatchEvent(new CustomEvent('app-load', {detail: { page: 'article/about-klog-2-0' }, bubbles: true, composed: true}));
         }
     }
 
