@@ -4,7 +4,6 @@ import '../style/klog-style-scrollbar.js';
 import './klog-image.js';
 import './klog-video.js';
 import '../style/klog-style-markdown.js';
-import '../data/klog-data-user.js';
 import './klog-popup.js';
 import './klog-markdown-scroller.js';
 import '../lib/han.js';
@@ -18,7 +17,6 @@ class KlogMarkdown extends PolymerElement {
     <style include="klog-style-scrollbar"></style>
     <style include="klog-style-markdown"></style>
     <style include="han-style"></style>
-    <klog-data-user disabled="" id="user"></klog-data-user>
     <klog-markdown-scroller id="scroller" link-prefix="{{linkPrefix}}"></klog-markdown-scroller>
     <article id="article" class="klog-article-content" theme\$="[[theme]]">
       <slot></slot>

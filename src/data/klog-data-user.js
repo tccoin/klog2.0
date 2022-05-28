@@ -2,7 +2,6 @@ import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
 import '../style/klog-style-card.js';
-import '../ui/klog-markdown.js';
 import { getDefaultPreference } from './klog-data-preference.js';
 'user strict';
 /*
@@ -42,29 +41,22 @@ class KlogDataUser extends PolymerElement {
 
     ready() {
         super.ready();
-        const markdown = document.createElement('klog-markdown');
         this.defaultPreference = getDefaultPreference();
         this.defaultUserinfo = { preference: this.defaultPreference };
-        if (!this.disabled) {
-            if (AV.User.current()) this.user = AV.User.current();
-            this._updateUserinfo();
-        } else {
-            this.loadPromise = Promise.resolve();
-        }
     }
 
-    _updateUserinfo() {
-        this.loadPromise = this.updateUserinfo();
+    async load(){
+        return this.updateUserinfo();
     }
 
     async updateUserinfo() {
-        if (!this.user) {
+        if (!AV.User.current()) {
             // 未登录
             return this.userinfoUpdated(false, this.defaultUserinfo);
         }
         // 尝试抓取数据
         try {
-            let user = await this.user.fetch();
+            let user = await AV.User.current().fetch();
             if (!user.get('publicinfo')) {
                 // 创建用户时出错
                 let query = new AV.Query('UserPublic');
@@ -91,6 +83,7 @@ class KlogDataUser extends PolymerElement {
                     publicinfo: publicinfo,
                     displayName: publicinfoJson.displayName,
                     introduction: publicinfoJson.introduction,
+                    location: publicinfoJson.location,
                     avatarUrl: publicinfoJson.avatarUrl,
                     license: publicinfoJson.license,
                     username: publicinfoJson.username,
@@ -106,19 +99,18 @@ class KlogDataUser extends PolymerElement {
 
     userinfoUpdated(login, userinfo) {
         this.set('userinfo', userinfo);
-        const result = { login, userinfo, user: this };
+        const userdata = { login, userinfo, userHandler: this };
         this.dispatchEvent(new CustomEvent('userinfo-updated', {
             bubbles: true,
             composed: true,
-            detail: { result: result }
+            detail: { userdata }
         }));
-        return result;
+        return userdata;
     }
 
     async login(email, password) {
-        const user = await AV.User.logIn(email, password);
-        this.set('user', user);
-        this._updateUserinfo();
+        await AV.User.logIn(email, password);
+        return this.load();
     }
 
     async resetPassword(email) {
@@ -132,7 +124,6 @@ class KlogDataUser extends PolymerElement {
         user.setEmail(email);
         user.setPassword(password);
         user = await user.signUp();
-        this.user = user;
         await this.login(email, password);
         await this._initUser(password);
     }
@@ -159,26 +150,26 @@ class KlogDataUser extends PolymerElement {
 
     // Update account
     async update(newInfo, publicinfo) {
-        if (!this.user) return;
-        publicinfo = publicinfo || this.user.get('publicinfo') || new AV.Object('UserPublic');
+        const _user = AV.User.current();
+        if (!_user) return;
+        publicinfo = publicinfo || _user.get('publicinfo') || new AV.Object('UserPublic');
         for (let key of Object.keys(newInfo)) {
             let value = newInfo[key].value;
             let publicRead = newInfo[key].publicRead || false;
             if (publicRead) {
                 publicinfo.set(key, value);
             } else {
-                this.user.set(key, value);
+                _user.set(key, value);
             }
         }
-        publicinfo.set('userId', this.user.id);
-        this.user.set('publicinfo', publicinfo);
-        await this.user.save();
-        return this._updateUserinfo();
+        publicinfo.set('userId', _user.id);
+        _user.set('publicinfo', publicinfo);
+        await _user.save();
+        return this.load();
     }
 
     logout() {
         AV.User.logOut();
-        this.user = AV.User.current();
     }
 
 }

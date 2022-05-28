@@ -278,7 +278,7 @@ class KlogZone extends KlogDataUserPublicMixin(KlogTimeline) {
     this.$.data.include = ['author', 'topic'];
   }
 
-  async update(userLoadPromise, subroute) {
+  async update(userdata, subroute) {
     // listen to avatar image for themeColor
     let lastAvaterSrc = this.$.avatar.src;
     this.$.avatar.lazy = true;

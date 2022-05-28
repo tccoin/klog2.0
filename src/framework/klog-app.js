@@ -129,14 +129,14 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
     }
 
     async load() {
+        if(!this._ready) { return; }
         if (this._hash == window.location.hash) { return; }
         this._hash = window.location.hash;
         const ui = this.$.layout;
-        const userLoadPromise = this.$.user.loadPromise;
         try {
             const pageName = await this._calcPage(this.routeData.page);
             const subroute = this._calcSubroute(this.subroute);
-            const page = await ui.load(pageName, subroute, userLoadPromise);
+            const page = await ui.load(pageName, subroute, this.userdata);
             this._setPageHistory(page);
         } catch (err) {
             if (err.message == '404') {
@@ -157,11 +157,14 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         }
     }
 
-    ready() {
+    async ready() {
         this._initGlobalEvent();
         super.ready();
         this.initUiEvent();
         this._loadLayout();
+        await this._loadUserinfo();
+        this._ready = true;
+        this.load(this.routeData.page);
     }
 
     _initGlobalEvent() {
@@ -178,7 +181,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
         });
         this.addEventListener('app-reload', (e) => this.reload());
         this.addEventListener('userinfo-updated', (e) => {
-            this._updateUserinfo(e.detail.result);
+            this._loadUserinfo(e.detail.userdata);
         });
         this.addEventListener('theme-color-updated', (e) => {
             this.themeColor = e.detail.themeColor;
@@ -221,6 +224,16 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             this._updateServiceWorker(callback);
         });
     }
+
+    async _loadUserinfo(userdata){
+        if(!userdata) {
+            userdata = await this.$.user.load();
+        }
+        this.userdata = userdata;
+        this.login = this.userdata.login;
+        this._updatePreference(this.userdata.userinfo.preference);
+    }
+
 
     _setPageHistory(page) {
         page.lastHash = this.lastHash;
@@ -304,12 +317,6 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
             path: r[1],
             param: r[2],
         };
-    }
-
-    _updateUserinfo(result) {
-        this.userinfo = result.userinfo;
-        this.login = result.login;
-        this._updatePreference(result.userinfo.preference);
     }
 
     _notifyNetworkStatus() {

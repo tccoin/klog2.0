@@ -9,6 +9,7 @@ import '../data/klog-data-timeline.js';
 import '../ui/klog-image.js';
 import '../style/klog-style-card.js';
 import '../ui/klog-render-timestamp.js';
+import '../lib/clamp.js';
 
 class KlogTimelineItem extends PolymerElement {
   static get template() {

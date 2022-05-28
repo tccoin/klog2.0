@@ -70,7 +70,7 @@ class KlogIMarkdown extends KlogMarkdown {
         margin: 0;
       }
     </style>
-    <klog-data-user disabled="" id="user"></klog-data-user>
+    <klog-data-user disabled id="user"></klog-data-user>
     <klog-markdown-scroller id="scroller" link-prefix="{{linkPrefix}}"></klog-markdown-scroller>
     <article id="article" class="klog-article-content" theme\$="[[theme]]">
       <slot></slot>

@@ -189,12 +189,11 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         window.addEventListener('resize', this._scrollHandler);
     }
 
-    async update(userLoadPromise, route) {
+    async update(userdata, route) {
         // user
-        const result = await userLoadPromise;
-        this.$.data.userinfo = result.userinfo;
-        this.userinfo = result.userinfo;
-        this.login = result.login;
+        this.$.data.userinfo = userdata.userinfo;
+        this.userinfo = userdata.userinfo;
+        this.login = userdata.login;
         // data
         this.loading = true;
         let params = route.path.split('/').splice(1);

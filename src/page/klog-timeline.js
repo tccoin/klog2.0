@@ -132,7 +132,7 @@ class KlogTimeline extends PolymerElement {
         this.$.scrollTarget.scrollTop = this._lastScrollY || 0;
     }
 
-    async update(userLoadPromise, subroute) {
+    async update(userdata, subroute) {
         if (!this.isTimelineInit) {
             this.isTimelineInit = true;
             this.$.scrollTarget.scrollTop = 0;

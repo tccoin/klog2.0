@@ -163,11 +163,10 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         return this._editor.save(labels);
     }
 
-    async update(userLoadPromise, route) {
+    async update(userdata, route) {
         // user
-        const result = await userLoadPromise;
-        if (!result.login) {
-            console.log(result);
+        if (!userdata.login) {
+            console.log(userdata);
             this.parentElement.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
         }
     }

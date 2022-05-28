@@ -120,21 +120,20 @@ class KlogNote extends KlogUiMixin(PolymerElement) {
         this.dispatchEvent(new CustomEvent('main-drawer-open', { bubbles: true, composed: true }));
     }
 
-    async update(userLoadPromise, route) {
+    async update(userdata, route) {
         // user
-        const result = await userLoadPromise;
-        if (!result.login) {
+        if (!userdata.login) {
             this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
             return Promise.reject(new Error('Not Login.'));
         } else {
-            this.preference = result.userinfo.preference;
-            this.userinfo = result.userinfo;
-            this.$.list.userinfo = result.userinfo;
-            this.$.content.userinfo = result.userinfo;
-            this.$.collection.userinfo = result.userinfo;
-            this.$.collection.login = result.login;
-            this.login = result.userinfo;
-            this._loadCollection(result);
+            this.preference = userdata.userinfo.preference;
+            this.userinfo = userdata.userinfo;
+            this.$.list.userinfo = userdata.userinfo;
+            this.$.content.userinfo = userdata.userinfo;
+            this.$.collection.userinfo = userdata.userinfo;
+            this.$.collection.login = userdata.login;
+            this.login = userdata.userinfo;
+            this._loadCollection(userdata);
         }
         // data
         let params = route.path.split('/').splice(1);

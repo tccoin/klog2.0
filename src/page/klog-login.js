@@ -101,10 +101,9 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
         this.password = '';
     }
 
-    async update(userLoadPromise) {
+    async update(userdata) {
         // user
-        const result = await userLoadPromise;
-        this.user = result.user;
+        this.userHandler = userdata.userHandler;
         this.title = 'welcome';
     }
 
@@ -117,7 +116,7 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
     async resetPassword() {
         if (this.email != '') {
             try {
-                await this.user.resetPassword(this.email);
+                await this.userHandler.resetPassword(this.email);
             } catch (err) {
                 this.openToast('请检查你输入的邮箱地址');
                 return;
@@ -130,7 +129,7 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
 
     login() {
         this.title = 'loading';
-        this.user.login(this.email, this.password).then(() => {
+        this.userHandler.login(this.email, this.password).then(() => {
             this.title = 'success';
             setTimeout(()=>this.back(), 200);
         }, () => {
@@ -139,7 +138,7 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
     }
 
     back() {
-        if (!this._inHash(this.lastHash, ['login', 'signup'])) {
+        if (this.lastHash && !this._inHash(this.lastHash, ['login', 'signup'])) {
             this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true,
                 detail: { page: this.lastHash }
             }));

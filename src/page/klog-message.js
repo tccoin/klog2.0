@@ -154,15 +154,14 @@ class KlogMessage extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         super.ready();
     }
 
-    async update(userLoadPromise, route) {
+    async update(userdata, route) {
         // user
-        const result = await userLoadPromise;
-        if (!result.login) {
+        if (!userdata.login) {
             this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
             return Promise.reject(new Error('Not Login.'));
         } else {
-            this.userinfo = result.userinfo;
-            this.login = result.login;
+            this.userinfo = userdata.userinfo;
+            this.login = userdata.login;
             await this.refresh(false);
         }
         // data

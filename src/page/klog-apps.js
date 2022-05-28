@@ -22,7 +22,7 @@ class KlogApps extends PolymerElement {
     ]
   }
 
-  async update(userLoadPromise, subroute) {
+  async update(userdata, subroute) {
     this.route = subroute;
   }
 

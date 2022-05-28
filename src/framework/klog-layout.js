@@ -269,8 +269,9 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         window.addEventListener('resize', setPageHeight);
     }
 
-    async load(page, subroute, userLoadPromise) {
-        this._userinfoHandle(userLoadPromise);
+    async load(page, subroute, userdata) {
+        this.userinfo = userdata.userinfo;
+        this.login = userdata.login;
         const oldPage = this.page;
         if (page != oldPage) {
             if (!this._pageValidate(page)) {
@@ -289,7 +290,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
             await importPromise;
             this.page = page;
             await this._getPageLayout(page);
-            await this._updatePage(page, userLoadPromise, subroute); // update data, set init state...
+            await this._updatePage(page, userdata, subroute); // update data, set init state...
             await this._checkInterrupt(page);
             this.displayPage = page;
             clearTimeout(timeout);
@@ -297,7 +298,7 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
             await this._loadPage(page); // animation...
             await this._checkInterrupt(page);
         } else {
-            await this._updatePage(page, userLoadPromise, subroute); // update data, set init state...
+            await this._updatePage(page, userdata, subroute); // update data, set init state...
             await this._loadPage(page); // animation...
         }
         await this._checkInterrupt(page);
@@ -306,12 +307,6 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
 
     _pageValidate(page) {
         return ['404', 'apps', 'article', 'editor', 'lab', 'login', 'signup', 'message', 'note', 'timeline', 'userpanel', 'zone'].includes(page);
-    }
-
-    async _userinfoHandle(userLoadPromise) {
-        const result = await userLoadPromise;
-        this.userinfo = result.userinfo;
-        this.login = result.login;
     }
 
     async _unloadPage(page) {
@@ -341,12 +336,12 @@ class KlogLayout extends KlogUiMixin(PolymerElement) {
         this._setAttribute(pageElement, 'exit', true);
     }
 
-    _updatePage(page, userLoadPromise, subroute) {
+    _updatePage(page, userdata, subroute) {
         let pageElement = this._getPage(page);
         pageElement.style.opacity = 0;
         this._setAttribute(pageElement, 'exit');
         if (pageElement && pageElement.update) {
-            return pageElement.update(userLoadPromise, subroute);
+            return pageElement.update(userdata, subroute);
         }
     }
 

@@ -121,10 +121,9 @@ class KlogSignup extends KlogUiMixin(PolymerElement) {
         });
     }
 
-    async update(userLoadPromise, route) {
+    async update(userdata, route) {
         // user
-        const result = await userLoadPromise;
-        this.user = result.user;
+        this.userHandler = userdata.userHandler;
         this.title = 'welcome';
         setTimeout(() => this.$.dialog.open(), 1000);
     }
@@ -135,7 +134,7 @@ class KlogSignup extends KlogUiMixin(PolymerElement) {
             this.title = 'error_short_password';
             return;
         }
-        this.user.signup(this.email, this.password).then(() => {
+        this.userHandler.signup(this.email, this.password).then(() => {
             this.title = 'success';
             setTimeout(()=>this.back(), 200);
         }, err => {
@@ -157,7 +156,7 @@ class KlogSignup extends KlogUiMixin(PolymerElement) {
     }
 
     back() {
-        if (!this._inHash(this.lastHash, ['login', 'signup'])) {
+        if (this.lastHash && !this._inHash(this.lastHash, ['login', 'signup'])) {
             this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true,
                 detail: { page: this.lastHash }
             }));

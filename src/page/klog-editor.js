@@ -371,14 +371,12 @@ class KlogEditor extends KlogUiMixin(PolymerElement) {
         }));
     }
 
-    async update(userLoadPromise, route) {
+    async update(userdata, route) {
         // user
-        const result = await userLoadPromise;
-        if (!result.login) {
+        if (!userdata.login) {
             this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'login' } }));
-            return Promise.reject(new Error('Not Login.'));
         } else {
-            this.userinfo = result.userinfo;
+            this.userinfo = userdata.userinfo;
         }
         // data
         this.route = route;
