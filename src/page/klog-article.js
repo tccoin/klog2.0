@@ -166,8 +166,9 @@ class KlogArticle extends KlogDataMessageMixin(KlogUiMixin(PolymerElement)) {
 
         this.$.image = document.createElement('klog-image');
 
+        this._safeareaBottom = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-bottom')) || 0;
         this._lastY = 0;
-        this._scrollHandler = e => {
+        this._scrollHandler = () => {
             // fab
             // this.fabExtended = !this.mobile;
             let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
@@ -352,10 +353,9 @@ class KlogArticle extends KlogDataMessageMixin(KlogUiMixin(PolymerElement)) {
     }
 
     _share() {
-        let safeareaBottom = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-bottom')) || 0;
         let copyInfo = `${this.article.title} - ${this.article.author.displayName}的文章 - Klog\nhttps://klog.app/#/article/${this.path}`;
         this.copy(copyInfo);
-        this.openToast('已复制分享链接到剪贴板', null, { bottom: document.body.clientWidth < 1024 ? 80 + safeareaBottom : 0 });
+        this.openToast('已复制分享链接到剪贴板', null, { bottom: document.body.clientWidth < 1024 ? 80 + this._safeareaBottom : 0 });
     }
 
     _resetLikeHit() {
@@ -368,10 +368,11 @@ class KlogArticle extends KlogDataMessageMixin(KlogUiMixin(PolymerElement)) {
     _updateLikeHit() {
         this._checkLikeHistory();
         this._likeHitAuthorName = this.isOwner ? '自己' : this.article.author.displayName;
-        this._showVisitCount = this.isOwner && this.visitCount >= 10;
+        this._showVisitCount = this.isOwner && this.article.visitCount >= 10;
         if (!this._visitHitDisabled) {
             this._saveLikeCount(1, 'article-visit');
             this.set('article.likeCount', this.article.likeCount + 1);
+            this.set('article.visitCount', this.article.visitCount + 1);
             this.set(`likeHistory.${this.article.objectId}-visit`, Date.now());
         }
     }
@@ -394,10 +395,10 @@ class KlogArticle extends KlogDataMessageMixin(KlogUiMixin(PolymerElement)) {
 
     _like() {
         if (this._likeHitDisabled) {
-            this.openToast('你最近已经给这篇文章点过赞了哟');
+            this.openToast('你最近已经给这篇文章点过赞了哟', null, { bottom: document.body.clientWidth < 1024 ? 80 + this._safeareaBottom : 0 });
             return;
         }
-        const minLikeHitDuration = 300;
+        const minLikeHitDuration = 200;
         const maxLikeHit = 10;
         let timePass = Date.now() - this._lastLikeHitTime >= minLikeHitDuration;
         let numberPass = this._likeHit + 1 <= maxLikeHit;
@@ -405,7 +406,7 @@ class KlogArticle extends KlogDataMessageMixin(KlogUiMixin(PolymerElement)) {
             this._likeHit += 1;
             this.set('article.likeCount', this.article.likeCount + 1);
             this._lastLikeHitTime = Date.now();
-            this.openToast(`你给${this._likeHitAuthorName}的文章点了${this._likeHit}个赞！`, null, { duration: 5000 });
+            this.openToast(`你给${this._likeHitAuthorName}的文章点了${this._likeHit}个赞！`, null, { duration: 5000, bottom: document.body.clientWidth < 1024 ? 80 + this._safeareaBottom : 0 });
             if (this._saveLikeCountTimeout) {
                 clearTimeout(this._saveLikeCountTimeout);
             }
@@ -419,7 +420,7 @@ class KlogArticle extends KlogDataMessageMixin(KlogUiMixin(PolymerElement)) {
     }
 
     _saveLikeCount(likeCount, type) {
-        this.openToast(`这篇文章收到了你的${likeCount}个赞！`);
+        this.openToast(`这篇文章收到了你的${likeCount}个赞！`, null, { bottom: document.body.clientWidth < 1024 ? 80 + this._safeareaBottom : 0 });
         let userId = this.article.author.objectId;
         let content = { isLogin: this.login };
         if (type == 'article-like') {
