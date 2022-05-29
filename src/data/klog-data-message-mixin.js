@@ -44,7 +44,7 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
         if (content) message.set('content', content);
         if (articleId) message.set('article', AV.Object.createWithoutData('Article', articleId));
         if (commentId) message.set('comment', AV.Object.createWithoutData('Comment', commentId));
-        return message.save().catch(err => {
+        return message.save().catch(() => {
             this.errorCode = '403';
         });
     }
@@ -80,7 +80,7 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
         for (let message of data) {
             try {
                 message = message.toJSON();
-                message = this._processMessageAccess(message, accessPrivate ? userPublicId : '');
+                // message = this._processMessageAccess(message, accessPrivate ? userPublicId : '');
                 message = this._processMessageDisplay(message, userPublicId);
                 result.push(message);
             } catch (err) {}
@@ -125,10 +125,21 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
             articleAuthorName = this._processName(message.article.author, userPublicId);
             articleWithAuthorName = `${articleAuthorName}的文章${articleTitle}`;
         }
-        // skip message from oneself
-        if ((message.type == 'comment-new' || message.type == 'comment-reply') && commentAuthorName == '你') {
-            throw new Error('user is author');
+        let fromAuthorName;
+        if (message.type == 'article-like') {
+            fromAuthorName = this._processName(message.from, userPublicId);
         }
+
+        // skip message from oneself
+        if (message.from.objectId == userPublicId) {
+            // comment-new comment-reply article-like
+            if (message.type == 'article-like' && message.content.isLogin === false) {
+                fromAuthorName = '来自地球的网友';
+            } else {
+                throw new Error('user is author');
+            }
+        }
+
         // concat info
         let info, title, text;
         if (message.type == 'comment-new') {
@@ -147,6 +158,9 @@ const DataMessageMixin = (superClass) => class extends KlogDataMixin(superClass)
         } else if (message.type == 'text') {
             info = 'Klog 新闻';
             text = message.content.text;
+        } else if (message.type == 'article-like') {
+            if (articleTitle) info = `${fromAuthorName}给你的文章${articleTitle}点了${message.content.likeCount+1}个赞`;
+            else info = `${fromAuthorName}给你的文章点了赞`;
         } else {
             throw new Error(`unknown message type ${message.type}`);
         }

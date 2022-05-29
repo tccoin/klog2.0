@@ -112,7 +112,7 @@ class KlogDataArticle extends PolymerElement {
         if (path) {
             query.equalTo('path', path);
         }
-        query.select(['title', 'markdown', 'image', 'comments', 'topic', 'author', 'collection', 'tags', 'path', 'license', 'updatedTime', 'createdTime']);
+        query.select(['title', 'markdown', 'image', 'comments', 'commentCount', 'likeCount', 'visitCount', 'topic', 'author', 'collection', 'tags', 'path', 'license', 'updatedTime', 'createdTime']);
         query.include(['author', 'topic']);
         query.limit(1);
         if (this.key) query.descending(this.key);

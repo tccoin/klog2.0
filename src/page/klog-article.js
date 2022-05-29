@@ -1,10 +1,12 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { KlogUiMixin } from '../framework/klog-ui-mixin.js';
+import { KlogDataMessageMixin } from '../data/klog-data-message-mixin.js';
 
 import '@polymer/app-layout/app-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/app-route/app-route.js';
 import '@polymer/paper-progress/paper-progress.js';
+import '@polymer/app-storage/app-localstorage/app-localstorage-document.js';
 import '../style/klog-style-article.js';
 import '../ui/klog-markdown.js';
 import '../ui/klog-icons.js';
@@ -16,17 +18,25 @@ import '../ui/klog-render-license.js';
 import '../ui/klog-bottom-app-bar.js';
 import './klog-comment.js';
 
-class KlogArticle extends KlogUiMixin(PolymerElement) {
+class KlogArticle extends KlogDataMessageMixin(KlogUiMixin(PolymerElement)) {
     static get template() {
         return html`
 <style include="klog-style-article"></style>
+<app-localstorage-document key="likeHistory" data="{{likeHistory}}"></app-localstorage-document>
 <klog-data-article id="data" path="{{path}}" last-response="{{article}}" last-error="{{error}}" is-owner="{{isOwner}}">
 </klog-data-article>
 
 <!--app bar-->
 <klog-bottom-app-bar id="appBar" compact="{{!isOwner}}">
+    <paper-button class="like-button" on-click="_like">
+        <iron-icon icon="thumb_up"></iron-icon>
+        <span class="like-button-count">{{article.likeCount}}</span>
+    </paper-button>
+    <paper-button on-click="_scrollToComment">
+        <iron-icon icon="comment"></iron-icon>
+        <span class="like-button-count">{{article.commentCount}}</span>
+    </paper-button>
     <paper-icon-button icon="share" on-click="_share"></paper-icon-button>
-    <paper-icon-button icon="comment" on-click="_scrollToComment"></paper-icon-button>
     <paper-icon-button icon="menu_book" on-click="_scrollToToc" hidden="{{!hasToc}}"></paper-icon-button>
     <klog-fab slot="fab" icon="edit" id="fab" label="编辑" on-click="edit" extended="{{fabExtended}}" hidden="{{!isOwner}}"></klog-fab>
 </klog-bottom-app-bar>
@@ -63,7 +73,11 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
   </div>
   <!--update info-->
   <div class="section article-update-info">
-  <klog-render-timestamp time-stamp="{{article.updatedTime}}">最后更新于</klog-render-timestamp>。<br>
+    <klog-render-timestamp time-stamp="{{article.updatedTime}}">最后更新于</klog-render-timestamp>
+    <template is="dom-if" if="{{_showVisitCount}}">
+        ，共{{article.visitCount}}次阅读
+    </template>。
+  <br>
     <klog-render-license license="{{article.license}}" default-license="{{article.author.license}}"></klog-render-license>
   </div>
 </div>
@@ -104,6 +118,9 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             from: {
                 type: String
             },
+            likeHistory: {
+                type: Object
+            },
             layout: {
                 type: Object,
                 value: {
@@ -136,28 +153,6 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         ];
     }
 
-    _updateBackTo() {
-        let backTo;
-        if (this.lastHash && !this._inHash(this.lastHash, ['article', 'editor'])) {
-            backTo = this.lastHash;
-        } else if (this.from) {
-            backTo = this.from;
-        } else {
-            backTo = 'timeline';
-        }
-        this.backTo = backTo;
-        return backTo;
-    }
-
-    back() {
-        this._updateBackTo();
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo } }));
-    }
-
-    openZone() {
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.article.author.username || 'zone/' + this.article.author.objectId } }));
-    }
-
     ready() {
         super.ready();
         this.setAttribute('tabindex', 1);
@@ -187,6 +182,31 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
             }
         };
         window.addEventListener('resize', this._scrollHandler);
+
+        this.$.comment.addEventListener('comment-created', ()=>this.set('article.commentCount', this.article.commentCount + 1));
+        this.$.comment.addEventListener('comment-deleted', ()=>this.set('article.commentCount', this.article.commentCount - 1));
+    }
+
+    _updateBackTo() {
+        let backTo;
+        if (this.lastHash && !this._inHash(this.lastHash, ['article', 'editor'])) {
+            backTo = this.lastHash;
+        } else if (this.from) {
+            backTo = this.from;
+        } else {
+            backTo = 'timeline';
+        }
+        this.backTo = backTo;
+        return backTo;
+    }
+
+    back() {
+        this._updateBackTo();
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.backTo } }));
+    }
+
+    openZone() {
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: this.article.author.username || 'zone/' + this.article.author.objectId } }));
     }
 
     async update(userdata, route) {
@@ -196,6 +216,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         this.login = userdata.login;
         // data
         this.loading = true;
+        this._resetLikeHit();
         let params = route.path.split('/').splice(1);
         if (params.length >= 2 && params[1]) {
             let share = params[1];
@@ -204,6 +225,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         if (params.length >= 1 && params[0]) {
             let path = params[0];
             if (this.$.data.isPathNew(path)) {
+                // load new article
                 this.path = path;
                 await new Promise(resolve => this.$.data.addEventListener('success', resolve, { once: true }));
                 let themeColor = 'default';
@@ -219,6 +241,7 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
                 this.dispatchEvent(new CustomEvent('layout-update', { bubbles: true, composed: true, detail: { themeColor } }));
                 this.$.avatar.lazyload();
                 this._scrollHandler();
+                this._updateLikeHit();
             }
         }
         // scroller
@@ -320,9 +343,12 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
     }
 
     _scrollToToc() {
-        console.log('123');
         this.$.markdown.$.scroller.updateQueryByHash('class-toc');
         this.$.markdown.$.scroller.scroll();
+    }
+
+    _logoClickHandle() {
+        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
     }
 
     _share() {
@@ -332,8 +358,78 @@ class KlogArticle extends KlogUiMixin(PolymerElement) {
         this.openToast('已复制分享链接到剪贴板', null, { bottom: document.body.clientWidth < 1024 ? 80 + safeareaBottom : 0 });
     }
 
-    _logoClickHandle() {
-        this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true, detail: { page: 'timeline' } }));
+    _resetLikeHit() {
+        this._likeHit = 0;
+        this._lastLikeHitTime = 0;
+        this._likeHitDisabled = false;
+        this._visitHitDisabled = false;
+    }
+
+    _updateLikeHit() {
+        this._checkLikeHistory();
+        this._likeHitAuthorName = this.isOwner ? '自己' : this.article.author.displayName;
+        this._showVisitCount = this.isOwner && this.visitCount >= 10;
+        if (!this._visitHitDisabled) {
+            this._saveLikeCount(1, 'article-visit');
+            this.set('article.likeCount', this.article.likeCount + 1);
+            this.set(`likeHistory.${this.article.objectId}-visit`, Date.now());
+        }
+    }
+
+    _checkLikeHistory() {
+        const minLikeDuration = 3600 * 1000;
+        const minVisitDuration = 600 * 1000;
+        let articleId = this.article.objectId;
+        if (!this.likeHistory) {
+            this.likeHistory = {};
+        } else {
+            if (articleId in this.likeHistory) {
+                this._likeHitDisabled = Date.now() - this.likeHistory[articleId] < minLikeDuration;
+            }
+            if (`${articleId}-visit` in this.likeHistory) {
+                this._visitHitDisabled = Date.now() - this.likeHistory[`${articleId}-visit`] < minVisitDuration;
+            }
+        }
+    }
+
+    _like() {
+        if (this._likeHitDisabled) {
+            this.openToast('你最近已经给这篇文章点过赞了哟');
+            return;
+        }
+        const minLikeHitDuration = 300;
+        const maxLikeHit = 10;
+        let timePass = Date.now() - this._lastLikeHitTime >= minLikeHitDuration;
+        let numberPass = this._likeHit + 1 <= maxLikeHit;
+        if (timePass && numberPass) {
+            this._likeHit += 1;
+            this.set('article.likeCount', this.article.likeCount + 1);
+            this._lastLikeHitTime = Date.now();
+            this.openToast(`你给${this._likeHitAuthorName}的文章点了${this._likeHit}个赞！`, null, { duration: 5000 });
+            if (this._saveLikeCountTimeout) {
+                clearTimeout(this._saveLikeCountTimeout);
+            }
+            this._saveLikeCountTimeout = setTimeout(()=>{
+                this._likeHitDisabled = true;
+                this._saveLikeCount(this._likeHit, 'article-like');
+                this._likeHit = 0;
+                this.set(`likeHistory.${this.article.objectId}`, Date.now());
+            }, this._likeHit == maxLikeHit ? 1000 : 2000);
+        }
+    }
+
+    _saveLikeCount(likeCount, type) {
+        this.openToast(`这篇文章收到了你的${likeCount}个赞！`);
+        let userId = this.article.author.objectId;
+        let content = { isLogin: this.login };
+        if (type == 'article-like') {
+            content.likeCount = likeCount;
+            if (this.login) {
+                userId = this.userinfo.publicinfo.id;
+            }
+        }
+        let articleAithorId = this.article.author.objectId;
+        this.createMessage(type, userId, [`author-user-${articleAithorId}`, `like-user-${articleAithorId}`], content, this.article.objectId);
     }
 }
 

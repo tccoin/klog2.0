@@ -321,12 +321,14 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
             if (method == 'create') {
                 const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value);
                 await new Promise(resolve => setTimeout(resolve, 1000));
+                this.dispatchEvent(new CustomEvent('comment-created', { bubbles: true, composed: true }));
                 this.openToast('评论已发送');
             } else if (method == 'edit') {
                 await this.updateComment(data.objectId, this.$.input.value);
                 this.openToast('评论已修改');
             } else if (method == 'reply') {
                 const comment = await this.createComment(this.articleId, this.articleAuthorId, this.userinfo.publicinfo.id, this.$.input.value, data.objectId, data.author.objectId);
+                this.dispatchEvent(new CustomEvent('comment-created', { bubbles: true, composed: true }));
                 this.openToast('回复已发送');
             }
             await this.refresh();
@@ -376,6 +378,7 @@ class KlogComment extends KlogUiMixin(KlogDataCommentMixin(PolymerElement)) {
                 await this.deleteComment(commentId);
                 await this.refresh();
                 this.resetInput();
+                this.dispatchEvent(new CustomEvent('comment-deleted', { bubbles: true, composed: true }));
                 this.openToast('评论已删除');
             }
         });

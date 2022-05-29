@@ -88,7 +88,34 @@ containerKlogStyleArticle.innerHTML = `<dom-module id="klog-style-article">
       height: 51.14px;
     }
 
+    /* app-bar */
+
+    klog-bottom-app-bar paper-button {
+      font-weight: bold;
+      min-width: initial;
+    }
+
+    klog-bottom-app-bar paper-button iron-icon {
+      margin-right: 4px;
+    }
+
+    klog-bottom-app-bar .like-button iron-icon {
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    klog-bottom-app-bar .like-button:hover iron-icon {
+      transform: translate(-2px, -2px) rotate(-8deg);
+    }
+
+    klog-bottom-app-bar .like-button:active iron-icon,
+    klog-bottom-app-bar .like-button.active iron-icon {
+      transform: translate(-5px, -5px) rotate(-20deg);
+    }
+
+
+
     /*Article*/
+
     klog-markdown {
       padding-bottom: 28px;
     }
