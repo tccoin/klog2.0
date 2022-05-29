@@ -227,7 +227,7 @@ class KlogApp extends KlogUiMixin(PolymerElement) {
 
     async _loadUserinfo(userdata) {
         if (!userdata) {
-            userdata = await this.$.user.load();
+            userdata = await this.$.user.updateUserinfo();
         }
         this.userdata = userdata;
         this.login = this.userdata.login;

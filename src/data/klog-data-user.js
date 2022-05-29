@@ -45,10 +45,6 @@ class KlogDataUser extends PolymerElement {
         this.defaultUserinfo = { preference: this.defaultPreference };
     }
 
-    async load() {
-        return this.updateUserinfo();
-    }
-
     async updateUserinfo() {
         if (!AV.User.current()) {
             // 未登录
@@ -105,12 +101,13 @@ class KlogDataUser extends PolymerElement {
             composed: true,
             detail: { userdata }
         }));
+        this.userdata = userdata;
         return userdata;
     }
 
     async login(email, password) {
         await AV.User.logIn(email, password);
-        return this.load();
+        return this.updateUserinfo();
     }
 
     async resetPassword(email) {
@@ -128,6 +125,10 @@ class KlogDataUser extends PolymerElement {
         await this._initUser(password);
     }
 
+    _generateDisplayName() {
+        return ['Wind', 'Wood', 'Water', 'Fire', 'Earth'][Math.floor(Math.random() * 4 + 1)] + Math.floor(Math.random() * 8999 + 1000);
+    }
+
     // User init
     async _initUser(p) {
         await this.update({
@@ -138,7 +139,7 @@ class KlogDataUser extends PolymerElement {
                 value: ['channel-default', 'author-user-self', 'reply-user-self', 'mention-user-self']
             },
             displayName: {
-                value: ['Wind', 'Wood', 'Water', 'Fire', 'Earth'][Math.floor(Math.random() * 4 + 1)] + Math.floor(Math.random() * 8999 + 1000),
+                value: this._generateDisplayName(),
                 publicRead: true
             },
             avatarUrl: {
@@ -165,7 +166,7 @@ class KlogDataUser extends PolymerElement {
         publicinfo.set('userId', _user.id);
         _user.set('publicinfo', publicinfo);
         await _user.save();
-        return this.load();
+        return this.updateUserinfo();
     }
 
     logout() {
