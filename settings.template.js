@@ -1,7 +1,7 @@
 const appId = '';
 const appKey = '';
 const buildDirectory = '';
-const version = '2.23.1';
+const version = '2.24.0';
 
 exports.appId = appId;
 exports.appKey = appKey;
