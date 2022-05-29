@@ -401,7 +401,9 @@ class KlogDataEditor extends KlogDataMessageMixin(PolymerElement) {
         article.set('topic', topic);
         if (this.quiet) {
             console.log('Updated in quite mode.');
-            labels.push('keep-timeline-time');
+        } else {
+            labels.push('update-timeline-time');
+            labels.push('update-article-time');
         }
         article.set('label', labels.join(','));
         // save article
