@@ -171,9 +171,10 @@ class KlogArticle extends KlogDataMessageMixin(KlogUiMixin(PolymerElement)) {
         this._scrollHandler = () => {
             // fab
             // this.fabExtended = !this.mobile;
+            let y = this.$.scrollTarget.scrollTop;
             let safeareaTop = parseInt(getComputedStyle(this).getPropertyValue('--safe-area-inset-top')) || 0;
             let top = this.shadowRoot.querySelector('.comment-container').getBoundingClientRect().top;
-            if (top != 0 && top + 60 - safeareaTop <= window.innerHeight) {
+            if (y > 32 && top != 0 && top + 60 - safeareaTop <= window.innerHeight) {
                 // fab.style.transform = 'translateY(88px)';
                 this.$.appBar.opened = false;
                 this.$.appBar.fabOpened = false;

@@ -176,7 +176,7 @@ class KlogTimeline extends PolymerElement {
             this.timelineUpdated(false);
         } else {
             await this.$.data.load();
-            const token = x => x.objectId + x.updatedAt + x.title + x.path + x.text;
+            const token = x => x.objectId + x.updatedTime + x.title + x.path + x.text;
             let newList = this._calculateCards(this.list);
             if (this._cards.length > 0 && newList.length > 0 && token(newList[0]) != token(this._cards[0])) {
                 this.updateButtonHidden = false;
