@@ -2,65 +2,64 @@
 <html lang="zh-Hans">
 
 <head>
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <title>Klog</title>
-  <meta name="description" content="Share everything.">
-  <meta charset="utf-8">
-  <base href="{{GLOBAL_BASE}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>Klog</title>
+    <meta name="description" content="Share everything.">
+    <meta charset="utf-8">
+    <base href="{{GLOBAL_BASE}}">
 
-  <!-- Web App -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#212121" id="themeColor">
-  <link rel="manifest" href="manifest.json">
+    <!-- Web App -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#212121" id="themeColor">
+    <link rel="manifest" href="manifest.json">
 
-  <!-- For Apple -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="Klog">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Klog">
-  <link rel="shortcut icon" href="static/favicon.ico" />
-  <link rel="bookmark" href="static/favicon.ico" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="static/img/klog/klogapple.png">
-  <link rel="apple-touch-icon-precomposed" href="static/img/klog/klogapple.png">
+    <!-- For Apple -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Klog">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Klog">
+    <link rel="shortcut icon" href="static/favicon.ico" />
+    <link rel="bookmark" href="static/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="static/img/klog/klogapple.png">
+    <link rel="apple-touch-icon-precomposed" href="static/img/klog/klogapple.png">
 
-  <!-- For Android -->
-  <link rel="manifest" href="manifest.json">
+    <!-- For Android -->
+    <link rel="manifest" href="manifest.json">
 
-  <!--Style-->
-  <style>
-    html {
-      height: 100%;
-      width: 100%;
-      background-color: #000;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, Roboto, "Nimbus Sans L", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
-      font-size: 14px;
-      line-height: 1.7;
-      min-height: 100%;
-      width: 100%;
-      overscroll-behavior-y: none;
-    }
-
-    body[unresolved] klog-app {
-      display: none;
-    }
-  </style>
-  <script src="./node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js" async></script>
-  <script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" async></script>
-  <script src="https://code.bdstatic.com/npm/leancloud-storage@4.12.0/dist/av-min.js"></script>
-  <script type="module">
-    (async () => { /* LeanClouds * appId and appKey will be replaced by app.js */ const appId = '{{GLOBAL_APPID}}'; const appKey = '{{GLOBAL_APPKEY}}'; await AV.init({ appId, appKey }); await import('./src/framework/klog-app.js');
-    })();
-  </script>
+    <!--Style-->
+    <style>
+        html {
+            height: 100%;
+            width: 100%;
+            background-color: #000;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            margin: 0;
+            font-family: -apple-system, Roboto, "Nimbus Sans L", "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+            font-size: 14px;
+            line-height: 1.7;
+            min-height: 100%;
+            width: 100%;
+            overscroll-behavior-y: none;
+        }
+        
+        body[unresolved] klog-app {
+            display: none;
+        }
+    </style>
+    <script src="./node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js" async></script>
+    <script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" async></script>
+    <script src="https://code.bdstatic.com/npm/leancloud-storage@4.12.0/dist/av-min.js"></script>
+    <script type="module">
+        (async () => { /* LeanClouds * appId and appKey will be replaced by app.js */ const appId = '{{GLOBAL_APPID}}'; const appKey = '{{GLOBAL_APPKEY}}'; await AV.init({ appId, appKey, serverURL:"https://lc.klog.app" }); await import('./src/framework/klog-app.js');
+        })();
+    </script>
 </head>
 
 <body>
-  <klog-app></klog-app>
+    <klog-app></klog-app>
 </body>
 
 </html>
