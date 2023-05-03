@@ -20,10 +20,15 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 sudo usermod -aG docker $USER
 
-# sudo sysctl -w net.ipv4.ip_forward=1
-# sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 3000
-# sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3000
-# sudo iptables-save > /etc/iptables/rules.v4
+sudo apt-get install firewalld
+sudo systemctl enable firewalld
+sudo systemctl start firewalld
+
+sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=443/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=3000/tcp --permanent
+sudo firewall-cmd --reload
+# sudo firewall-cmd --list-all
 
 sudo cp scripts/service/start_klog.sh /usr/bin/start_klog.sh
 sudo chmod +x /usr/bin/start_klog.sh
@@ -32,3 +37,15 @@ sudo chmod 644 /etc/systemd/system/klog.service
 sudo systemctl start klog
 sudo systemctl enable klog
 # sudo systemctl status klog
+
+sudo snap install core; sudo snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo snap set certbot trust-plugin-with-root=ok
+sudo snap install certbot-dns-cloudflare
+sudo certbot certonly \
+  --dns-cloudflare \
+  --dns-cloudflare-credentials /home/ubuntu/klog_secret/token \
+  -d klog.app \
+  -d *.krrr.party
+sudo certbot renew --dry-run

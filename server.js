@@ -24,8 +24,8 @@ if (!settings.tls) {
         maxParamLength: 200,
         https: {
             allowHTTP1: true,
-            key: fs.readFileSync(settings.certDirectory + '/fullchain.pem'),
-            cert: fs.readFileSync(settings.certDirectory + '/privkey.pem')
+            key: fs.readFileSync(settings.certDirectory + '/fullchain1.pem'),
+            cert: fs.readFileSync(settings.certDirectory + '/privkey1.pem')
         }
     };
     const http2server = app(fastify(opt));
