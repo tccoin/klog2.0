@@ -1,9 +1,6 @@
-const appId = '';
-const appKey = '';
-const buildDirectory = '';
-const version = '2.24.0';
-
-exports.appId = appId;
-exports.appKey = appKey;
-exports.buildDirectory = buildDirectory;
-exports.version = version;
+exports.tls = false;
+exports.appId = '';
+exports.appKey = '';
+exports.storageDirectory = 'storage';
+exports.certDirectory = 'cert';
+exports.version = '2.25.0';

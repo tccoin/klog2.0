@@ -5,19 +5,20 @@ const md5File = require('md5-file');
 const uploader = require('huge-uploader-nodejs');
 const fs = require('fs');
 const mime = require('mime-types');
+const settings = require('../settings');
 
 // upload params
 const maxFileSize = 100;
 const maxChunkSize = 20;
 
-module.exports = function(app, opts, next) {
+module.exports = function (app, opts, next) {
     // upload test
     app.get('/test', (request, reply, next) => {
         reply
             .header('Content-Type', 'text/html; charset=UTF-8')
             .send('<form action="/upload" method="post" enctype="multipart/form-data"><input type="file" name="file" /><input type="submit" value="submit"></form>');
     });
- 
+
     app.options('/', (request, reply, next) => {
         reply.header('Access-Control-Allow-Origin', '*');
         reply.header('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -25,7 +26,7 @@ module.exports = function(app, opts, next) {
         reply.header('Access-Control-Max-Age', '86400');
         reply.send('');
     });
-     
+
     app.post('/', async (request, reply, next) => {
         reply.header('Access-Control-Allow-Origin', '*');
         reply.header('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -34,19 +35,25 @@ module.exports = function(app, opts, next) {
 
         // process file name
         try {
-            let tmpPath = 'pan/upload_tmp';
+            let tmpPath = settings.storageDirectory + '/upload_tmp';
+            if (!fs.existsSync(tmpPath)) {
+                fs.mkdirSync(tmpPath);
+            }
             // request.pipe = target=>target.send(request.raw);
             let assembleChunks = await uploader(request.raw, tmpPath, maxFileSize, maxChunkSize);
             if (assembleChunks) {
                 assembleChunks()
-                    .then(data =>{
-                        // { filePath: 'tmp/1528932277257', postParams: { email: 'upload@corp.com', name: 'Mr Smith' } }
+                    .then(data => {
                         // change file name
                         let bucketname = data.postParams.bucketname || 'drive';
                         let filename = data.postParams.name || 'test';
                         let key = decodeURIComponent(filename).replace(/[\(\)]/g, '');
                         let hash = md5File.sync(data.filePath);
-                        let newPath = `pan/${bucketname}/${hash}/`;
+                        let bucketPath = `${settings.storageDirectory}/${bucketname}`;
+                        let newPath = `${bucketPath}/${hash}/`;
+                        if (!fs.existsSync(bucketPath)) {
+                            fs.mkdirSync(bucketPath);
+                        }
                         if (!fs.existsSync(newPath)) {
                             fs.mkdirSync(newPath);
                         }
@@ -71,8 +78,8 @@ module.exports = function(app, opts, next) {
             reply.code(500);
             reply.send(error.message);
         }
-     
+
     });
-     
+
     next();
 };

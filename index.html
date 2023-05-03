@@ -53,8 +53,7 @@
     <script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" async></script>
     <script src="https://code.bdstatic.com/npm/leancloud-storage@4.12.0/dist/av-min.js"></script>
     <script type="module">
-        (async () => { /* LeanClouds * appId and appKey will be replaced by app.js */ const appId = '{{GLOBAL_APPID}}'; const appKey = '{{GLOBAL_APPKEY}}'; await AV.init({ appId, appKey, serverURL:"https://lc.klog.app" }); await import('./src/framework/klog-app.js');
-        })();
+        window.klogVersion = '{{GLOBAL_VERSION}}'; const appId = '{{GLOBAL_APPID}}'; const appKey = '{{GLOBAL_APPKEY}}'; AV.init({ appId, appKey, serverURL: "https://lc.klog.app" }); import ('./src/framework/klog-app.js');
     </script>
 </head>
 

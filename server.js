@@ -9,7 +9,7 @@ const settings = require('./settings');
 
 if (!settings.tls) {
     const httpserver = app(fastify({ maxParamLength: 200 }));
-    httpserver.listen(3001, '0.0.0.0', (err, address) => {
+    httpserver.listen(3000, '0.0.0.0', (err, address) => {
         if (err) {
             console.log(err);
             process.exit(1);
@@ -24,18 +24,8 @@ if (!settings.tls) {
         maxParamLength: 200,
         https: {
             allowHTTP1: true,
-            key: fs.readFileSync('certs/krrr.party/krrr.party.key'),
-            cert: fs.readFileSync('certs/krrr.party/krrr.party.crt'),
-            SNICallback: (servername, callback) => {
-                if (servername === 'klog.app') {
-                    let ctx = tls.createSecureContext({
-                        key: fs.readFileSync('certs/klog.app/klog.app.key'),
-                        cert: fs.readFileSync('certs/klog.app/klog.app.crt')
-                    });
-                    return callback(null, ctx);
-                }
-                return callback();
-            }
+            key: fs.readFileSync(settings.certDirectory + '/fullchain.pem'),
+            cert: fs.readFileSync(settings.certDirectory + '/privkey.pem')
         }
     };
     const http2server = app(fastify(opt));

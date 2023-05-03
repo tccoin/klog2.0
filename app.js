@@ -1,9 +1,11 @@
 const routes = require('./routes/router');
 const fs = require('fs');
 const settings = require('./settings');
+const path = require('path');
 
 // environment
-console.log('static directory: ', settings.staticDir);
+let staticDir = path.join(__dirname, 'build');
+console.log('static directory: ', staticDir);
 
 // set response header
 swHeader = (request, reply, done) => {
@@ -13,10 +15,10 @@ swHeader = (request, reply, done) => {
 };
 
 module.exports = (app) => {
-    app.addContentTypeParser('multipart', (req, payload, done)=>{
+    app.addContentTypeParser('multipart', (req, payload, done) => {
         done();
     });
-    app.register(require('fastify-static'), { root: settings.staticDir });
+    app.register(require('fastify-static'), { root: staticDir });
     app.register(require('fastify-compress'));
     app.addHook('preHandler', swHeader);
     routes(app);

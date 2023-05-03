@@ -8,8 +8,11 @@ const sharp = require('sharp');
 const OptiPng = require('optipng');
 const stream = require('stream');
 const Vibrant = require('node-vibrant');
-const materialDynamicColors = require('material-dynamic-colors');
-  
+const settings = require('../settings');
+(async () => {
+    materialDynamicColors = await import("material-dynamic-colors");
+})();
+
 const sendStream = (request, reply, filePath) => {
     let stat = fs.statSync(filePath);
     // json type
@@ -18,21 +21,21 @@ const sendStream = (request, reply, filePath) => {
     }
     // cross-origin
     reply.header('Access-Control-Allow-Origin', '*');
-  
+
     // range
     const rawrange = request.raw.headers.range;
     let streamOption = {};
     if (rawrange) {
         let chunkSize = 2 * 1024 * 1024;//2 * 1024
         let range = rawrange.replace(/bytes=/, '').split('-');
-  
+
         range[0] = range[0] ? parseInt(range[0], 10) : 0;
         range[1] = range[1] ? parseInt(range[1], 10) : range[0] + chunkSize;
         if (range[1] > stat.size - 1) {
             range[1] = stat.size - 1;
         }
         streamOption = { start: range[0], end: range[1] };
-  
+
         reply.code(206);
         reply.headers({
             'Accept-Ranges': 'bytes',
@@ -60,10 +63,10 @@ const sendStream = (request, reply, filePath) => {
         let stream = fs.createReadStream(filePath, streamOption);
         reply.send(stream);
     }
-  
+
 };
-  
-const getPixels = async (image, channels)=>{
+
+const getPixels = async (image, channels) => {
     const data = await image.raw().toBuffer();
     let pixels = [];
     for (let i = 0; i < data.length; i += channels) {
@@ -73,10 +76,10 @@ const getPixels = async (image, channels)=>{
     }
     return pixels;
 };
-  
+
 const sendImage = async (request, reply, filePath, query) => {
     // mode: <=5: return image, >5: return info
-  
+
     // resolve the params
     let srcParams = query.match(/(?:View2|Magic)\/([0-9])(.*)/);
     if (!srcParams) {
@@ -98,13 +101,13 @@ const sendImage = async (request, reply, filePath, query) => {
             else params[key] = max(parseInt(value), 0);
         }
     }
-  
+
     // input image
     let image = sharp(filePath);
     let metadata = await image.metadata();
     let _w = metadata.width;
     let _h = metadata.height;
-  
+
     // decide the format
     let acceptWebp = request.headers.accept.indexOf('image/webp') > -1;
     let outputFormat = metadata.format;
@@ -114,10 +117,9 @@ const sendImage = async (request, reply, filePath, query) => {
         if (mode == 1) outputFormat = 'jpeg';
     }
     if (mode > 5) outputFormat = 'json';
-  
+
     // cache
-    // let filePath = path.join('pan', request.params.bucketname, request.params.hash || '', unicode2utf8(request.params.key));
-    let cachePath = path.join('pan', 'cache', request.params.bucketname + '.' + (request.params.hash || '') + '.' + unicode2utf8(request.params.key) + '.' + `${mode}${params['w']}${params['h']}${params['q']}.${outputFormat}`);
+    let cachePath = path.join(settings.storageDirectory, 'cache', request.params.bucketname + '.' + (request.params.hash || '') + '.' + unicode2utf8(request.params.key) + '.' + `${mode}${params['w']}${params['h']}${params['q']}.${outputFormat}`);
     if (fs.existsSync(cachePath)) {
         let size = await fs.statSync(cachePath).size;
         if (size != 0) {
@@ -125,7 +127,7 @@ const sendImage = async (request, reply, filePath, query) => {
             return;
         }
     }
-  
+
     if (mode > 5) {
         // info mode
         params['q'] = params['q'] || 64;
@@ -135,7 +137,7 @@ const sendImage = async (request, reply, filePath, query) => {
         const start = Date.now();
         if (mode == 6) {
             console.log('LOG Generating palette[old]...');
-            let samplePath = path.join('pan', 'cache', request.params.bucketname + '.' + (request.params.hash || '') + '.' + unicode2utf8(request.params.key) + '.' + `vibrantsample${params['q']}.jpg`);
+            let samplePath = path.join(settings.storageDirectory, 'cache', request.params.bucketname + '.' + (request.params.hash || '') + '.' + unicode2utf8(request.params.key) + '.' + `vibrantsample${params['q']}.jpg`);
             await sample.toFile(samplePath);
             let vibrant = new Vibrant(samplePath, { maxDimension: 64 });
             let palette = await vibrant.getPalette();
@@ -186,7 +188,7 @@ const sendImage = async (request, reply, filePath, query) => {
             image = sharp(await image.resize(params['q']).toBuffer())
                 .resize(params['w'], null, { kernel: 'nearest' });
         }
-  
+
         //convert
         let outputStream = new stream.PassThrough();
         if (outputFormat == 'webp') {
@@ -211,10 +213,10 @@ const sendImage = async (request, reply, filePath, query) => {
         });
         outputStream.pipe(cacheStream);
     }
-  
+
 };
-  
-  
+
+
 const unicode2utf8 = str => {
     let result = '';
     while (true) {
@@ -229,17 +231,17 @@ const unicode2utf8 = str => {
     }
     return result;
 };
-  
+
 const router = function (app, opts, next) {
     const storageRouter = (request, reply, next) => {
-        let filePath = path.join('pan', request.params.bucketname, request.params.hash || '', unicode2utf8(request.params.key));
+        let filePath = path.join(settings.storageDirectory, request.params.bucketname, request.params.hash || '', unicode2utf8(request.params.key));
         if (fs.existsSync(filePath)) {
             let mimeType = mime.lookup(filePath) || 'unknown';
             let query = request.raw.url.match(/\?(.*)/);
             query = query ? query[1] : '';
             console.log('LOG download file ', `[${query}]`, filePath);
             reply.header('content-type', mimeType);
-            let isImage = mimeType.indexOf('image') > -1 && !(['svg', 'bmp'].find(x=>mimeType.indexOf(x) > -1));
+            let isImage = mimeType.indexOf('image') > -1 && !(['svg', 'bmp'].find(x => mimeType.indexOf(x) > -1));
             let hasMagic = query.indexOf('imageView2') > -1 || query.indexOf('Magic') > -1;
             if (query && isImage && hasMagic) {
                 sendImage(request, reply, filePath, query);
@@ -260,5 +262,5 @@ const router = function (app, opts, next) {
     app.get('/:bucketname/:hash/:key', storageRouter);
     next();
 };
-  
+
 module.exports = router;
