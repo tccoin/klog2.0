@@ -1,0 +1,9 @@
+[Unit]
+Description=KLOOOOOOOG
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /usr/bin/start_klog.sh
+
+[Install]
+WantedBy=multi-user.target

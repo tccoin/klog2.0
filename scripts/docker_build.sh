@@ -1,0 +1,1 @@
+docker build --tag tccoin/klog2.0 .
