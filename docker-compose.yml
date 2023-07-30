@@ -7,7 +7,7 @@ services:
         volumes:
             - ./settings.js:/app/settings.js
             - ./storage:/app/storage
-            - /etc/letsencrypt/archive/klog.app:/app/cert
+            - /etc/letsencrypt/live/klog.app:/app/cert
         entrypoint: [ "yarn", "run", "serve" ]
         expose:
             - 3000
