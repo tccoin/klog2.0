@@ -17,7 +17,7 @@ import '../ui/klog-icons.js';
 
 class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
     static get template() {
-        return html `
+        return html`
     <style include="klog-style-layout"></style>
     <style include="klog-style-card"></style>
     <style>
@@ -114,7 +114,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
                         short: false,
                         shadow: 'off'
                     },
-                    toolbar: html `
+                    toolbar: html`
       <app-toolbar>
         <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
         <div class="title">
@@ -199,7 +199,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
         if (this.list.length > 0) {
             this.articleId = this.pop('list').objectId;
             await this.loadArticle(false);
-            for (let image of this.article.attachments.filter(x=>x.image)) {
+            for (let image of this.article.attachments.filter(x => x.image)) {
                 if (this.$.image.isKlogStorage(image.url)) {
                     let retry = 0;
                     while (retry < 3) {
@@ -209,7 +209,7 @@ class KlogLab extends KlogUiMixin(KlogDataMessageMixin(PolymerElement)) {
                         } catch (error) {
                             retry += 1;
                             console.log(error);
-                            await new Promise(resolve=>setTimeout(resolve, 500));
+                            await new Promise(resolve => setTimeout(resolve, 500));
                         }
                     }
                 }

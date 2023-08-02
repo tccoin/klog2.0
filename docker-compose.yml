@@ -8,6 +8,7 @@ services:
             - ./settings.js:/app/settings.js
             - ./storage:/app/storage
             - /etc/letsencrypt/live/klog.app:/app/cert
+            - /etc/letsencrypt/archive/klog.app:/archive/klog.app
         entrypoint: [ "yarn", "run", "serve" ]
         expose:
             - 3000
@@ -31,3 +32,4 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
         restart: always
+        command: --interval 10

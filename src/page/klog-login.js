@@ -11,7 +11,7 @@ import '../ui/klog-input.js';
 
 class KlogLogin extends KlogUiMixin(PolymerElement) {
     static get template() {
-        return html `
+        return html`
     <style include="klog-style-login"></style>
     <app-localstorage-document key="email" data="{{email}}"></app-localstorage-document>
     <div class="login-card">
@@ -74,7 +74,7 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
                         '--klog-page-background': 'var(--surface)',
                         '--klog-header-opacity': 0.8
                     },
-                    toolbar: html `
+                    toolbar: html`
               <app-toolbar>
                 <paper-icon-button icon="menu" name="drawer-button"></paper-icon-button>
                 <div class="title">
@@ -131,7 +131,7 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
         this.title = 'loading';
         this.userHandler.login(this.email, this.password).then(() => {
             this.title = 'success';
-            setTimeout(()=>this.back(), 200);
+            setTimeout(() => this.back(), 200);
         }, () => {
             this.title = 'error';
         });
@@ -139,11 +139,13 @@ class KlogLogin extends KlogUiMixin(PolymerElement) {
 
     back() {
         if (this.lastHash && !this._inHash(this.lastHash, ['login', 'signup'])) {
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true,
+            this.dispatchEvent(new CustomEvent('app-load', {
+                bubbles: true, composed: true,
                 detail: { page: this.lastHash }
             }));
         } else {
-            this.dispatchEvent(new CustomEvent('app-load', { bubbles: true, composed: true,
+            this.dispatchEvent(new CustomEvent('app-load', {
+                bubbles: true, composed: true,
                 detail: { page: 'timeline' }
             }));
         }

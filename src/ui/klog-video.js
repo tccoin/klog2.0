@@ -3,7 +3,7 @@ import '@polymer/paper-ripple/paper-ripple.js';
 
 class KlogVideo extends PolymerElement {
     static get template() {
-        return html `
+        return html`
     <style>
       :host {
         display: block;
@@ -69,14 +69,14 @@ class KlogVideo extends PolymerElement {
     </style>
     <div class="tips" hidden="{{!playable}}">
       <span hidden="{{!mobile}}" for="paused">轻触此处开始播放<br></span>
-      <span hidden="{{!mobile}}">双击静音</span>
+      <!--<span hidden="{{!mobile}}">双击静音</span>-->
       <span hidden="{{mobile}}" for="paused">移入鼠标开始播放</span>
     </div>
     <div class="tips" hidden="{{playable}}">
       <span>加载中...</span>
     </div>
-    <video id="video" preload="metadata" loop="" playsinline="">
-      <source src="{{_src}}" type="video/mp4">
+    <video id="video" preload="metadata" loop="{{!mobile}}" playsinline>
+      <source src="{{_src}}#t=0.001" type="video/mp4">
     </video>
     <paper-ripple></paper-ripple>
     <div id="bg"></div>
@@ -128,8 +128,8 @@ class KlogVideo extends PolymerElement {
         this.$.video.addEventListener('playing', () => this.updatePaused());
         this.$.video.addEventListener('pause', () => this.updatePaused());
         this.$.video.addEventListener('playing', () => this.playingHandle());
-        this.$.video.addEventListener('canplay', () => { this.playable = true; });
-        this.$.video.addEventListener('waiting', () => { this.playable = false; });
+        this.$.video.addEventListener('loadedmetadata', () => { this.playable = true; });
+        // this.$.video.addEventListener('waiting', () => { this.playable = false; });
         this.updatePlaceholder();
         if (!this.lazy) {
             this.lazyload();
@@ -218,7 +218,7 @@ class KlogVideo extends PolymerElement {
             let mediaWidth = getComputedStyle(this).getPropertyValue('--klog-media-width');
             let maxWidth = parseInt(mediaWidth);
             let w, h;
-            w = mediaWidth ? maxWidth : this.offsetWidth;
+            w = mediaWidth ? maxWidth : window.innerWidth;
             h = w / 16 * 9;
             this.$.bg.style.width = `${w}px`;
             this.$.bg.style.height = `${h}px`;
@@ -240,7 +240,7 @@ class KlogVideo extends PolymerElement {
             this.$.video.style.position = 'relative';
         };
         if (!this.playable) {
-            await new Promise(resolve => this.$.video.addEventListener('canplay', resolve, { once: true }));
+            await new Promise(resolve => this.$.video.addEventListener('loadedmetadata', resolve, { once: true }));
         }
         loadHandle();
     }
